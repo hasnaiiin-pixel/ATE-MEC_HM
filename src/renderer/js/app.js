@@ -4634,7 +4634,7 @@ function printTraceabilitySerialHistory(){
   html += tests.map(r=>`<tr><td>${escapeHtml(new Date(r.timestamp).toLocaleString('it-IT'))}</td><td class="${String(r.final_result||'').toLowerCase()}">${escapeHtml(r.final_result||'')}</td><td>${escapeHtml(r.recipe_name||'')}</td><td>${escapeHtml(r.recipe_version||'')}</td><td>${escapeHtml(r.lot_number||r.work_order||'')}</td><td>${escapeHtml(r.operator||'')}</td><td>${escapeHtml(r.repair_note||'')}</td></tr>`).join('') || '<tr><td colspan="7">Nessun test.</td></tr>';
   html += '</tbody></table><h2>Riparazioni</h2><table><thead><tr><th>Data</th><th>Lotto</th><th>Operatore</th><th>Intervento</th></tr></thead><tbody>';
   html += repairs.map(r=>`<tr><td>${escapeHtml(new Date(r.timestamp).toLocaleString('it-IT'))}</td><td>${escapeHtml(r.lot_number||r.work_order||'')}</td><td>${escapeHtml(r.operator||'')}</td><td>${escapeHtml(r.repair_note||'')}</td></tr>`).join('') || '<tr><td colspan="4">Nessuna riparazione.</td></tr>';
-  html += '</tbody></table><p style="margin-top:22px;font-size:11px">Generato da AT-MEC HM 4.12C</p></body></html>';
+  html += '</tbody></table><p style="margin-top:22px;font-size:11px">Generato da AT-MEC HM 4.12D</p></body></html>';
   const w=window.open('', '_blank');
   if(!w){ downloadTextFile(`storico_seriale_${serial}.html`, html, 'text/html'); return; }
   w.document.write(html); w.document.close(); setTimeout(()=>{ try{ w.print(); }catch{} }, 350);
@@ -4737,7 +4737,7 @@ function printUnitGenealogy410E(){
   html+=tests.map((r,i)=>`<tr><td>${i+1}</td><td>${escapeHtml(unitDate410E(r.timestamp))}</td><td class="${String(r.final_result||'').toLowerCase()}">${escapeHtml(r.final_result||'')}</td><td>${escapeHtml(r.recipe_name||'')}</td><td>${escapeHtml(r.recipe_version||'')}</td><td>${escapeHtml(r.operator||'')}</td><td>${escapeHtml(r.repair_note||'')}</td></tr>`).join('') || '<tr><td colspan="7">Nessun test.</td></tr>';
   html+='</tbody></table><h2>Riparazioni</h2><table><thead><tr><th>#</th><th>Data</th><th>Lotto</th><th>Operatore</th><th>Intervento</th></tr></thead><tbody>';
   html+=repairs.map((r,i)=>`<tr><td>${i+1}</td><td>${escapeHtml(unitDate410E(r.timestamp))}</td><td>${escapeHtml(r.lot_number||r.work_order||'')}</td><td>${escapeHtml(r.operator||'')}</td><td>${escapeHtml(r.repair_note||'')}</td></tr>`).join('') || '<tr><td colspan="5">Nessuna riparazione.</td></tr>';
-  html+='</tbody></table><p style="margin-top:22px;font-size:11px">Generato da AT-MEC HM 4.12C</p></body></html>';
+  html+='</tbody></table><p style="margin-top:22px;font-size:11px">Generato da AT-MEC HM 4.12D</p></body></html>';
   const w=window.open('', '_blank');
   if(!w){ downloadTextFile(`scheda_unita_${serial}.html`, html, 'text/html'); return; }
   w.document.write(html); w.document.close(); setTimeout(()=>{ try{ w.print(); }catch{} },350);
@@ -4756,10 +4756,30 @@ function atmecReportHeader410J(title, subtitle=''){
 }
 function atmecReportStyle410J(){
   return `<style>
-    body{font-family:Arial,Helvetica,sans-serif;padding:26px;color:#111;background:#fff} h1{font-size:20px;margin:0 0 4px 0} h2{font-size:15px;margin:20px 0 8px 0} table{width:100%;border-collapse:collapse;margin-top:10px}td,th{border:1px solid #999;padding:6px;font-size:12px;vertical-align:top}th{background:#f1f3f6;text-align:left}.pass{color:green;font-weight:bold}.fail{color:red;font-weight:bold}.muted{color:#666;font-size:11px}.atmec-print-header{display:grid;grid-template-columns:120px 1fr 120px;gap:18px;align-items:center;border-bottom:2px solid #202538;padding-bottom:12px;margin-bottom:18px}.atmec-print-logo-box{height:68px;display:flex;align-items:center;justify-content:center;background:#fff;border:1px solid #e4e7ee;border-radius:10px;padding:6px}.atmec-print-logo-box img{max-width:100%;max-height:56px;object-fit:contain}.atmec-print-title{text-align:center}.atmec-print-title div{font-size:12px;color:#555}.atmec-print-footer{margin-top:22px;border-top:1px solid #ddd;padding-top:8px;font-size:11px;color:#666;display:flex;justify-content:space-between;gap:12px}@media print{body{padding:14mm}.atmec-print-header{break-inside:avoid}}
+    body{font-family:Arial,Helvetica,sans-serif;padding:26px;color:#111827;background:#fff} h1{font-size:20px;margin:0 0 4px 0} h2{font-size:15px;margin:20px 0 8px 0;color:#111827;border-bottom:1px solid #e5e7eb;padding-bottom:4px} table{width:100%;border-collapse:collapse;margin-top:10px;page-break-inside:auto}tr{page-break-inside:avoid;page-break-after:auto}td,th{border:1px solid #d0d5dd;padding:7px;font-size:12px;vertical-align:top}th{background:#f3f4f6;text-align:left;color:#374151}.pass{color:#087443;font-weight:bold}.fail{color:#b42318;font-weight:bold}.done{color:#175cd3;font-weight:bold}.muted{color:#667085;font-size:11px}.atmec-print-header{display:grid;grid-template-columns:120px 1fr 120px;gap:18px;align-items:center;border-bottom:2px solid #202538;padding-bottom:12px;margin-bottom:18px}.atmec-print-logo-box{height:68px;display:flex;align-items:center;justify-content:center;background:#fff;border:1px solid #e4e7ee;border-radius:10px;padding:6px}.atmec-print-logo-box img{max-width:100%;max-height:56px;object-fit:contain}.atmec-print-title{text-align:center}.atmec-print-title div{font-size:12px;color:#555}.atmec-print-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:14px 0}.atmec-print-card{border:1px solid #d0d5dd;border-radius:10px;padding:9px;background:#f9fafb}.atmec-print-card b{display:block;font-size:16px}.atmec-print-footer{margin-top:22px;border-top:1px solid #ddd;padding-top:8px;font-size:11px;color:#666;display:flex;justify-content:space-between;gap:12px}.signature-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:24px}.signature-box{border:1px solid #d0d5dd;border-radius:10px;padding:12px;height:62px}.signature-line{border-bottom:1px solid #98a2b3;margin-top:28px}@media print{body{padding:14mm}.atmec-print-header,.atmec-print-summary,.signature-grid{break-inside:avoid}}
   </style>`;
 }
 
+
+function atmecPrintMeasureCell412D(step){
+  const unit=step?.unit||'';
+  const measured=(step?.measured!==undefined&&step?.measured!==null)?String(step.measured)+(unit?' '+unit:''):'N/D';
+  const target=(step?.target!==undefined&&step?.target!==null)?String(step.target)+(unit?' '+unit:''):'';
+  const min=(step?.min!==undefined&&step?.min!==null)?String(step.min)+(unit?' '+unit:''):'';
+  const max=(step?.max!==undefined&&step?.max!==null)?String(step.max)+(unit?' '+unit:''):'';
+  const tol=(step?.tolerance!==undefined&&step?.tolerance!==null)?'±'+String(step.tolerance)+(unit?' '+unit:''):'';
+  return [
+    '<b>Misurato:</b> '+escapeHtml(measured),
+    target?'<b>Atteso:</b> '+escapeHtml(target):'',
+    (min||max)?'<b>Range:</b> '+escapeHtml(min||'N/D')+' → '+escapeHtml(max||'N/D'):'',
+    tol?'<b>Tol:</b> '+escapeHtml(tol):'',
+    step?.measurement_source?'<b>Origine:</b> '+escapeHtml(step.measurement_source):'',
+    step?.measurement_device?'<b>Device:</b> '+escapeHtml(step.measurement_device):''
+  ].filter(Boolean).join('<br>');
+}
+function atmecReportFooter412D(){
+  return `<div class="signature-grid"><div class="signature-box"><b>Firma operatore</b><div class="signature-line"></div></div><div class="signature-box"><b>Approvazione qualità</b><div class="signature-line"></div></div></div>${atmecReportFooter412D()}`;
+}
 // Sovrascrittura conservativa export storico da pagina Test Report/Audit: stessa logica, solo header loghi.
 function exportSerialHistoryPdf() {
   const serial = document.getElementById('audit-serial')?.value?.trim() || document.getElementById('serial-history-input')?.value?.trim() || getSerialDutRaw();
@@ -4771,7 +4791,7 @@ function exportSerialHistoryPdf() {
   html += atmecReportHeader410J('AT-MEC HM - Storico scheda e riparazioni', `<b>Seriale:</b> ${escapeHtml(serial)} &nbsp; <b>Commessa/Lotto:</b> ${escapeHtml(lot || 'Tutte')}`);
   html += `<table><thead><tr><th>Data</th><th>Esito</th><th>Ricetta</th><th>Rev</th><th>Operatore</th><th>Riparazione / Intervento</th></tr></thead><tbody>`;
   html += rows.map(r => `<tr><td>${new Date(r.timestamp).toLocaleString('it-IT')}</td><td class="${String(r.final_result).toLowerCase()}">${escapeHtml(r.final_result || '')}</td><td>${escapeHtml(r.recipe_name || '')}</td><td>${escapeHtml(String(r.recipe_version || ''))}</td><td>${escapeHtml(r.operator || '')}</td><td>${escapeHtml(r.repair_note || '')}</td></tr>`).join('') || '<tr><td colspan="6">Nessun record trovato.</td></tr>';
-  html += `</tbody></table><div class="atmec-print-footer"><span>Generato da AT-MEC HM 4.12C</span><span>${new Date().toLocaleString('it-IT')}</span></div></body></html>`;
+  html += `</tbody></table>${atmecReportFooter412D()}</body></html>`;
   const w = window.open('', '_blank');
   if (!w) { downloadTextFile(`storico_${serial}.html`, html, 'text/html'); return; }
   w.document.write(html); w.document.close(); setTimeout(() => { try { w.print(); } catch {} }, 350);
@@ -4789,7 +4809,7 @@ function printTraceabilitySerialHistory(){
   html += tests.map(r=>`<tr><td>${new Date(r.timestamp).toLocaleString('it-IT')}</td><td>${escapeHtml(r.serial_dut||serial)}</td><td class="${String(r.final_result||'').toLowerCase()}">${escapeHtml(r.final_result||'')}</td><td>${escapeHtml(r.recipe_name||'')}</td><td>${escapeHtml(r.operator||'')}</td><td>${escapeHtml(r.repair_note||'')}</td></tr>`).join('') || '<tr><td colspan="6">Nessun test.</td></tr>';
   html += '</tbody></table><h2>Riparazioni</h2><table><thead><tr><th>Data</th><th>Lotto</th><th>Operatore</th><th>Intervento</th></tr></thead><tbody>';
   html += repairs.map(r=>`<tr><td>${new Date(r.timestamp).toLocaleString('it-IT')}</td><td>${escapeHtml(r.lot_number||r.work_order||'')}</td><td>${escapeHtml(r.operator||'')}</td><td>${escapeHtml(r.repair_note||'')}</td></tr>`).join('') || '<tr><td colspan="4">Nessuna riparazione.</td></tr>';
-  html += `</tbody></table><div class="atmec-print-footer"><span>Generato da AT-MEC HM 4.12C</span><span>${new Date().toLocaleString('it-IT')}</span></div></body></html>`;
+  html += `</tbody></table>${atmecReportFooter412D()}</body></html>`;
   const w=window.open('', '_blank');
   if(!w){ downloadTextFile(`storico_seriale_${serial}.html`, html, 'text/html'); return; }
   w.document.write(html); w.document.close(); setTimeout(()=>{ try{ w.print(); }catch{} }, 350);
@@ -4808,13 +4828,13 @@ function printUnitGenealogy410E(){
   html+=tests.map((r,i)=>`<tr><td>${i+1}</td><td>${escapeHtml(unitDate410E(r.timestamp))}</td><td class="${String(r.final_result||'').toLowerCase()}">${escapeHtml(r.final_result||'')}</td><td>${escapeHtml(r.recipe_name||'')}</td><td>${escapeHtml(r.recipe_version||'')}</td><td>${escapeHtml(r.operator||'')}</td><td>${escapeHtml(r.repair_note||'')}</td></tr>`).join('') || '<tr><td colspan="7">Nessun test.</td></tr>';
   html+='</tbody></table><h2>Riparazioni</h2><table><thead><tr><th>#</th><th>Data</th><th>Lotto</th><th>Operatore</th><th>Intervento</th></tr></thead><tbody>';
   html+=repairs.map((r,i)=>`<tr><td>${i+1}</td><td>${escapeHtml(unitDate410E(r.timestamp))}</td><td>${escapeHtml(r.lot_number||r.work_order||'')}</td><td>${escapeHtml(r.operator||'')}</td><td>${escapeHtml(r.repair_note||'')}</td></tr>`).join('') || '<tr><td colspan="5">Nessuna riparazione.</td></tr>';
-  html+=`</tbody></table><div class="atmec-print-footer"><span>Generato da AT-MEC HM 4.12C</span><span>${new Date().toLocaleString('it-IT')}</span></div></body></html>`;
+  html+=`</tbody></table>${atmecReportFooter412D()}</body></html>`;
   const w=window.open('', '_blank');
   if(!w){ downloadTextFile(`scheda_unita_${serial}.html`, html, 'text/html'); return; }
   w.document.write(html); w.document.close(); setTimeout(()=>{ try{ w.print(); }catch{} },350);
 }
 
-// AT-MEC_HM_4.12C - Analisi Produzione separata.
+// AT-MEC_HM_4.12D - Analisi Produzione separata.
 // Modulo additivo: usa solo getLocalDbStats e non modifica Test Mode, Dashboard, Storico, Scheda Unità o Layout Editor.
 function productionAnalysisFilters412A(){
   return {
@@ -4865,7 +4885,7 @@ async function loadProductionAnalysisDashboard412A(){
     if(status) status.textContent=`KPI aggiornati · ${st.total || 0} test filtrati · DB: ${st.dbPath || 'N/D'}`;
   }catch(e){
     if(status) status.textContent='Errore calcolo KPI: '+normalizeError(e);
-    console.error('[AT-MEC 4.12C] Analisi Produzione', e);
+    console.error('[AT-MEC 4.12D] Analisi Produzione', e);
   }
 }
 function clearProductionAnalysisFilters412A(){
@@ -4875,7 +4895,7 @@ function clearProductionAnalysisFilters412A(){
 }
 
 
-// AT-MEC_HM_4.12C - Archivio Dati & Backup separato.
+// AT-MEC_HM_4.12D - Archivio Dati & Backup separato.
 // Modulo additivo: usa API gia esistenti e non modifica Test Mode, Ricette, Hardware, Layout Editor, Storico o Scheda Unità.
 function archiveFilters412B(){
   return {
@@ -4911,7 +4931,7 @@ async function loadDataArchiveDashboard412B(){
     da412bStatus('da412b-maint-status', `Archivio OK · ${st.total || 0} test · DB: ${st.dbPath || 'N/D'}`);
   }catch(e){
     da412bStatus('da412b-maint-status','Errore archivio: '+normalizeError(e));
-    console.error('[AT-MEC 4.12C] Archivio dati', e);
+    console.error('[AT-MEC 4.12D] Archivio dati', e);
   }
 }
 async function previewDataArchive412B(){
