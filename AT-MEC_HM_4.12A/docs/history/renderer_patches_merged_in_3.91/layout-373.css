@@ -1,0 +1,17 @@
+/* AT-MEC 3.73 - strumenti leggeri sopra 3.72: ricerca, albero, testo/alias, copia proprietà. Non cambia layout/tema da solo. */
+#atmec-layout-373-panel{position:fixed;top:96px;left:14px;z-index:2147483004;display:none;width:390px;max-width:calc(100vw - 24px);max-height:calc(100vh - 120px);overflow:auto;border:1px solid rgba(126,231,255,.38);border-radius:14px;background:rgba(8,14,24,.98);color:#e8f4ff;box-shadow:0 18px 44px rgba(0,0,0,.45);font-family:inherit;font-size:12px}
+#atmec-layout-373-panel .h373{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 11px;background:rgba(126,231,255,.12);cursor:move;font-weight:900;color:#7ee7ff}
+#atmec-layout-373-panel .b373{padding:10px;display:grid;gap:8px}
+#atmec-layout-373-panel label{display:grid;gap:4px;color:#b6c7d9;font-weight:800;font-size:11px}
+#atmec-layout-373-panel input,#atmec-layout-373-panel select,#atmec-layout-373-panel textarea{border:1px solid rgba(255,255,255,.22);border-radius:9px;background:rgba(255,255,255,.08);color:#fff;padding:7px 8px;font-size:12px;font-family:inherit}
+#atmec-layout-373-panel textarea{min-height:48px;resize:vertical}
+#atmec-layout-373-panel button{border:1px solid rgba(255,255,255,.22);border-radius:10px;background:rgba(255,255,255,.08);color:#fff;padding:7px 9px;font-weight:850;cursor:pointer;font-size:11px}
+#atmec-layout-373-panel button.primary{background:linear-gradient(135deg,#00d5ff,#37ffb0);color:#06121d;border-color:rgba(255,255,255,.45)}
+#atmec-layout-373-panel button.warn{background:rgba(255,216,77,.16);border-color:rgba(255,216,77,.45);color:#ffd84d}
+#atmec-layout-373-panel .row{display:flex;gap:6px;flex-wrap:wrap}.row>*{flex:1 1 auto}
+#atmec-layout-373-panel .tree373{max-height:220px;overflow:auto;border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:6px;background:rgba(255,255,255,.04)}
+#atmec-layout-373-panel .tree373 button{display:block;width:100%;text-align:left;margin:2px 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;background:rgba(255,255,255,.05)}
+#atmec-layout-373-panel .tree373 button:hover{background:rgba(126,231,255,.14)}
+#atmec-layout-373-panel .muted{color:#98b6cf;font-size:11px;line-height:1.35}
+#atmec-layout-373-toggle{border:1px solid rgba(126,231,255,.35)!important;background:rgba(126,231,255,.12)!important;color:#dff8ff!important}
+.atmec-layout-found-373{outline:3px solid rgba(55,255,176,.9)!important;outline-offset:3px!important;box-shadow:0 0 0 5px rgba(55,255,176,.18)!important}

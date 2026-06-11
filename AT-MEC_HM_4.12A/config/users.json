@@ -1,0 +1,65 @@
+{
+  "roles": {
+    "Operator": {
+      "permissions": [
+        "run_test"
+      ],
+      "level": 10
+    },
+    "Technician": {
+      "permissions": [
+        "run_test",
+        "debug_mode"
+      ],
+      "level": 30
+    },
+    "Engineer": {
+      "permissions": [
+        "run_test",
+        "debug_mode",
+        "edit_recipe",
+        "config_hardware"
+      ],
+      "level": 60
+    },
+    "Developer": {
+      "permissions": [
+        "run_test",
+        "debug_mode",
+        "edit_recipe",
+        "config_hardware",
+        "manage_branding"
+      ],
+      "level": 80
+    },
+    "Admin": {
+      "permissions": [
+        "run_test",
+        "debug_mode",
+        "edit_recipe",
+        "config_hardware",
+        "manage_users",
+        "manage_branding"
+      ],
+      "level": 100
+    }
+  },
+  "users": [
+    {
+      "username": "admin",
+      "displayName": "Admin",
+      "role": "Admin",
+      "salt": "bd161c457887e4e35e3f01a6bcb12f52",
+      "passwordHash": "e5e65fd88c58385482f1886aac8d9dd148a3ac07c2dac7323850019193f98bb9",
+      "enabled": true
+    },
+    {
+      "username": "mirza",
+      "displayName": "Mirza",
+      "role": "Operator",
+      "salt": "1a0972d41057b989dea001df46a1a24b",
+      "passwordHash": "431bd2ee25963454e8d349a484bdfc4ee80160f58b8bc5447ee931f59abd63ea",
+      "enabled": true
+    }
+  ]
+}

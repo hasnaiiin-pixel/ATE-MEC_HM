@@ -1,0 +1,15 @@
+/* AT-MEC 3.67 - Layout Manager non invasivo. Non modifica stile/tema originale. */
+#atmec-layout-manager-362-panel{position:fixed;top:58px;right:12px;z-index:2147483003;display:none;width:360px;max-width:calc(100vw - 24px);border:1px solid rgba(126,231,255,.45);border-radius:14px;background:rgba(8,14,24,.97);color:#e8f4ff;box-shadow:0 18px 44px rgba(0,0,0,.45);font-family:inherit;font-size:12px;overflow:hidden}
+#atmec-layout-manager-362-panel .lm-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 11px;background:rgba(126,231,255,.12);cursor:move;font-weight:900;color:#7ee7ff}
+#atmec-layout-manager-362-panel .lm-body{padding:10px;display:grid;gap:8px}
+#atmec-layout-manager-362-panel label{display:grid;gap:4px;color:#b6c7d9;font-weight:800;font-size:11px}
+#atmec-layout-manager-362-panel input,#atmec-layout-manager-362-panel select{border:1px solid rgba(255,255,255,.22);border-radius:9px;background:rgba(255,255,255,.08);color:#fff;padding:7px 8px;font-size:12px}
+#atmec-layout-manager-362-panel button{border:1px solid rgba(255,255,255,.22);border-radius:10px;background:rgba(255,255,255,.08);color:#fff;padding:7px 9px;font-weight:850;cursor:pointer;font-size:11px}
+#atmec-layout-manager-362-panel button.primary{background:linear-gradient(135deg,#00d5ff,#37ffb0);color:#06121d;border-color:rgba(255,255,255,.45)}
+#atmec-layout-manager-362-panel button.warn{background:rgba(255,216,77,.16);border-color:rgba(255,216,77,.45);color:#ffd84d}
+#atmec-layout-manager-362-panel button.danger{background:rgba(255,70,70,.16);border-color:rgba(255,70,70,.45);color:#ffb2b2}
+#atmec-layout-manager-362-panel .row{display:flex;gap:7px;flex-wrap:wrap}
+#atmec-layout-manager-362-panel .row>*{flex:1 1 auto}
+#atmec-layout-manager-362-panel .hint{color:#98b6cf;font-size:11px;line-height:1.35;border-top:1px solid rgba(255,255,255,.10);padding-top:8px}
+#atmec-layout-manager-362-panel .status{font-size:11px;color:#37ffb0;min-height:14px}
+#atmec-layout-manager-362-toggle{border:1px solid rgba(126,231,255,.35)!important;background:rgba(126,231,255,.12)!important;color:#dff8ff!important}

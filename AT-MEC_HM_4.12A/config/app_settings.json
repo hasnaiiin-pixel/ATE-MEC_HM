@@ -1,0 +1,25 @@
+{
+  "pl303Mode": "USB",
+  "pl303Host": "mock",
+  "pl303Port": 9221,
+  "pl303Com": "COM4",
+  "pl303Baud": 9600,
+  "ttiPort": "COM4",
+  "ttiBaud": 9600,
+  "logoBackgroundMode": "white",
+  "logoBgModes": {
+    "loginLarge": "white",
+    "loginSmall": "white",
+    "hmiLarge": "white",
+    "developerSmall": "white",
+    "reportLarge": "white",
+    "reportSmall": "white"
+  },
+  "developerSmallLogoPath": "assets/default_logos/MIRZA_Animation.gif",
+  "reportSmallLogoPath": "assets/default_logos/MIRZA_LOGO.png",
+  "loginSmallLogoPath": "C:\\Users\\spea4060_tmv331ef\\Documents\\PROGETTI\\AT-MEC_HM_3.11\\config\\logos\\loginSmall_logo.png",
+  "loginLargeLogoPath": "assets/default_logos/MIRZA_Animation.gif",
+  "hmiLargeLogoPath": "assets/default_logos/MIRZA_Animation.gif",
+  "appLargeLogoPath": "assets/default_logos/MIRZA_Animation.gif",
+  "reportLargeLogoPath": "assets/default_logos/MIRZA_LOGO.png"
+}
