@@ -1772,3 +1772,30 @@ body.atmec-layout-edit-on #unit-card-tab .db-panel-grid{
 #data-archive-tab .da412b-row span{color:var(--text2) !important;font-size:12px !important;text-align:right !important;}
 @media(max-width:1100px){#data-archive-tab .da412b-grid,#data-archive-tab .da412b-stats-grid,#data-archive-tab .da412b-panel-grid{grid-template-columns:repeat(2,minmax(0,1fr)) !important;}}
 @media(max-width:700px){#data-archive-tab .da412b-grid,#data-archive-tab .da412b-stats-grid,#data-archive-tab .da412b-panel-grid{grid-template-columns:1fr !important;}#data-archive-tab .da412b-hero{display:grid !important;}#data-archive-tab .da412b-row{display:grid !important;}#data-archive-tab .da412b-row span{text-align:left !important;}}
+
+/* AT-MEC_HM_4.12C - Recipe Editor misure universali: anteprima tolleranza/range PASS.
+   Modulo confinato al Recipe Editor: non modifica Test Mode, hardware, Layout Editor, Storico, Scheda Unità o Archivio. */
+#recipe-tab .measure-preview-412c,
+#step-wizard .measure-preview-412c{
+  border:1px solid rgba(0,212,255,.28);
+  background:linear-gradient(135deg,rgba(0,212,255,.08),rgba(255,255,255,.035));
+  border-radius:14px;
+  padding:10px;
+  color:var(--text);
+  font-size:12px;
+  line-height:1.45;
+}
+.measure-preview-head-412c{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:8px;}
+.measure-preview-head-412c b{color:var(--accent);font-size:13px;}
+.measure-preview-head-412c span{border:1px solid rgba(255,255,255,.14);border-radius:999px;padding:3px 8px;color:var(--text2);font-size:10px;font-weight:900;}
+.measure-preview-grid-412c{display:grid;grid-template-columns:repeat(4,minmax(95px,1fr));gap:7px;margin:8px 0;}
+.measure-preview-grid-412c div{border:1px solid rgba(255,255,255,.10);border-radius:10px;background:rgba(0,0,0,.16);padding:7px;}
+.measure-preview-grid-412c small{display:block;color:var(--text2);font-size:10px;margin-bottom:3px;text-transform:uppercase;letter-spacing:.04em;}
+.measure-preview-grid-412c strong{font-size:14px;color:#fff;}
+.measure-preview-range-412c{padding:7px 8px;border-radius:10px;background:rgba(54,211,153,.08);border:1px solid rgba(54,211,153,.24);}
+.measure-preview-origin-412c{margin-top:6px;color:var(--text2);font-size:11px;}
+.measure-preview-warn-412c{margin-top:6px;color:var(--fail);font-weight:900;}
+#recipe-tab .recipe-measure-preview-412c{grid-column:1/-1;border:1px solid rgba(0,212,255,.22);background:rgba(0,212,255,.055);border-radius:10px;padding:7px 8px;font-size:11px;color:var(--text2);line-height:1.35;}
+#recipe-tab .recipe-measure-preview-412c b{color:var(--accent);}
+#recipe-tab .recipe-measure-preview-412c .fail{color:var(--fail);font-weight:900;margin-left:6px;}
+@media(max-width:900px){.measure-preview-grid-412c{grid-template-columns:1fr 1fr;}}

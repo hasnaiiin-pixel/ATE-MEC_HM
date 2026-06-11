@@ -1,7 +1,7 @@
 {
-  "name": "at-mec-hm-4-12b",
-  "version": "4.12.2",
-  "description": "AT-MEC HM 4.12B - Analisi Produzione e Archivio Dati additivi su base stabile 4.12",
+  "name": "at-mec-hm-4-12c",
+  "version": "4.12.3",
+  "description": "AT-MEC HM 4.12C - Recipe Editor evoluto per misure universali su base stabile 4.12B",
   "main": "dist/main/main.js",
   "scripts": {
     "build": "tsc",
@@ -17,7 +17,7 @@
   },
   "build": {
     "appId": "com.atemec.platform",
-    "productName": "AT-MEC HM 4.12B",
+    "productName": "AT-MEC HM 4.12C",
     "directories": {
       "output": "dist_installer"
     },
@@ -27,14 +27,14 @@
         "portable"
       ],
       "icon": "assets/icon.ico",
-      "shortcutName": "AT-MEC HM 4.12B"
+      "shortcutName": "AT-MEC HM 4.12C"
     },
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "AT-MEC HM 4.12B"
+      "shortcutName": "AT-MEC HM 4.12C"
     },
     "files": [
       "dist/**/*",

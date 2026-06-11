@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: file:; media-src 'self' blob: file:;">
-<title>ATE-MEC Suite v4.12B</title>
+<title>ATE-MEC Suite v4.12C</title>
 <link rel="stylesheet" href="css/app.css">
 </head>
 <body class="locked">
@@ -18,7 +18,7 @@
   <div class="login-card">
     <img id="login-large-logo" class="login-hero-logo" title="Logo aziendale">
     <div class="login-brand">
-      <div><div class="login-title">ATE-MEC HM 4.12B</div><div class="login-sub">Automatic Test & Measurement System</div></div>
+      <div><div class="login-title">ATE-MEC HM 4.12C</div><div class="login-sub">Automatic Test & Measurement System</div></div>
     </div>
     <div class="col"><label>Utente / Badge</label><input id="op-name" type="text" value="Operatore" placeholder="Inserisci utente"></div>
     <div class="col"><label>Password</label><input id="op-password" type="password" placeholder="Password"></div>
@@ -165,7 +165,7 @@
   <div id="sidebar">
     <div class="section-title">🏭 Banco prova</div>
     <div class="side-card">
-      <div style="font-size:17px;font-weight:900;color:var(--accent);letter-spacing:1px;">ATE-MEC HM 4.12B</div>
+      <div style="font-size:17px;font-weight:900;color:var(--accent);letter-spacing:1px;">ATE-MEC HM 4.12C</div>
       <div id="logged-user-box" class="hint">Accesso non effettuato</div>
       <button class="btn btn-ghost btn-sm side-nav-btn" onclick="logoutAndLock()">🔒 Logout / cambia utente</button>
     </div>
@@ -817,7 +817,7 @@
       <div class="pa412a-page">
         <div class="recipe-big-card pa412a-hero">
           <div>
-            <div style="font-size:11px;color:var(--text2);letter-spacing:1px;">AT-MEC_HM_4.12B</div>
+            <div style="font-size:11px;color:var(--text2);letter-spacing:1px;">AT-MEC_HM_4.12C</div>
             <h3>📈 Analisi Produzione</h3>
             <div class="hint">Modulo separato per KPI industriali. Non modifica Dashboard, Storico Seriali, Scheda Unità, Test Mode o Layout Editor.</div>
           </div>
@@ -868,12 +868,12 @@
     </div>
 
 
-    <!-- TAB: ARCHIVIO DATI 4.12B - Modulo separato, non modifica Test Mode/Ricette/Hardware/Layout Editor -->
+    <!-- TAB: ARCHIVIO DATI 4.12C - Modulo separato, non modifica Test Mode/Ricette/Hardware/Layout Editor -->
     <div id="data-archive-tab" class="tab-content">
       <div class="da412b-page">
         <div class="recipe-big-card da412b-hero">
           <div>
-            <div style="font-size:11px;color:var(--text2);letter-spacing:1px;">AT-MEC_HM_4.12B</div>
+            <div style="font-size:11px;color:var(--text2);letter-spacing:1px;">AT-MEC_HM_4.12C</div>
             <h3>🗄️ Archivio Dati & Backup</h3>
             <div class="hint">Modulo separato per backup, esportazione e controllo archivio. Non modifica Test Mode, ricette, hardware, Layout Editor, Storico o Scheda Unità.</div>
           </div>
@@ -1283,6 +1283,10 @@
               <option value="measure_analog">Leggi ingresso analogico</option>
               <option value="measure_resistance">Misura resistenza</option>
               <option value="measure_frequency">Misura frequenza</option>
+              <option value="measure_continuity">Controllo continuità</option>
+              <option value="measure_temp">Misura temperatura</option>
+              <option value="measure_power">Misura potenza</option>
+              <option value="manual_value">Misura manuale valore</option>
               <option value="digital_input">Leggi ingresso digitale</option>
               <option value="digital_output">Set uscita digitale</option>
               <option value="power_supply">Set alimentatore PL303 CH1/CH2</option>
@@ -1401,27 +1405,27 @@
           </div>
           <div class="wizard-field" data-field="unit">
             <label>Unità misura</label>
-            <input id="w-unit" placeholder="V, A, Ω, Hz, s, bool">
+            <input id="w-unit" placeholder="V, A, Ω, Hz, s, bool" oninput="updateWizardMeasurePreview412C()">
           </div>
           <div class="wizard-field" data-field="min">
             <label>Limite minimo</label>
-            <input id="w-min" type="number" step="any" placeholder="es. 4.75">
+            <input id="w-min" type="number" step="any" placeholder="es. 4.75" oninput="updateWizardMeasurePreview412C()">
           </div>
           <div class="wizard-field" data-field="max">
             <label>Limite massimo</label>
-            <input id="w-max" type="number" step="any" placeholder="es. 5.25">
+            <input id="w-max" type="number" step="any" placeholder="es. 5.25" oninput="updateWizardMeasurePreview412C()">
           </div>
           <div class="wizard-field" data-field="target">
             <label>Valore atteso / target</label>
-            <input id="w-target" type="number" step="any" placeholder="es. 5.00">
+            <input id="w-target" type="number" step="any" placeholder="es. 5.00" oninput="updateWizardMeasurePreview412C()">
           </div>
           <div class="wizard-field" data-field="tolerance">
             <label>Tolleranza ±</label>
-            <input id="w-tolerance" type="number" step="any" placeholder="es. 0.20">
+            <input id="w-tolerance" type="number" step="any" placeholder="es. 0.20" oninput="updateWizardMeasurePreview412C()">
           </div>
           <div class="wizard-field" data-field="measure_mode">
             <label>Origine misura</label>
-            <select id="w-measure-mode" onchange="syncWizardVisibility()">
+            <select id="w-measure-mode" onchange="syncWizardVisibility(); updateWizardMeasurePreview412C()">
               <option value="automatic">Automatica da multimetro digitale</option>
               <option value="auto_with_fallback">Automatica + fallback manuale se fallisce</option>
               <option value="manual">Solo manuale operatore</option>
@@ -1429,10 +1433,16 @@
           </div>
           <div class="wizard-field" data-field="manual_fallback">
             <label style="display:flex;align-items:center;gap:6px;">
-              <input id="w-manual-fallback-enabled" type="checkbox" checked onchange="syncWizardVisibility()" style="width:auto;">
+              <input id="w-manual-fallback-enabled" type="checkbox" checked onchange="syncWizardVisibility(); updateWizardMeasurePreview412C()" style="width:auto;">
               Accetta inserimento manuale se il multimetro digitale fallisce
             </label>
             <div class="hint">Nel report viene salvata sempre l'origine: AUTOMATICA o MANUALE.</div>
+          </div>
+          <div class="wizard-field wide" data-field="measure_preview">
+            <label>Anteprima misura / tolleranza</label>
+            <div id="w-measure-preview-412c" class="measure-preview-412c">
+              Inserisci target e tolleranza per vedere Min/Max PASS.
+            </div>
           </div>
           <div class="wizard-field" data-field="timeout">
             <label>Timeout / attesa ms</label>

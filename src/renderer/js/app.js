@@ -448,6 +448,11 @@ const WIZARD_PRESETS = {
   measure_analog:    { type:'AnalogInputMeasurement', io_type:'SCPI', device:'Keysight_34461A', unit:'V', target:1.65, tolerance:1.65, min:0, max:3.3, timeout:2500, command:'MEAS:VOLT:DC?', label:'Misura analogica DMM', measurement_mode:'auto_with_fallback', manual_fallback_enabled:true },
   measure_resistance:{ type:'ResistanceTest', io_type:'SCPI', device:'Keysight_34461A', unit:'Ω', target:480, tolerance:30, min:450, max:510, timeout:2000, command:'MEAS:RES?', label:'Misura resistenza', measurement_mode:'auto_with_fallback', manual_fallback_enabled:true },
   measure_frequency: { type:'FrequencyTest', io_type:'SCPI', device:'Keysight_34461A', unit:'Hz', target:1000, tolerance:10, min:990, max:1010, timeout:2000, command:'MEAS:FREQ?', label:'Misura frequenza', measurement_mode:'auto_with_fallback', manual_fallback_enabled:true },
+  measure_continuity:{ type:'ManualMeasurement', io_type:'SCPI', device:'Keysight_34461A', unit:'Ω', target:0, tolerance:10, min:0, max:10, timeout:2500, command:'MEAS:RES?', label:'Controllo continuità', manual_measure_type:'SCPI_OHM', measurement_mode:'auto_with_fallback', manual_fallback_enabled:true },
+  measure_temp:      { type:'ManualMeasurement', io_type:'SYSTEM', device:'manual', unit:'°C', target:25, tolerance:10, min:15, max:35, timeout:0, command:'', label:'Misura temperatura', manual_measure_type:'TEMPERATURE', measurement_mode:'manual', manual_input_enabled:true, manual_fallback_enabled:true },
+  measure_power:     { type:'ManualMeasurement', io_type:'SYSTEM', device:'manual', unit:'W', target:10, tolerance:5, min:5, max:15, timeout:0, command:'', label:'Misura potenza', manual_measure_type:'POWER', measurement_mode:'manual', manual_input_enabled:true, manual_fallback_enabled:true },
+  manual_value:      { type:'ManualMeasurement', io_type:'SYSTEM', device:'manual', unit:'', target:0, tolerance:0, min:0, max:999, timeout:0, command:'', label:'Misura manuale valore', manual_measure_type:'MANUAL_VALUE', measurement_mode:'manual', manual_input_enabled:true, manual_fallback_enabled:true },
+  power_supply:      { type:'PowerSupplySet', io_type:'SCPI', device:'AimTTi_PL303', unit:'V/A', timeout:3000, command:'', label:'Set alimentatore PL303', ps_channel:1, ps_voltage:24, ps_current:1, ps_output_on:true },
   digital_input:     { type:'DigitalInputCheck', io_type:'DI', device:'modbus_serial', unit:'bool', value:true, timeout:500, command:'', label:'Ingresso digitale' },
   digital_output:    { type:'DigitalOutputSet', io_type:'DO', device:'modbus_serial', unit:'bool', value:true, timeout:1500, command:'', label:'Uscita digitale', verify_feedback:false },
   manual_measure:    { type:'ManualMeasurement', io_type:'SCPI', device:'Keysight_34461A', unit:'V', min:0, max:3.3, timeout:2500, label:'Step manuale guidato', manual_measure_type:'SCPI', command:'MEAS:VOLT:DC?', stable_time_ms:1000 },
@@ -571,7 +576,7 @@ function syncWizardVisibility() {
   } else if (isInputDigital) {
     show.add('channel'); show.add('value'); show.add('timeout');
   } else if (isMeasurement) {
-    show.add('device'); show.add('command'); show.add('unit'); show.add('min'); show.add('max'); show.add('target'); show.add('tolerance'); show.add('measure_mode'); show.add('manual_fallback'); show.add('timeout');
+    show.add('device'); show.add('command'); show.add('unit'); show.add('min'); show.add('max'); show.add('target'); show.add('tolerance'); show.add('measure_mode'); show.add('manual_fallback'); show.add('measure_preview'); show.add('timeout');
   } else if (isPowerSupply) {
     show.add('ps_channel'); show.add('ps_voltage'); show.add('ps_current'); show.add('ps_output'); show.add('timeout');
   } else if (isManual) {
@@ -579,7 +584,7 @@ function syncWizardVisibility() {
     if (!manualInputEnabled && manualKind !== 'CONFIRM' && manualKind !== 'MANUAL_VALUE') show.add('device');
     if (!manualInputEnabled && ['DI','DO','AI'].includes(manualKind)) show.add('channel');
     if (!manualInputEnabled && (manualKind === 'SCPI' || manualKind.startsWith('SCPI_'))) { show.add('device'); show.add('command'); }
-    if (manualInputEnabled || (['AI','SCPI'].includes(manualKind) || manualKind.startsWith('SCPI_'))) { show.add('min'); show.add('max'); show.add('target'); show.add('tolerance'); show.add('manual_fallback'); }
+    if (manualInputEnabled || (['AI','SCPI'].includes(manualKind) || manualKind.startsWith('SCPI_'))) { show.add('min'); show.add('max'); show.add('target'); show.add('tolerance'); show.add('manual_fallback'); show.add('measure_preview'); }
     if (!manualInputEnabled && ['DI','DO'].includes(manualKind)) show.add('value');
   } else if (isScpi) {
     show.add('device'); show.add('command'); show.add('timeout');
@@ -621,6 +626,52 @@ function syncWizardVisibility() {
   else if (isManual) help.textContent = manualInputEnabled ? 'Step manuale con misura manuale: l’operatore inserisce il valore, il sistema applica min/max e assegna PASS/FAIL.' : 'Step manuale: mostra istruzioni/immagine e poi acquisisce da I/O o strumento selezionato.';
   else if (isDelay) help.textContent = 'Attesa: viene mostrato solo il tempo in millisecondi.';
   else help.textContent = 'Step strumento/firmware: mostra solo device, comando e timeout.';
+  updateWizardMeasurePreview412C();
+}
+
+function formatMeasure412C(value, unit) {
+  if (value === undefined || value === null || value === '' || Number.isNaN(Number(value))) return '—';
+  const n = Number(value);
+  const fixed = Math.abs(n) >= 100 ? n.toFixed(2) : n.toFixed(3);
+  return `${fixed.replace(/\.?0+$/, '')}${unit ? ' ' + unit : ''}`;
+}
+function calcMeasureRange412C(target, tolerance, min, max) {
+  const tOk = target !== '' && target !== undefined && !Number.isNaN(Number(target));
+  const tolOk = tolerance !== '' && tolerance !== undefined && !Number.isNaN(Number(tolerance));
+  let lo = min !== '' && min !== undefined && !Number.isNaN(Number(min)) ? Number(min) : undefined;
+  let hi = max !== '' && max !== undefined && !Number.isNaN(Number(max)) ? Number(max) : undefined;
+  if (tOk && tolOk) {
+    lo = Number(target) - Math.abs(Number(tolerance));
+    hi = Number(target) + Math.abs(Number(tolerance));
+  }
+  return { min: lo, max: hi, target: tOk ? Number(target) : undefined, tolerance: tolOk ? Math.abs(Number(tolerance)) : undefined };
+}
+function updateWizardMeasurePreview412C() {
+  const box = document.getElementById('w-measure-preview-412c');
+  if (!box) return;
+  const unit = document.getElementById('w-unit')?.value?.trim() || '';
+  const type = document.getElementById('w-type')?.value || '';
+  const mode = document.getElementById('w-measure-mode')?.value || 'auto_with_fallback';
+  const manualFallback = document.getElementById('w-manual-fallback-enabled')?.checked !== false;
+  const target = document.getElementById('w-target')?.value ?? '';
+  const tolerance = document.getElementById('w-tolerance')?.value ?? '';
+  const min = document.getElementById('w-min')?.value ?? '';
+  const max = document.getElementById('w-max')?.value ?? '';
+  const r = calcMeasureRange412C(target, tolerance, min, max);
+  const origin = mode === 'manual' ? 'MANUALE operatore' : (mode === 'automatic' ? 'AUTOMATICA da multimetro digitale' : 'AUTOMATICA + fallback MANUALE');
+  const warn = (r.min !== undefined && r.max !== undefined && r.min > r.max) ? '<div class="measure-preview-warn-412c">⚠️ Min maggiore di Max: correggere i valori.</div>' : '';
+  const rangeReady = r.min !== undefined && r.max !== undefined;
+  box.innerHTML = `
+    <div class="measure-preview-head-412c"><b>${escapeHtml(type || 'Misura')}</b><span>${escapeHtml(origin)}</span></div>
+    <div class="measure-preview-grid-412c">
+      <div><small>Valore atteso</small><strong>${formatMeasure412C(r.target, unit)}</strong></div>
+      <div><small>Tolleranza ±</small><strong>${formatMeasure412C(r.tolerance, unit)}</strong></div>
+      <div><small>Min PASS</small><strong>${formatMeasure412C(r.min, unit)}</strong></div>
+      <div><small>Max PASS</small><strong>${formatMeasure412C(r.max, unit)}</strong></div>
+    </div>
+    <div class="measure-preview-range-412c">${rangeReady ? `PASS se valore misurato è tra <b>${formatMeasure412C(r.min, unit)}</b> e <b>${formatMeasure412C(r.max, unit)}</b>.` : 'Inserisci target+tolleranza oppure min/max per calcolare il range PASS.'}</div>
+    <div class="measure-preview-origin-412c">Fallback manuale multimetro: <b>${manualFallback ? 'ACCETTATO' : 'NON ACCETTATO'}</b>. Nel report viene salvata origine misura AUTOMATICA/MANUALE.</div>
+    ${warn}`;
 }
 
 
@@ -656,7 +707,12 @@ function wizardStepFromForm(commitId = false) {
   if (minRaw !== '') step.min = Number(minRaw);
   if (maxRaw !== '') step.max = Number(maxRaw);
   if (targetRaw !== '') step.target = Number(targetRaw);
-  if (toleranceRaw !== '') step.tolerance = Number(toleranceRaw);
+  if (toleranceRaw !== '') step.tolerance = Math.abs(Number(toleranceRaw));
+  if (targetRaw !== '' && toleranceRaw !== '') {
+    const range412C = calcMeasureRange412C(targetRaw, toleranceRaw, minRaw, maxRaw);
+    step.min = range412C.min;
+    step.max = range412C.max;
+  }
   if (['VoltageMeasurement','CurrentMeasurement','ResistanceTest','FrequencyTest','AnalogInputMeasurement'].includes(type)) {
     step.measurement_mode = document.getElementById('w-measure-mode')?.value || 'auto_with_fallback';
     step.manual_fallback_enabled = Boolean(document.getElementById('w-manual-fallback-enabled')?.checked);
@@ -3306,11 +3362,11 @@ function addQuickRecipeStep(kind) {
   const base = {
     ps_on:{ type:'PowerSupplySet', label:'Alimentatore ON', description:'Imposta e abilita uscita alimentatore', io_type:'SCPI', device_mapping:'AimTTi_PL303', channel:1, ps_channel:1, ps_voltage:24, ps_current:1, ps_output_on:true, value:{ voltage:24, current:1, outputOn:true }, unit:'V/A', timeout:3000 },
     ps_off:{ type:'PowerSupplySet', label:'Alimentatore OFF sicuro', description:'Disattiva uscita alimentatore', io_type:'SCPI', device_mapping:'AimTTi_PL303', channel:1, ps_channel:1, ps_voltage:0, ps_current:0, ps_output_on:false, value:{ voltage:0, current:0, outputOn:false }, unit:'V/A', timeout:3000 },
-    measure_voltage:{ type:'VoltageMeasurement', label:'Misura tensione', description:'Misura tensione con limiti', io_type:'SCPI', device_mapping:'Keysight_34461A', command:'MEAS:VOLT:DC?', min:23.5, max:24.5, unit:'V', timeout:2500 },
-    measure_current:{ type:'CurrentMeasurement', label:'Misura corrente', description:'Misura consumo in ampere', io_type:'SCPI', device_mapping:'Keysight_34461A', command:'MEAS:CURR:DC?', min:0, max:1, unit:'A', timeout:2500 },
-    measure_ohm:{ type:'ResistanceTest', label:'Misura resistenza', description:'Misura resistenza con tolleranza', io_type:'SCPI', device_mapping:'Keysight_34461A', command:'MEAS:RES?', min:0, max:1000, unit:'Ω', timeout:2500 },
+    measure_voltage:{ type:'VoltageMeasurement', label:'Misura tensione', description:'Misura tensione con limiti e tolleranza', io_type:'SCPI', device_mapping:'Keysight_34461A', command:'MEAS:VOLT:DC?', target:24.0, tolerance:0.5, min:23.5, max:24.5, unit:'V', timeout:2500, measurement_mode:'auto_with_fallback', manual_fallback_enabled:true },
+    measure_current:{ type:'CurrentMeasurement', label:'Misura corrente', description:'Misura consumo in ampere con tolleranza', io_type:'SCPI', device_mapping:'Keysight_34461A', command:'MEAS:CURR:DC?', target:0.5, tolerance:0.5, min:0, max:1, unit:'A', timeout:2500, measurement_mode:'auto_with_fallback', manual_fallback_enabled:true },
+    measure_ohm:{ type:'ResistanceTest', label:'Misura resistenza', description:'Misura resistenza con tolleranza', io_type:'SCPI', device_mapping:'Keysight_34461A', command:'MEAS:RES?', target:500, tolerance:500, min:0, max:1000, unit:'Ω', timeout:2500, measurement_mode:'auto_with_fallback', manual_fallback_enabled:true },
     multi_channel_resistance:{ type:'MultiChannelResistanceTest', label:'Test multi-canale resistenza', description:'Misura resistenza canali con uscite associate e valori separati', io_type:'SCPI', device_mapping:'Keysight_34461A', command:'MEAS:RES?', unit:'Ω', timeout:3000, stop_on_fail:false, channel_fail_policy:'continue', channels:Array.from({length:10},(_,n)=>({ name:'CH'+(n+1), output:'OUT'+(n+1), min:10, max:50, stable_ms:500, enabled:true })) },
-    measure_freq:{ type:'FrequencyTest', label:'Misura frequenza', description:'Misura frequenza con limiti', io_type:'SCPI', device_mapping:'Keysight_34461A', command:'MEAS:FREQ?', min:990, max:1010, unit:'Hz', timeout:2500 },
+    measure_freq:{ type:'FrequencyTest', label:'Misura frequenza', description:'Misura frequenza con tolleranza', io_type:'SCPI', device_mapping:'Keysight_34461A', command:'MEAS:FREQ?', target:1000, tolerance:10, min:990, max:1010, unit:'Hz', timeout:2500, measurement_mode:'auto_with_fallback', manual_fallback_enabled:true },
     measure_continuity:{ type:'ManualMeasurement', label:'Controllo continuità', description:'Verifica continuità circuito con valore Ohm manuale/strumento', io_type:'SCPI', device_mapping:'Keysight_34461A', manual_measure_type:'SCPI_OHM', command:'MEAS:RES?', manual_input_enabled:false, manual_fallback_enabled:true, min:0, max:10, unit:'Ω', timeout:2500 },
     measure_temp:{ type:'ManualMeasurement', label:'Misura temperatura', description:'Inserimento temperatura misurata', io_type:'SYSTEM', device_mapping:'manual', manual_measure_type:'TEMPERATURE', manual_input_enabled:true, min:15, max:45, unit:'°C', timeout:0 },
     measure_power:{ type:'ManualMeasurement', label:'Misura potenza', description:'Inserimento o calcolo potenza assorbita', io_type:'SYSTEM', device_mapping:'manual', manual_measure_type:'POWER', manual_input_enabled:true, min:0, max:100, unit:'W', timeout:0 },
@@ -3428,7 +3484,22 @@ function renderRecipeInlineEditor(step, i) {
     ${field('Salva variabile', input('save_as_variable', step.save_as_variable || ''))}
     ${field('Usa variabile', input('compare_variable', step.compare_variable || ''))}
     ${field('Tipo', `<select onchange="updateRecipeStepField(${i}, 'manual_measure_type', this.value)"><option value="MANUAL_VALUE" ${step.manual_measure_type==='MANUAL_VALUE'?'selected':''}>Valore</option><option value="CONFIRM" ${step.manual_measure_type==='CONFIRM'?'selected':''}>PASS/FAIL</option><option value="CONTINUITY" ${step.manual_measure_type==='CONTINUITY'?'selected':''}>Continuità</option><option value="TEMPERATURE" ${step.manual_measure_type==='TEMPERATURE'?'selected':''}>Temperatura</option><option value="POWER" ${step.manual_measure_type==='POWER'?'selected':''}>Potenza</option></select>`)}
+    <div class="recipe-measure-preview-412c">${renderMeasurePreviewInline412C(step)}</div>
   </div>`;
+}
+
+function renderMeasurePreviewInline412C(step) {
+  const unit = step.unit || '';
+  const r = calcMeasureRange412C(step.target, step.tolerance, step.min, step.max);
+  const mode = step.measurement_mode || (step.manual_input_enabled ? 'manual' : 'auto_with_fallback');
+  const origin = mode === 'manual' ? 'MANUALE' : (mode === 'automatic' ? 'AUTOMATICA' : 'AUTO + MANUALE');
+  const range = (r.min !== undefined && r.max !== undefined)
+    ? `${formatMeasure412C(r.min, unit)} → ${formatMeasure412C(r.max, unit)}`
+    : 'range non definito';
+  const target = r.target !== undefined ? formatMeasure412C(r.target, unit) : '—';
+  const tol = r.tolerance !== undefined ? '± ' + formatMeasure412C(r.tolerance, unit) : '—';
+  const bad = (r.min !== undefined && r.max !== undefined && r.min > r.max) ? '<span class="fail">⚠️ Min > Max</span>' : '';
+  return `<b>Anteprima misura:</b> atteso ${target}, tolleranza ${tol}, PASS ${range}, origine ${escapeHtml(origin)} ${bad}`;
 }
 
 function renderStopOnFailOption331(step, i) {
@@ -3453,7 +3524,7 @@ function fillMultiChannelRows336(stepIndex, count) { const step = recipe.steps[s
 function updateRecipeStepField(i, prop, value) {
   const step = recipe.steps[i]; if (!step) return;
   let v = value;
-  if (['min','max','timeout','ps_voltage','ps_current','ps_channel','channel','target_step','value'].includes(prop)) v = value === '' ? '' : Number(value);
+  if (['min','max','target','tolerance','timeout','ps_voltage','ps_current','ps_channel','channel','target_step','value'].includes(prop)) v = value === '' ? '' : Number(value);
   if (prop === 'ps_output_on') v = String(value) === 'true';
   if (prop === 'stop_on_fail') v = Boolean(value);
   step[prop] = v;
@@ -3461,6 +3532,12 @@ function updateRecipeStepField(i, prop, value) {
   if (prop === 'ps_voltage') step.value = { ...(step.value || {}), voltage: Number(v) || 0 };
   if (prop === 'ps_current') step.value = { ...(step.value || {}), current: Number(v) || 0 };
   if (prop === 'ps_output_on') step.value = { ...(step.value || {}), outputOn: Boolean(v) };
+  if (['target','tolerance'].includes(prop) && step.target !== '' && step.target !== undefined && step.tolerance !== '' && step.tolerance !== undefined) {
+    const rr = calcMeasureRange412C(step.target, step.tolerance, step.min, step.max);
+    step.tolerance = Math.abs(Number(step.tolerance));
+    step.min = rr.min;
+    step.max = rr.max;
+  }
   renderSteps();
 }
 let recipeDragIndex = null;
@@ -3497,7 +3574,14 @@ function updateRecipeHealth() {
   const esp = latestHardwareStatuses.find(x => x.name === 'modbus_serial');
   const espTxt = needsEsp ? (esp && !esp.mock ? '✅ ESP32/modbus_serial LIVE' : '❌ ESP32/modbus_serial non LIVE') : 'ℹ️ ESP32 non richiesto';
   const errors = [];
-  active.forEach((s,idx)=>{ if (s.min !== undefined && s.max !== undefined && s.min !== '' && s.max !== '' && Number(s.min) > Number(s.max)) errors.push(`Step ${idx+1}: Min > Max`); if (!s.label) errors.push(`Step ${idx+1}: etichetta mancante`); });
+  active.forEach((s,idx)=>{ 
+    const measure = String(s.type||'').match(/Measurement|Resistance|Frequency|PowerSupplyMeasureCurrent|Manual/i);
+    if (s.min !== undefined && s.max !== undefined && s.min !== '' && s.max !== '' && Number(s.min) > Number(s.max)) errors.push(`Step ${idx+1}: Min > Max`); 
+    if (measure && s.target !== undefined && s.target !== '' && s.min !== undefined && s.max !== undefined && (Number(s.target) < Number(s.min) || Number(s.target) > Number(s.max))) errors.push(`Step ${idx+1}: target fuori range`);
+    if (measure && !s.unit && s.type !== 'ManualMeasurement') errors.push(`Step ${idx+1}: unità mancante`);
+    if (measure && !s.device_mapping) errors.push(`Step ${idx+1}: dispositivo mancante`);
+    if (!s.label) errors.push(`Step ${idx+1}: etichetta mancante`); 
+  });
   const pl303Needed = active.some(s => s.device_mapping === 'AimTTi_PL303' || s.type === 'PowerSupplySet' || s.type === 'PowerSupplyMeasureCurrent');
   const pl303 = latestHardwareStatuses.find(x => x.name === 'AimTTi_PL303');
   const pl303Txt = pl303Needed ? (pl303 && !pl303.mock ? '✅ PL303 LIVE' : '⚠️ PL303 offline/mock') : 'ℹ️ PL303 non richiesto';
@@ -4550,7 +4634,7 @@ function printTraceabilitySerialHistory(){
   html += tests.map(r=>`<tr><td>${escapeHtml(new Date(r.timestamp).toLocaleString('it-IT'))}</td><td class="${String(r.final_result||'').toLowerCase()}">${escapeHtml(r.final_result||'')}</td><td>${escapeHtml(r.recipe_name||'')}</td><td>${escapeHtml(r.recipe_version||'')}</td><td>${escapeHtml(r.lot_number||r.work_order||'')}</td><td>${escapeHtml(r.operator||'')}</td><td>${escapeHtml(r.repair_note||'')}</td></tr>`).join('') || '<tr><td colspan="7">Nessun test.</td></tr>';
   html += '</tbody></table><h2>Riparazioni</h2><table><thead><tr><th>Data</th><th>Lotto</th><th>Operatore</th><th>Intervento</th></tr></thead><tbody>';
   html += repairs.map(r=>`<tr><td>${escapeHtml(new Date(r.timestamp).toLocaleString('it-IT'))}</td><td>${escapeHtml(r.lot_number||r.work_order||'')}</td><td>${escapeHtml(r.operator||'')}</td><td>${escapeHtml(r.repair_note||'')}</td></tr>`).join('') || '<tr><td colspan="4">Nessuna riparazione.</td></tr>';
-  html += '</tbody></table><p style="margin-top:22px;font-size:11px">Generato da AT-MEC HM 4.12B</p></body></html>';
+  html += '</tbody></table><p style="margin-top:22px;font-size:11px">Generato da AT-MEC HM 4.12C</p></body></html>';
   const w=window.open('', '_blank');
   if(!w){ downloadTextFile(`storico_seriale_${serial}.html`, html, 'text/html'); return; }
   w.document.write(html); w.document.close(); setTimeout(()=>{ try{ w.print(); }catch{} }, 350);
@@ -4653,7 +4737,7 @@ function printUnitGenealogy410E(){
   html+=tests.map((r,i)=>`<tr><td>${i+1}</td><td>${escapeHtml(unitDate410E(r.timestamp))}</td><td class="${String(r.final_result||'').toLowerCase()}">${escapeHtml(r.final_result||'')}</td><td>${escapeHtml(r.recipe_name||'')}</td><td>${escapeHtml(r.recipe_version||'')}</td><td>${escapeHtml(r.operator||'')}</td><td>${escapeHtml(r.repair_note||'')}</td></tr>`).join('') || '<tr><td colspan="7">Nessun test.</td></tr>';
   html+='</tbody></table><h2>Riparazioni</h2><table><thead><tr><th>#</th><th>Data</th><th>Lotto</th><th>Operatore</th><th>Intervento</th></tr></thead><tbody>';
   html+=repairs.map((r,i)=>`<tr><td>${i+1}</td><td>${escapeHtml(unitDate410E(r.timestamp))}</td><td>${escapeHtml(r.lot_number||r.work_order||'')}</td><td>${escapeHtml(r.operator||'')}</td><td>${escapeHtml(r.repair_note||'')}</td></tr>`).join('') || '<tr><td colspan="5">Nessuna riparazione.</td></tr>';
-  html+='</tbody></table><p style="margin-top:22px;font-size:11px">Generato da AT-MEC HM 4.12B</p></body></html>';
+  html+='</tbody></table><p style="margin-top:22px;font-size:11px">Generato da AT-MEC HM 4.12C</p></body></html>';
   const w=window.open('', '_blank');
   if(!w){ downloadTextFile(`scheda_unita_${serial}.html`, html, 'text/html'); return; }
   w.document.write(html); w.document.close(); setTimeout(()=>{ try{ w.print(); }catch{} },350);
@@ -4687,7 +4771,7 @@ function exportSerialHistoryPdf() {
   html += atmecReportHeader410J('AT-MEC HM - Storico scheda e riparazioni', `<b>Seriale:</b> ${escapeHtml(serial)} &nbsp; <b>Commessa/Lotto:</b> ${escapeHtml(lot || 'Tutte')}`);
   html += `<table><thead><tr><th>Data</th><th>Esito</th><th>Ricetta</th><th>Rev</th><th>Operatore</th><th>Riparazione / Intervento</th></tr></thead><tbody>`;
   html += rows.map(r => `<tr><td>${new Date(r.timestamp).toLocaleString('it-IT')}</td><td class="${String(r.final_result).toLowerCase()}">${escapeHtml(r.final_result || '')}</td><td>${escapeHtml(r.recipe_name || '')}</td><td>${escapeHtml(String(r.recipe_version || ''))}</td><td>${escapeHtml(r.operator || '')}</td><td>${escapeHtml(r.repair_note || '')}</td></tr>`).join('') || '<tr><td colspan="6">Nessun record trovato.</td></tr>';
-  html += `</tbody></table><div class="atmec-print-footer"><span>Generato da AT-MEC HM 4.12B</span><span>${new Date().toLocaleString('it-IT')}</span></div></body></html>`;
+  html += `</tbody></table><div class="atmec-print-footer"><span>Generato da AT-MEC HM 4.12C</span><span>${new Date().toLocaleString('it-IT')}</span></div></body></html>`;
   const w = window.open('', '_blank');
   if (!w) { downloadTextFile(`storico_${serial}.html`, html, 'text/html'); return; }
   w.document.write(html); w.document.close(); setTimeout(() => { try { w.print(); } catch {} }, 350);
@@ -4705,7 +4789,7 @@ function printTraceabilitySerialHistory(){
   html += tests.map(r=>`<tr><td>${new Date(r.timestamp).toLocaleString('it-IT')}</td><td>${escapeHtml(r.serial_dut||serial)}</td><td class="${String(r.final_result||'').toLowerCase()}">${escapeHtml(r.final_result||'')}</td><td>${escapeHtml(r.recipe_name||'')}</td><td>${escapeHtml(r.operator||'')}</td><td>${escapeHtml(r.repair_note||'')}</td></tr>`).join('') || '<tr><td colspan="6">Nessun test.</td></tr>';
   html += '</tbody></table><h2>Riparazioni</h2><table><thead><tr><th>Data</th><th>Lotto</th><th>Operatore</th><th>Intervento</th></tr></thead><tbody>';
   html += repairs.map(r=>`<tr><td>${new Date(r.timestamp).toLocaleString('it-IT')}</td><td>${escapeHtml(r.lot_number||r.work_order||'')}</td><td>${escapeHtml(r.operator||'')}</td><td>${escapeHtml(r.repair_note||'')}</td></tr>`).join('') || '<tr><td colspan="4">Nessuna riparazione.</td></tr>';
-  html += `</tbody></table><div class="atmec-print-footer"><span>Generato da AT-MEC HM 4.12B</span><span>${new Date().toLocaleString('it-IT')}</span></div></body></html>`;
+  html += `</tbody></table><div class="atmec-print-footer"><span>Generato da AT-MEC HM 4.12C</span><span>${new Date().toLocaleString('it-IT')}</span></div></body></html>`;
   const w=window.open('', '_blank');
   if(!w){ downloadTextFile(`storico_seriale_${serial}.html`, html, 'text/html'); return; }
   w.document.write(html); w.document.close(); setTimeout(()=>{ try{ w.print(); }catch{} }, 350);
@@ -4724,13 +4808,13 @@ function printUnitGenealogy410E(){
   html+=tests.map((r,i)=>`<tr><td>${i+1}</td><td>${escapeHtml(unitDate410E(r.timestamp))}</td><td class="${String(r.final_result||'').toLowerCase()}">${escapeHtml(r.final_result||'')}</td><td>${escapeHtml(r.recipe_name||'')}</td><td>${escapeHtml(r.recipe_version||'')}</td><td>${escapeHtml(r.operator||'')}</td><td>${escapeHtml(r.repair_note||'')}</td></tr>`).join('') || '<tr><td colspan="7">Nessun test.</td></tr>';
   html+='</tbody></table><h2>Riparazioni</h2><table><thead><tr><th>#</th><th>Data</th><th>Lotto</th><th>Operatore</th><th>Intervento</th></tr></thead><tbody>';
   html+=repairs.map((r,i)=>`<tr><td>${i+1}</td><td>${escapeHtml(unitDate410E(r.timestamp))}</td><td>${escapeHtml(r.lot_number||r.work_order||'')}</td><td>${escapeHtml(r.operator||'')}</td><td>${escapeHtml(r.repair_note||'')}</td></tr>`).join('') || '<tr><td colspan="5">Nessuna riparazione.</td></tr>';
-  html+=`</tbody></table><div class="atmec-print-footer"><span>Generato da AT-MEC HM 4.12B</span><span>${new Date().toLocaleString('it-IT')}</span></div></body></html>`;
+  html+=`</tbody></table><div class="atmec-print-footer"><span>Generato da AT-MEC HM 4.12C</span><span>${new Date().toLocaleString('it-IT')}</span></div></body></html>`;
   const w=window.open('', '_blank');
   if(!w){ downloadTextFile(`scheda_unita_${serial}.html`, html, 'text/html'); return; }
   w.document.write(html); w.document.close(); setTimeout(()=>{ try{ w.print(); }catch{} },350);
 }
 
-// AT-MEC_HM_4.12B - Analisi Produzione separata.
+// AT-MEC_HM_4.12C - Analisi Produzione separata.
 // Modulo additivo: usa solo getLocalDbStats e non modifica Test Mode, Dashboard, Storico, Scheda Unità o Layout Editor.
 function productionAnalysisFilters412A(){
   return {
@@ -4781,7 +4865,7 @@ async function loadProductionAnalysisDashboard412A(){
     if(status) status.textContent=`KPI aggiornati · ${st.total || 0} test filtrati · DB: ${st.dbPath || 'N/D'}`;
   }catch(e){
     if(status) status.textContent='Errore calcolo KPI: '+normalizeError(e);
-    console.error('[AT-MEC 4.12B] Analisi Produzione', e);
+    console.error('[AT-MEC 4.12C] Analisi Produzione', e);
   }
 }
 function clearProductionAnalysisFilters412A(){
@@ -4791,7 +4875,7 @@ function clearProductionAnalysisFilters412A(){
 }
 
 
-// AT-MEC_HM_4.12B - Archivio Dati & Backup separato.
+// AT-MEC_HM_4.12C - Archivio Dati & Backup separato.
 // Modulo additivo: usa API gia esistenti e non modifica Test Mode, Ricette, Hardware, Layout Editor, Storico o Scheda Unità.
 function archiveFilters412B(){
   return {
@@ -4827,7 +4911,7 @@ async function loadDataArchiveDashboard412B(){
     da412bStatus('da412b-maint-status', `Archivio OK · ${st.total || 0} test · DB: ${st.dbPath || 'N/D'}`);
   }catch(e){
     da412bStatus('da412b-maint-status','Errore archivio: '+normalizeError(e));
-    console.error('[AT-MEC 4.12B] Archivio dati', e);
+    console.error('[AT-MEC 4.12C] Archivio dati', e);
   }
 }
 async function previewDataArchive412B(){
