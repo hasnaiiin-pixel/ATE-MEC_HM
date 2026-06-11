@@ -1,0 +1,1553 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: file:; media-src 'self' blob: file:;">
+<title>ATE-MEC Suite v4.12B</title>
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body class="locked">
+<!--
+  AT-MEC HM 2.16 - COMMENTI LAYOUT E STABILITÀ
+  Questa pagina contiene tutta la HMI renderer: login, test mode, ricette, ESP32, report, loghi e utenti.
+  Le sezioni sono divise in card/pannelli per ridurre dipendenze incrociate.
+  Gli handler JavaScript usano controlli null-safe e log limitato per evitare blocchi UI.
+-->
+
+<div id="login-gate">
+  <div class="login-card">
+    <img id="login-large-logo" class="login-hero-logo" title="Logo aziendale">
+    <div class="login-brand">
+      <div><div class="login-title">ATE-MEC HM 4.12B</div><div class="login-sub">Automatic Test & Measurement System</div></div>
+    </div>
+    <div class="col"><label>Utente / Badge</label><input id="op-name" type="text" value="Operatore" placeholder="Inserisci utente"></div>
+    <div class="col"><label>Password</label><input id="op-password" type="password" placeholder="Password"></div>
+    <div class="hint">Il ruolo e il livello accesso vengono decisi automaticamente da username e password.</div>
+    <button class="btn btn-primary btn-3d" onclick="doLogin()">🔐 ACCEDI</button>
+    <img id="login-developer-logo" title="Logo sviluppatore">
+    <div id="login-status" style="font-size:12px;color:var(--text2);text-align:center;min-height:18px;"></div>
+  </div>
+</div>
+<div id="ui-watchdog">⚠️ Operazione lenta: puoi premere STOP o attendere timeout.</div>
+
+<div id="topbar">
+  <img id="app-large-logo" class="app-logo-large"><span class="logo" id="app-title-logo">ATE-MEC</span>
+  <span class="ver">Suite v3.92</span>
+  <div id="hw-badges" style="display:flex;gap:6px;"></div>
+  <span class="spacer"></span>
+  <button class="btn btn-ghost btn-xs chrome-toggle" onclick="toggleLeftRail()" title="Mostra/nascondi menu sinistro">☰ Menu</button>
+  <button class="btn btn-ghost btn-xs chrome-toggle" onclick="toggleRightRail()" title="Mostra/nascondi pannello destro">◫ Step</button>
+  <span id="state-pill" class="state-pill" style="color:var(--text2)">IDLE</span>
+  <span id="clock" style="font-size:11px;color:var(--text2);font-family:monospace;"></span>
+  <img id="developer-small-logo" class="dev-logo-small logo-halo-fix" title="Logo sviluppatore">
+</div>
+<button id="left-rail-edge" class="rail-edge rail-edge-left" onclick="toggleLeftRail()" title="Apri menu">☰</button>
+<button id="right-rail-edge" class="rail-edge rail-edge-right" onclick="toggleRightRail()" title="Apri dettagli step">◫</button>
+
+<div id="production-test-mode" data-ui-id="testmode.page" aria-live="polite">
+  <div class="prod-test-header">
+    <img id="prod-company-logo" class="prod-test-logo" title="Logo azienda">
+    <div class="prod-test-title">
+      <h1>ATE-MEC TEST MODE</h1>
+      <div class="subtitle">Modalità produzione — interfaccia operatore semplificata</div>
+    </div>
+    <div class="prod-emergency-top">
+      <img id="prod-dev-logo" class="prod-test-dev-logo logo-halo-fix" title="Logo sviluppatore">
+      <button class="btn-emergency prod-top-emergency" onclick="emergencyStopAll()"><span class="siren-icon">🚨</span> EMERGENZA<br><span style="font-size:10px;font-weight:800;">STOP + DO LOW + SCOLLEGA</span></button>
+    </div>
+  </div>
+  <div class="prod-test-body">
+    <div class="prod-panel">
+      <div class="prod-selector-row-221 prod-selector-row-318">
+        <div class="prod-select-cell"><label>Cliente</label><input id="prod-client-filter" placeholder="cliente" oninput="refreshProductionRecipes()"></div>
+        <div class="prod-select-cell"><label>Ricetta</label><select id="prod-recipe-select" onchange="loadProductionRecipeSelection()"></select></div>
+        <div class="prod-select-cell revision"><label>Rev.</label><select id="prod-recipe-version-select" onchange="loadProductionRecipeRevisionSelection()"><option value="">ultima</option></select></div>
+        <button class="btn btn-primary btn-sm" onclick="refreshProductionRecipes()">🔄 Ricette</button>
+        <button class="btn btn-ghost btn-sm" onclick="loadProductionRecipeSelection()">📂 Seleziona</button>
+        <button class="btn btn-warn btn-sm" onclick="openStartupWizard(true)">🧭 Wizard strumenti</button>
+      </div>
+      <div class="prod-meta-row-225 prod-meta-row-318">
+        <div class="prod-info-cell"><label>Commessa / Lotto</label><input id="prod-lot-number" placeholder="Commessa produzione" oninput="syncLotNumberInputs('prod')"></div>
+        <div class="prod-info-cell prod-check-card"><label>Seriale scheda</label><div class="prod-inline-control"><span>SN obbligatorio</span><input id="serial-required-prod" type="checkbox" checked onchange="setSerialRequired(this.checked)"></div><div class="row prod-input-row"><input id="prod-serial-input" placeholder="QR o manuale" oninput="syncSerialInputs('prod')"><button class="btn btn-ghost btn-sm" onclick="startQr()">📷</button></div></div>
+        <div class="prod-info-cell prod-check-card sample-cell"><label>Test scheda campione</label><div class="prod-inline-control"><span>Abilita all'inizio produzione</span><input id="sample-test-required-prod" type="checkbox" onchange="setSampleTestRequired(this.checked)"></div><div class="hint prod-boxed-hint">Richiede conferma scheda campione solo all'avvio test.</div></div>
+      </div>
+      <div class="prod-recipe-name" id="prod-recipe-name">Nessuna ricetta selezionata</div>
+      <div class="prod-status-line">
+        <span id="prod-serial">Commessa: - · SN: -</span>
+        <span id="prod-state">Stato: READY</span>
+        <span id="prod-running-badge" class="running-indicator" style="display:none;"><span class="spinner"></span><span>TEST IN ESECUZIONE<span class="dots"></span></span></span>
+      </div>
+      <div class="prod-timing-strip">
+        <div id="prod-state-cell" class="prod-time-cell"><label>Stato esecuzione</label><b id="prod-execution-state">READY</b></div>
+        <div class="prod-time-cell"><label>Tempo stimato ricetta</label><b id="prod-estimated-time">00:00</b></div>
+        <div class="prod-time-cell running"><label>Tempo reale test</label><b id="prod-real-time">00:00</b></div>
+      </div>
+      <div class="prod-main-split-221">
+        <div>
+          <div class="prod-current-step">
+            <div class="label">STEP ATTUALE</div>
+            <div id="prod-current-step" class="value">Da fare</div><div id="prod-live-measure-panel" class="step-live-measure-panel"><div class="live-title">Misura step live</div><div class="live-value" id="prod-live-measure-value">--</div><div class="live-grid"><div class="live-cell">Atteso<b id="prod-live-expected">--</b></div><div class="live-cell">Tolleranza<b id="prod-live-tolerance">--</b></div><div class="live-cell">Device<b id="prod-live-device">--</b></div><div class="live-cell">Unità<b id="prod-live-unit">--</b></div><div class="live-cell">Timestamp<b id="prod-live-ts">--</b></div><div class="live-cell">Esito<b id="prod-live-result">--</b></div></div></div>
+          </div>
+          <div id="prod-status-banner" data-ui-id="testmode.status.banner" class="prod-status-banner todo">DA FARE</div>
+        </div>
+        <div class="prod-sequence-log" id="prod-sequence-log"></div>
+      </div>
+      <div class="prod-progress-wrap">
+        <div class="prod-progress-head"><span>Avanzamento test</span><b id="prod-progress-percent" data-ui-id="testmode.progress.percent">0%</b></div>
+        <div class="prod-progress-bar"><div id="prod-progress-fill" class="prod-progress-fill"></div></div>
+      </div>
+    </div>
+    <div class="prod-panel">
+      <div class="prod-kpis">
+        <div class="prod-kpi"><div id="prod-kpi-total" class="num">0</div><div class="lbl">STEP TOTALI</div></div>
+        <div class="prod-kpi"><div id="prod-kpi-pass" class="num" style="color:var(--pass)">0</div><div class="lbl">PASS</div></div>
+        <div class="prod-kpi"><div id="prod-kpi-fail" class="num" style="color:var(--fail)">0</div><div class="lbl">FAIL</div></div>
+        <div class="prod-kpi"><div id="prod-kpi-todo" class="num" style="color:var(--text2)">0</div><div class="lbl">DA FARE</div></div>
+      </div>
+      <div class="prod-actions prod-actions-vertical-318">
+        <button class="btn btn-success btn-3d prod-big-action" onclick="startTest()"><span class="action-ico">▶️</span><span>AVVIA TEST</span></button>
+        <button class="btn btn-warn btn-3d prod-big-action" onclick="pauseTest()"><span class="action-ico">⏸️</span><span>PAUSA / RIPRENDI</span></button>
+        <button class="btn btn-danger btn-3d stop-under-pause prod-big-action" onclick="stopTestAndReset()"><span class="action-ico">⏹️</span><span>STOP TEST</span></button>
+        <button class="btn btn-ghost btn-3d prod-big-action" onclick="requestExitProductionTestMode()"><span class="action-ico">🚪</span><span>ESCI TEST MODE</span></button>
+        <button class="btn btn-ghost btn-3d prod-big-action" onclick="openTestReportFromTestMode()"><span class="action-ico">🧾</span><span>TEST REPORT</span></button>
+      </div>
+      <div id="prod-debug-box" class="debug-box">
+        <label style="display:flex;gap:8px;align-items:center;"><input id="prod-debug-flag" type="checkbox" onchange="toggleDebugModeFromProduction(this.checked)" style="width:auto;"> Debug step-by-step</label>
+        <button class="btn btn-warn btn-sm" onclick="nextDebugStep()">⏭️ Prossimo step</button>
+      </div>
+      <div class="prod-hw-card">
+        <b>Strumenti utilizzati per questa ricetta</b>
+        <div class="detail-line">Mostra solo gli strumenti richiesti dalla ricetta caricata. Puoi escludere strumenti non necessari.</div>
+        <button class="btn btn-primary btn-sm" onclick="autoConnectProductionInstruments(true)">🔌 Ricollega strumenti</button>
+        <div id="prod-precheck-list" class="hint" style="margin-bottom:6px;"></div><div id="prod-hardware-list"></div>
+      </div>
+    </div>
+  </div>
+  <div class="prod-footer"><span>Uscita consentita solo con credenziali Admin / Sviluppatore / Engineer / Tecnico.</span><span id="prod-clock"></span></div>
+</div>
+
+
+<div id="startup-wizard-modal" class="startup-wizard-modal">
+  <div class="startup-wizard-card">
+    <div class="modal-head"><strong>🚀 Startup Wizard produzione</strong><span class="spacer"></span><button class="btn btn-ghost btn-sm" onclick="closeStartupWizard(true)">Salta</button></div>
+    <div class="hint" style="margin:6px 0 12px;">Sequenza guidata: seleziona ricetta/revisione, collega e testa strumenti, conferma scheda campione e passa alla Test Mode.</div>
+    <div class="startup-wizard-grid">
+      <div class="startup-wizard-steps" id="startup-wizard-steps"></div>
+      <div>
+        <div id="startup-wizard-content"></div>
+        <div class="row" style="justify-content:flex-end;margin-top:14px;">
+          <button class="btn btn-ghost" onclick="startupWizardPrev()">← Indietro</button>
+          <button class="btn btn-primary" onclick="startupWizardNext()">Avanti →</button>
+          <button class="btn btn-success" onclick="closeStartupWizard(false); enterProductionTestMode();">Entra in Test Mode</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="exit-test-modal">
+  <div class="exit-card">
+    <h3>🔓 Uscita modalità test</h3>
+    <div class="hint">Inserisci credenziali autorizzate: Admin, Sviluppatore, Engineer o Tecnico.</div>
+    <div class="col" style="margin-top:10px;"><label>Username</label><input id="exit-test-user" placeholder="utente autorizzato"></div>
+    <div class="col"><label>Password</label><input id="exit-test-pass" type="password" placeholder="password"></div>
+    <div id="exit-test-status" class="hint" style="min-height:18px;"></div>
+    <div class="row" style="justify-content:flex-end;margin-top:12px;">
+      <button class="btn btn-ghost" onclick="document.getElementById('exit-test-modal').classList.remove('show')">Annulla</button>
+      <button class="btn btn-primary" onclick="verifyExitProductionTestMode()">Esci</button>
+    </div>
+  </div>
+</div>
+
+<div id="main">
+
+  <!-- SIDEBAR: navigazione e dati banco -->
+  <div id="sidebar">
+    <div class="section-title">🏭 Banco prova</div>
+    <div class="side-card">
+      <div style="font-size:17px;font-weight:900;color:var(--accent);letter-spacing:1px;">ATE-MEC HM 4.12B</div>
+      <div id="logged-user-box" class="hint">Accesso non effettuato</div>
+      <button class="btn btn-ghost btn-sm side-nav-btn" onclick="logoutAndLock()">🔒 Logout / cambia utente</button>
+    </div>
+    <div class="section-title">🧭 Menu principale</div>
+    <div class="side-card main-menu-card">
+      <details class="nav-group" open><summary>▶ Produzione <span>▾</span></summary>
+        <button class="btn btn-ghost btn-sm side-nav-btn submenu-btn" onclick="showTab('run-tab', document.querySelector('[data-tab=run]'))">▶ Esecuzione ricette</button>
+        <button class="btn btn-primary btn-sm side-nav-btn submenu-btn" onclick="enterProductionTestMode()">🖥️ Modalità Test</button>
+      </details>
+      <details class="nav-group" open><summary>🧾 Ricette & qualità <span>▾</span></summary>
+        <button class="btn btn-ghost btn-sm side-nav-btn submenu-btn" onclick="showTab('recipe-tab', document.querySelector('[data-tab=recipe]')); renderRecipePage()">🧾 Ricette & Step</button>
+        <button class="btn btn-ghost btn-sm side-nav-btn submenu-btn" onclick="showTab('audit-tab', document.querySelector('[data-tab=audit]')); loadAudit()">📁 Test Report</button>
+        <button class="btn btn-ghost btn-sm side-nav-btn submenu-btn" onclick="showTab('traceability-tab', null); initTraceabilitySerialPage()">🔎 Storico Seriali</button>
+        <button class="btn btn-ghost btn-sm side-nav-btn submenu-btn" onclick="showTab('unit-card-tab', null); initUnitCardPage410E()">🧬 Scheda Unità</button>
+        <button class="btn btn-ghost btn-sm side-nav-btn submenu-btn" onclick="showTab('database-tab', null); loadDatabaseDashboard()">📊 Database / KPI</button>
+        <button class="btn btn-ghost btn-sm side-nav-btn submenu-btn" onclick="showTab('production-analysis-tab', null); loadProductionAnalysisDashboard412A()">📈 Analisi Produzione</button>
+        <button class="btn btn-ghost btn-sm side-nav-btn submenu-btn" onclick="showTab('data-archive-tab', null); loadDataArchiveDashboard412B()">🗄️ Archivio Dati</button>
+      </details>
+      <details class="submenu-device" open><summary>🧰 Strumenti <span>▾</span></summary>
+        
+        <button class="btn btn-ghost btn-sm side-nav-btn submenu-btn" onclick="showTab('pl303-tab', null); loadPl303Settings()">🔋 Alimentatore PL303</button>
+        <button class="btn btn-ghost btn-sm side-nav-btn submenu-btn" onclick="showTab('esp32-tab', document.querySelector('[data-tab=esp32]')); initEsp32ControlPage()">🧩 ESP32 Controller I/O</button>
+        <button class="btn btn-ghost btn-sm side-nav-btn submenu-btn" onclick="showTab('commhub-tab', null); initCommunicationHub()">💬 Communication Hub</button>
+        <button class="btn btn-ghost btn-sm side-nav-btn submenu-btn" onclick="showTab('qr-tab', null); setTimeout(()=>document.getElementById('qr-manual-input-standalone')?.focus(),150)">▦ Scanner QR / Serial Number</button>
+        <button class="btn btn-ghost btn-sm side-nav-btn submenu-btn" onclick="showTab('meter-tab', document.querySelector('[data-tab=meter]'))">📊 Keysight Multimetro</button>
+        <button class="btn btn-ghost btn-sm side-nav-btn submenu-btn" onclick="showTab('flash-tab', document.querySelector('[data-tab=flash]'))">⚡ Flash</button>
+      </details>
+      <details class="nav-group"><summary>🔧 Impostazioni <span>▾</span></summary>
+        <button class="btn btn-ghost btn-sm side-nav-btn submenu-btn" onclick="showTab('device-tab', null); renderDeviceManagerPage326()">🧠 Device Manager</button>
+        <button class="btn btn-ghost btn-sm side-nav-btn submenu-btn" onclick="showTab('branding-tab', document.querySelector('[data-tab=branding]')); loadAppSettings()">🏷️ Loghi HMI / Report</button>
+        <button class="btn btn-ghost btn-sm side-nav-btn submenu-btn" onclick="showTab('users-tab', document.querySelector('[data-tab=users]')); refreshRolesUsers()">🔐 Utenti & Ruoli</button>
+        <button class="btn btn-ghost btn-sm side-nav-btn submenu-btn" onclick="showTab('settings-tab', document.querySelector('[data-tab=settings]'))">⚙️ Configurazione</button>
+      </details>
+    </div>
+  </div>
+
+  <!-- CENTER -->
+  <div id="center">
+    <div class="tab-bar">
+      <button class="tab-btn active" data-tab="run" onclick="showTab('run-tab', this)">▶ Esecuzione</button>
+      <button class="tab-btn" data-tab="meter" onclick="showTab('meter-tab', this)">📊 Multimetro</button>
+      <button class="tab-btn" data-tab="recipe" onclick="showTab('recipe-tab', this); renderRecipePage()">🧾 Ricette & Step</button>
+    </div>
+
+    <!-- TAB: RUN -->
+    <div id="run-tab" class="tab-content active">
+      <div class="brand-hero">
+        <div>
+          <div style="font-size:11px;color:var(--text2);letter-spacing:1px;">PAGINA PRINCIPALE TEST</div>
+          <div style="font-size:22px;font-weight:900;color:var(--accent);">Esecuzione ricette</div>
+          <div style="font-size:12px;color:var(--text2);">Logo HMI grande configurabile dalla pagina Loghi.</div>
+        </div>
+        <img id="hmi-main-large-logo" class="hmi-main-logo-large" title="Logo HMI principale">
+        <div class="run-mini-kpi"><div class="kpi-card"><div class="kpi-val" id="kpi-total-mini">0</div><div class="kpi-lbl">TOTAL</div></div><div class="kpi-card"><div class="kpi-val" id="kpi-passed-mini" style="color:var(--pass)">0</div><div class="kpi-lbl">PASS</div></div><div class="kpi-card"><div class="kpi-val" id="kpi-failed-mini" style="color:var(--fail)">0</div><div class="kpi-lbl">FAIL</div></div><div class="kpi-card"><div class="kpi-val" id="kpi-yield-mini" style="color:var(--accent)">0%</div><div class="kpi-lbl">YIELD</div></div></div>
+      </div>
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-val" id="kpi-total">0</div>
+          <div class="kpi-lbl">TOTALE</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-val" id="kpi-yield" style="color:var(--accent)">0%</div>
+          <div class="kpi-lbl">YIELD</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-val" id="kpi-passed" style="color:var(--pass)">0</div>
+          <div class="kpi-lbl">PASS</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-val" id="kpi-failed" style="color:var(--fail)">0</div>
+          <div class="kpi-lbl">FAIL</div>
+        </div>
+      </div>
+
+      <div class="dashboard-production-grid">
+        <div class="dashboard-card">
+          <h3>🧪 Produzione / Ricetta da eseguire</h3>
+          <div class="dashboard-recipe-row">
+            <div class="col"><label>Cliente</label><input id="dash-client-filter" placeholder="filtra cliente" oninput="refreshDashboardRecipes()"></div>
+            <div class="col"><label>Ricetta</label><select id="dash-recipe-select" onchange="loadDashboardRecipeSelection()"></select></div>
+            <button class="btn btn-ghost btn-sm" onclick="refreshDashboardRecipes()">🔄 Ricette</button>
+            <button class="btn btn-primary btn-sm" onclick="loadDashboardRecipeSelection()">📂 Seleziona</button>
+          </div>
+          <div class="dashboard-meta-row">
+            <div class="col"><label>Commessa / Lotto</label><input id="lot-number-dash" placeholder="Commessa produzione" oninput="setLotNumber(this.value)"></div>
+            <div class="col"><label>Serial Number scheda</label><input id="serial-dut-dash" placeholder="QR o manuale" oninput="setSerialFromQrPanel(this.value)"><label class="hint" style="display:flex;gap:6px;align-items:center;margin-top:4px;"><input id="serial-required-dash" type="checkbox" checked onchange="setSerialRequired(this.checked)"> SN obbligatorio</label></div>
+          </div>
+          <div class="dashboard-start-row">
+            <button id="btn-start-dashboard" data-ui-id="dashboard.action.start" class="btn btn-success btn-3d exec-btn atmec-dashboard-action" onclick="startTestFromDashboard()">🚀 Avvia test</button>
+            <button id="btn-pause-dashboard" data-ui-id="dashboard.action.pause" class="btn btn-warn btn-3d exec-btn atmec-dashboard-action" onclick="pauseTest()">⏸ Pausa</button>
+            <button id="btn-stop-dashboard" data-ui-id="dashboard.action.stop" class="btn btn-danger btn-3d exec-btn atmec-dashboard-action" onclick="stopTestAndReset()">🛑 Stop test</button>
+            <button id="btn-testmode-dashboard" data-ui-id="dashboard.action.testmode" class="btn btn-primary btn-3d exec-btn atmec-dashboard-action" onclick="enterProductionTestMode()">🖥 Test Mode</button>
+          </div>
+        </div>
+        <div class="dashboard-card">
+          <h3>🔌 Strumenti collegati</h3>
+          <div id="dashboard-device-list" class="dashboard-hw-list"><div class="hint">Caricamento strumenti...</div></div>
+          <div class="row" style="margin-top:10px;"><button class="btn btn-primary btn-sm" onclick="autoConnectProductionInstruments(true); setTimeout(renderDashboardDevices,500)">🔌 Auto collega</button><button class="btn btn-ghost btn-sm" onclick="renderDashboardDevices()">🔄 Aggiorna</button></div>
+        </div>
+      </div>
+
+      <div id="result-banner" class="result-banner"></div>
+      <div id="fault-panel" class="fault-panel">
+        <h4>⚠️ FAULT RILEVATO</h4>
+        <p id="fault-cause"></p>
+        <p id="fault-check" style="font-style:italic;"></p>
+        <button class="btn btn-warn btn-sm" onclick="recoverFault()">🔄 RECUPERA</button>
+      </div>
+
+      <div class="run-actions-modern">
+        <button id="btn-start" class="btn btn-success btn-3d" onclick="startTest()">▶ TEST</button>
+        <button id="btn-pause" class="btn btn-warn btn-3d" onclick="pauseTest()" disabled>⏸ IN ESECUZIONE / PAUSA</button>
+        <button id="btn-stop"  class="btn btn-danger btn-3d" onclick="stopTest()" disabled>⏹ STOP</button>
+        <button class="btn btn-primary btn-3d" onclick="enterProductionTestMode()">🖥️ TEST MODE</button>
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:11px;">
+          <input type="checkbox" id="debug-chk" onchange="toggleDebug(this.checked)">
+          <span>Debug Step-by-Step</span>
+        </label>
+        <button id="btn-next-step" class="btn btn-ghost btn-sm" onclick="nextStep()" disabled>⏭ Next Step</button>
+      </div>
+
+      <div style="display:flex;gap:4px;align-items:center;">
+        <div style="font-size:10px;color:var(--text2);letter-spacing:1px;">STEP LOG</div>
+        <div style="flex:1;border-top:1px solid var(--border);"></div>
+        <button class="btn btn-ghost btn-xs" onclick="clearLog()">Clear</button>
+      </div>
+      <div id="run-log" class="log-list" style="flex:1;"></div>
+    </div>
+
+    <!-- TAB: MULTIMETRO / KEYSIGHT 34461A -->
+    <div id="meter-tab" class="tab-content">
+      <div class="wizard-card" style="margin-bottom:12px;">
+        <h3>📊 Keysight 34461A — Multimetro digitale</h3>
+        <div class="hint">Connessione supportata: Ethernet/LAN SCPI TCP 5025, USB/COM se Windows espone una porta seriale, oppure USB/VISA tramite Keysight IO Libraries e bridge VISA esterno. Usa TEST CONNESSIONE prima delle ricette con misure DMM.</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;align-items:end;">
+          <div class="col">
+            <label>Tipo connessione</label>
+            <select id="meter-conn-mode" onchange="syncKeysightMeterMode()">
+              <option value="ETH">Ethernet / LAN SCPI</option>
+              <option value="USB_COM">USB / COM</option>
+              <option value="USB_VISA">USB / VISA Resource</option>
+            </select>
+          </div>
+          <div class="col" id="meter-host-box">
+            <label id="meter-host-label">IP / Host</label>
+            <input id="meter-host" placeholder="192.168.1.100">
+          </div>
+          <div class="col">
+            <label id="meter-port-label">Porta TCP / Baud</label>
+            <input id="meter-port" type="number" value="5025">
+          </div>
+          <div class="col" id="meter-com-box" style="display:none;">
+            <label>Porta USB/COM</label>
+            <div class="row"><select id="meter-com" style="flex:1"><option value="">Seleziona COM</option></select><button class="btn btn-ghost btn-sm" onclick="scanKeysightUsbPorts()">🔎 USB</button></div>
+          </div>
+          <div class="col" id="meter-visa-box" style="display:none;">
+            <label>VISA Resource</label>
+            <div class="row"><input id="meter-visa" style="flex:1" placeholder="USB0::0x2A8D::0x1301::MY57216945::0::INSTR"><button class="btn btn-ghost btn-sm" onclick="scanKeysightVisaResources()">🔎 VISA</button></div>
+          </div>
+          <div class="col">
+            <label>Comando manuale SCPI</label>
+            <input id="meter-manual-cmd" value="*IDN?" placeholder="*IDN? / MEAS:VOLT:DC?">
+          </div>
+        </div>
+        <div class="row" style="margin-top:10px;flex-wrap:wrap;">
+          <button class="btn btn-primary btn-sm" onclick="connectKeysightFromPage()">🔌 Collega Keysight</button>
+          <button class="btn btn-ghost btn-sm" onclick="keysightIdn()">🧾 *IDN?</button>
+          <button class="btn btn-ghost btn-sm" onclick="keysightManualQuery()">⌨ Interroga SCPI</button>
+          <button class="btn btn-ghost btn-sm" onclick="saveKeysightSettingsFromPage()">💾 Salva impostazioni</button>
+        </div>
+        <div id="keysight-status" class="detail-line" style="margin-top:8px;">Stato Keysight: N/D</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div class="meter-display">
+          <div class="meter-label">TENSIONE DC</div>
+          <div class="meter-value" id="m-volt">---</div>
+          <div class="meter-unit">V</div>
+        </div>
+        <div class="meter-display">
+          <div class="meter-label">CORRENTE DC</div>
+          <div class="meter-value" id="m-curr">---</div>
+          <div class="meter-unit">A</div>
+        </div>
+        <div class="meter-display">
+          <div class="meter-label">RESISTENZA</div>
+          <div class="meter-value" id="m-res">---</div>
+          <div class="meter-unit">Ω</div>
+        </div>
+        <div class="meter-display">
+          <div class="meter-label">FREQUENZA</div>
+          <div class="meter-value" id="m-freq">---</div>
+          <div class="meter-unit">Hz</div>
+        </div>
+      </div>
+      <div class="col">
+        <label>Strumento usato dalla ricetta</label>
+        <select id="meter-device">
+          <option value="Keysight_34461A">Keysight 34461A</option>
+          <option value="AimTTi_PL303">Aim-TTi PL303</option>
+        </select>
+      </div>
+      <div class="row" style="flex-wrap:wrap;">
+        <button class="btn btn-primary btn-sm" onclick="queryMeter('MEAS:VOLT:DC?','m-volt','V')">Misura Volt DC</button>
+        <button class="btn btn-primary btn-sm" onclick="queryMeter('MEAS:VOLT:AC?','m-volt','V')">Volt AC</button>
+        <button class="btn btn-primary btn-sm" onclick="queryMeter('MEAS:CURR:DC?','m-curr','A')">Corrente DC</button>
+        <button class="btn btn-primary btn-sm" onclick="queryMeter('MEAS:CURR:AC?','m-curr','A')">Corrente AC</button>
+        <button class="btn btn-primary btn-sm" onclick="queryMeter('MEAS:RES?','m-res','Ω')">Resistenza</button>
+        <button class="btn btn-primary btn-sm" onclick="queryMeter('MEAS:FREQ?','m-freq','Hz')">Frequenza</button>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <label style="margin:0;">Live:</label>
+        <select id="meter-live-command"><option value="MEAS:VOLT:DC?">VDC</option><option value="MEAS:VOLT:AC?">VAC</option><option value="MEAS:CURR:DC?">IDC</option><option value="MEAS:RES?">OHM</option></select>
+        <input type="checkbox" id="auto-poll-chk" onchange="toggleAutoPoll(this.checked)">
+        <span style="font-size:10px;color:var(--text2)">aggiornamento ogni 1500 ms</span>
+      </div>
+      <div>
+        <label>Trend Tensione</label>
+        <canvas id="trendChart" width="800" height="160"></canvas>
+      </div>
+      <div class="log-list" id="keysight-log" style="height:120px;margin-top:8px;"></div>
+    </div>
+
+
+
+    <!-- TAB: ALIMENTATORE PL303 -->
+    <div id="pl303-tab" class="tab-content">
+      <div class="pl303-grid">
+        <div class="pl303-card">
+          <h3>🔋 Aim-TTi PL303QMD-P — Alimentatore programmabile 2 canali</h3>
+          <div class="hint">Pagina dedicata per collegamento USB o Ethernet e impostazione manuale separata di CH1 e CH2. I comandi sono protetti da timeout per non bloccare la HMI.</div>
+          <div class="col">
+            <label>Modalità collegamento</label>
+            <select id="pl303-mode" onchange="syncPl303ModeFields()">
+              <option value="USB">USB / seriale COM</option>
+              <option value="ETHERNET">Ethernet / TCP SCPI</option>
+            </select>
+          </div>
+          <div id="pl303-usb-fields" class="pl303-mode-fields">
+            <div class="col"><label>Porta COM</label><div class="row"><select id="pl303-com" style="flex:1"><option value="mock">mock</option></select><button class="btn btn-ghost btn-sm" onclick="scanPl303SerialPorts()">🔎</button></div></div>
+            <div class="col"><label>Baud</label><input id="pl303-baud" type="number" value="9600"></div>
+          </div>
+          <div id="pl303-eth-fields" class="pl303-mode-fields" style="display:none;">
+            <div class="col"><label>IP / Host</label><input id="pl303-host" placeholder="192.168.0.50"></div>
+            <div class="col"><label>Porta TCP</label><input id="pl303-port" type="number" value="9221"></div>
+          </div>
+          <div class="row" style="margin-top:10px;">
+            <button class="btn btn-primary" onclick="connectPl303()">🔌 Collega PL303</button>
+            <button class="btn btn-danger" onclick="safePl303Off()">🛑 CH1+CH2 OFF SICURO</button>
+            <button class="btn btn-ghost" onclick="queryPl303Status()">📡 Leggi stato</button>
+            <button class="btn btn-ghost" onclick="savePl303SettingsOnly()">💾 Salva impostazioni</button>
+          </div>
+          <div class="row" style="margin-top:10px;align-items:end;">
+            <label class="row" style="gap:6px;align-items:center;"><input id="pl303-live-enabled" type="checkbox" onchange="togglePl303Live(this.checked)"> Live PL303</label>
+            <div class="col" style="max-width:160px;"><label>Intervallo live ms</label><input id="pl303-live-interval" type="number" min="1000" step="500" value="2500" onchange="restartPl303LiveIfEnabled()"></div>
+            <button class="btn btn-secondary btn-sm" onclick="pl303LiveOnce(true)">🔄 Aggiorna ora</button>
+            <span id="pl303-live-state" class="detail-line">Live OFF</span>
+          </div>
+          <div id="pl303-port-list" class="detail-line" style="margin-top:8px;"></div>
+        </div>
+
+        <div class="pl303-card wide">
+          <h3>⚙️ Uscite indipendenti PL303QMD-P</h3>
+          <div class="hint">AT-MEC_HM_3.6: il PL303QMD-P viene gestito come alimentatore a due canali indipendenti. Ogni canale ha setpoint, ON/OFF e lettura separata.</div>
+          <div class="pl303-channel-grid">
+            <div class="pl303-channel-card">
+              <h4>CH1</h4>
+              <div class="pl303-display">
+                <div class="pl303-meter"><div id="pl303-ch1-v-read" class="num">--.--</div><div class="lbl">VOLT</div></div>
+                <div class="pl303-meter"><div id="pl303-ch1-i-read" class="num">--.--</div><div class="lbl">AMPERE</div></div>
+              </div>
+              <div class="pl303-mode-fields">
+                <div class="col"><label>CH1 Tensione V</label><input id="pl303-ch1-set-v" type="number" step="0.001" min="0" max="30" value="5.000"></div>
+                <div class="col"><label>CH1 Corrente A</label><input id="pl303-ch1-set-i" type="number" step="0.001" min="0" max="3" value="0.500"></div>
+              </div>
+              <div class="row" style="margin-top:12px;">
+                <button class="btn btn-success btn-3d" onclick="setPl303Output(1,true)">⚡ CH1 SET + ON</button>
+                <button class="btn btn-danger btn-3d" onclick="setPl303Output(1,false)">⏹ CH1 OFF</button>
+                <button class="btn btn-ghost" onclick="queryPl303Status(1)">📡 CH1 READ</button>
+                <button class="btn btn-secondary" onclick="measurePl303Current(1)">📈 CH1 MISURA I</button>
+              </div>
+            </div>
+            <div class="pl303-channel-card">
+              <h4>CH2</h4>
+              <div class="pl303-display">
+                <div class="pl303-meter"><div id="pl303-ch2-v-read" class="num">--.--</div><div class="lbl">VOLT</div></div>
+                <div class="pl303-meter"><div id="pl303-ch2-i-read" class="num">--.--</div><div class="lbl">AMPERE</div></div>
+              </div>
+              <div class="pl303-mode-fields">
+                <div class="col"><label>CH2 Tensione V</label><input id="pl303-ch2-set-v" type="number" step="0.001" min="0" max="30" value="12.000"></div>
+                <div class="col"><label>CH2 Corrente A</label><input id="pl303-ch2-set-i" type="number" step="0.001" min="0" max="3" value="0.500"></div>
+              </div>
+              <div class="row" style="margin-top:12px;">
+                <button class="btn btn-success btn-3d" onclick="setPl303Output(2,true)">⚡ CH2 SET + ON</button>
+                <button class="btn btn-danger btn-3d" onclick="setPl303Output(2,false)">⏹ CH2 OFF</button>
+                <button class="btn btn-ghost" onclick="queryPl303Status(2)">📡 CH2 READ</button>
+                <button class="btn btn-secondary" onclick="measurePl303Current(2)">📈 CH2 MISURA I</button>
+              </div>
+            </div>
+          </div>
+          <div id="pl303-status" class="log-list" style="height:160px;margin-top:12px;"></div>
+        </div>
+      </div>
+</div>
+
+
+
+    <!-- TAB: DEVICE MANAGER SEPARATO 3.30 -->
+    <div id="device-tab" class="tab-content">
+      <div class="recipe-big-card">
+        <h3>🧠 Device Manager</h3>
+        <div class="hint">Pagina separata strumenti. Non è più dentro Ricette & Step.</div>
+        <div id="device-manager-page" class="device-manager-mini"></div>
+      </div>
+    </div>
+
+    <!-- TAB: COMMUNICATION HUB 3.30 -->
+    <div id="commhub-tab" class="tab-content">
+      <div class="comm-grid">
+        <div class="comm-card">
+          <h3>💬 Communication Hub</h3>
+          <div class="hint">Terminale stile PuTTY per Seriale, Telnet e TCP. I valori RX possono diventare variabili e regole PASS/FAIL.</div>
+          <label>Tipo collegamento</label>
+          <select id="comm-type" onchange="updateCommModeUi()"><option value="serial">Seriale COM</option><option value="telnet">Telnet</option><option value="tcp">TCP Client</option></select>
+          <div id="comm-serial-box">
+            <label>Porta COM</label><div class="row"><select id="comm-port"><option value="">seleziona porta</option></select><button class="btn btn-ghost btn-sm" onclick="scanCommPorts()">🔎</button></div>
+            <label>Baudrate</label><input id="comm-baud" value="115200" inputmode="numeric">
+          </div>
+          <div id="comm-tcp-box" style="display:none;">
+            <label>IP / Host</label><input id="comm-host" placeholder="192.168.1.100">
+            <label>Porta</label><input id="comm-tcp-port" value="23" inputmode="numeric">
+          </div>
+          <div class="row" style="margin-top:10px;"><button class="btn btn-success btn-sm" onclick="openCommunication()">🔌 Connetti</button><button class="btn btn-danger btn-sm" onclick="closeCommunication()">⛔ Disconnetti</button></div>
+          <div id="comm-status" class="hint" style="margin-top:8px;">Non connesso.</div>
+          <hr style="border-color:var(--border);margin:12px 0;">
+          <label>Comando TX</label>
+          <textarea id="comm-tx" rows="4" placeholder="es. *IDN? oppure READ"></textarea>
+          <label style="display:flex;gap:8px;align-items:center;margin-top:6px;"><input id="comm-newline" type="checkbox" checked> Aggiungi newline</label>
+          <button class="btn btn-primary" onclick="sendCommunication()">📤 Invia comando</button>
+        </div>
+        <div class="comm-card">
+          <h3>📟 RX / TX Live</h3>
+          <div id="comm-log" class="comm-log"></div>
+        </div>
+        <div class="comm-card">
+          <h3>🧪 Parser PASS/FAIL</h3>
+          <label>Nome variabile da cercare</label><input id="comm-parser-key" value="VOLT" placeholder="es. VOLT, TEMP, CURR">
+          <div class="row"><div class="col"><label>Min</label><input id="comm-parser-min" value="23" inputmode="decimal"></div><div class="col"><label>Max</label><input id="comm-parser-max" value="25" inputmode="decimal"></div></div>
+          <label>Salva come variabile ricetta</label><input id="comm-parser-var" value="VIN" placeholder="VIN">
+          <button class="btn btn-warn" onclick="testCommParserLast()">🧪 Test parser su ultimo RX</button>
+          <div class="comm-step-actions">
+            <button class="btn btn-primary btn-sm" onclick="addCommReadStepToRecipe326()">➕ Step lettura RX</button>
+            <button class="btn btn-primary btn-sm" onclick="addCommWriteStepToRecipe326()">➕ Step scrittura TX</button>
+            <button class="btn btn-success btn-sm" onclick="addCommVerifyStepToRecipe326()">➕ Step verifica PASS/FAIL</button>
+            <button class="btn btn-ghost btn-sm" onclick="exportCommLog326()">📤 Export esiti/log</button>
+            <button class="btn btn-ghost btn-sm" onclick="importCommLog326()">📥 Import esiti</button>
+            <button class="btn btn-ghost btn-sm" onclick="registerSerialFromCommRx326()">▦ Registra seriale da RX</button>
+          </div>
+          <div id="comm-parser-result" class="manual-input-panel" style="min-height:90px;"><b>Risultato parser</b><div class="hint">Esempio RX: VOLT=24.1 → PASS se dentro min/max.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: SCANNER QR -->
+    <div id="qr-tab" class="tab-content">
+      <div class="recipe-big-card">
+        <h3>▦ Scanner QR / Serial Number</h3>
+        <div class="hint">Scanner USB HID, inserimento manuale o webcam. Il valore viene usato come Serial Number della singola scheda.</div>
+        <div class="row">
+          <input id="qr-manual-input-standalone" class="qr-big-input" placeholder="Scansiona o inserisci seriale" oninput="setSerialFromQrPanel(this.value); const q=document.getElementById('qr-manual-input'); if(q) q.value=this.value;">
+          <button class="btn btn-primary" onclick="startQr()">📷 Camera</button>
+          <button class="btn btn-ghost" onclick="stopQr()">Stop</button>
+        </div>
+        <div class="hint">Suggerimento: uno scanner QR USB si comporta come tastiera. Clicca nel campo e scansiona.</div>
+      </div>
+    </div>
+
+    <!-- TAB: FLASH -->
+    <div id="flash-tab" class="tab-content">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div class="col">
+          <label>Programmatore</label>
+          <select id="flash-tool">
+            <option value="JLinkLite">J-LINK LITE</option>
+            <option value="JLink">J-LINK</option>
+            <option value="STLink">ST-LINK</option>
+            <option value="JTAG">JTAG generico</option>
+            <option value="SWD">SWD generico</option>
+            <option value="SPI">SPI programmer</option>
+            <option value="I2C">I2C programmer</option>
+          </select>
+        </div>
+        <div class="col">
+          <label>Operazione</label>
+          <select id="flash-op">
+            <option value="FLASH">FLASH (Programma)</option>
+            <option value="ERASE">ERASE (Cancella)</option>
+            <option value="VERIFY">VERIFY (Verifica)</option>
+          </select>
+        </div>
+      </div>
+      <div class="col">
+        <label>File Firmware (.hex / .bin)</label>
+        <div class="row">
+          <input id="flash-path" placeholder="Percorso file..." readonly>
+          <button class="btn btn-ghost btn-sm" onclick="browseFile()">📂</button>
+          <button class="btn btn-ghost btn-sm" onclick="document.getElementById('flash-path').value='mock'">Demo</button>
+        </div>
+      </div>
+      <div class="row">
+        <button class="btn btn-danger" onclick="runFlash()">⚡ ESEGUI OPERAZIONE</button>
+        <button class="btn btn-ghost btn-sm" onclick="clearFlashLog()">Clear Log</button>
+      </div>
+      <div style="display:flex;gap:4px;align-items:center;margin-top:4px;">
+        <div style="font-size:10px;color:var(--text2)">OUTPUT CLI</div>
+        <div style="flex:1;border-top:1px solid var(--border);"></div>
+        <div id="flash-status" style="font-size:10px;"></div>
+      </div>
+      <div id="flash-log" class="log-list" style="min-height:200px;font-size:11px;"></div>
+    </div>
+
+    <!-- TAB: TEST REPORT -->
+    <div id="audit-tab" class="tab-content">
+      <div class="recipe-big-card">
+        <h3>📁 Test Report</h3>
+        <div class="hint">Filtra storico per commessa, data test, serial number, operatore, schede PASS/FAIL.</div>
+        <div class="recipe-page-toolbar">
+          <div class="col"><label>Commessa/Lotto</label><input id="audit-lot" placeholder="commessa"></div>
+          <div class="col"><label>Serial Number</label><input id="audit-serial" placeholder="seriale"></div>
+          <div class="col"><label>Operatore</label><input id="audit-operator" placeholder="operatore"></div>
+          <div class="col"><label>Esito</label><select id="audit-result"><option value="ALL">Tutti</option><option value="PASS">PASS</option><option value="FAIL">FAIL</option></select></div>
+          <div class="col"><label>Dal</label><input id="audit-date-from" type="date"></div>
+          <div class="col"><label>Al</label><input id="audit-date-to" type="date"></div>
+          <div class="col"><label>Filtro libero</label><input id="audit-filter" placeholder="ricetta, seriale, note..."></div>
+        </div>
+        <div class="row" style="margin:8px 0;">
+          <button class="btn btn-primary btn-sm" onclick="loadAudit()">🔎 Applica filtri</button>
+          <button class="btn btn-ghost btn-sm" onclick="clearAuditFilters()">🧹 Pulisci</button>
+          <button class="btn btn-ghost btn-sm" onclick="window.api.openCertificatesFolder()">📁 Certificati PDF</button>
+          <button class="btn btn-ghost btn-sm" onclick="exportAuditCsv('ALL')">📤 Esporta storico filtrato CSV</button>
+          <button class="btn btn-ghost btn-sm" onclick="exportAuditCsv('PASS')">✅ Esporta PASS</button>
+          <button class="btn btn-ghost btn-sm" onclick="exportAuditCsv('FAIL')">❌ Esporta FAIL</button>
+          <button class="btn btn-primary btn-sm" onclick="exportSerialHistoryPdf()">🧾 PDF storico seriale/riparazioni</button>
+        </div>
+      </div>
+      <div style="overflow:auto;flex:1;">
+        <table class="audit-tbl" id="audit-tbl">
+          <thead><tr><th>Data test</th><th>Commessa</th><th>Operatore</th><th>Ricetta</th><th>Seriale</th><th>Tempo</th><th>Esito</th><th>Riparazione</th></tr></thead>
+          <tbody id="audit-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+
+    <!-- TAB: STORICO SERIALI / RIPARAZIONI -->
+    <div id="traceability-tab" class="tab-content">
+      <div class="recipe-big-card">
+        <h3>🔎 Storico Seriali & Riparazioni</h3>
+        <div class="hint">Modulo indipendente di consultazione seriale. Non modifica ricette, Test Mode, Layout Editor o gestione hardware.</div>
+        <div class="recipe-page-toolbar traceability-filter-toolbar">
+          <div class="col"><label>Seriale scheda</label><input id="trace-serial-input" placeholder="Scansiona o inserisci SN"></div>
+          <div class="col"><label>Commessa / Lotto</label><input id="trace-lot-input" placeholder="opzionale"></div>
+          <div class="col"><label>Operatore</label><input id="trace-operator-input" placeholder="opzionale"></div>
+          <div class="col"><label>Ricetta</label><input id="trace-recipe-input" placeholder="opzionale"></div>
+          <div class="col"><label>Esito</label><select id="trace-result-input"><option value="ALL">Tutti</option><option value="PASS">PASS</option><option value="FAIL">FAIL</option></select></div>
+          <div class="col"><label>Data da</label><input id="trace-date-from-input" type="date"></div>
+          <div class="col"><label>Data a</label><input id="trace-date-to-input" type="date"></div>
+        </div>
+        <div class="row traceability-action-row" style="margin:8px 0;">
+          <button class="btn btn-primary btn-sm" onclick="loadTraceabilitySerialHistory()">🔎 Cerca storico</button>
+          <button class="btn btn-ghost btn-sm" onclick="clearTraceabilitySerialPage()">🧹 Pulisci</button>
+          <button class="btn btn-ghost btn-sm" onclick="exportTraceabilityCsv411()">📤 CSV</button>
+          <button class="btn btn-ghost btn-sm" onclick="printTraceabilitySerialHistory()">🧾 Stampa / PDF</button>
+          <button class="btn btn-ghost btn-sm" onclick="openTraceabilityUnitCard411()">🧬 Apri Scheda Unità</button>
+        </div>
+      </div>
+      <div class="traceability-stats-grid">
+        <div class="traceability-stat-card"><div class="traceability-stat-val" id="trace-total-tests">0</div><div class="traceability-stat-lbl">TEST</div></div>
+        <div class="traceability-stat-card"><div class="traceability-stat-val" id="trace-last-result" style="color:var(--accent)">N/D</div><div class="traceability-stat-lbl">ULTIMO ESITO</div></div>
+        <div class="traceability-stat-card"><div class="traceability-stat-val" id="trace-repair-count">0</div><div class="traceability-stat-lbl">RIPARAZIONI</div></div>
+        <div class="traceability-stat-card"><div class="traceability-stat-val" id="trace-retest-count">0</div><div class="traceability-stat-lbl">RETEST</div></div>
+      </div>
+      <div class="recipe-big-card" style="margin-top:12px;">
+        <h3>🛠 Aggiungi intervento riparazione</h3>
+        <div class="recipe-page-toolbar">
+          <div class="col"><label>Nota intervento</label><input id="trace-repair-note" placeholder="es. sostituito componente / saldatura / verifica"></div>
+          <div class="col"><label>Difetto / causa</label><input id="trace-repair-cause" placeholder="opzionale"></div>
+        </div>
+        <div class="row" style="margin:8px 0;">
+          <button class="btn btn-success btn-sm" onclick="saveTraceabilityRepairNote()">🛠 Salva riparazione</button>
+        </div>
+      </div>
+      <div class="db-panel-grid" style="margin-top:12px;">
+        <div class="recipe-big-card">
+          <h3>📋 Cronologia test</h3>
+          <div id="trace-tests-result" class="log-list" style="min-height:180px;"><div class="hint">Inserisci un seriale e premi Cerca storico.</div></div>
+        </div>
+        <div class="recipe-big-card">
+          <h3>🧯 Cronologia riparazioni</h3>
+          <div id="trace-repairs-result" class="log-list" style="min-height:180px;"><div class="hint">Nessuna ricerca eseguita.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="unit-card-tab" class="tab-content">
+      <div class="recipe-big-card">
+        <h3>🧬 Scheda Unità / Genealogia prodotto</h3>
+        <div class="hint">Modulo separato collegato allo storico seriale. Mostra vita completa della scheda senza modificare Test Mode, Ricette, Layout Editor o hardware.</div>
+        <div class="recipe-page-toolbar">
+          <div class="col"><label>Seriale scheda</label><input id="unit-serial-input" placeholder="Scansiona o inserisci SN"></div>
+          <div class="col"><label>Commessa / Lotto</label><input id="unit-lot-input" placeholder="opzionale"></div>
+          <div class="col"><label>Revisione scheda</label><input id="unit-board-rev-input" placeholder="es. R03 / AX"></div>
+          <div class="col"><label>Firmware</label><input id="unit-fw-input" placeholder="versione FW se nota"></div>
+        </div>
+        <div class="recipe-page-toolbar">
+          <div class="col"><label>Note qualità</label><input id="unit-quality-note-input" placeholder="nota opzionale per questa consultazione"></div>
+          <div class="col"><label>Operatore</label><input id="unit-operator-input" placeholder="opzionale"></div>
+        </div>
+        <div class="row" style="margin:8px 0;">
+          <button class="btn btn-primary btn-sm" onclick="loadUnitGenealogy410E()">🔎 Carica scheda unità</button>
+          <button class="btn btn-ghost btn-sm" onclick="clearUnitCard410E()">🧹 Pulisci</button>
+          <button class="btn btn-ghost btn-sm" onclick="printUnitGenealogy410E()">🧾 Stampa / PDF</button>
+        </div>
+      </div>
+      <div class="unit-card-stats-grid">
+        <div class="unit-card-stat"><div class="unit-card-stat-val" id="unit-last-result" style="color:var(--accent)">N/D</div><div class="unit-card-stat-lbl">ULTIMO ESITO</div></div>
+        <div class="unit-card-stat"><div class="unit-card-stat-val" id="unit-test-count">0</div><div class="unit-card-stat-lbl">TEST TOTALI</div></div>
+        <div class="unit-card-stat"><div class="unit-card-stat-val" id="unit-retest-count">0</div><div class="unit-card-stat-lbl">RETEST</div></div>
+        <div class="unit-card-stat"><div class="unit-card-stat-val" id="unit-repair-count">0</div><div class="unit-card-stat-lbl">RIPARAZIONI</div></div>
+      </div>
+      <div class="db-panel-grid" style="margin-top:12px;">
+        <div class="recipe-big-card">
+          <h3>📌 Identità unità</h3>
+          <div id="unit-identity-box" class="serial-history-card"><div class="hint">Inserisci un seriale e carica la scheda unità.</div></div>
+        </div>
+        <div class="recipe-big-card">
+          <h3>🧾 Stato qualità</h3>
+          <div id="unit-quality-box" class="serial-history-card"><div class="hint">Nessuna scheda caricata.</div></div>
+        </div>
+      </div>
+      <div class="db-panel-grid" style="margin-top:12px;">
+        <div class="recipe-big-card">
+          <h3>🕒 Timeline test e retest</h3>
+          <div id="unit-timeline-box" class="log-list" style="min-height:180px;"><div class="hint">La timeline appare dopo la ricerca.</div></div>
+        </div>
+        <div class="recipe-big-card">
+          <h3>🛠 Riparazioni collegate</h3>
+          <div id="unit-repairs-box" class="log-list" style="min-height:180px;"><div class="hint">Nessuna ricerca eseguita.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="database-tab" class="tab-content">
+      <div class="recipe-big-card">
+        <h3>📊 Database locale & KPI produzione</h3>
+        <div class="hint">Database locale semplice in JSON: ricette versionate, test report, seriali, riparazioni e statistiche. Non richiede installazione server.</div>
+        <div class="recipe-page-toolbar">
+          <div class="col"><label>Commessa/Lotto</label><input id="db-lot" placeholder="commessa"></div>
+          <div class="col"><label>Seriale</label><input id="db-serial" placeholder="seriale"></div>
+          <div class="col"><label>Operatore</label><input id="db-operator" placeholder="operatore"></div>
+          <div class="col"><label>Ricetta</label><input id="db-recipe" placeholder="ricetta"></div>
+          <div class="col"><label>Esito</label><select id="db-result"><option value="ALL">Tutti</option><option value="PASS">PASS</option><option value="FAIL">FAIL</option></select></div>
+          <div class="col"><label>Dal</label><input id="db-date-from" type="date"></div>
+          <div class="col"><label>Al</label><input id="db-date-to" type="date"></div>
+        </div>
+        <div class="row" style="margin:8px 0;">
+          <button class="btn btn-primary btn-sm" onclick="loadDatabaseDashboard()">🔎 Aggiorna KPI</button>
+          <button class="btn btn-ghost btn-sm" onclick="clearDatabaseFilters()">🧹 Pulisci filtri</button>
+          <button class="btn btn-ghost btn-sm" onclick="exportLocalDatabase()">💾 Esporta database locale</button>
+          <button class="btn btn-ghost btn-sm" onclick="exportFilteredReportsCsv()">📤 Export CSV filtrato</button>
+          <button class="btn btn-ghost btn-sm" onclick="backupLocalDatabaseNow()">🧰 Backup DB</button>
+        </div>
+        <div id="db-path" class="hint"></div>
+        <div class="signature-box" style="margin-top:10px;">
+          <b>✍️ Firma operatore base</b>
+          <div class="recipe-page-toolbar" style="margin-top:8px;">
+            <div class="col"><label>Nome firma</label><input id="operator-signature-name" placeholder="Nome e cognome"></div>
+            <div class="col"><label>PIN / conferma</label><input id="operator-signature-pin" type="password" placeholder="facoltativo"></div>
+            <div class="col"><label>Nota firma</label><input id="operator-signature-note" placeholder="conferma collaudo"></div>
+          </div>
+          <button class="btn btn-ghost btn-sm" onclick="saveOperatorSignature()">💾 Salva firma locale</button>
+          <span id="operator-signature-status" class="hint"></span>
+        </div>
+      </div>
+      <div class="recipe-big-card" style="margin-top:12px;">
+        <h3>📦 Gestione lotti 3.16</h3>
+        <div class="hint">Riepilogo immediato per lotto/commessa: seriali collegati, PASS/FAIL, yield e difetti principali.</div>
+        <div class="recipe-page-toolbar">
+          <div class="col"><label>Lotto / commessa</label><input id="lot-manager-input" placeholder="es. LOT-2026-001"></div>
+          <div class="col"><label>Filtro seriale</label><input id="lot-manager-serial" placeholder="opzionale"></div>
+          <div class="col"><label>Esito</label><select id="lot-manager-result"><option value="ALL">Tutti</option><option value="PASS">PASS</option><option value="FAIL">FAIL</option></select></div>
+        </div>
+        <div class="row" style="margin:8px 0;">
+          <button class="btn btn-primary btn-sm" onclick="loadLotDashboard()">🔎 Carica lotto</button>
+          <button class="btn btn-ghost btn-sm" onclick="exportLotCsv()">📤 CSV lotto</button>
+          <button class="btn btn-ghost btn-sm" onclick="exportLotPdf()">🧾 PDF lotto</button>
+          <button class="btn btn-ghost btn-sm" onclick="copyLotToDbFilters()">↗ Usa filtri KPI</button>
+        </div>
+        <div id="lot-dashboard-result" class="lot-card"><div class="hint">Inserisci un lotto per visualizzare riepilogo produzione.</div></div>
+      </div>
+      <div class="kpi-grid" style="margin-top:12px;">
+        <div class="kpi-card"><div class="kpi-val" id="db-total">0</div><div class="kpi-lbl">TEST</div></div>
+        <div class="kpi-card"><div class="kpi-val" id="db-pass" style="color:var(--pass)">0</div><div class="kpi-lbl">PASS</div></div>
+        <div class="kpi-card"><div class="kpi-val" id="db-fail" style="color:var(--fail)">0</div><div class="kpi-lbl">FAIL</div></div>
+        <div class="kpi-card"><div class="kpi-val" id="db-yield" style="color:var(--accent)">0%</div><div class="kpi-lbl">YIELD</div></div>
+        <div class="kpi-card"><div class="kpi-val" id="db-repairs">0</div><div class="kpi-lbl">RIPARAZIONI</div></div>
+        <div class="kpi-card"><div class="kpi-val" id="db-recipes">0</div><div class="kpi-lbl">RICETTE</div></div>
+        <div class="kpi-card"><div class="kpi-val" id="db-fpy" style="color:var(--accent)">0%</div><div class="kpi-lbl">FPY</div></div>
+        <div class="kpi-card"><div class="kpi-val" id="db-retest-rate">0%</div><div class="kpi-lbl">RETEST</div></div>
+        <div class="kpi-card"><div class="kpi-val" id="db-avg-time">0s</div><div class="kpi-lbl">TEMPO MEDIO</div></div>
+        <div class="kpi-card"><div class="kpi-val" id="db-unique-serials">0</div><div class="kpi-lbl">SERIALI</div></div>
+      </div>
+      <div class="recipe-big-card" style="margin-top:12px;">
+        <h3>📈 KPI per ricetta</h3>
+        <div id="db-by-recipe" class="log-list" style="min-height:160px;"></div>
+      </div>
+      <div class="db-panel-grid">
+        <div class="recipe-big-card">
+          <h3>📉 Trend ultimi giorni</h3>
+          <div id="db-daily-trend" class="log-list" style="min-height:140px;"></div>
+        </div>
+        <div class="recipe-big-card">
+          <h3>🧯 Top guasti / step FAIL</h3>
+          <div id="db-top-failures" class="log-list" style="min-height:140px;"></div>
+        </div>
+        <div class="recipe-big-card">
+          <h3>🏭 KPI industriali 4.10I</h3>
+          <div id="db-industrial-kpi" class="log-list" style="min-height:140px;"><div class="hint">Premi Aggiorna KPI.</div></div>
+        </div>
+      </div>
+      <div class="recipe-big-card" style="margin-top:12px;">
+        <h3>🔎 Storico seriale e riparazioni</h3>
+        <div class="recipe-page-toolbar">
+          <div class="col"><label>Seriale</label><input id="serial-history-input" placeholder="SN da cercare"></div>
+          <div class="col"><label>Commessa/Lotto</label><input id="serial-history-lot" placeholder="opzionale"></div>
+          <div class="col"><label>Nota riparazione</label><input id="serial-repair-note" placeholder="cosa è stato riparato"></div>
+        </div>
+        <div class="row" style="margin:8px 0;">
+          <button class="btn btn-primary btn-sm" onclick="loadSerialHistoryPanel()">🔎 Cerca storico seriale</button>
+          <button class="btn btn-success btn-sm" onclick="saveSerialRepairNote()">🛠 Salva riparazione</button>
+          <button class="btn btn-ghost btn-sm" onclick="exportSerialHistoryPdf()">🧾 PDF storico seriale</button>
+        </div>
+        <div id="serial-history-result" class="serial-history-card"><div class="hint">Inserisci un seriale per vedere test precedenti e riparazioni.</div></div>
+      </div>
+    </div>
+
+
+    <!-- TAB: ANALISI PRODUZIONE 4.12A - Modulo KPI separato, non modifica Dashboard/Storico/Scheda -->
+    <div id="production-analysis-tab" class="tab-content">
+      <div class="pa412a-page">
+        <div class="recipe-big-card pa412a-hero">
+          <div>
+            <div style="font-size:11px;color:var(--text2);letter-spacing:1px;">AT-MEC_HM_4.12B</div>
+            <h3>📈 Analisi Produzione</h3>
+            <div class="hint">Modulo separato per KPI industriali. Non modifica Dashboard, Storico Seriali, Scheda Unità, Test Mode o Layout Editor.</div>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="loadProductionAnalysisDashboard412A()">🔄 Aggiorna</button>
+        </div>
+        <div class="recipe-big-card">
+          <h3>🔎 Filtri analisi</h3>
+          <div class="pa412a-filter-grid">
+            <div class="col"><label>Commessa/Lotto</label><input id="pa412a-lot" placeholder="tutti"></div>
+            <div class="col"><label>Seriale</label><input id="pa412a-serial" placeholder="tutti"></div>
+            <div class="col"><label>Operatore</label><input id="pa412a-operator" placeholder="tutti"></div>
+            <div class="col"><label>Ricetta</label><input id="pa412a-recipe" placeholder="tutte"></div>
+            <div class="col"><label>Esito</label><select id="pa412a-result"><option value="ALL">Tutti</option><option value="PASS">PASS</option><option value="FAIL">FAIL</option></select></div>
+            <div class="col"><label>Dal</label><input id="pa412a-date-from" type="date"></div>
+            <div class="col"><label>Al</label><input id="pa412a-date-to" type="date"></div>
+          </div>
+          <div class="row" style="margin-top:10px;">
+            <button class="btn btn-primary btn-sm" onclick="loadProductionAnalysisDashboard412A()">📊 Calcola KPI</button>
+            <button class="btn btn-ghost btn-sm" onclick="clearProductionAnalysisFilters412A()">🧹 Pulisci</button>
+          </div>
+          <div id="pa412a-status" class="hint" style="margin-top:8px;">Premi Calcola KPI.</div>
+        </div>
+        <div class="pa412a-kpi-grid">
+          <div class="pa412a-kpi-card"><span>FPY</span><b id="pa412a-fpy">0%</b><small>PASS al primo colpo / seriali</small></div>
+          <div class="pa412a-kpi-card"><span>Yield</span><b id="pa412a-yield">0%</b><small>PASS / test totali</small></div>
+          <div class="pa412a-kpi-card"><span>Retest Rate</span><b id="pa412a-retest">0%</b><small>seriali con più test</small></div>
+          <div class="pa412a-kpi-card"><span>Tempo medio</span><b id="pa412a-avg-time">0s</b><small>media test filtrati</small></div>
+          <div class="pa412a-kpi-card"><span>PASS oggi</span><b id="pa412a-pass-today">0</b><small>giornata corrente</small></div>
+          <div class="pa412a-kpi-card"><span>FAIL oggi</span><b id="pa412a-fail-today">0</b><small>giornata corrente</small></div>
+          <div class="pa412a-kpi-card"><span>Seriali</span><b id="pa412a-serials">0</b><small>seriali unici</small></div>
+          <div class="pa412a-kpi-card"><span>Test totali</span><b id="pa412a-total">0</b><small>record filtrati</small></div>
+        </div>
+        <div class="pa412a-panel-grid">
+          <div class="recipe-big-card">
+            <h3>📉 Trend ultimi giorni</h3>
+            <div id="pa412a-trend" class="pa412a-list"><div class="hint">Nessun dato caricato.</div></div>
+          </div>
+          <div class="recipe-big-card">
+            <h3>🧯 Top Failure</h3>
+            <div id="pa412a-top-failures" class="pa412a-list"><div class="hint">Nessun dato caricato.</div></div>
+          </div>
+          <div class="recipe-big-card">
+            <h3>🧾 Ultimo report</h3>
+            <div id="pa412a-latest" class="pa412a-list"><div class="hint">Nessun dato caricato.</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- TAB: ARCHIVIO DATI 4.12B - Modulo separato, non modifica Test Mode/Ricette/Hardware/Layout Editor -->
+    <div id="data-archive-tab" class="tab-content">
+      <div class="da412b-page">
+        <div class="recipe-big-card da412b-hero">
+          <div>
+            <div style="font-size:11px;color:var(--text2);letter-spacing:1px;">AT-MEC_HM_4.12B</div>
+            <h3>🗄️ Archivio Dati & Backup</h3>
+            <div class="hint">Modulo separato per backup, esportazione e controllo archivio. Non modifica Test Mode, ricette, hardware, Layout Editor, Storico o Scheda Unità.</div>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="loadDataArchiveDashboard412B()">🔄 Aggiorna</button>
+        </div>
+        <div class="da412b-grid">
+          <div class="recipe-big-card">
+            <h3>🧰 Backup database</h3>
+            <div class="hint">Crea una copia JSON del database locale nella cartella backup dell'applicazione.</div>
+            <div class="recipe-page-toolbar da412b-toolbar">
+              <div class="col"><label>Etichetta backup</label><input id="da412b-backup-label" placeholder="es. prima_modifica / stabile"></div>
+            </div>
+            <div class="row">
+              <button class="btn btn-success btn-sm" onclick="createArchiveBackup412B()">🧰 Crea backup</button>
+              <button class="btn btn-ghost btn-sm" onclick="verifyDataArchive412B()">✅ Verifica archivio</button>
+            </div>
+            <div id="da412b-backup-status" class="hint" style="margin-top:8px;">Nessun backup creato in questa sessione.</div>
+          </div>
+          <div class="recipe-big-card">
+            <h3>📤 Esporta dati</h3>
+            <div class="hint">Esporta lo storico filtrato per analisi esterna, qualità o backup manuale.</div>
+            <div class="recipe-page-toolbar da412b-toolbar">
+              <div class="col"><label>Seriale</label><input id="da412b-serial" placeholder="tutti"></div>
+              <div class="col"><label>Lotto/Commessa</label><input id="da412b-lot" placeholder="tutti"></div>
+              <div class="col"><label>Operatore</label><input id="da412b-operator" placeholder="tutti"></div>
+              <div class="col"><label>Ricetta</label><input id="da412b-recipe" placeholder="tutte"></div>
+              <div class="col"><label>Esito</label><select id="da412b-result"><option value="ALL">Tutti</option><option value="PASS">PASS</option><option value="FAIL">FAIL</option></select></div>
+              <div class="col"><label>Dal</label><input id="da412b-date-from" type="date"></div>
+              <div class="col"><label>Al</label><input id="da412b-date-to" type="date"></div>
+            </div>
+            <div class="row">
+              <button class="btn btn-primary btn-sm" onclick="previewDataArchive412B()">🔎 Anteprima</button>
+              <button class="btn btn-ghost btn-sm" onclick="exportArchiveCsv412B()">📄 CSV storico</button>
+              <button class="btn btn-ghost btn-sm" onclick="exportArchiveJson412B()">🧾 JSON snapshot</button>
+              <button class="btn btn-ghost btn-sm" onclick="clearArchiveFilters412B()">🧹 Pulisci</button>
+            </div>
+            <div id="da412b-export-status" class="hint" style="margin-top:8px;">Imposta filtri o esporta tutto.</div>
+          </div>
+        </div>
+        <div class="da412b-stats-grid">
+          <div class="da412b-stat-card"><span>Record test</span><b id="da412b-total">0</b><small>storico filtrato</small></div>
+          <div class="da412b-stat-card"><span>Seriali unici</span><b id="da412b-serials">0</b><small>unità tracciate</small></div>
+          <div class="da412b-stat-card"><span>Yield</span><b id="da412b-yield">0%</b><small>PASS / totale</small></div>
+          <div class="da412b-stat-card"><span>Retest</span><b id="da412b-retest">0%</b><small>seriali con più test</small></div>
+        </div>
+        <div class="da412b-panel-grid">
+          <div class="recipe-big-card">
+            <h3>🔎 Anteprima risultati</h3>
+            <div id="da412b-preview" class="da412b-list"><div class="hint">Premi Anteprima per visualizzare gli ultimi record filtrati.</div></div>
+          </div>
+          <div class="recipe-big-card">
+            <h3>🛠 Manutenzione archivio</h3>
+            <div class="da412b-list">
+              <div class="da412b-row"><b>Verifica archivio</b><span>Controlla conteggi e API dati.</span></div>
+              <div class="da412b-row"><b>Backup manuale</b><span>Crea snapshot JSON datato.</span></div>
+              <div class="da412b-row"><b>Preparazione SQLite</b><span>Modulo isolato per futura migrazione JSON → SQLite.</span></div>
+            </div>
+            <div id="da412b-maint-status" class="hint" style="margin-top:8px;">Archivio pronto.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: RICETTE & STEP -->
+    <div id="recipe-tab" data-ui-id="recipe.page" class="tab-content">
+      <div class="recipe-page-layout">
+        <div class="recipe-big-card">
+          <h3>🧾 Gestione ricetta</h3>
+          <div class="recipe-page-toolbar">
+            <div class="col"><label>Ricette salvate</label><div class="row"><select id="recipe-list" onchange="refreshRecipeVersions()"></select><button class="btn btn-ghost btn-sm" onclick="loadSavedRecipe(); renderRecipePage()">📂 Carica</button><button class="btn btn-danger btn-sm" onclick="deleteSelectedRecipe()">🗑 Elimina</button></div></div>
+            <div class="col"><label>Versione</label><div class="row"><select id="recipe-version-list"></select><button class="btn btn-ghost btn-sm" onclick="loadSelectedRecipeVersion()">🕘 Carica versione</button></div></div>
+            <div class="col"><label>Nome ricetta</label><input id="recipe-name-page" data-ui-id="recipe.name.input" placeholder="Nome ricetta" oninput="syncRecipeNameInputs('page')"></div>
+            <div class="col"><label>Cliente</label><input id="recipe-client-page" data-ui-id="recipe.client.input" placeholder="Cliente" oninput="syncRecipeClient(this.value)"></div>
+            <div class="col"><label>Prodotto</label><input id="recipe-product-page" data-ui-id="recipe.product.input" placeholder="Prodotto" oninput="syncRecipeProduct(this.value)"></div>
+            <div class="col"><label>Alimentazione</label><select id="power-source-page" onchange="syncPowerInputs('page')"><option value="PL303_PROGRAMMABLE">PL303 Programmabile</option><option value="ESP32_RELAY_POWER">ESP32 Relay</option><option value="MANUAL_POWER">Manuale</option></select></div>
+            <label style="display:flex;align-items:center;gap:6px;margin:0;min-width:170px;"><input id="recipe-enabled-page" type="checkbox" checked onchange="syncRecipeEnabledInputs('page')" style="width:auto;"> Ricetta abilitata</label>
+          </div>
+          <div class="modern-panel">
+            <div class="recipe-simple-switch">
+              <div><b>🧩 Recipe Builder 2.0</b><div class="hint">Crea gli step con blocchi grafici e template pronti. I campi avanzati restano disponibili solo quando servono.</div></div>
+              <label style="display:flex;align-items:center;gap:6px;margin:0;"><input id="recipe-simple-mode" type="checkbox" checked onchange="toggleRecipeSimpleMode(this.checked)" style="width:auto;"> Modalità semplice</label>
+            </div>
+            <label>Template rapidi</label>
+            <div class="recipe-template-grid">
+              <button class="recipe-template-btn" onclick="addQuickRecipeStep('ps_on')">🔋 Alimentatore ON<span>CH1/CH2, tensione e limite corrente.</span></button>
+              <button class="recipe-template-btn" onclick="addQuickRecipeStep('ps_off')">🛑 Alimentatore OFF<span>Step sicuro per spegnere uscita.</span></button>
+              <button class="recipe-template-btn" onclick="addQuickRecipeStep('measure_voltage')">📏 Misura tensione<span>Valore atteso con min/max.</span></button>
+              <button class="recipe-template-btn" onclick="addQuickRecipeStep('measure_current')">📈 Misura corrente<span>Consumo reale in ampere.</span></button>
+              <button class="recipe-template-btn" onclick="addQuickRecipeStep('measure_ohm')">Ω Misura ohm<span>Resistenza con tolleranza.</span></button>
+              <button class="recipe-template-btn" onclick="addQuickRecipeStep('multi_channel_resistance')">🧪 Test multi-canale Ω<span>Uscite associate, valori separati e canali guasti.</span></button>
+              <button class="recipe-template-btn" onclick="addQuickRecipeStep('measure_freq')">Hz Frequenza<span>Frequenza con limiti.</span></button>
+              <button class="recipe-template-btn" onclick="addQuickRecipeStep('measure_continuity')">🔔 Continuità<span>Controllo circuito aperto/chiuso.</span></button>
+              <button class="recipe-template-btn" onclick="addQuickRecipeStep('measure_temp')">🌡 Temperatura<span>Misura manuale o sensore futuro.</span></button>
+              <button class="recipe-template-btn" onclick="addQuickRecipeStep('measure_power')">⚡ Potenza<span>Calcolo/controllo Watt.</span></button>
+              <button class="recipe-template-btn" onclick="addQuickRecipeStep('manual_value')">✍️ Valore manuale<span>L’operatore inserisce la misura.</span></button>
+              <button class="recipe-template-btn" onclick="addQuickRecipeStep('delay')">⏱ Attesa<span>Tempo di stabilizzazione.</span></button>
+              <button class="recipe-template-btn advanced-recipe-only" onclick="addQuickRecipeStep('save_variable')">💾 Salva variabile<span>Memorizza una misura per step successivi.</span></button>
+              <button class="recipe-template-btn advanced-recipe-only" onclick="addQuickRecipeStep('if_fail_goto')">🔀 IF FAIL → Step<span>Salto condizionato base su errore.</span></button>
+              <button class="recipe-template-btn advanced-recipe-only" onclick="addQuickRecipeStep('loop_3x')">🔁 Loop 3x<span>Ripete un gruppo di step.</span></button>
+            </div>
+            <div class="advanced-recipe-only">
+              <label>Nuovo step guidato per tipologia avanzata</label>
+              <div class="recipe-type-tabs">
+                <div class="recipe-type-tab active" onclick="selectRecipeStepType('DigitalOutputSet', this)">🔌 Uscita digitale<br><span class="hint">solo DO</span></div>
+                <div class="recipe-type-tab" onclick="selectRecipeStepType('DigitalInputCheck', this)">👁️ Ingresso digitale<br><span class="hint">solo DI</span></div>
+                <div class="recipe-type-tab" onclick="selectRecipeStepType('VoltageMeasurement', this)">📊 Multimetro<br><span class="hint">V/I/Ω/Hz</span></div>
+                <div class="recipe-type-tab" onclick="selectRecipeStepType('PowerSupplySet', this)">🔋 Alimentatore<br><span class="hint">PL303 CH1/CH2</span></div>
+                <div class="recipe-type-tab" onclick="selectRecipeStepType('PowerSupplyMeasureCurrent', this)">📈 Consumo<br><span class="hint">Misura corrente PL303</span></div>
+                <div class="recipe-type-tab" onclick="selectRecipeStepType('ManualMeasurement', this)">✋ Manuale<br><span class="hint">istruzioni + misura</span></div>
+                <div class="recipe-type-tab" onclick="selectRecipeStepType('Delay', this)">⏱ Timer<br><span class="hint">attesa</span></div>
+                <div class="recipe-type-tab" onclick="selectRecipeStepType('SCPICommand', this)">💬 SCPI<br><span class="hint">strumenti</span></div>
+              </div>
+            </div>
+            <select id="new-step-type-page" style="display:none"><option value="DigitalOutputSet">DigitalOutputSet</option><option value="DigitalInputCheck">DigitalInputCheck</option><option value="VoltageMeasurement">VoltageMeasurement</option><option value="CurrentMeasurement">CurrentMeasurement</option><option value="AnalogInputMeasurement">AnalogInputMeasurement</option><option value="ResistanceTest">ResistanceTest</option><option value="FrequencyTest">FrequencyTest</option><option value="ManualMeasurement">ManualMeasurement</option><option value="PowerSupplySet">PowerSupplySet</option><option value="PowerSupplyMeasureCurrent">PowerSupplyMeasureCurrent</option><option value="SCPICommand">SCPICommand</option><option value="Delay">Delay</option><option value="FirmwareFlash">FirmwareFlash</option></select>
+            <div class="recipe-actions-grid">
+              <button class="btn btn-primary" onclick="openStepWizardFromPage()">🧙 Aggiungi step</button>
+              <button class="btn btn-primary" onclick="saveRecipe()">💾 Salva</button>
+              <button class="btn btn-warn" onclick="validateRecipeAdvanced(true)">🩺 Valida ricetta</button>
+              <button class="btn btn-ghost" onclick="exportCurrentRecipe()">📤 Esporta</button>
+              <button class="btn btn-ghost" onclick="importRecipeFile()">📥 Importa</button>
+              <button class="btn btn-ghost" onclick="duplicateRecipe(); renderRecipePage()">📑 Duplica</button>
+              <button class="btn btn-danger" onclick="clearRecipe(); renderRecipePage()">🗑️ Pulisci</button>
+            </div>
+          </div>
+          <div class="visual-flow-hint"><span class="flow-block">START</span><span class="flow-block">I/O</span><span class="flow-block">MISURA</span><span class="flow-block">MANUALE</span><span class="flow-block">REPORT</span></div>
+          <div id="recipe-health" class="recipe-health">Verifica ricetta non ancora calcolata.</div>
+          <div class="modern-panel">
+            <b>📊 Qualità base</b>
+            <div id="quality-mini" class="quality-mini-grid"></div>
+          </div>
+          <div class="hint">Gli step sono blocchi grafici: modifica i valori direttamente sul blocco, usa i template rapidi, poi salva la ricetta.</div>
+        </div>
+        <div class="recipe-big-card recipe-step-workspace">
+          <div class="row" style="align-items:center;"><h3 style="flex:1;">🧩 Step ricetta</h3><button class="btn btn-ghost btn-sm" onclick="toggleRecipeDetailsPanel()">👁 Dettagli</button><button class="btn btn-ghost btn-sm" onclick="renderRecipePage()">🔄 Aggiorna</button></div>
+          <div id="recipe-steps-page-list" data-ui-id="recipe.steps.list"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: ESP32 CONTROL -->
+    <div id="esp32-tab" class="tab-content">
+      <div class="esp32-page-grid">
+        <div class="esp32-card">
+          <h3>🧩 ESP32 — connessione semplificata</h3>
+          <div class="esp32-status-line">
+            <span id="esp32-control-conn">Stato: n/d</span>
+            <span id="esp32-control-port">Porta: n/d</span>
+            <span id="esp32-control-fw">FW: n/d</span>
+          </div>
+          <div class="row">
+            <select id="esp32-control-com" style="flex:1"><option value="mock">mock</option></select>
+            <button class="btn btn-ghost btn-sm" onclick="esp32ControlScanPorts()">🔎 Trova ESP32</button>
+            <button class="btn btn-primary btn-sm" onclick="esp32ControlConnect()">🔌 Connetti</button>
+            <button class="btn btn-ghost btn-sm" onclick="esp32ControlInfo()">ℹ️ Info</button>
+          </div>
+          <div id="esp32-control-ports" class="detail-line">Premi “Trova ESP32” o “Auto collega ESP32”. La porta viene salvata anche in Settings e usata dalle ricette come <b>modbus_serial</b>.</div>
+          <div class="esp32-quick-actions">
+            <button class="btn btn-success big-action" onclick="esp32AutoConnectAndUseForRecipes()">✅ Auto collega ESP32 per ricette</button>
+            <button class="btn btn-danger big-action" onclick="esp32EmergencyLow()">⛔ Tutte DO LOW</button>
+          </div>
+          <div class="row">
+            <label style="display:flex;align-items:center;gap:6px;margin:0;flex:0 0 auto;">
+              <input id="esp32-live-enable" type="checkbox" onchange="toggleEsp32ControlLive(this.checked)" style="width:auto;"> Live I/O
+            </label>
+            <select id="esp32-live-rate" style="max-width:150px">
+              <option value="300">300 ms</option>
+              <option value="500" selected>500 ms</option>
+              <option value="1000">1000 ms</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="esp32-card">
+          <h3>📟 Log ESP32</h3>
+          <div id="esp32-control-log" class="log-list esp32-log"></div>
+        </div>
+      </div>
+
+      <div class="esp32-card">
+        <h3>🔘 Uscite digitali — attivazione singola</h3>
+        <div class="hint">Ogni uscita può essere messa HIGH/LOW singolarmente. Il feedback viene letto dopo il comando e durante il live.</div>
+        <div id="esp32-do-grid" class="io-control-grid"></div>
+      </div>
+
+      <div class="esp32-card">
+        <h3>👁️ Ingressi digitali e analogici — lettura live</h3>
+        <div class="hint">Gli ingressi sono solo lettura. I canali non adatti alla funzione restano disattivati.</div>
+        <div id="esp32-input-grid" class="io-control-grid"></div>
+      </div>
+    </div>
+
+    <!-- TAB: LOGHI / BRANDING -->
+    <div id="branding-tab" class="tab-content">
+      <div class="recipe-big-card">
+        <h3>🏷️ Loghi HMI, Login e Test Report</h3>
+        <div class="hint">Configurazione centralizzata dei loghi. Solo utenti Admin possono caricare o cambiare immagini.</div>
+        <div id="branding-admin-warning" class="brand-admin-warning">Per modificare i loghi devi accedere come Admin.</div>
+        <div class="logo-bg-mode-row"><div><b>Sfondo loghi</b><div class="detail-line">Scegli trasparenza originale PNG oppure sfondo bianco automatico.</div></div><select id="logo-bg-mode" class="brand-admin-only" onchange="saveLogoBackgroundMode()"><option value="transparent">Trasparente</option><option value="white">Sfondo bianco</option></select></div>
+        <button class="btn btn-ghost btn-sm brand-admin-only" onclick="resetDefaultLogos()">↩️ Ripristina loghi default M/MEC/MIRZA</button>
+        <div class="brand-grid">
+          <div class="brand-logo-card">
+            <div class="brand-logo-title">Login — logo grande</div>
+            <div class="brand-logo-desc">Default: M LOGO. Mostrato grande nella finestra login.</div>
+            <button class="btn btn-primary btn-sm brand-admin-only" onclick="selectLogo('loginLarge')">📂 Scegli logo grande login</button><select class="brand-admin-only logo-mode-select" data-logo-kind="loginLarge" onchange="saveLogoBgKind('loginLarge', this.value)"><option value="transparent">Trasparente</option><option value="white">Sfondo bianco</option></select>
+            <img id="loginLarge-logo-preview">
+          </div>
+          <div class="brand-logo-card">
+            <div class="brand-logo-title">Login — logo piccolo</div>
+            <div class="brand-logo-desc">Default: MEC. Logo piccolo/azienda nella pagina login.</div>
+            <button class="btn btn-primary btn-sm brand-admin-only" onclick="selectLogo('loginSmall')">📂 Scegli logo piccolo login</button><select class="brand-admin-only logo-mode-select" data-logo-kind="loginSmall" onchange="saveLogoBgKind('loginSmall', this.value)"><option value="transparent">Trasparente</option><option value="white">Sfondo bianco</option></select>
+            <img id="loginSmall-logo-preview">
+          </div>
+          <div class="brand-logo-card">
+            <div class="brand-logo-title">HMI principale — logo aziendale grande</div>
+            <div class="brand-logo-desc">Default: MEC. Logo azienda grande nella HMI principale.</div>
+            <button class="btn btn-primary btn-sm brand-admin-only" onclick="selectLogo('hmiLarge')">📂 Scegli logo HMI grande</button><select class="brand-admin-only logo-mode-select" data-logo-kind="hmiLarge" onchange="saveLogoBgKind('hmiLarge', this.value)"><option value="transparent">Trasparente</option><option value="white">Sfondo bianco</option></select>
+            <img id="hmiLarge-logo-preview">
+          </div>
+          <div class="brand-logo-card">
+            <div class="brand-logo-title">HMI principale — logo piccolo sviluppatore</div>
+            <div class="brand-logo-desc">Default: MIRZA. Logo piccolo sviluppatore nella barra superiore.</div>
+            <button class="btn btn-primary btn-sm brand-admin-only" onclick="selectLogo('developerSmall')">📂 Scegli logo sviluppatore</button><select class="brand-admin-only logo-mode-select" data-logo-kind="developerSmall" onchange="saveLogoBgKind('developerSmall', this.value)"><option value="transparent">Trasparente</option><option value="white">Sfondo bianco</option></select>
+            <img id="developerSmall-logo-preview">
+          </div>
+          <div class="brand-logo-card">
+            <div class="brand-logo-title">Test report — logo azienda</div>
+            <div class="brand-logo-desc">Default: MEC in alto a sinistra nel report, senza sovrapposizione testo.</div>
+            <button class="btn btn-primary btn-sm brand-admin-only" onclick="selectLogo('reportLarge')">📂 Scegli logo report grande</button><select class="brand-admin-only logo-mode-select" data-logo-kind="reportLarge" onchange="saveLogoBgKind('reportLarge', this.value)"><option value="transparent">Trasparente</option><option value="white">Sfondo bianco</option></select>
+            <img id="reportLarge-logo-preview">
+          </div>
+          <div class="brand-logo-card">
+            <div class="brand-logo-title">Test report — logo sviluppatore</div>
+            <div class="brand-logo-desc">Default: MIRZA in alto a destra nel report, senza sovrapposizione testo.</div>
+            <button class="btn btn-primary btn-sm brand-admin-only" onclick="selectLogo('reportSmall')">📂 Scegli logo report piccolo</button><select class="brand-admin-only logo-mode-select" data-logo-kind="reportSmall" onchange="saveLogoBgKind('reportSmall', this.value)"><option value="transparent">Trasparente</option><option value="white">Sfondo bianco</option></select>
+            <img id="reportSmall-logo-preview">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: UTENTI E RUOLI -->
+    <div id="users-tab" class="tab-content">
+      <div class="recipe-big-card">
+        <h3>🔐 Utenti, ruoli e livelli accesso</h3>
+        <div class="hint">Ogni accesso è deciso da <b>username + password</b>. All’utente assegni ruolo e livello: Admin, Sviluppatore, Engineer, Operatore o un ruolo personalizzato.</div>
+        <div style="display:grid;grid-template-columns:minmax(280px,0.9fr) minmax(340px,1.1fr);gap:12px;align-items:start;">
+          <div class="wizard-card">
+            <h4>1) Crea / aggiorna ruolo</h4>
+            <label>Nome ruolo</label>
+            <input id="new-role-name" placeholder="es. Admin, Sviluppatore, Engineer, Operatore">
+            <label>Livello accesso</label>
+            <select id="new-role-level" onchange="applyRoleLevelPreset()">
+              <option value="10">10 — Operatore</option>
+              <option value="30">30 — Tecnico</option>
+              <option value="60" selected>60 — Engineer</option>
+              <option value="80">80 — Sviluppatore</option>
+              <option value="100">100 — Admin</option>
+            </select>
+            <label>Permessi</label>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;font-size:11px;">
+              <label><input type="checkbox" class="perm-check" value="run_test" checked> Eseguire test</label>
+              <label><input type="checkbox" class="perm-check" value="debug_mode"> Debug</label>
+              <label><input type="checkbox" class="perm-check" value="edit_recipe"> Modifica ricette</label>
+              <label><input type="checkbox" class="perm-check" value="config_hardware"> Config. hardware</label>
+              <label><input type="checkbox" class="perm-check" value="manage_users"> Gestione utenti</label>
+              <label><input type="checkbox" class="perm-check" value="manage_branding"> Loghi/branding</label>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="createRoleFromUi()">💾 Salva ruolo</button>
+          </div>
+          <div class="wizard-card">
+            <h4>2) Credenziali utente</h4>
+            <label>Seleziona utente</label><select id="users-select" onchange="selectUserFromList(this.value)"></select>
+            <label>Nome utente login</label><input id="new-user-name" placeholder="username usato nel login">
+            <label>Nome visualizzato</label><input id="new-user-display" placeholder="nome operatore mostrato nei report">
+            <label>Ruolo / livello accesso</label><select id="new-user-role"></select>
+            <label>Password</label><input id="new-user-pass" type="password" placeholder="obbligatoria per nuovo utente; se vuota mantiene dati visuali">
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">
+              <button class="btn btn-primary btn-sm user-admin-only" onclick="createUserFromUi()">🔐 Salva utente</button>
+              <button class="btn btn-ghost btn-sm user-admin-only" onclick="clearUserForm()">➕ Nuovo</button>
+              <button class="btn btn-danger btn-sm user-admin-only" onclick="deleteSelectedUser()">🗑 Elimina</button>
+              <button class="btn btn-ghost btn-sm user-admin-only" onclick="toggleSelectedUser(false)">🚫 Disabilita</button>
+              <button class="btn btn-ghost btn-sm user-admin-only" onclick="toggleSelectedUser(true)">✅ Abilita</button>
+            </div>
+            <div class="hint" id="user-admin-hint" style="margin-top:8px;">Solo Admin può modificare utenti e ruoli.</div>
+          </div>
+        </div>
+        <div id="roles-users-list" class="detail-line"></div>
+      </div>
+    </div>
+
+    <!-- TAB: IMPOSTAZIONI -->
+    <div id="settings-tab" class="tab-content">
+      <div style="font-size:11px;color:var(--text2);margin-bottom:8px;">
+        Configura le porte hardware reali del banco. Dopo la modifica premi APPLICA.
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div class="col">
+          <label>Keysight 34461A — Tipo connessione</label>
+          <select id="cfg-keysight-mode" onchange="updateKeysightConnectionHint()">
+            <option value="ETH">Ethernet / LAN SCPI</option>
+            <option value="USB_COM">USB / COM</option>
+            <option value="USB_VISA">USB / VISA Resource</option>
+          </select>
+        </div>
+        <div class="col">
+          <label>Keysight 34461A — IP Ethernet / COM / VISA Resource</label>
+          <input id="cfg-keysight-ip" value="127.0.0.1" placeholder="LAN: 192.168.1.101 oppure COM8 oppure USB0::...::INSTR">
+          <div class="hint" id="keysight-conn-hint">Ethernet consigliata: porta SCPI 5025.</div>
+        </div>
+        <div class="col">
+          <label>Keysight 34461A — Porta TCP / Baud USB</label>
+          <input id="cfg-keysight-port" value="5025" type="number">
+        </div>
+        <div class="col">
+          <label>Aim-TTi PL303 — COM</label>
+          <input id="cfg-tti-com" value="mock" placeholder="COM4">
+        </div>
+        <div class="col">
+          <label>Aim-TTi — Baud Rate</label>
+          <input id="cfg-tti-baud" value="9600" type="number">
+        </div>
+        <div class="col">
+          <label>ESP32-S3 — COM (Modbus)</label>
+          <div class="row">
+            <select id="cfg-esp-com" style="flex:1"><option value="mock">mock</option></select>
+            <button class="btn btn-ghost btn-sm" onclick="scanSerialPorts()">🔎 Cerca</button>
+          </div>
+          <div class="hint">Seleziona dalla lista: non serve scrivere il nome della porta.</div>
+        </div>
+        <div class="col">
+          <label>ESP32-S3 — Baud Rate</label>
+          <input id="cfg-esp-baud" value="115200" type="number">
+        </div>
+      </div>
+      <button class="btn btn-primary" onclick="applyHwSettings()">🔌 APPLICA E RICONNETTI</button>
+      <button class="btn btn-ghost" onclick="testManualPowerStart()">🧪 Test start con alimentazione manuale</button>
+      <div id="serial-port-list" style="margin-top:8px;"></div>
+      <div id="hw-detail-status" style="font-size:10px;color:var(--text2);margin-top:6px;"></div>
+
+      <div style="height:1px;background:var(--border);margin:14px 0;"></div>
+      <div class="section-title" style="padding:0;margin-bottom:8px;">🏷️ Loghi programma, login e report</div>
+      <div class="logo-grid">
+        <div class="logo-box"><b>Login — logo grande</b><br><button class="btn btn-ghost btn-sm" onclick="selectLogo('loginLarge')">Scegli file</button><img id="loginLarge-logo-preview"></div>
+        <div class="logo-box"><b>Login — logo piccolo</b><br><button class="btn btn-ghost btn-sm" onclick="selectLogo('loginSmall')">Scegli file</button><img id="loginSmall-logo-preview"></div>
+        <div class="logo-box"><b>App — logo aziendale grande</b><br><button class="btn btn-ghost btn-sm" onclick="selectLogo('appLarge')">Scegli file</button><img id="appLarge-logo-preview"></div>
+        <div class="logo-box"><b>App — logo sviluppatore piccolo</b><br><button class="btn btn-ghost btn-sm" onclick="selectLogo('developerSmall')">Scegli file</button><img id="developerSmall-logo-preview"></div>
+        <div class="logo-box"><b>Report — logo azienda</b><br><button class="btn btn-ghost btn-sm" onclick="selectLogo('company')">Scegli file</button><img id="company-logo-preview"></div>
+        <div class="logo-box"><b>Report — logo costruttore</b><br><button class="btn btn-ghost btn-sm" onclick="selectLogo('builder')">Scegli file</button><img id="builder-logo-preview"></div>
+      </div>
+      <div class="driver-card" style="margin-top:12px;">
+        <b>Multimetro / driver:</b> ATE-MEC usa Keysight 34461A via Ethernet SCPI TCP/IP o USB/COM/VISA configurabile. Se l'indirizzo resta 127.0.0.1 oppure lo strumento non è LIVE, le misure sono simulate/casuali. Imposta IP reale del multimetro in Settings e verifica LIVE prima di usare step Voltage/Current/Resistance/Frequency.
+      </div>
+
+    </div>
+  </div>
+
+  <!-- RIGHT: Step live + QR + Webcam -->
+  <div id="right">
+    <div class="section-title">🔴 STEP IN ESECUZIONE <button class="btn btn-ghost btn-xs" onclick="toggleRightStepDetails()" style="float:right;margin-top:-3px;">Dettagli</button></div>
+    <div id="current-step-box" style="padding:10px;border-bottom:1px solid var(--border);">
+      <div style="font-size:11px;color:var(--text2);">In attesa...</div>
+    </div>
+
+    <div class="section-title">📷 QR / WEBCAM</div>
+    <div style="padding:8px;border-bottom:1px solid var(--border);display:flex;flex-direction:column;gap:6px;">
+      <video id="videoEl" autoplay playsinline style="display:none;height:140px;object-fit:cover;"></video>
+      <canvas id="qrCanvas" style="display:none;"></canvas>
+      <div class="row">
+        <button class="btn btn-ghost btn-sm" onclick="startQr()">📷 Avvia Camera</button>
+        <button class="btn btn-ghost btn-sm" onclick="stopQr()">⏹ Stop</button>
+      </div>
+      <div id="qrResult" class="qr-result">In attesa scansione...</div>
+    </div>
+
+    <div class="section-title">🔔 EVENTI SISTEMA</div>
+    <div id="sys-log" class="log-list" style="flex:1;"></div>
+  </div>
+
+</div>
+
+<div style="display:none">
+  <input id="recipe-enabled" type="checkbox" checked>
+  <input id="recipe-name-inp" value="Nuova Ricetta">
+  <select id="new-step-type"><option value="VoltageMeasurement">VoltageMeasurement</option><option value="CurrentMeasurement">CurrentMeasurement</option><option value="AnalogInputMeasurement">AnalogInputMeasurement</option><option value="ResistanceTest">ResistanceTest</option><option value="FrequencyTest">FrequencyTest</option><option value="DigitalOutputSet">DigitalOutputSet</option><option value="DigitalInputCheck">DigitalInputCheck</option><option value="ManualMeasurement">ManualMeasurement</option><option value="PowerSupplySet">PowerSupplySet</option><option value="PowerSupplyMeasureCurrent">PowerSupplyMeasureCurrent</option><option value="SCPICommand">SCPICommand</option><option value="Delay">Delay</option><option value="FirmwareFlash">FirmwareFlash</option></select>
+  <div id="steps-list"></div>
+</div>
+
+<div id="step-wizard" class="modal-backdrop">
+  <div class="modal">
+    <div class="modal-head">
+      <strong id="wizard-title">🧙 Step Smart Wizard</strong>
+      <span class="spacer"></span>
+      <button class="btn btn-ghost btn-xs" onclick="closeStepWizard()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="wizard-card">
+        <div class="wizard-grid">
+          <div>
+            <label>Nome step / misura</label>
+            <input id="w-label" placeholder="es. Verifica 5V logica">
+          </div>
+          <div>
+            <label>Categoria smart</label>
+            <select id="w-category" onchange="applyWizardCategory()">
+              <option value="measure_voltage">Misura tensione</option>
+              <option value="measure_current">Misura corrente</option>
+              <option value="measure_analog">Leggi ingresso analogico</option>
+              <option value="measure_resistance">Misura resistenza</option>
+              <option value="measure_frequency">Misura frequenza</option>
+              <option value="digital_input">Leggi ingresso digitale</option>
+              <option value="digital_output">Set uscita digitale</option>
+              <option value="power_supply">Set alimentatore PL303 CH1/CH2</option>
+              <option value="manual_measure">Step manuale guidato</option>
+              <option value="scpi">Comando SCPI custom</option>
+              <option value="delay">Attesa</option>
+              <option value="firmware_flash">Firmware flash</option>
+            </select>
+          </div>
+          <div class="wizard-field" data-field="enabled">
+            <label style="display:flex;align-items:center;gap:6px;">
+              <input id="w-enabled" type="checkbox" checked style="width:auto;">
+              Step attivo
+            </label>
+          </div>
+          <div class="wizard-field" data-field="do_mode">
+            <label>Modalità uscita</label>
+            <select id="w-do-mode" onchange="syncWizardVisibility()">
+              <option value="set">Set stabile HIGH/LOW</option>
+              <option value="timed">Set per tempo e ritorno</option>
+              <option value="pulse">Impulsi a frequenza fissa</option>
+            </select>
+          </div>
+          <div class="wizard-field" data-field="do_return">
+            <label>Stato finale dopo tempo/impulsi</label>
+            <select id="w-return-state">
+              <option value="false">LOW / OFF</option>
+              <option value="true">HIGH / ON</option>
+            </select>
+          </div>
+          <div class="wizard-field" data-field="do_freq">
+            <label>Frequenza impulsi Hz</label>
+            <input id="w-frequency" type="number" min="0.1" step="0.1" value="1">
+          </div>
+          <div class="wizard-field" data-field="do_count">
+            <label>Numero impulsi</label>
+            <input id="w-pulse-count" type="number" min="1" step="1" value="1">
+          </div>
+          <div class="wizard-field" data-field="do_verify">
+            <label>Verifica feedback DO</label>
+            <label class="checkline"><input id="w-verify-feedback" type="checkbox"> Blocca lo step se il feedback HIGH/LOW non torna</label>
+            <div class="hint">Disattivo = il set uscita non fallisce se la lettura feedback è lenta/non supportata.</div>
+          </div>
+          <div class="wizard-field" data-field="io">
+            <label>Tipo I/O</label>
+            <select id="w-io-type">
+              <option value="SCPI">SCPI / Strumento</option>
+              <option value="DI">Digital Input</option>
+              <option value="DO">Digital Output</option>
+              <option value="AI">Analog Input</option>
+              <option value="AO">Analog Output</option>
+              <option value="SYSTEM">Sistema</option>
+              <option value="FW">Firmware</option>
+            </select>
+          </div>
+          <div class="wizard-field" data-field="runtime">
+            <label>Tipo step runtime</label>
+            <select id="w-type" onchange="syncWizardVisibility()">
+              <option value="VoltageMeasurement">VoltageMeasurement</option>
+              <option value="CurrentMeasurement">CurrentMeasurement</option>
+              <option value="AnalogInputMeasurement">AnalogInputMeasurement</option>
+              <option value="ResistanceTest">ResistanceTest</option>
+              <option value="FrequencyTest">FrequencyTest</option>
+              <option value="DigitalInputCheck">DigitalInputCheck</option>
+              <option value="DigitalOutputSet">DigitalOutputSet</option>
+              <option value="ManualMeasurement">ManualMeasurement</option>
+              <option value="PowerSupplySet">PowerSupplySet</option>
+              <option value="SCPICommand">SCPICommand</option>
+              <option value="Delay">Delay</option>
+              <option value="FirmwareFlash">FirmwareFlash</option>
+              <option value="FirmwareErase">FirmwareErase</option>
+              <option value="FirmwareVerify">FirmwareVerify</option>
+            </select>
+          </div>
+          <div class="wizard-field" data-field="device">
+            <label>Device mapping</label>
+            <select id="w-device">
+              <option value="Keysight_34461A">Keysight_34461A</option>
+              <option value="AimTTi_PL303">AimTTi_PL303</option>
+              <option value="modbus_serial">modbus_serial / ESP32</option>
+              <option value="STLink">STLink</option>
+              <option value="system">system</option>
+            </select>
+          </div>
+          <div class="wizard-field wide" data-field="channel">
+            <label>GPIO I/O</label>
+            <input id="w-channel" type="number" min="0" step="1" value="0" onchange="highlightSelectedIo()">
+            <div id="w-io-grid" class="io-grid"></div>
+          </div>
+          <div class="wizard-field" data-field="value">
+            <label id="w-value-label">Valore atteso / output</label>
+            <select id="w-value-bool">
+              <option value="true">TRUE / ON / HIGH</option>
+              <option value="false">FALSE / OFF / LOW</option>
+            </select>
+            <input id="w-value" placeholder="valore custom" style="display:none;margin-top:6px;">
+          </div>
+          <div class="wizard-field" data-field="ps_channel">
+            <label>Canale alimentatore PL303</label>
+            <select id="w-ps-channel">
+              <option value="1">CH1</option>
+              <option value="2">CH2</option>
+            </select>
+          </div>
+          <div class="wizard-field" data-field="ps_voltage">
+            <label>Tensione alimentatore V</label>
+            <input id="w-ps-voltage" type="number" step="0.001" min="0" max="30" value="5.000">
+          </div>
+          <div class="wizard-field" data-field="ps_current">
+            <label>Corrente limite A</label>
+            <input id="w-ps-current" type="number" step="0.001" min="0" max="3" value="0.500">
+          </div>
+          <div class="wizard-field" data-field="ps_output">
+            <label>Stato uscita alimentatore</label>
+            <select id="w-ps-output"><option value="true">ON</option><option value="false">OFF</option></select>
+          </div>
+          <div class="wizard-field" data-field="unit">
+            <label>Unità misura</label>
+            <input id="w-unit" placeholder="V, A, Ω, Hz, s, bool">
+          </div>
+          <div class="wizard-field" data-field="min">
+            <label>Limite minimo</label>
+            <input id="w-min" type="number" step="any" placeholder="es. 4.75">
+          </div>
+          <div class="wizard-field" data-field="max">
+            <label>Limite massimo</label>
+            <input id="w-max" type="number" step="any" placeholder="es. 5.25">
+          </div>
+          <div class="wizard-field" data-field="target">
+            <label>Valore atteso / target</label>
+            <input id="w-target" type="number" step="any" placeholder="es. 5.00">
+          </div>
+          <div class="wizard-field" data-field="tolerance">
+            <label>Tolleranza ±</label>
+            <input id="w-tolerance" type="number" step="any" placeholder="es. 0.20">
+          </div>
+          <div class="wizard-field" data-field="measure_mode">
+            <label>Origine misura</label>
+            <select id="w-measure-mode" onchange="syncWizardVisibility()">
+              <option value="automatic">Automatica da multimetro digitale</option>
+              <option value="auto_with_fallback">Automatica + fallback manuale se fallisce</option>
+              <option value="manual">Solo manuale operatore</option>
+            </select>
+          </div>
+          <div class="wizard-field" data-field="manual_fallback">
+            <label style="display:flex;align-items:center;gap:6px;">
+              <input id="w-manual-fallback-enabled" type="checkbox" checked onchange="syncWizardVisibility()" style="width:auto;">
+              Accetta inserimento manuale se il multimetro digitale fallisce
+            </label>
+            <div class="hint">Nel report viene salvata sempre l'origine: AUTOMATICA o MANUALE.</div>
+          </div>
+          <div class="wizard-field" data-field="timeout">
+            <label>Timeout / attesa ms</label>
+            <input id="w-timeout" type="number" min="0" step="100" value="1000">
+          </div>
+          <div class="wizard-field" data-field="command">
+            <label>Comando SCPI / path firmware</label>
+            <input id="w-command" placeholder="MEAS:VOLT:DC? oppure *RST">
+          </div>
+          <div class="wizard-field" data-field="manual_type">
+            <label>Tipo misura manuale da acquisire</label>
+            <select id="w-manual-type" onchange="syncWizardVisibility()">
+              <option value="AI">Ingresso analogico ESP32</option>
+              <option value="DI">Ingresso digitale ESP32</option>
+              <option value="DO">Feedback uscita ESP32</option>
+              <option value="SCPI">Misura da strumento SCPI generica</option>
+              <option value="SCPI_VOLT_DC">Tensione DC manuale/strumento</option>
+              <option value="SCPI_CURR_DC">Corrente DC manuale/strumento</option>
+              <option value="SCPI_FREQ">Frequenza manuale/strumento</option>
+              <option value="SCPI_OHM">Resistenza Ohm manuale/strumento</option>
+              <option value="MANUAL_VALUE">Misura manuale digitata operatore</option>
+              <option value="CONFIRM">Solo conferma operatore</option>
+            </select>
+          </div>
+          <div class="wizard-field" data-field="manual_input">
+            <label style="display:flex;align-items:center;gap:6px;">
+              <input id="w-manual-input-enabled" type="checkbox" onchange="syncWizardVisibility()" style="width:auto;">
+              Misura manuale inserita dall'operatore se non leggibile da strumento
+            </label>
+            <div class="hint">Se attivo, durante il test l'operatore inserisce il valore e il sistema lo valida con min/max senza leggere hardware.</div>
+          </div>
+          <div class="wizard-field" data-field="stable_time">
+            <label>Tempo stabilizzazione misura ms</label>
+            <input id="w-stable-time" type="number" min="0" step="100" value="1000">
+          </div>
+          <div class="wizard-field wide" data-field="instruction_image">
+            <label>Immagine dimostrativa istruzione</label>
+            <div class="row">
+              <input id="w-instruction-image-name" placeholder="Nessuna immagine" readonly>
+              <button class="btn btn-ghost btn-sm" onclick="selectInstructionImageForStep()">🖼️ Scegli</button>
+              <button class="btn btn-ghost btn-sm" onclick="clearInstructionImage()">Rimuovi</button>
+            </div>
+            <img id="w-instruction-image-preview" class="manual-image-preview" style="display:none;margin-top:8px;">
+          </div>
+          <div class="wide">
+            <label>Descrizione / istruzioni operatore</label>
+            <textarea id="w-description" rows="3" placeholder="Cosa deve fare l'operatore, dove mettere le sonde, quando premere conferma..."></textarea>
+          </div>
+        </div>
+        <div class="wizard-help" id="w-smart-help">Seleziona una categoria: il wizard mostra solo i campi necessari.</div>
+        <div class="row">
+          <button class="btn btn-ghost btn-sm" onclick="readWizardValue()">📖 Leggi valore ora</button>
+          <button class="btn btn-ghost btn-sm" id="w-live-btn" onclick="toggleWizardLive()">▶ Live</button>
+          <span id="w-live-value" class="live-chip"><span class="live-dot"></span><span>Nessuna lettura live.</span></span>
+        </div>
+        <div class="hint">Il wizard genera step puliti: per una uscita digitale mostra solo canale, ON/OFF, timeout e verifica stato; per ingressi mostra valore live HIGH/LOW.</div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeStepWizard()">Annulla</button>
+      <button class="btn btn-primary" onclick="saveWizardStep()">Salva step</button>
+    </div>
+  </div>
+</div>
+
+<div id="manual-step-modal" class="modal-backdrop">
+  <div class="modal" style="width:min(900px, calc(100vw - 28px));">
+    <div class="modal-head">
+      <strong id="manual-step-title">✋ Step manuale</strong>
+      <span class="spacer"></span>
+      <span class="state-pill" style="color:var(--warn);border-color:var(--warn);">IN ATTESA OPERATORE</span>
+    </div>
+    <div class="modal-body">
+      <div id="manual-step-instructions" class="manual-instructions"></div>
+      <img id="manual-step-image" class="manual-image-preview" style="display:none;">
+      <div class="wizard-help" id="manual-step-measure-info"></div>
+      <div id="manual-step-alert" class="manual-clear-alert">Inserisci qui la misura solo se richiesta dal sistema o se la lettura multimetro non riesce.</div>
+      <div class="manual-input-panel">
+        <label>Misura manuale operatore</label>
+        <input id="manual-step-value" class="manual-measure-input" placeholder="es. 24.12" inputmode="decimal">
+        <div id="manual-step-limits" class="hint">Il sistema assegna PASS/FAIL automaticamente usando min/max dello step.</div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <div class="manual-action-grid">
+        <button class="btn btn-danger" onclick="respondManualStep(false)">🛑 Misura non disponibile</button>
+        <button class="btn btn-primary" id="manual-step-acquire-btn" onclick="respondManualStep(true)">📡 Riprova multimetro</button>
+        <button class="btn btn-success" id="manual-step-value-btn" onclick="respondManualValueOnly()">✍️ Usa misura manuale</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="fail-decision-modal" class="modal-backdrop">
+  <div class="modal" style="width:min(720px, calc(100vw - 28px));">
+    <div class="modal-head"><strong>❌ Step fallito</strong></div>
+    <div class="modal-body">
+      <div class="fail-choice">
+        <div id="fail-decision-text" style="font-size:13px;line-height:1.5;"></div>
+        <div class="hint">Il test è fermo. Puoi continuare gli step successivi, ma il risultato finale resterà FAIL, oppure fermare subito la ricetta.</div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-danger" onclick="respondFailureAction('stop')">Ferma test</button>
+      <button class="btn btn-warn" onclick="respondFailureAction('continue')">Continua comunque</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/ui-events.js" data-source="atmec-ui-events-398"></script>
+<script src="js/app.js"></script>
+<link rel="stylesheet" href="css/layout-editor.css" data-source="atmec-layout-editor-398-style">
+<script src="js/layout-editor.js" data-source="atmec-layout-editor-398-script"></script>
+<script src="js/layout-editor-managers.js" data-source="atmec-layout-editor-managers-398"></script>
+<script src="js/version.js" data-source="atmec-version-script"></script>
+
+</body>
+</html>
