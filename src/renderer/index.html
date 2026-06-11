@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: file:; media-src 'self' blob: file:;">
-<title>ATE-MEC Suite v4.12F</title>
+<title>ATE-MEC Suite v4.12G</title>
 <link rel="stylesheet" href="css/app.css">
 </head>
 <body class="locked">
@@ -18,7 +18,7 @@
   <div class="login-card">
     <img id="login-large-logo" class="login-hero-logo" title="Logo aziendale">
     <div class="login-brand">
-      <div><div class="login-title">ATE-MEC HM 4.12F</div><div class="login-sub">Automatic Test & Measurement System</div></div>
+      <div><div class="login-title">ATE-MEC HM 4.12G</div><div class="login-sub">Automatic Test & Measurement System</div></div>
     </div>
     <div class="col"><label>Utente / Badge</label><input id="op-name" type="text" value="Operatore" placeholder="Inserisci utente"></div>
     <div class="col"><label>Password</label><input id="op-password" type="password" placeholder="Password"></div>
@@ -165,7 +165,7 @@
   <div id="sidebar">
     <div class="section-title">🏭 Banco prova</div>
     <div class="side-card">
-      <div style="font-size:17px;font-weight:900;color:var(--accent);letter-spacing:1px;">ATE-MEC HM 4.12F</div>
+      <div style="font-size:17px;font-weight:900;color:var(--accent);letter-spacing:1px;">ATE-MEC HM 4.12G</div>
       <div id="logged-user-box" class="hint">Accesso non effettuato</div>
       <button class="btn btn-ghost btn-sm side-nav-btn" onclick="logoutAndLock()">🔒 Logout / cambia utente</button>
     </div>
@@ -817,7 +817,7 @@
       <div class="pa412a-page">
         <div class="recipe-big-card pa412a-hero">
           <div>
-            <div style="font-size:11px;color:var(--text2);letter-spacing:1px;">AT-MEC_HM_4.12F</div>
+            <div style="font-size:11px;color:var(--text2);letter-spacing:1px;">AT-MEC_HM_4.12G</div>
             <h3>📈 Analisi Produzione</h3>
             <div class="hint">Modulo separato per KPI industriali. Non modifica Dashboard, Storico Seriali, Scheda Unità, Test Mode o Layout Editor.</div>
           </div>
@@ -873,7 +873,7 @@
       <div class="da412b-page">
         <div class="recipe-big-card da412b-hero">
           <div>
-            <div style="font-size:11px;color:var(--text2);letter-spacing:1px;">AT-MEC_HM_4.12F</div>
+            <div style="font-size:11px;color:var(--text2);letter-spacing:1px;">AT-MEC_HM_4.12G</div>
             <h3>🗄️ Archivio Dati & Backup</h3>
             <div class="hint">Modulo separato per backup, esportazione e controllo archivio. Non modifica Test Mode, ricette, hardware, Layout Editor, Storico o Scheda Unità.</div>
           </div>
@@ -935,7 +935,7 @@
           </div>
           <div class="recipe-big-card da412e-sync-card">
             <h3>🔄 Data Provider & Sync</h3>
-            <div class="hint">4.12F aggiunge la gestione server locale/centrale. Il comportamento resta LOCAL FIRST: il test salva sempre in locale e non si blocca se il server è offline.</div>
+            <div class="hint">4.12G aggiunge la gestione server locale/centrale. Il comportamento resta LOCAL FIRST: il test salva sempre in locale e non si blocca se il server è offline.</div>
             <div class="da412f-config-grid">
               <div class="col">
                 <label>Modalità dati</label>
@@ -965,8 +965,12 @@
               <button class="btn btn-ghost btn-sm" onclick="saveDataProviderConfig412F()">💾 Salva configurazione</button>
               <button class="btn btn-ghost btn-sm" onclick="testDataProviderServer412F()">🌐 Verifica server</button>
               <button class="btn btn-primary btn-sm" onclick="syncDataProviderNow412E()">🔄 Sincronizza ora</button>
+              <button class="btn btn-ghost btn-sm" onclick="refreshSyncQueue412G()">📋 Vedi coda</button>
+              <button class="btn btn-ghost btn-sm" onclick="retryFailedSyncQueue412G()">🔁 Retry errori</button>
+              <button class="btn btn-ghost btn-sm" onclick="clearSyncedSyncQueue412G()">🧹 Pulisci inviati</button>
             </div>
             <div id="da412e-sync-status" class="hint" style="margin-top:8px;">Sync locale pronto.</div>
+            <div id="da412g-queue-preview" class="da412g-queue-preview"><div class="hint">Premi “Vedi coda” per controllare PENDING / FAILED / SYNCED.</div></div>
           </div>
         </div>
       </div>

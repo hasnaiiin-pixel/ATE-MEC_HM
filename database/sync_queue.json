@@ -1,23 +1,23 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-06-11T13:42:08.847Z",
-  "lastSyncAt": "2026-06-11T13:42:08.847Z",
+  "updatedAt": "2026-06-11T14:21:24.166Z",
+  "lastSyncAt": "2026-06-11T14:21:24.165Z",
   "items": [
     {
-      "id": "sync_1781185296987_56241345",
+      "id": "sync_1781187665584_8defe7bd",
       "type": "test_report",
       "status": "SYNCED",
       "payload": {
-        "timestamp": "2026-06-11T13:41:36.981Z",
+        "timestamp": "2026-06-11T14:21:05.578Z",
         "operator": "Admin",
         "recipe_name": "TEST_rix",
         "recipe_version": 2,
-        "serial_dut": "0100",
+        "serial_dut": "01002",
         "lot_number": "10000",
         "work_order": "10000",
         "repair_note": "",
         "final_result": "PASS",
-        "execution_time_ms": 9428,
+        "execution_time_ms": 10247,
         "steps_log": [
           {
             "step_id": 1,
@@ -39,19 +39,19 @@
             "min": 0,
             "max": 3.3,
             "unit": "V",
-            "timestamp": "2026-06-11T13:41:33.063Z",
+            "timestamp": "2026-06-11T14:21:00.535Z",
             "result": "PASS"
           },
           {
             "step_id": 3,
             "type": "ManualMeasurement",
-            "measured": 523,
+            "measured": 600,
             "measurement_source": "MANUALE",
             "measurement_device": "operatore/manuale",
             "min": 500,
             "max": 999,
             "unit": "",
-            "timestamp": "2026-06-11T13:41:35.734Z",
+            "timestamp": "2026-06-11T14:21:04.328Z",
             "result": "PASS"
           },
           {
@@ -67,57 +67,10 @@
           }
         ]
       },
-      "createdAt": "2026-06-11T13:41:36.987Z",
-      "updatedAt": "2026-06-11T13:42:04.742Z",
+      "createdAt": "2026-06-11T14:21:05.584Z",
+      "updatedAt": "2026-06-11T14:21:24.129Z",
       "attempts": 1,
-      "syncedAt": "2026-06-11T13:42:04.780Z",
-      "lastError": ""
-    },
-    {
-      "id": "sync_1781185310403_9a23cf20",
-      "type": "test_report",
-      "status": "SYNCED",
-      "payload": {
-        "timestamp": "2026-06-11T13:41:50.398Z",
-        "operator": "Admin",
-        "recipe_name": "TEST_rix",
-        "recipe_version": 2,
-        "serial_dut": "0101",
-        "lot_number": "10000",
-        "work_order": "10000",
-        "repair_note": "",
-        "final_result": "FAIL",
-        "execution_time_ms": 9681,
-        "steps_log": [
-          {
-            "step_id": 1,
-            "type": "PowerSupplySet",
-            "measured": {
-              "channel": 1,
-              "voltage": 18.5,
-              "current": 1,
-              "outputOn": true
-            },
-            "result": "DONE"
-          },
-          {
-            "step_id": 2,
-            "type": "ManualMeasurement",
-            "measured": 3.4,
-            "measurement_source": "MANUALE",
-            "measurement_device": "operatore/manuale",
-            "min": 0,
-            "max": 3.3,
-            "unit": "V",
-            "timestamp": "2026-06-11T13:41:49.454Z",
-            "result": "FAIL"
-          }
-        ]
-      },
-      "createdAt": "2026-06-11T13:41:50.403Z",
-      "updatedAt": "2026-06-11T13:42:04.780Z",
-      "attempts": 1,
-      "syncedAt": "2026-06-11T13:42:04.784Z",
+      "syncedAt": "2026-06-11T14:21:24.165Z",
       "lastError": ""
     }
   ]

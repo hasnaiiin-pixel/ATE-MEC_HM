@@ -309,4 +309,62 @@ export class DataProvider {
     const pending = queue.items.filter(i => i.status === 'PENDING').length;
     return { ok: failed === 0, synced, failed, pending, lastSyncAt: queue.lastSyncAt };
   }
+
+  public getQueuePreview(limit = 30): any {
+    const queue = this.readQueue();
+    const items = queue.items
+      .slice()
+      .sort((a, b) => String(b.updatedAt || b.createdAt).localeCompare(String(a.updatedAt || a.createdAt)))
+      .slice(0, Math.max(1, Number(limit || 30)))
+      .map(i => ({
+        id: i.id,
+        type: i.type,
+        status: i.status,
+        attempts: Number(i.attempts || 0),
+        createdAt: i.createdAt,
+        updatedAt: i.updatedAt,
+        syncedAt: i.syncedAt || '',
+        lastError: i.lastError || '',
+        payloadSummary: this.summarizePayload(i.payload)
+      }));
+    return { ok: true, total: queue.items.length, lastSyncAt: queue.lastSyncAt || '', items };
+  }
+
+  private summarizePayload(payload: any): string {
+    try {
+      const serial = payload?.serial_dut || payload?.serial || payload?.serialNumber || payload?.seriale || '';
+      const recipe = payload?.recipe_name || payload?.recipe || payload?.recipeName || '';
+      const result = payload?.final_result || payload?.result || payload?.esito || '';
+      const ts = payload?.timestamp || payload?.createdAt || payload?.date || '';
+      const parts = [serial ? `SN ${serial}` : '', recipe ? `Ricetta ${recipe}` : '', result ? `Esito ${result}` : '', ts ? String(ts).slice(0, 19) : ''].filter(Boolean);
+      return parts.join(' · ') || JSON.stringify(payload).slice(0, 180);
+    } catch {
+      return 'Payload non leggibile';
+    }
+  }
+
+  public markFailedForRetry(): any {
+    const queue = this.readQueue();
+    let changed = 0;
+    for (const item of queue.items) {
+      if (item.status === 'FAILED') {
+        item.status = 'PENDING';
+        item.updatedAt = nowIso();
+        item.lastError = item.lastError || 'Rimesso in coda manualmente';
+        changed++;
+      }
+    }
+    this.writeQueue(queue);
+    return { ok: true, changed, message: `${changed} record rimessi in coda.` };
+  }
+
+  public clearSyncedItems(): any {
+    const queue = this.readQueue();
+    const before = queue.items.length;
+    queue.items = queue.items.filter(i => i.status !== 'SYNCED');
+    const removed = before - queue.items.length;
+    this.writeQueue(queue);
+    return { ok: true, removed, pending: queue.items.filter(i => i.status === 'PENDING').length, failed: queue.items.filter(i => i.status === 'FAILED').length };
+  }
+
 }

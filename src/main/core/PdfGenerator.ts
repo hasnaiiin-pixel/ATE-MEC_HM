@@ -9,7 +9,7 @@ import * as path from 'path';
 import { TestReport } from './AuditSystem';
 
 export class PdfGenerator {
-  private static readonly APP_VERSION = '4.12F';
+  private static readonly APP_VERSION = '4.12G';
 
   private static safeFilePart(value: any): string {
     return String(value || 'ND').trim().replace(/[^a-zA-Z0-9_\-]+/g, '_').replace(/^_+|_+$/g, '').slice(0, 80) || 'ND';

@@ -66,6 +66,9 @@ contextBridge.exposeInMainWorld('api', {
   saveDataProviderConfig: (cfg: any) => ipcRenderer.invoke('save-data-provider-config', cfg || {}),
   testDataProviderServer: (url: string) => ipcRenderer.invoke('test-data-provider-server', url),
   syncDataProviderNow: () => ipcRenderer.invoke('sync-data-provider-now'),
+  getSyncQueuePreview: (limit?: number) => ipcRenderer.invoke('get-sync-queue-preview', limit || 30),
+  retryFailedSyncQueue: () => ipcRenderer.invoke('retry-failed-sync-queue'),
+  clearSyncedSyncQueue: () => ipcRenderer.invoke('clear-synced-sync-queue'),
 
   saveRecipe: (name: string, recipe: any) => ipcRenderer.invoke('save-recipe', { name, recipe }),
   loadRecipe: (name: string) => ipcRenderer.invoke('load-recipe', name),
