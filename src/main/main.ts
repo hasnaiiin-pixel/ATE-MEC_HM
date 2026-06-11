@@ -110,7 +110,7 @@ function createWindow(): void {
     minWidth: 1280,
     minHeight: 800,
     backgroundColor: '#0d0d14',
-    title: 'AT-MEC HM 4.12F',
+    title: 'AT-MEC HM 4.12G',
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
@@ -227,7 +227,7 @@ app.whenReady().then(async () => {
     await connectHardware();
     stateMachine.transitionTo('READY');
     mainWindow?.webContents.send('state-changed', stateMachine.getState());
-    mainWindow?.webContents.send('system-ready', { version: '4.12F' });
+    mainWindow?.webContents.send('system-ready', { version: '4.12G' });
   });
 
   app.on('activate', () => {
@@ -656,6 +656,12 @@ safeIpcHandle('get-data-provider-status', () => dataProvider.getStatus());
 safeIpcHandle('save-data-provider-config', (_e, cfg) => dataProvider.updateConfig(cfg || {}));
 safeIpcHandle('test-data-provider-server', (_e, url) => dataProvider.testServerConnection(url));
 safeIpcHandle('sync-data-provider-now', async () => dataProvider.syncNow());
+safeIpcHandle('get-sync-queue-preview', (_e, limit) => dataProvider.getQueuePreview(Number(limit || 30)));
+safeIpcHandle('retry-failed-sync-queue', async () => {
+  dataProvider.markFailedForRetry();
+  return dataProvider.syncNow();
+});
+safeIpcHandle('clear-synced-sync-queue', () => dataProvider.clearSyncedItems());
 
 safeIpcHandle('get-kpi', () => ({
   total: kpiTotal, passed: kpiPassed, failed: kpiFailed,

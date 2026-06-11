@@ -1800,7 +1800,7 @@ body.atmec-layout-edit-on #unit-card-tab .db-panel-grid{
 #recipe-tab .recipe-measure-preview-412c .fail{color:var(--fail);font-weight:900;margin-left:6px;}
 @media(max-width:900px){.measure-preview-grid-412c{grid-template-columns:1fr 1fr;}}
 
-/* AT-MEC_HM_4.12F - Data Provider Layer / Sync Queue.
+/* AT-MEC_HM_4.12G - Data Provider Layer / Sync Queue.
    Additivo su Archivio Dati: non modifica Test Mode, Ricette, Hardware o Layout Editor. */
 #data-archive-tab .da412e-sync-card{border-color:rgba(55,255,176,.22) !important;}
 #data-archive-tab .da412e-sync-grid{display:grid !important;grid-template-columns:repeat(4,minmax(120px,1fr)) !important;gap:8px !important;margin-top:10px !important;}
@@ -1811,7 +1811,7 @@ body.atmec-layout-edit-on #unit-card-tab .db-panel-grid{
 @media(max-width:560px){#data-archive-tab .da412e-sync-grid{grid-template-columns:1fr !important;}}
 
 
-/* AT-MEC_HM_4.12F - Sync Manager UI, additivo su Archivio Dati. */
+/* AT-MEC_HM_4.12G - Sync Manager UI, additivo su Archivio Dati. */
 #data-archive-tab .da412f-config-grid{display:grid !important;grid-template-columns:1fr 1.4fr .7fr auto !important;gap:10px !important;align-items:end !important;margin-top:12px !important;padding:12px !important;border:1px solid rgba(126,231,255,.16) !important;border-radius:14px !important;background:rgba(255,255,255,.035) !important;}
 #data-archive-tab .da412f-config-grid label{font-size:11px !important;color:var(--text2) !important;font-weight:900 !important;letter-spacing:.04em !important;}
 #data-archive-tab .da412f-config-grid input,#data-archive-tab .da412f-config-grid select{width:100% !important;border:1px solid rgba(255,255,255,.18) !important;border-radius:10px !important;background:rgba(8,14,24,.85) !important;color:#fff !important;padding:8px 10px !important;}
@@ -1819,3 +1819,17 @@ body.atmec-layout-edit-on #unit-card-tab .db-panel-grid{
 #data-archive-tab .da412f-check input{width:auto !important;}
 @media(max-width:1100px){#data-archive-tab .da412f-config-grid{grid-template-columns:1fr 1fr !important;}}
 @media(max-width:650px){#data-archive-tab .da412f-config-grid{grid-template-columns:1fr !important;}}
+
+
+/* AT-MEC_HM_4.12G - Sync Queue Manager UI. Additivo su Archivio Dati. */
+#data-archive-tab .da412g-queue-preview{margin-top:10px;display:grid;gap:7px;max-height:260px;overflow:auto;border:1px solid rgba(255,255,255,.10);border-radius:12px;padding:8px;background:rgba(8,14,24,.42);}
+#data-archive-tab .da412g-queue-row{display:grid;grid-template-columns:1.4fr .45fr 1fr;gap:8px;align-items:center;border:1px solid rgba(255,255,255,.10);border-radius:10px;padding:8px;background:rgba(255,255,255,.035);}
+#data-archive-tab .da412g-queue-row b{display:block;color:#fff;font-size:12px;}
+#data-archive-tab .da412g-queue-row span{display:block;color:var(--text2);font-size:11px;margin-top:2px;}
+#data-archive-tab .da412g-queue-row strong{display:inline-block;border-radius:999px;padding:3px 7px;font-size:10px;letter-spacing:.04em;background:rgba(255,255,255,.08);}
+#data-archive-tab .da412g-queue-row small{display:block;color:var(--text2);font-size:10px;margin-top:3px;}
+#data-archive-tab .da412g-queue-row em{display:block;color:#ffb4b4;font-style:normal;font-size:10px;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+#data-archive-tab .da412g-queue-row.pending strong{background:rgba(255,216,77,.15);color:#ffd84d;}
+#data-archive-tab .da412g-queue-row.failed strong{background:rgba(255,70,70,.15);color:#ff8d8d;}
+#data-archive-tab .da412g-queue-row.synced strong{background:rgba(55,255,176,.15);color:#37ffb0;}
+@media(max-width:850px){#data-archive-tab .da412g-queue-row{grid-template-columns:1fr;}}

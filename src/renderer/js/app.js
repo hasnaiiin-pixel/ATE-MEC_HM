@@ -4634,7 +4634,7 @@ function printTraceabilitySerialHistory(){
   html += tests.map(r=>`<tr><td>${escapeHtml(new Date(r.timestamp).toLocaleString('it-IT'))}</td><td class="${String(r.final_result||'').toLowerCase()}">${escapeHtml(r.final_result||'')}</td><td>${escapeHtml(r.recipe_name||'')}</td><td>${escapeHtml(r.recipe_version||'')}</td><td>${escapeHtml(r.lot_number||r.work_order||'')}</td><td>${escapeHtml(r.operator||'')}</td><td>${escapeHtml(r.repair_note||'')}</td></tr>`).join('') || '<tr><td colspan="7">Nessun test.</td></tr>';
   html += '</tbody></table><h2>Riparazioni</h2><table><thead><tr><th>Data</th><th>Lotto</th><th>Operatore</th><th>Intervento</th></tr></thead><tbody>';
   html += repairs.map(r=>`<tr><td>${escapeHtml(new Date(r.timestamp).toLocaleString('it-IT'))}</td><td>${escapeHtml(r.lot_number||r.work_order||'')}</td><td>${escapeHtml(r.operator||'')}</td><td>${escapeHtml(r.repair_note||'')}</td></tr>`).join('') || '<tr><td colspan="4">Nessuna riparazione.</td></tr>';
-  html += '</tbody></table><p style="margin-top:22px;font-size:11px">Generato da AT-MEC HM 4.12F</p></body></html>';
+  html += '</tbody></table><p style="margin-top:22px;font-size:11px">Generato da AT-MEC HM 4.12G</p></body></html>';
   const w=window.open('', '_blank');
   if(!w){ downloadTextFile(`storico_seriale_${serial}.html`, html, 'text/html'); return; }
   w.document.write(html); w.document.close(); setTimeout(()=>{ try{ w.print(); }catch{} }, 350);
@@ -4737,7 +4737,7 @@ function printUnitGenealogy410E(){
   html+=tests.map((r,i)=>`<tr><td>${i+1}</td><td>${escapeHtml(unitDate410E(r.timestamp))}</td><td class="${String(r.final_result||'').toLowerCase()}">${escapeHtml(r.final_result||'')}</td><td>${escapeHtml(r.recipe_name||'')}</td><td>${escapeHtml(r.recipe_version||'')}</td><td>${escapeHtml(r.operator||'')}</td><td>${escapeHtml(r.repair_note||'')}</td></tr>`).join('') || '<tr><td colspan="7">Nessun test.</td></tr>';
   html+='</tbody></table><h2>Riparazioni</h2><table><thead><tr><th>#</th><th>Data</th><th>Lotto</th><th>Operatore</th><th>Intervento</th></tr></thead><tbody>';
   html+=repairs.map((r,i)=>`<tr><td>${i+1}</td><td>${escapeHtml(unitDate410E(r.timestamp))}</td><td>${escapeHtml(r.lot_number||r.work_order||'')}</td><td>${escapeHtml(r.operator||'')}</td><td>${escapeHtml(r.repair_note||'')}</td></tr>`).join('') || '<tr><td colspan="5">Nessuna riparazione.</td></tr>';
-  html+='</tbody></table><p style="margin-top:22px;font-size:11px">Generato da AT-MEC HM 4.12F</p></body></html>';
+  html+='</tbody></table><p style="margin-top:22px;font-size:11px">Generato da AT-MEC HM 4.12G</p></body></html>';
   const w=window.open('', '_blank');
   if(!w){ downloadTextFile(`scheda_unita_${serial}.html`, html, 'text/html'); return; }
   w.document.write(html); w.document.close(); setTimeout(()=>{ try{ w.print(); }catch{} },350);
@@ -4778,9 +4778,9 @@ function atmecPrintMeasureCell412D(step){
   ].filter(Boolean).join('<br>');
 }
 function atmecReportFooter412D(){
-  // 4.12F: footer statico. Non richiamare questa funzione dentro se stessa.
+  // 4.12G: footer statico. Non richiamare questa funzione dentro se stessa.
   // La vecchia versione causava ricorsione infinita e Maximum call stack size exceeded.
-  return `<div class="signature-grid"><div class="signature-box"><b>Firma operatore</b><div class="signature-line"></div></div><div class="signature-box"><b>Approvazione qualità</b><div class="signature-line"></div></div></div><div class="atmec-print-footer"><span>AT-MEC HM 4.12F</span><span>Report generato automaticamente</span></div>`;
+  return `<div class="signature-grid"><div class="signature-box"><b>Firma operatore</b><div class="signature-line"></div></div><div class="signature-box"><b>Approvazione qualità</b><div class="signature-line"></div></div></div><div class="atmec-print-footer"><span>AT-MEC HM 4.12G</span><span>Report generato automaticamente</span></div>`;
 }
 // Sovrascrittura conservativa export storico da pagina Test Report/Audit: stessa logica, solo header loghi.
 function exportSerialHistoryPdf() {
@@ -4836,7 +4836,7 @@ function printUnitGenealogy410E(){
   w.document.write(html); w.document.close(); setTimeout(()=>{ try{ w.print(); }catch{} },350);
 }
 
-// AT-MEC_HM_4.12F - Analisi Produzione separata.
+// AT-MEC_HM_4.12G - Analisi Produzione separata.
 // Modulo additivo: usa solo getLocalDbStats e non modifica Test Mode, Dashboard, Storico, Scheda Unità o Layout Editor.
 function productionAnalysisFilters412A(){
   return {
@@ -4887,7 +4887,7 @@ async function loadProductionAnalysisDashboard412A(){
     if(status) status.textContent=`KPI aggiornati · ${st.total || 0} test filtrati · DB: ${st.dbPath || 'N/D'}`;
   }catch(e){
     if(status) status.textContent='Errore calcolo KPI: '+normalizeError(e);
-    console.error('[AT-MEC 4.12F] Analisi Produzione', e);
+    console.error('[AT-MEC 4.12G] Analisi Produzione', e);
   }
 }
 function clearProductionAnalysisFilters412A(){
@@ -4897,7 +4897,7 @@ function clearProductionAnalysisFilters412A(){
 }
 
 
-// AT-MEC_HM_4.12F - Archivio Dati & Backup separato.
+// AT-MEC_HM_4.12G - Archivio Dati & Backup separato.
 // Modulo additivo: usa API gia esistenti e non modifica Test Mode, Ricette, Hardware, Layout Editor, Storico o Scheda Unità.
 function archiveFilters412B(){
   return {
@@ -4934,7 +4934,7 @@ async function loadDataArchiveDashboard412B(){
     if(typeof loadDataProviderStatus412E==='function') await loadDataProviderStatus412E();
   }catch(e){
     da412bStatus('da412b-maint-status','Errore archivio: '+normalizeError(e));
-    console.error('[AT-MEC 4.12F] Archivio dati', e);
+    console.error('[AT-MEC 4.12G] Archivio dati', e);
   }
 }
 async function previewDataArchive412B(){
@@ -5001,7 +5001,7 @@ function clearArchiveFilters412B(){
 }
 
 
-// AT-MEC_HM_4.12F - Data Provider Layer / Sync Queue.
+// AT-MEC_HM_4.12G - Data Provider Layer / Sync Queue.
 // Modulo additivo: default LOCAL FIRST. Non blocca Test Mode se server/SQLite non sono disponibili.
 function da412eSetText(id, value){ const el=document.getElementById(id); if(el) el.textContent=String(value ?? ''); }
 function da412eSetValue(id, value){ const el=document.getElementById(id); if(el) el.value=String(value ?? ''); }
@@ -5022,7 +5022,7 @@ async function loadDataProviderStatus412E(){
     da412eStatus(`${st.message || 'Data Provider pronto.'} · Queue: ${st.queuePath || 'N/D'} · DB: ${st.localDbPath || 'N/D'} · Last sync: ${st.lastSyncAt || 'mai'}`);
   }catch(e){
     da412eStatus('Errore stato Data Provider: '+normalizeError(e));
-    console.error('[AT-MEC 4.12F] Data Provider status', e);
+    console.error('[AT-MEC 4.12G] Data Provider status', e);
   }
 }
 function da412fReadConfig(){
@@ -5047,7 +5047,7 @@ async function saveDataProviderConfig412F(){
     await loadDataProviderStatus412E();
   }catch(e){
     da412eStatus('Errore salvataggio configurazione: '+normalizeError(e));
-    console.error('[AT-MEC 4.12F] Save Data Provider config', e);
+    console.error('[AT-MEC 4.12G] Save Data Provider config', e);
   }
 }
 async function testDataProviderServer412F(){
@@ -5060,7 +5060,7 @@ async function testDataProviderServer412F(){
     da412eStatus(res?.ok ? `Server ONLINE (${res?.message || 'OK'})` : `Server NON raggiungibile: ${res?.message || 'errore'}`);
   }catch(e){
     da412eStatus('Errore verifica server: '+normalizeError(e));
-    console.error('[AT-MEC 4.12F] Test server', e);
+    console.error('[AT-MEC 4.12G] Test server', e);
   }
 }
 async function syncDataProviderNow412E(){
@@ -5072,6 +5072,46 @@ async function syncDataProviderNow412E(){
     await loadDataProviderStatus412E();
   }catch(e){
     da412eStatus('Errore sync: '+normalizeError(e));
-    console.error('[AT-MEC 4.12F] Data Provider sync', e);
+    console.error('[AT-MEC 4.12G] Data Provider sync', e);
   }
+}
+
+async function refreshSyncQueue412G(){
+  const box=document.getElementById('da412g-queue-preview');
+  if(box) box.innerHTML='<div class="hint">Caricamento coda sync...</div>';
+  try{
+    if(!api?.getSyncQueuePreview){ if(box) box.innerHTML='<div class="hint">API coda sync non disponibile.</div>'; return; }
+    const res=await api.getSyncQueuePreview(30);
+    if(!box) return;
+    const items=Array.isArray(res?.items) ? res.items : [];
+    if(!items.length){ box.innerHTML='<div class="hint">Coda sync vuota. Nessun record da inviare.</div>'; return; }
+    box.innerHTML=items.map(i=>{
+      const cls=String(i.status||'').toLowerCase();
+      return `<div class="da412g-queue-row ${cls}"><div><b>${escapeHtml(i.type||'record')}</b><span>${escapeHtml(i.payloadSummary||'')}</span></div><div><strong>${escapeHtml(i.status||'')}</strong><small>tentativi ${Number(i.attempts||0)}</small></div><div><small>${escapeHtml((i.updatedAt||i.createdAt||'').slice(0,19))}</small>${i.lastError?`<em>${escapeHtml(i.lastError)}</em>`:''}</div></div>`;
+    }).join('');
+  }catch(e){
+    if(box) box.innerHTML='<div class="hint">Errore lettura coda sync: '+escapeHtml(normalizeError(e))+'</div>';
+    console.error('[AT-MEC 4.12G] Queue preview', e);
+  }
+}
+async function retryFailedSyncQueue412G(){
+  da412eStatus('Retry record FAILED in corso...');
+  try{
+    if(!api?.retryFailedSyncQueue){ da412eStatus('API retry sync non disponibile.'); return; }
+    const res=await api.retryFailedSyncQueue();
+    da412eStatus(`${res?.message || 'Retry completato.'} · synced: ${res?.synced ?? 0} · failed: ${res?.failed ?? 0} · pending: ${res?.pending ?? 0}`);
+    await loadDataProviderStatus412E();
+    await refreshSyncQueue412G();
+  }catch(e){ da412eStatus('Errore retry sync: '+normalizeError(e)); console.error('[AT-MEC 4.12G] Retry queue', e); }
+}
+async function clearSyncedSyncQueue412G(){
+  if(!confirm('Rimuovere dalla coda i record già sincronizzati? I dati locali non vengono cancellati.')) return;
+  da412eStatus('Pulizia record SYNCED...');
+  try{
+    if(!api?.clearSyncedSyncQueue){ da412eStatus('API pulizia coda non disponibile.'); return; }
+    const res=await api.clearSyncedSyncQueue();
+    da412eStatus(`Pulizia completata. Rimossi: ${res?.removed ?? 0}`);
+    await loadDataProviderStatus412E();
+    await refreshSyncQueue412G();
+  }catch(e){ da412eStatus('Errore pulizia coda: '+normalizeError(e)); console.error('[AT-MEC 4.12G] Clear synced', e); }
 }

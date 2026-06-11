@@ -1,7 +1,7 @@
 {
-  "name": "at-mec-hm-4-12f",
-  "version": "4.12.7",
-  "description": "AT-MEC HM 4.12F - Sync Manager UI, server locale/centrale, Data Provider Layer e coda offline su base stabile 4.12D_FIX1",
+  "name": "at-mec-hm-4-12g",
+  "version": "4.12.8",
+  "description": "AT-MEC HM 4.12G - Sync Queue Manager, Data Provider Layer, coda offline e retry sincronizzazione su base stabile 4.12F",
   "main": "dist/main/main.js",
   "scripts": {
     "build": "tsc",
@@ -17,7 +17,7 @@
   },
   "build": {
     "appId": "com.atemec.platform",
-    "productName": "AT-MEC HM 4.12F",
+    "productName": "AT-MEC HM 4.12G",
     "directories": {
       "output": "dist_installer"
     },
@@ -27,14 +27,14 @@
         "portable"
       ],
       "icon": "assets/icon.ico",
-      "shortcutName": "AT-MEC HM 4.12F"
+      "shortcutName": "AT-MEC HM 4.12G"
     },
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "AT-MEC HM 4.12F"
+      "shortcutName": "AT-MEC HM 4.12G"
     },
     "files": [
       "dist/**/*",
@@ -70,6 +70,6 @@
     "electron": "^42.3.2",
     "electron-builder": "^26.8.1",
     "typescript": "^5.4.5",
-    "wait-on": "^7.2.0"
+    "wait-on": "^9.0.10"
   }
 }
