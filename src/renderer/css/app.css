@@ -1799,3 +1799,23 @@ body.atmec-layout-edit-on #unit-card-tab .db-panel-grid{
 #recipe-tab .recipe-measure-preview-412c b{color:var(--accent);}
 #recipe-tab .recipe-measure-preview-412c .fail{color:var(--fail);font-weight:900;margin-left:6px;}
 @media(max-width:900px){.measure-preview-grid-412c{grid-template-columns:1fr 1fr;}}
+
+/* AT-MEC_HM_4.12F - Data Provider Layer / Sync Queue.
+   Additivo su Archivio Dati: non modifica Test Mode, Ricette, Hardware o Layout Editor. */
+#data-archive-tab .da412e-sync-card{border-color:rgba(55,255,176,.22) !important;}
+#data-archive-tab .da412e-sync-grid{display:grid !important;grid-template-columns:repeat(4,minmax(120px,1fr)) !important;gap:8px !important;margin-top:10px !important;}
+#data-archive-tab .da412e-sync-grid div{border:1px solid rgba(255,255,255,.10) !important;border-radius:12px !important;background:rgba(55,255,176,.055) !important;padding:9px !important;display:grid !important;gap:4px !important;}
+#data-archive-tab .da412e-sync-grid span{font-size:10px !important;color:var(--text2) !important;text-transform:uppercase !important;letter-spacing:.06em !important;font-weight:900 !important;}
+#data-archive-tab .da412e-sync-grid b{font-size:13px !important;color:#37ffb0 !important;}
+@media(max-width:900px){#data-archive-tab .da412e-sync-grid{grid-template-columns:1fr 1fr !important;}}
+@media(max-width:560px){#data-archive-tab .da412e-sync-grid{grid-template-columns:1fr !important;}}
+
+
+/* AT-MEC_HM_4.12F - Sync Manager UI, additivo su Archivio Dati. */
+#data-archive-tab .da412f-config-grid{display:grid !important;grid-template-columns:1fr 1.4fr .7fr auto !important;gap:10px !important;align-items:end !important;margin-top:12px !important;padding:12px !important;border:1px solid rgba(126,231,255,.16) !important;border-radius:14px !important;background:rgba(255,255,255,.035) !important;}
+#data-archive-tab .da412f-config-grid label{font-size:11px !important;color:var(--text2) !important;font-weight:900 !important;letter-spacing:.04em !important;}
+#data-archive-tab .da412f-config-grid input,#data-archive-tab .da412f-config-grid select{width:100% !important;border:1px solid rgba(255,255,255,.18) !important;border-radius:10px !important;background:rgba(8,14,24,.85) !important;color:#fff !important;padding:8px 10px !important;}
+#data-archive-tab .da412f-check{display:flex !important;align-items:center !important;gap:8px !important;min-height:38px !important;color:#dff8ff !important;font-weight:900 !important;}
+#data-archive-tab .da412f-check input{width:auto !important;}
+@media(max-width:1100px){#data-archive-tab .da412f-config-grid{grid-template-columns:1fr 1fr !important;}}
+@media(max-width:650px){#data-archive-tab .da412f-config-grid{grid-template-columns:1fr !important;}}

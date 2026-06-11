@@ -20,6 +20,7 @@ import { IotServer } from './core/IotServer';
 import { PdfGenerator } from './core/PdfGenerator';
 import { AuditSystem, TestReport } from './core/AuditSystem';
 import { LocalDatabase } from './core/LocalDatabase';
+import { DataProvider } from './core/DataProvider';
 import { DeviceManager } from './hal/DeviceManager';
 import { RecipeEngine, Recipe } from './runtime/RecipeEngine';
 
@@ -32,6 +33,7 @@ let eventBus: EventBus;
 let userManager: UserManager;
 let auditSystem: AuditSystem;
 let localDb: LocalDatabase;
+let dataProvider: DataProvider;
 
 
 type CommSessionType = 'serial' | 'telnet' | 'tcp';
@@ -108,7 +110,7 @@ function createWindow(): void {
     minWidth: 1280,
     minHeight: 800,
     backgroundColor: '#0d0d14',
-    title: 'AT-MEC HM 4.12D',
+    title: 'AT-MEC HM 4.12F',
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
@@ -128,6 +130,7 @@ function initSystems(): void {
   userManager = new UserManager();
   auditSystem = new AuditSystem();
   localDb = new LocalDatabase();
+  dataProvider = new DataProvider(localDb);
 
   stateMachine = new StateMachine((newState: SystemState) => {
     mainWindow?.webContents.send('state-changed', newState);
@@ -172,7 +175,7 @@ function initSystems(): void {
     }
     // AT-MEC_HM_2.28: genera PDF sia per PASS sia per FAIL, cosi il Test Report e sempre stampabile.
     // AT-MEC_HM_3.14: duplica lo storico anche nel database locale per KPI/seriali/riparazioni.
-    if (report) { try { localDb.saveTestReport(report); } catch (err) { console.error('[LOCALDB] save report:', err); } }
+    if (report) { try { dataProvider.saveTestReport(report); } catch (err) { console.error('[DATA_PROVIDER] save report:', err); } }
     if (report) PdfGenerator.generateCertificate(report);
     kpiTotal++;
     if (report) iotServer.updateLiveKpi(kpiTotal, kpiPassed, kpiFailed, report.serial_dut, report.final_result);
@@ -224,7 +227,7 @@ app.whenReady().then(async () => {
     await connectHardware();
     stateMachine.transitionTo('READY');
     mainWindow?.webContents.send('state-changed', stateMachine.getState());
-    mainWindow?.webContents.send('system-ready', { version: '3.34.0-test-light' });
+    mainWindow?.webContents.send('system-ready', { version: '4.12F' });
   });
 
   app.on('activate', () => {
@@ -606,9 +609,9 @@ safeIpcHandle('comm-read-log', async () => ({ ok: true, type: commType, rows: co
 
 safeIpcHandle('get-audit-history', (_e, filters) => auditSystem.filterHistory(filters || {}).slice(-1000));
 safeIpcHandle('check-serial-history', (_e, { serialDut, lotNumber }) => auditSystem.findBySerialAndLot(serialDut, lotNumber));
-safeIpcHandle('get-local-db-stats', (_e, filters) => localDb.getStats(filters || {}));
-safeIpcHandle('get-serial-history', (_e, { serialDut, lotNumber }) => localDb.getSerialHistory(serialDut, lotNumber));
-safeIpcHandle('add-repair-record', (_e, payload) => localDb.addRepairRecord({ ...(payload || {}), operator: userManager.getCurrentOperator() }));
+safeIpcHandle('get-local-db-stats', (_e, filters) => dataProvider.getStats(filters || {}));
+safeIpcHandle('get-serial-history', (_e, { serialDut, lotNumber }) => dataProvider.getSerialHistory(serialDut, lotNumber));
+safeIpcHandle('add-repair-record', (_e, payload) => dataProvider.addRepairRecord({ ...(payload || {}), operator: userManager.getCurrentOperator() }));
 
 safeIpcHandle('delete-recipe', async (_e, name: string) => {
   const role = String((userManager as any).getCurrentUser?.()?.role || userManager.getCurrentOperator?.() || '').toLowerCase();
@@ -621,9 +624,9 @@ safeIpcHandle('delete-recipe', async (_e, name: string) => {
   return { ok:true };
 });
 
-safeIpcHandle('list-recipe-versions', (_e, name: string) => localDb.listRecipeVersions(name));
+safeIpcHandle('list-recipe-versions', (_e, name: string) => dataProvider.listRecipeVersions(name));
 safeIpcHandle('load-recipe-version', (_e, { name, version }) => {
-  const recipe = localDb.loadRecipe(name, Number(version));
+  const recipe = dataProvider.loadRecipe(name, Number(version));
   return recipe ? { ok: true, recipe } : { ok: false, error: 'Versione ricetta non trovata.' };
 });
 safeIpcHandle('export-local-database', async () => {
@@ -633,7 +636,7 @@ safeIpcHandle('export-local-database', async () => {
     filters: [{ name: 'Database locale JSON', extensions: ['json'] }]
   });
   if (result.canceled || !result.filePath) return { ok: false };
-  fs.writeFileSync(result.filePath, JSON.stringify(localDb.exportSnapshot(), null, 2));
+  fs.writeFileSync(result.filePath, JSON.stringify(dataProvider.exportSnapshot(), null, 2));
   return { ok: true, filePath: result.filePath };
 });
 
@@ -644,11 +647,15 @@ safeIpcHandle('export-local-reports-csv', async (_e, filters) => {
     filters: [{ name: 'CSV Excel compatibile', extensions: ['csv'] }]
   });
   if (result.canceled || !result.filePath) return { ok: false };
-  fs.writeFileSync(result.filePath, localDb.exportReportsCsv(filters || {}), 'utf8');
+  fs.writeFileSync(result.filePath, dataProvider.exportReportsCsv(filters || {}), 'utf8');
   return { ok: true, filePath: result.filePath };
 });
 
-safeIpcHandle('backup-local-database', async (_e, label) => localDb.backupSnapshot(label || 'manuale'));
+safeIpcHandle('backup-local-database', async (_e, label) => dataProvider.backupSnapshot(label || 'manuale'));
+safeIpcHandle('get-data-provider-status', () => dataProvider.getStatus());
+safeIpcHandle('save-data-provider-config', (_e, cfg) => dataProvider.updateConfig(cfg || {}));
+safeIpcHandle('test-data-provider-server', (_e, url) => dataProvider.testServerConnection(url));
+safeIpcHandle('sync-data-provider-now', async () => dataProvider.syncNow());
 
 safeIpcHandle('get-kpi', () => ({
   total: kpiTotal, passed: kpiPassed, failed: kpiFailed,
@@ -659,14 +666,14 @@ safeIpcHandle('save-recipe', async (_e, { name, recipe }: { name: string; recipe
   const recipesDir = path.join(process.cwd(), 'recipes');
   if (!fs.existsSync(recipesDir)) fs.mkdirSync(recipesDir, { recursive: true });
   const baseName = String(name || recipe?.recipe_name || 'Nuova Ricetta').trim() || 'Nuova Ricetta';
-  const rev = localDb.saveRecipeVersion({ ...recipe, recipe_name: baseName }, userManager.getCurrentOperator(), 'Salvataggio da HMI');
+  const rev = dataProvider.saveRecipeVersion({ ...recipe, recipe_name: baseName }, userManager.getCurrentOperator(), 'Salvataggio da HMI');
   const filePath = path.join(recipesDir, `${baseName}.json`);
   fs.writeFileSync(filePath, JSON.stringify(rev.recipe, null, 2));
   return { ok: true, filePath, version: rev.version, revisionId: rev.id };
 });
 
 safeIpcHandle('load-recipe', async (_e, name: string) => {
-  const fromDb = localDb.loadRecipe(name);
+  const fromDb = dataProvider.loadRecipe(name);
   if (fromDb) return { ok: true, recipe: fromDb };
   const filePath = path.join(process.cwd(), 'recipes', `${name}.json`);
   if (!fs.existsSync(filePath)) return { ok: false, error: 'Ricetta non trovata.' };
@@ -676,7 +683,7 @@ safeIpcHandle('load-recipe', async (_e, name: string) => {
 
 safeIpcHandle('list-recipes', () => {
   const names = new Set<string>();
-  for (const r of localDb.listRecipes()) names.add(r.recipe_name);
+  for (const r of dataProvider.listRecipes()) names.add(r.recipe_name);
   const recipesDir = path.join(process.cwd(), 'recipes');
   if (fs.existsSync(recipesDir)) {
     fs.readdirSync(recipesDir).filter(f => f.endsWith('.json')).forEach(f => names.add(f.replace('.json', '')));

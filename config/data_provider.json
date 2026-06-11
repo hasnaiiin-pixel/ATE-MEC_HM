@@ -1,0 +1,13 @@
+{
+  "mode": "local_first",
+  "server": {
+    "enabled": true,
+    "url": "http://localhost:8099",
+    "timeoutMs": 5000
+  },
+  "sync": {
+    "enabled": true,
+    "queuePath": "C:\\Users\\spea4060_tmv331ef\\Documents\\PROGETTI\\AT-MEC_HM_4.12F\\database\\sync_queue.json",
+    "localFirst": true
+  }
+}
