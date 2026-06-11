@@ -108,7 +108,7 @@ function createWindow(): void {
     minWidth: 1280,
     minHeight: 800,
     backgroundColor: '#0d0d14',
-    title: 'AT-MEC HM 4.12C',
+    title: 'AT-MEC HM 4.12D',
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
