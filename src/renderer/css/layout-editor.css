@@ -1,0 +1,276 @@
+/* AT-MEC HM 3.92 - Layout Editor bundle.
+   Unifica le vecchie patch 3.58/3.62/3.73/3.76/3.79 in un solo file, mantenendo l'ordine originale. */
+
+
+/* ===== layout-inspector-358.css ===== */
+/* AT-MEC 3.67 - Layout editor pulito. OFF = HMI normale. Nessun cambio tema/colore. */
+#atmec-inspector-358-bar{position:fixed;top:8px;right:10px;z-index:2147483000;display:flex;gap:6px;align-items:center;padding:6px 8px;border:1px solid rgba(255,255,255,.18);border-radius:14px;background:rgba(8,16,28,.92);backdrop-filter:blur(8px);box-shadow:0 8px 24px rgba(0,0,0,.30);font-family:inherit;font-size:11px;color:#e8f4ff}
+#atmec-inspector-358-bar button,#atmec-inspector-358-bar select{border:1px solid rgba(255,255,255,.22);border-radius:10px;background:rgba(255,255,255,.08);color:#e8f4ff;padding:5px 8px;font-weight:800;cursor:pointer;font-size:11px}
+#atmec-inspector-358-bar select{background:#102033;color:#e8f4ff;padding:4px 7px}
+#atmec-inspector-358-bar button.on{background:linear-gradient(135deg,#00d5ff,#37ffb0);color:#06121d;border-color:rgba(255,255,255,.45)}
+#atmec-inspector-358-bar .idbox{max-width:350px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#a9d6ff;border-left:1px solid rgba(255,255,255,.16);padding-left:8px}
+#atmec-inspector-358-grid{position:fixed;inset:0;z-index:2147482990;pointer-events:none;display:none;background-image:linear-gradient(rgba(126,231,255,.13) 1px,transparent 1px),linear-gradient(90deg,rgba(126,231,255,.13) 1px,transparent 1px);background-size:20px 20px}
+body.atmec-layout-grid-on #atmec-inspector-358-grid{display:block}
+body.atmec-layout-edit-on .atmec-layout-selected-366{outline:2px solid #ffd84d!important;outline-offset:2px!important;box-shadow:0 0 0 3px rgba(255,216,77,.18)!important;position:relative!important;z-index:2147482000!important}
+body.atmec-layout-edit-on .atmec-layout-multi-366{outline:2px dashed #7ee7ff!important;outline-offset:2px!important}
+body.atmec-layout-edit-on .atmec-layout-ref-367{outline:3px solid #37ffb0!important;outline-offset:4px!important;box-shadow:0 0 0 4px rgba(55,255,176,.18)!important}
+.atmec-layout-handle-358{position:fixed;z-index:2147483002;display:none;user-select:none;box-shadow:0 8px 20px rgba(0,0,0,.35)}
+#atmec-move-handle-358{background:#ffd84d;color:#141414;border-radius:10px;padding:5px 10px;font-size:11px;font-weight:900;cursor:move;border:1px solid rgba(0,0,0,.25)}
+#atmec-resize-handle-358{width:18px;height:18px;border-radius:50%;background:#7ee7ff;color:#06121d;display:none;align-items:center;justify-content:center;font-weight:900;cursor:nwse-resize;border:1px solid rgba(0,0,0,.25)}
+#atmec-inspector-358-pop{position:fixed;z-index:2147483001;display:none;width:390px;max-width:calc(100vw - 20px);background:rgba(8,14,24,.98);color:#e8f4ff;border:1px solid rgba(126,231,255,.42);border-radius:14px;box-shadow:0 18px 46px rgba(0,0,0,.45);font-family:inherit;font-size:12px;overflow:hidden}
+#atmec-inspector-358-pop .head{display:flex;justify-content:space-between;gap:8px;align-items:center;padding:9px 11px;background:rgba(126,231,255,.12);cursor:move;color:#7ee7ff;font-weight:900}
+#atmec-inspector-358-pop .head button{border:0;background:transparent;color:#fff;font-size:18px;cursor:pointer}
+#atmec-inspector-358-pop .body{padding:10px;display:grid;gap:9px}
+#atmec-inspector-358-pop code{display:block;color:#ffd84d;background:rgba(255,216,77,.10);border:1px solid rgba(255,216,77,.25);border-radius:9px;padding:7px;overflow:hidden;text-overflow:ellipsis}
+#atmec-inspector-358-pop .muted{color:#9fb8cc;font-size:11px;line-height:1.35}
+#atmec-inspector-358-pop .grid2{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+#atmec-inspector-358-pop label{display:grid;gap:4px;color:#b6c7d9;font-size:11px;font-weight:800}
+#atmec-inspector-358-pop input,#atmec-inspector-358-pop select{border:1px solid rgba(255,255,255,.22);border-radius:8px;background:#102033;color:#fff;padding:6px 7px;font-size:12px;box-sizing:border-box;width:100%}
+#atmec-inspector-358-pop .actions{display:flex;gap:6px;flex-wrap:wrap}
+#atmec-inspector-358-pop button{border:1px solid rgba(255,255,255,.20);border-radius:9px;background:rgba(255,255,255,.08);color:#fff;padding:6px 8px;font-weight:850;cursor:pointer;font-size:11px}
+#atmec-inspector-358-pop button.primary{background:linear-gradient(135deg,#00d5ff,#37ffb0);color:#06121d;border-color:rgba(255,255,255,.45)}
+#atmec-inspector-358-pop button.danger{background:rgba(255,70,70,.16);border-color:rgba(255,70,70,.45);color:#ffb2b2}
+
+
+/* ===== layout-manager-362.css ===== */
+/* AT-MEC 3.67 - Layout Manager non invasivo. Non modifica stile/tema originale. */
+#atmec-layout-manager-362-panel{position:fixed;top:58px;right:12px;z-index:2147483003;display:none;width:360px;max-width:calc(100vw - 24px);border:1px solid rgba(126,231,255,.45);border-radius:14px;background:rgba(8,14,24,.97);color:#e8f4ff;box-shadow:0 18px 44px rgba(0,0,0,.45);font-family:inherit;font-size:12px;overflow:hidden}
+#atmec-layout-manager-362-panel .lm-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 11px;background:rgba(126,231,255,.12);cursor:move;font-weight:900;color:#7ee7ff}
+#atmec-layout-manager-362-panel .lm-body{padding:10px;display:grid;gap:8px}
+#atmec-layout-manager-362-panel label{display:grid;gap:4px;color:#b6c7d9;font-weight:800;font-size:11px}
+#atmec-layout-manager-362-panel input,#atmec-layout-manager-362-panel select{border:1px solid rgba(255,255,255,.22);border-radius:9px;background:rgba(255,255,255,.08);color:#fff;padding:7px 8px;font-size:12px}
+#atmec-layout-manager-362-panel button{border:1px solid rgba(255,255,255,.22);border-radius:10px;background:rgba(255,255,255,.08);color:#fff;padding:7px 9px;font-weight:850;cursor:pointer;font-size:11px}
+#atmec-layout-manager-362-panel button.primary{background:linear-gradient(135deg,#00d5ff,#37ffb0);color:#06121d;border-color:rgba(255,255,255,.45)}
+#atmec-layout-manager-362-panel button.warn{background:rgba(255,216,77,.16);border-color:rgba(255,216,77,.45);color:#ffd84d}
+#atmec-layout-manager-362-panel button.danger{background:rgba(255,70,70,.16);border-color:rgba(255,70,70,.45);color:#ffb2b2}
+#atmec-layout-manager-362-panel .row{display:flex;gap:7px;flex-wrap:wrap}
+#atmec-layout-manager-362-panel .row>*{flex:1 1 auto}
+#atmec-layout-manager-362-panel .hint{color:#98b6cf;font-size:11px;line-height:1.35;border-top:1px solid rgba(255,255,255,.10);padding-top:8px}
+#atmec-layout-manager-362-panel .status{font-size:11px;color:#37ffb0;min-height:14px}
+#atmec-layout-manager-362-toggle{border:1px solid rgba(126,231,255,.35)!important;background:rgba(126,231,255,.12)!important;color:#dff8ff!important}
+
+
+/* ===== layout-373.css ===== */
+/* AT-MEC 3.73 - strumenti leggeri sopra 3.72: ricerca, albero, testo/alias, copia proprietà. Non cambia layout/tema da solo. */
+#atmec-layout-373-panel{position:fixed;top:96px;left:14px;z-index:2147483004;display:none;width:390px;max-width:calc(100vw - 24px);max-height:calc(100vh - 120px);overflow:auto;border:1px solid rgba(126,231,255,.38);border-radius:14px;background:rgba(8,14,24,.98);color:#e8f4ff;box-shadow:0 18px 44px rgba(0,0,0,.45);font-family:inherit;font-size:12px}
+#atmec-layout-373-panel .h373{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 11px;background:rgba(126,231,255,.12);cursor:move;font-weight:900;color:#7ee7ff}
+#atmec-layout-373-panel .b373{padding:10px;display:grid;gap:8px}
+#atmec-layout-373-panel label{display:grid;gap:4px;color:#b6c7d9;font-weight:800;font-size:11px}
+#atmec-layout-373-panel input,#atmec-layout-373-panel select,#atmec-layout-373-panel textarea{border:1px solid rgba(255,255,255,.22);border-radius:9px;background:rgba(255,255,255,.08);color:#fff;padding:7px 8px;font-size:12px;font-family:inherit}
+#atmec-layout-373-panel textarea{min-height:48px;resize:vertical}
+#atmec-layout-373-panel button{border:1px solid rgba(255,255,255,.22);border-radius:10px;background:rgba(255,255,255,.08);color:#fff;padding:7px 9px;font-weight:850;cursor:pointer;font-size:11px}
+#atmec-layout-373-panel button.primary{background:linear-gradient(135deg,#00d5ff,#37ffb0);color:#06121d;border-color:rgba(255,255,255,.45)}
+#atmec-layout-373-panel button.warn{background:rgba(255,216,77,.16);border-color:rgba(255,216,77,.45);color:#ffd84d}
+#atmec-layout-373-panel .row{display:flex;gap:6px;flex-wrap:wrap}.row>*{flex:1 1 auto}
+#atmec-layout-373-panel .tree373{max-height:220px;overflow:auto;border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:6px;background:rgba(255,255,255,.04)}
+#atmec-layout-373-panel .tree373 button{display:block;width:100%;text-align:left;margin:2px 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;background:rgba(255,255,255,.05)}
+#atmec-layout-373-panel .tree373 button:hover{background:rgba(126,231,255,.14)}
+#atmec-layout-373-panel .muted{color:#98b6cf;font-size:11px;line-height:1.35}
+#atmec-layout-373-toggle{border:1px solid rgba(126,231,255,.35)!important;background:rgba(126,231,255,.12)!important;color:#dff8ff!important}
+.atmec-layout-found-373{outline:3px solid rgba(55,255,176,.9)!important;outline-offset:3px!important;box-shadow:0 0 0 5px rgba(55,255,176,.18)!important}
+
+
+/* ===== layout-376-fix.css ===== */
+#atmec-layout-373-panel .atmec-376-minirow{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+#atmec-layout-373-panel .atmec-376-minirow button{flex:1 1 auto}
+.atmec-376-flash{outline:3px solid #37ffb0!important; outline-offset:3px!important; box-shadow:0 0 0 4px rgba(55,255,176,.22)!important;}
+
+
+/* ===== layout-379-text-fix.css ===== */
+.atmec-379-target-flash{outline:3px solid #00ff99!important;outline-offset:4px!important;box-shadow:0 0 0 5px rgba(0,255,153,.22)!important}
+#atmec-layout-373-panel .atmec-379-target-info{font-size:11px;color:#00e5ff;margin:6px 0;padding:6px;border:1px solid rgba(0,229,255,.25);border-radius:8px;background:rgba(0,229,255,.06)}
+
+
+
+/* AT-MEC 3.94 - stable tools panel, text edit and clean resize handle */
+body.atmec-layout-edit-on .atmec-layout-selected-366{outline:3px solid #b566ff!important;box-shadow:0 0 0 4px rgba(181,102,255,.22)!important;}
+body.atmec-layout-edit-on .atmec-layout-multi-366{outline:2px dashed #52e6ff!important;box-shadow:0 0 0 3px rgba(82,230,255,.12)!important;}
+#atmec-layout-373-panel{position:fixed!important;resize:both!important;overflow:auto!important;max-height:86vh!important;min-width:320px!important;}
+#atmec-layout-373-panel .h373{cursor:move!important;user-select:none!important;}
+#atmec-search-box-3933{border:1px solid rgba(255,255,255,.14);border-radius:10px;padding:6px 8px;margin:8px 0;}
+#atmec-search-box-3933 summary{cursor:pointer;font-weight:700;}
+#atmec-search-box-3933:not([open]) .tree373{display:none!important;}
+
+
+/* AT-MEC 3.934 bugfix */
+#atmec-resize-handle-358{
+  width:28px!important;height:28px!important;border-radius:50%!important;
+  background:#7ee7ff!important;color:#06121d!important;
+  display:none;align-items:center!important;justify-content:center!important;
+  font-size:18px!important;line-height:1!important;font-weight:900!important;
+  z-index:2147483600!important;overflow:hidden!important;text-indent:0!important;
+}
+#atmec-resize-handle-358 span{display:block!important;pointer-events:none!important;transform:translate(0,0)!important;}
+#atmec-layout-373-panel{position:fixed!important;left:14px;top:96px;right:auto!important;bottom:auto!important;}
+#atmec-layout-373-panel .h373{touch-action:none!important;cursor:move!important;}
+body.atmec-tools-373-dragging, body.atmec-tools-373-dragging *{user-select:none!important;}
+#atmec-search-box-3933:not([open]) label,
+#atmec-search-box-3933:not([open]) input,
+#atmec-search-box-3933:not([open]) .tree373{display:none!important;}
+
+
+/* AT-MEC 3.94 - handle definitivo separato dal contenuto del bottone */
+#atmec-resize-handle-358.atmec-resize-handle-394,
+#atmec-resize-handle-358{
+  position:fixed!important;
+  width:30px!important;
+  height:30px!important;
+  min-width:30px!important;
+  max-width:30px!important;
+  min-height:30px!important;
+  max-height:30px!important;
+  border-radius:50%!important;
+  background:#7ee7ff!important;
+  color:#06121d!important;
+  border:2px solid rgba(6,18,29,.65)!important;
+  box-shadow:0 8px 22px rgba(0,0,0,.45)!important;
+  display:none;
+  align-items:center!important;
+  justify-content:center!important;
+  cursor:nwse-resize!important;
+  overflow:hidden!important;
+  text-indent:0!important;
+  font-size:0!important;
+  line-height:0!important;
+  white-space:nowrap!important;
+  user-select:none!important;
+  pointer-events:auto!important;
+  contain:layout paint style!important;
+  isolation:isolate!important;
+  z-index:2147483646!important;
+}
+#atmec-resize-handle-358.atmec-resize-handle-394::before,
+#atmec-resize-handle-358::before{
+  content:'↘'!important;
+  display:block!important;
+  font-size:19px!important;
+  line-height:30px!important;
+  font-weight:900!important;
+  width:30px!important;
+  height:30px!important;
+  text-align:center!important;
+  color:#06121d!important;
+  pointer-events:none!important;
+}
+#atmec-resize-handle-358.atmec-resize-handle-394 span,
+#atmec-resize-handle-358 span{display:none!important;}
+
+/* AT-MEC HM 3.981 - Lock/Layer Layout Editor bugfix */
+.atmec-layout-locked-398{
+  outline: 2px dashed rgba(255, 193, 7, 0.95) !important;
+  outline-offset: 3px !important;
+  filter: saturate(0.85) !important;
+}
+.atmec-layout-locked-398::after{
+  content: none !important;
+  display: none !important;
+}
+body.atmec-layout-edit-on .atmec-layout-locked-398::after{
+  content: "🔒" !important;
+  display: block !important;
+  position: absolute !important;
+  right: -10px !important;
+  top: -12px !important;
+  z-index: 2147483600 !important;
+  background: rgba(8,14,24,.92) !important;
+  border: 1px solid rgba(255,193,7,.85) !important;
+  border-radius: 999px !important;
+  padding: 1px 4px !important;
+  font-size: 13px !important;
+  line-height: 16px !important;
+  pointer-events: none !important;
+}
+
+
+/* AT-MEC HM 3.982 - lock marker only in Layout ON, no dashed outline in Layout OFF */
+body:not(.atmec-layout-edit-on) .atmec-layout-locked-398{
+  outline: none !important;
+  outline-offset: 0 !important;
+  box-shadow: none !important;
+  filter: none !important;
+}
+body:not(.atmec-layout-edit-on) .atmec-layout-locked-398::after{
+  content: none !important;
+  display: none !important;
+}
+body.atmec-layout-edit-on .atmec-layout-locked-398{
+  outline: 2px dashed rgba(255, 193, 7, 0.95) !important;
+  outline-offset: 3px !important;
+}
+/* z-index layers must not be hidden by the layout selection outline. The outline stays visible, but no fixed forced z-index. */
+body.atmec-layout-edit-on .atmec-layout-selected-366,
+body.atmec-layout-edit-on .atmec-layout-multi-366{
+  /* selection visual only: layer order belongs to the element style */
+}
+
+
+/* AT-MEC HM 3.984 - elementi estesi editabili */
+body.atmec-layout-edit-on .atmec-editable-3984:hover{
+  outline: 1px dashed rgba(96,165,250,.55);
+  outline-offset: 2px;
+}
+body:not(.atmec-layout-edit-on) .atmec-editable-3984{
+  outline: none !important;
+  box-shadow: none !important;
+}
+body:not(.atmec-layout-edit-on) [data-atmec-layer-root-3984]{
+  outline: none !important;
+}
+
+/* AT-MEC HM 4.1 - pannello scorribile, sezioni richiudibili e strumenti avanzati */
+#atmec-inspector-358-pop{
+  max-height:calc(100vh - 72px)!important;
+  overflow:hidden!important;
+  display:none;
+}
+#atmec-inspector-358-pop .body{
+  max-height:calc(100vh - 126px)!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  padding-right:8px!important;
+  scrollbar-width:thin;
+}
+#atmec-inspector-358-pop .body::-webkit-scrollbar{width:9px!important;}
+#atmec-inspector-358-pop .body::-webkit-scrollbar-thumb{background:rgba(126,231,255,.35)!important;border-radius:999px!important;}
+#atmec-inspector-358-pop .atmec-panel-section-401,
+#atmec-inspector-358-pop #atmec-pro-400{
+  border:1px solid rgba(255,255,255,.14)!important;
+  border-radius:12px!important;
+  background:rgba(255,255,255,.035)!important;
+  margin:8px 0!important;
+  padding:0!important;
+  overflow:hidden!important;
+}
+#atmec-inspector-358-pop .atmec-panel-section-401 summary,
+#atmec-inspector-358-pop #atmec-pro-400 summary{
+  cursor:pointer!important;
+  user-select:none!important;
+  padding:9px 10px!important;
+  font-weight:900!important;
+  color:#7ee7ff!important;
+  background:rgba(126,231,255,.09)!important;
+  list-style:revert!important;
+}
+#atmec-inspector-358-pop .atmec-panel-section-401[open] > summary,
+#atmec-inspector-358-pop #atmec-pro-400[open] > summary{
+  border-bottom:1px solid rgba(255,255,255,.10)!important;
+}
+#atmec-inspector-358-pop .atmec-panel-section-401 > .grid2,
+#atmec-inspector-358-pop .atmec-panel-section-401 > .actions,
+#atmec-inspector-358-pop .atmec-panel-section-401 > .muted,
+#atmec-inspector-358-pop #atmec-pro-400 > .grid2,
+#atmec-inspector-358-pop #atmec-pro-400 > .actions{
+  margin:8px!important;
+}
+#atmec-inspector-358-pop #atmec-pro-400:not([open]) > .grid2,
+#atmec-inspector-358-pop #atmec-pro-400:not([open]) > .actions,
+#atmec-inspector-358-pop .atmec-panel-section-401:not([open]) > .grid2,
+#atmec-inspector-358-pop .atmec-panel-section-401:not([open]) > .actions{
+  display:none!important;
+}
+
+/* AT-MEC HM 4.10C - layer fix: selection highlight must not override element z-index */
+body.atmec-layout-edit-on .atmec-layout-selected-366,
+body.atmec-layout-edit-on .atmec-layout-multi-366{
+  z-index: auto !important;
+}

@@ -1,0 +1,27 @@
+/* AT-MEC 3.67 - Layout editor pulito. OFF = HMI normale. Nessun cambio tema/colore. */
+#atmec-inspector-358-bar{position:fixed;top:8px;right:10px;z-index:2147483000;display:flex;gap:6px;align-items:center;padding:6px 8px;border:1px solid rgba(255,255,255,.18);border-radius:14px;background:rgba(8,16,28,.92);backdrop-filter:blur(8px);box-shadow:0 8px 24px rgba(0,0,0,.30);font-family:inherit;font-size:11px;color:#e8f4ff}
+#atmec-inspector-358-bar button,#atmec-inspector-358-bar select{border:1px solid rgba(255,255,255,.22);border-radius:10px;background:rgba(255,255,255,.08);color:#e8f4ff;padding:5px 8px;font-weight:800;cursor:pointer;font-size:11px}
+#atmec-inspector-358-bar select{background:#102033;color:#e8f4ff;padding:4px 7px}
+#atmec-inspector-358-bar button.on{background:linear-gradient(135deg,#00d5ff,#37ffb0);color:#06121d;border-color:rgba(255,255,255,.45)}
+#atmec-inspector-358-bar .idbox{max-width:350px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#a9d6ff;border-left:1px solid rgba(255,255,255,.16);padding-left:8px}
+#atmec-inspector-358-grid{position:fixed;inset:0;z-index:2147482990;pointer-events:none;display:none;background-image:linear-gradient(rgba(126,231,255,.13) 1px,transparent 1px),linear-gradient(90deg,rgba(126,231,255,.13) 1px,transparent 1px);background-size:20px 20px}
+body.atmec-layout-grid-on #atmec-inspector-358-grid{display:block}
+body.atmec-layout-edit-on .atmec-layout-selected-366{outline:2px solid #ffd84d!important;outline-offset:2px!important;box-shadow:0 0 0 3px rgba(255,216,77,.18)!important;position:relative!important;z-index:2147482000!important}
+body.atmec-layout-edit-on .atmec-layout-multi-366{outline:2px dashed #7ee7ff!important;outline-offset:2px!important}
+body.atmec-layout-edit-on .atmec-layout-ref-367{outline:3px solid #37ffb0!important;outline-offset:4px!important;box-shadow:0 0 0 4px rgba(55,255,176,.18)!important}
+.atmec-layout-handle-358{position:fixed;z-index:2147483002;display:none;user-select:none;box-shadow:0 8px 20px rgba(0,0,0,.35)}
+#atmec-move-handle-358{background:#ffd84d;color:#141414;border-radius:10px;padding:5px 10px;font-size:11px;font-weight:900;cursor:move;border:1px solid rgba(0,0,0,.25)}
+#atmec-resize-handle-358{width:18px;height:18px;border-radius:50%;background:#7ee7ff;color:#06121d;display:none;align-items:center;justify-content:center;font-weight:900;cursor:nwse-resize;border:1px solid rgba(0,0,0,.25)}
+#atmec-inspector-358-pop{position:fixed;z-index:2147483001;display:none;width:390px;max-width:calc(100vw - 20px);background:rgba(8,14,24,.98);color:#e8f4ff;border:1px solid rgba(126,231,255,.42);border-radius:14px;box-shadow:0 18px 46px rgba(0,0,0,.45);font-family:inherit;font-size:12px;overflow:hidden}
+#atmec-inspector-358-pop .head{display:flex;justify-content:space-between;gap:8px;align-items:center;padding:9px 11px;background:rgba(126,231,255,.12);cursor:move;color:#7ee7ff;font-weight:900}
+#atmec-inspector-358-pop .head button{border:0;background:transparent;color:#fff;font-size:18px;cursor:pointer}
+#atmec-inspector-358-pop .body{padding:10px;display:grid;gap:9px}
+#atmec-inspector-358-pop code{display:block;color:#ffd84d;background:rgba(255,216,77,.10);border:1px solid rgba(255,216,77,.25);border-radius:9px;padding:7px;overflow:hidden;text-overflow:ellipsis}
+#atmec-inspector-358-pop .muted{color:#9fb8cc;font-size:11px;line-height:1.35}
+#atmec-inspector-358-pop .grid2{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+#atmec-inspector-358-pop label{display:grid;gap:4px;color:#b6c7d9;font-size:11px;font-weight:800}
+#atmec-inspector-358-pop input,#atmec-inspector-358-pop select{border:1px solid rgba(255,255,255,.22);border-radius:8px;background:#102033;color:#fff;padding:6px 7px;font-size:12px;box-sizing:border-box;width:100%}
+#atmec-inspector-358-pop .actions{display:flex;gap:6px;flex-wrap:wrap}
+#atmec-inspector-358-pop button{border:1px solid rgba(255,255,255,.20);border-radius:9px;background:rgba(255,255,255,.08);color:#fff;padding:6px 8px;font-weight:850;cursor:pointer;font-size:11px}
+#atmec-inspector-358-pop button.primary{background:linear-gradient(135deg,#00d5ff,#37ffb0);color:#06121d;border-color:rgba(255,255,255,.45)}
+#atmec-inspector-358-pop button.danger{background:rgba(255,70,70,.16);border-color:rgba(255,70,70,.45);color:#ffb2b2}
