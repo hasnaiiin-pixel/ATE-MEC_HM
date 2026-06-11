@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "createdAt": "2026-06-03T11:36:37.771Z",
-  "updatedAt": "2026-06-11T09:44:29.099Z",
+  "updatedAt": "2026-06-11T13:41:50.400Z",
   "recipes": [
     {
       "id": "recipe_1780499051207_4a5df09b",
@@ -202,16 +202,16 @@
       ]
     },
     {
-      "timestamp": "2026-06-11T09:43:55.388Z",
+      "timestamp": "2026-06-11T13:41:36.981Z",
       "operator": "Admin",
       "recipe_name": "TEST_rix",
       "recipe_version": 2,
-      "serial_dut": "00250",
+      "serial_dut": "0100",
       "lot_number": "10000",
       "work_order": "10000",
       "repair_note": "",
       "final_result": "PASS",
-      "execution_time_ms": 12095,
+      "execution_time_ms": 9428,
       "steps_log": [
         {
           "step_id": 1,
@@ -227,25 +227,25 @@
         {
           "step_id": 2,
           "type": "ManualMeasurement",
-          "measured": 2.4,
+          "measured": 3.1,
           "measurement_source": "MANUALE",
           "measurement_device": "operatore/manuale",
           "min": 0,
           "max": 3.3,
           "unit": "V",
-          "timestamp": "2026-06-11T09:43:49.687Z",
+          "timestamp": "2026-06-11T13:41:33.063Z",
           "result": "PASS"
         },
         {
           "step_id": 3,
           "type": "ManualMeasurement",
-          "measured": 569,
+          "measured": 523,
           "measurement_source": "MANUALE",
           "measurement_device": "operatore/manuale",
           "min": 500,
           "max": 999,
           "unit": "",
-          "timestamp": "2026-06-11T09:43:54.143Z",
+          "timestamp": "2026-06-11T13:41:35.734Z",
           "result": "PASS"
         },
         {
@@ -262,16 +262,16 @@
       ]
     },
     {
-      "timestamp": "2026-06-11T09:43:55.388Z",
+      "timestamp": "2026-06-11T13:41:36.981Z",
       "operator": "Admin",
       "recipe_name": "TEST_rix",
       "recipe_version": 2,
-      "serial_dut": "00250",
+      "serial_dut": "0100",
       "lot_number": "10000",
       "work_order": "10000",
       "repair_note": "",
       "final_result": "PASS",
-      "execution_time_ms": 12095,
+      "execution_time_ms": 9428,
       "steps_log": [
         {
           "step_id": 1,
@@ -287,25 +287,25 @@
         {
           "step_id": 2,
           "type": "ManualMeasurement",
-          "measured": 2.4,
+          "measured": 3.1,
           "measurement_source": "MANUALE",
           "measurement_device": "operatore/manuale",
           "min": 0,
           "max": 3.3,
           "unit": "V",
-          "timestamp": "2026-06-11T09:43:49.687Z",
+          "timestamp": "2026-06-11T13:41:33.063Z",
           "result": "PASS"
         },
         {
           "step_id": 3,
           "type": "ManualMeasurement",
-          "measured": 569,
+          "measured": 523,
           "measurement_source": "MANUALE",
           "measurement_device": "operatore/manuale",
           "min": 500,
           "max": 999,
           "unit": "",
-          "timestamp": "2026-06-11T09:43:54.143Z",
+          "timestamp": "2026-06-11T13:41:35.734Z",
           "result": "PASS"
         },
         {
@@ -322,16 +322,16 @@
       ]
     },
     {
-      "timestamp": "2026-06-11T09:44:11.579Z",
+      "timestamp": "2026-06-11T13:41:50.398Z",
       "operator": "Admin",
       "recipe_name": "TEST_rix",
       "recipe_version": 2,
-      "serial_dut": "00251",
+      "serial_dut": "0101",
       "lot_number": "10000",
       "work_order": "10000",
       "repair_note": "",
       "final_result": "FAIL",
-      "execution_time_ms": 5503,
+      "execution_time_ms": 9681,
       "steps_log": [
         {
           "step_id": 1,
@@ -347,28 +347,28 @@
         {
           "step_id": 2,
           "type": "ManualMeasurement",
-          "measured": 4,
+          "measured": 3.4,
           "measurement_source": "MANUALE",
           "measurement_device": "operatore/manuale",
           "min": 0,
           "max": 3.3,
           "unit": "V",
-          "timestamp": "2026-06-11T09:44:10.633Z",
+          "timestamp": "2026-06-11T13:41:49.454Z",
           "result": "FAIL"
         }
       ]
     },
     {
-      "timestamp": "2026-06-11T09:44:11.579Z",
+      "timestamp": "2026-06-11T13:41:50.398Z",
       "operator": "Admin",
       "recipe_name": "TEST_rix",
       "recipe_version": 2,
-      "serial_dut": "00251",
+      "serial_dut": "0101",
       "lot_number": "10000",
       "work_order": "10000",
       "repair_note": "",
       "final_result": "FAIL",
-      "execution_time_ms": 5503,
+      "execution_time_ms": 9681,
       "steps_log": [
         {
           "step_id": 1,
@@ -384,158 +384,17 @@
         {
           "step_id": 2,
           "type": "ManualMeasurement",
-          "measured": 4,
+          "measured": 3.4,
           "measurement_source": "MANUALE",
           "measurement_device": "operatore/manuale",
           "min": 0,
           "max": 3.3,
           "unit": "V",
-          "timestamp": "2026-06-11T09:44:10.633Z",
+          "timestamp": "2026-06-11T13:41:49.454Z",
           "result": "FAIL"
-        }
-      ]
-    },
-    {
-      "timestamp": "2026-06-11T09:44:29.096Z",
-      "operator": "Admin",
-      "recipe_name": "TEST_rix",
-      "recipe_version": 2,
-      "serial_dut": "00251",
-      "lot_number": "10000",
-      "work_order": "10000",
-      "repair_note": "sgdht",
-      "final_result": "PASS",
-      "execution_time_ms": 10346,
-      "steps_log": [
-        {
-          "step_id": 1,
-          "type": "PowerSupplySet",
-          "measured": {
-            "channel": 1,
-            "voltage": 18.5,
-            "current": 1,
-            "outputOn": true
-          },
-          "result": "DONE"
-        },
-        {
-          "step_id": 2,
-          "type": "ManualMeasurement",
-          "measured": 3.2,
-          "measurement_source": "MANUALE",
-          "measurement_device": "operatore/manuale",
-          "min": 0,
-          "max": 3.3,
-          "unit": "V",
-          "timestamp": "2026-06-11T09:44:23.911Z",
-          "result": "PASS"
-        },
-        {
-          "step_id": 3,
-          "type": "ManualMeasurement",
-          "measured": 562,
-          "measurement_source": "MANUALE",
-          "measurement_device": "operatore/manuale",
-          "min": 500,
-          "max": 999,
-          "unit": "",
-          "timestamp": "2026-06-11T09:44:27.848Z",
-          "result": "PASS"
-        },
-        {
-          "step_id": 4,
-          "type": "PowerSupplySet",
-          "measured": {
-            "channel": 1,
-            "voltage": 0,
-            "current": 0,
-            "outputOn": false
-          },
-          "result": "DONE"
-        }
-      ]
-    },
-    {
-      "timestamp": "2026-06-11T09:44:29.096Z",
-      "operator": "Admin",
-      "recipe_name": "TEST_rix",
-      "recipe_version": 2,
-      "serial_dut": "00251",
-      "lot_number": "10000",
-      "work_order": "10000",
-      "repair_note": "sgdht",
-      "final_result": "PASS",
-      "execution_time_ms": 10346,
-      "steps_log": [
-        {
-          "step_id": 1,
-          "type": "PowerSupplySet",
-          "measured": {
-            "channel": 1,
-            "voltage": 18.5,
-            "current": 1,
-            "outputOn": true
-          },
-          "result": "DONE"
-        },
-        {
-          "step_id": 2,
-          "type": "ManualMeasurement",
-          "measured": 3.2,
-          "measurement_source": "MANUALE",
-          "measurement_device": "operatore/manuale",
-          "min": 0,
-          "max": 3.3,
-          "unit": "V",
-          "timestamp": "2026-06-11T09:44:23.911Z",
-          "result": "PASS"
-        },
-        {
-          "step_id": 3,
-          "type": "ManualMeasurement",
-          "measured": 562,
-          "measurement_source": "MANUALE",
-          "measurement_device": "operatore/manuale",
-          "min": 500,
-          "max": 999,
-          "unit": "",
-          "timestamp": "2026-06-11T09:44:27.848Z",
-          "result": "PASS"
-        },
-        {
-          "step_id": 4,
-          "type": "PowerSupplySet",
-          "measured": {
-            "channel": 1,
-            "voltage": 0,
-            "current": 0,
-            "outputOn": false
-          },
-          "result": "DONE"
         }
       ]
     }
   ],
-  "repairs": [
-    {
-      "id": "repair_1781171069096_4f34b2e7",
-      "serial_dut": "00251",
-      "lot_number": "10000",
-      "work_order": "10000",
-      "timestamp": "2026-06-11T09:44:29.096Z",
-      "operator": "Admin",
-      "repair_note": "sgdht",
-      "previous_result": "PASS"
-    },
-    {
-      "id": "repair_1781171069099_661de171",
-      "serial_dut": "00251",
-      "lot_number": "10000",
-      "work_order": "10000",
-      "timestamp": "2026-06-11T09:44:29.099Z",
-      "operator": "Admin",
-      "repair_note": "sgdht",
-      "previous_result": "PASS"
-    }
-  ]
+  "repairs": []
 }

@@ -62,6 +62,10 @@ contextBridge.exposeInMainWorld('api', {
   exportLocalReportsCsv: (filters?: any) => ipcRenderer.invoke('export-local-reports-csv', filters || {}),
   backupLocalDatabase: (label?: string) => ipcRenderer.invoke('backup-local-database', label || 'manuale'),
   getKpi: () => ipcRenderer.invoke('get-kpi'),
+  getDataProviderStatus: () => ipcRenderer.invoke('get-data-provider-status'),
+  saveDataProviderConfig: (cfg: any) => ipcRenderer.invoke('save-data-provider-config', cfg || {}),
+  testDataProviderServer: (url: string) => ipcRenderer.invoke('test-data-provider-server', url),
+  syncDataProviderNow: () => ipcRenderer.invoke('sync-data-provider-now'),
 
   saveRecipe: (name: string, recipe: any) => ipcRenderer.invoke('save-recipe', { name, recipe }),
   loadRecipe: (name: string) => ipcRenderer.invoke('load-recipe', name),
