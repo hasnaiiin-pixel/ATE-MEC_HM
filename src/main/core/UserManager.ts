@@ -20,8 +20,8 @@ export class UserManager {
     Operator:   { level: 10,  permissions: ['run_test'] },
     Technician: { level: 30,  permissions: ['run_test', 'debug_mode'] },
     Engineer:   { level: 60,  permissions: ['run_test', 'debug_mode', 'edit_recipe', 'config_hardware'] },
-    Developer:  { level: 80,  permissions: ['run_test', 'debug_mode', 'edit_recipe', 'config_hardware', 'manage_branding'] },
-    Admin:      { level: 100, permissions: ['run_test', 'debug_mode', 'edit_recipe', 'config_hardware', 'manage_users', 'manage_branding'] }
+    Developer:  { level: 80,  permissions: ['run_test', 'debug_mode', 'edit_recipe', 'config_hardware', 'manage_branding', 'edit_layout', 'show_ui_ids', 'test_elements'] },
+    Admin:      { level: 100, permissions: ['run_test', 'debug_mode', 'edit_recipe', 'config_hardware', 'manage_users', 'manage_branding', 'edit_layout', 'show_ui_ids', 'test_elements'] }
   };
 
   private users: StoredUser[] = [];
@@ -83,7 +83,7 @@ export class UserManager {
     return crypto.createHash('sha256').update(`${salt}:${password}`).digest('hex');
   }
 
-  public login(usernameRaw: string, password?: string): { ok: boolean; error?: string; operator?: string; role?: Role; level?: number } {
+  public login(usernameRaw: string, password?: string): { ok: boolean; error?: string; operator?: string; role?: Role; level?: number; permissions?: string[] } {
     const username = (usernameRaw || '').trim();
     if (!username) return { ok: false, error: 'Username mancante.' };
     if (!password) return { ok: false, error: 'Password obbligatoria.' };
@@ -94,7 +94,7 @@ export class UserManager {
     this.currentRole = user.role;
     const level = this.roles[user.role]?.level ?? 0;
     console.log(`[USER] Login: ${this.currentOperator} come ${this.currentRole} livello ${level}`);
-    return { ok: true, operator: this.currentOperator, role: this.currentRole, level };
+    return { ok: true, operator: this.currentOperator, role: this.currentRole, level, permissions: this.roles[user.role]?.permissions || [] };
   }
 
   public createRole(role: string, permissions: string[], level?: number): { ok: boolean; error?: string } {
@@ -149,8 +149,8 @@ export class UserManager {
     return Object.keys(this.roles).map(role => ({ role, permissions: this.roles[role].permissions, level: this.roles[role].level }));
   }
 
-  public listUsers(): Array<{ username: string; displayName: string; role: Role; enabled: boolean; level: number }> {
-    return this.users.map(({ username, displayName, role, enabled }) => ({ username, displayName, role, enabled, level: this.roles[role]?.level ?? 0 }));
+  public listUsers(): Array<{ username: string; displayName: string; role: Role; enabled: boolean; level: number; permissions: string[] }> {
+    return this.users.map(({ username, displayName, role, enabled }) => ({ username, displayName, role, enabled, level: this.roles[role]?.level ?? 0, permissions: this.roles[role]?.permissions || [] }));
   }
 
   public hasPermission(role: Role, action: string): boolean {

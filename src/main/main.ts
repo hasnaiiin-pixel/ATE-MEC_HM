@@ -111,7 +111,7 @@ function createWindow(): void {
     minWidth: 1280,
     minHeight: 800,
     backgroundColor: '#0d0d14',
-    title: 'AT-MEC HM 4.12I_FIX1',
+    title: 'AT-MEC HM 4.12K_FIX1',
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
@@ -186,7 +186,7 @@ function initSystems(): void {
     } else {
       kpiFailed++;
     }
-    // AT-MEC_HM_4.12I_FIX1: salva e stampa il report arricchito con tracciabilità postazione/cliente.
+    // AT-MEC_HM_4.12K_FIX1: salva e stampa il report arricchito con tracciabilità postazione/cliente.
     if (report) { try { dataProvider.saveTestReport(report); } catch (err) { console.error('[DATA_PROVIDER] save report:', err); } }
     if (report) PdfGenerator.generateCertificate(report);
     kpiTotal++;
@@ -239,7 +239,7 @@ app.whenReady().then(async () => {
     await connectHardware();
     stateMachine.transitionTo('READY');
     mainWindow?.webContents.send('state-changed', stateMachine.getState());
-    mainWindow?.webContents.send('system-ready', { version: '4.12I_FIX1' });
+    mainWindow?.webContents.send('system-ready', { version: '4.12K_FIX1' });
   });
 
   app.on('activate', () => {

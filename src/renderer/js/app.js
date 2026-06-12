@@ -78,6 +78,41 @@ function userCanManageUsers() {
   return !!currentUser && ((currentUser.role || '').toLowerCase() === 'admin' || Number(currentUser.level || 0) >= 100);
 }
 
+// AT-MEC_HM_4.12K - permessi UI/layout centralizzati.
+function userHasPermission412K(permission) {
+  try {
+    const perms = currentUser?.permissions || [];
+    return Array.isArray(perms) && perms.includes(permission);
+  } catch(_e) { return false; }
+}
+function isAdminOrDeveloper412K() {
+  const r = String(currentUser?.role || '').toLowerCase();
+  return !!currentUser && (r.includes('admin') || r.includes('developer') || r.includes('svilupp') || Number(currentUser?.level || 0) >= 80);
+}
+function canUseLayoutTools412K() {
+  return isAdminOrDeveloper412K() || userHasPermission412K('edit_layout') || userHasPermission412K('test_elements');
+}
+function canShowUiIds412K() {
+  return isAdminOrDeveloper412K() || userHasPermission412K('show_ui_ids');
+}
+window.atmecCanUseLayoutTools412K = canUseLayoutTools412K;
+window.atmecCanShowUiIds412K = canShowUiIds412K;
+function refreshSecurityUi412K() {
+  try {
+    const canLayout = canUseLayoutTools412K();
+    const canIds = canShowUiIds412K();
+    document.body.classList.toggle('atmec-can-layout-412k', canLayout);
+    document.body.classList.toggle('atmec-can-uiids-412k', canIds);
+    document.body.classList.toggle('atmec-operator-session-412k', !!currentUser && !canLayout);
+    ['atmec-inspector-358-bar','atmec-layout-manager-362-panel','atmec-layout-373-panel','atmec-inspector-358-pop','atmec-move-handle-358','atmec-resize-handle-358'].forEach(id=>{
+      const el=document.getElementById(id); if(el && !canLayout) el.style.display='none';
+    });
+    const dev=document.getElementById('ui-dev-toggle-336'); if(dev && !canIds) dev.style.display='none';
+    if(!canIds){ try{ clearUiDevLabels336(); document.body.classList.remove('ui-dev-labels-on'); }catch(_e){} }
+    if(!canLayout){ try{ document.body.classList.remove('atmec-layout-edit-on','atmec-layout-grid-on'); }catch(_e){} }
+  } catch(e) { console.warn('refreshSecurityUi412K', e); }
+}
+
 function saveLotNumberLocal() {
   const v = document.getElementById('lot-number')?.value || '';
   activeLotNumber = v.trim();
@@ -255,13 +290,14 @@ function renderStartupWizard(){
 }
 
 
-function completeLogin(operator, role, level = 0) {
-  currentUser = { operator, role, level: Number(level || 0) };
+function completeLogin(operator, role, level = 0, permissions = []) {
+  currentUser = { operator, role, level: Number(level || 0), permissions: Array.isArray(permissions) ? permissions : [] };
+  window.atmecCurrentUser412K = currentUser;
   document.body.classList.remove('locked');
   const box = document.getElementById('logged-user-box');
   if (box) box.innerHTML = `✅ <b>${escapeHtml(operator)}</b><br><span>${escapeHtml(role)} · livello ${Number(level || 0)}</span>`;
   addLog(document.getElementById('sys-log'), `Login: <b>${escapeHtml(operator)}</b> [${escapeHtml(role)}] livello ${Number(level || 0)}`, 'pass');
-  refreshRolesUsers().catch(()=>{}); loadAppSettings().catch(()=>{}); refreshBrandingPermissions();
+  refreshRolesUsers().catch(()=>{}); loadAppSettings().catch(()=>{}); refreshBrandingPermissions(); refreshSecurityUi412K();
   const lotEl=document.getElementById('lot-number'); if(lotEl && !lotEl.value) lotEl.value=activeLotNumber;
   const prodLot=document.getElementById('prod-lot-number'); if(prodLot && !prodLot.value) prodLot.value=activeLotNumber;
   refreshProductionRecipes();
@@ -271,6 +307,8 @@ function completeLogin(operator, role, level = 0) {
 }
 function logoutAndLock() {
   currentUser = null;
+  window.atmecCurrentUser412K = null;
+  refreshSecurityUi412K();
   document.body.classList.add('locked');
   const st = document.getElementById('login-status'); if (st) st.textContent = '';
   const pw = document.getElementById('op-password'); if (pw) pw.value = '';
@@ -1059,12 +1097,12 @@ async function doLogin() {
       const res = await api.userLogin(operator, password);
       if (!res.ok) { document.getElementById('login-status').textContent = '❌ ' + res.error; return; }
       document.getElementById('login-status').textContent = `✅ ${res.operator || operator} [${res.role || ''}] livello ${res.level ?? ''}`;
-      completeLogin(res.operator || operator, res.role || 'Operator', res.level || 0);
+      completeLogin(res.operator || operator, res.role || 'Operator', res.level || 0, res.permissions || []);
       return;
     } catch (e) { document.getElementById('login-status').textContent = '❌ Errore login: ' + normalizeError(e); return; }
   }
   document.getElementById('login-status').textContent = `✅ ${operator} [offline]`;
-  completeLogin(operator, 'Offline', 0);
+  completeLogin(operator, 'Offline', 0, []);
 }
 
 async function startTest() {
@@ -3078,6 +3116,9 @@ function applyRoleLevelPreset() {
     edit_recipe: level >= 60,
     config_hardware: level >= 60,
     manage_branding: level >= 80,
+    edit_layout: level >= 80,
+    test_elements: level >= 80,
+    show_ui_ids: level >= 80,
     manage_users: level >= 100
   };
   document.querySelectorAll('.perm-check').forEach(ch => { ch.checked = !!map[ch.value]; });
@@ -4458,8 +4499,8 @@ function ensureUiDevPanel336(){
   d.innerHTML='<button class="btn btn-ghost btn-sm" onclick="toggleUiDevLabels336()">🏷 Mostra ID moduli</button><button class="btn btn-ghost btn-sm" onclick="exportUiLayoutHints336()">📋 Copia lista UI</button>';
   document.body.appendChild(d);
 }
-function isAdminUi336(){ try { return String(currentUser?.role || currentUser?.username || '').toLowerCase().includes('admin') || Number(currentUser?.level||0) >= 90; } catch { return true; } }
-function refreshUiDevButton336(){ ensureUiDevPanel336(); try { document.body.classList.toggle('admin-session', isAdminUi336()); } catch { document.body.classList.add('admin-session'); } }
+function isAdminUi336(){ try { return typeof canShowUiIds412K === 'function' ? canShowUiIds412K() : (String(currentUser?.role || currentUser?.username || '').toLowerCase().includes('admin') || Number(currentUser?.level||0) >= 90); } catch { return false; } }
+function refreshUiDevButton336(){ ensureUiDevPanel336(); try { const can=isAdminUi336(); document.body.classList.toggle('admin-session', can); const p=document.getElementById('ui-dev-toggle-336'); if(p) p.style.display=can?'flex':'none'; if(!can){ clearUiDevLabels336(); document.body.classList.remove('ui-dev-labels-on'); } } catch { document.body.classList.remove('admin-session'); } }
 function clearUiDevLabels336(){ document.querySelectorAll('.ui-dev-label-336').forEach(x=>x.remove()); }
 function toggleUiDevLabels336(){
   const on = !document.body.classList.contains('ui-dev-labels-on');
@@ -5193,3 +5234,194 @@ async function clearSyncedSyncQueue412G(){
     await refreshSyncQueue412G();
   }catch(e){ da412eStatus('Errore pulizia coda: '+normalizeError(e)); console.error('[AT-MEC 4.12I_FIX1] Clear synced', e); }
 }
+
+
+/* AT-MEC_HM_4.12K - sicurezza UI layout e accesso operatore Test Report */
+(function(){
+  function install412K(){
+    if(document.getElementById('atmec-style-412k')) return;
+    const st=document.createElement('style'); st.id='atmec-style-412k';
+    st.textContent=`
+      #topbar .logo, #app-title-logo{font-family:'Segoe UI Black','Arial Black','Orbitron','Segoe UI',sans-serif!important;font-size:25px!important;font-weight:1000!important;letter-spacing:3px!important;text-transform:uppercase!important;color:#7ee7ff!important;text-shadow:0 0 14px rgba(126,231,255,.45),0 2px 0 rgba(0,0,0,.35)!important;}
+      #atmec-inspector-358-bar,#atmec-layout-manager-362-panel,#atmec-layout-373-panel,#atmec-inspector-358-pop,#atmec-move-handle-358,#atmec-resize-handle-358,#ui-dev-toggle-336{display:none;}
+      body.atmec-can-layout-412k #atmec-inspector-358-bar{display:flex;}
+      body.atmec-can-uiids-412k #ui-dev-toggle-336{display:flex;}
+      .audit-header-412k{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+      .operator-testmode-return-412k{white-space:nowrap;}
+      body.atmec-operator-session-412k #sidebar details:not(.main-menu-card details){ }
+    `;
+    document.head.appendChild(st);
+  }
+  document.addEventListener('DOMContentLoaded',()=>{install412K(); setTimeout(()=>{ try{ refreshSecurityUi412K(); }catch(_e){} },300);});
+})();
+
+
+/* AT-MEC_HM_4.12K_FIX1 - permessi menu/layout corretti e non distruttivi.
+   Scopo: vedere solo i menu autorizzati; Layout Editor visibile ad Admin/Sviluppatore o permessi espliciti.
+   Non modifica Test Mode, ricette, hardware, report PDF o sync. */
+(function(){
+  const VERSION_LABEL_412K_FIX1 = '4.12K_FIX1';
+  function normRole(){ return String(window.atmecCurrentUser412K?.role || currentUser?.role || '').toLowerCase(); }
+  function level(){ return Number(window.atmecCurrentUser412K?.level ?? currentUser?.level ?? 0); }
+  function perms(){
+    const p = window.atmecCurrentUser412K?.permissions || currentUser?.permissions || [];
+    return Array.isArray(p) ? p : [];
+  }
+  function isRoot(){
+    const r = normRole();
+    return !!(currentUser || window.atmecCurrentUser412K) && (r.includes('admin') || r.includes('developer') || r.includes('svilupp') || level() >= 100);
+  }
+  function isDeveloperLike(){
+    const r = normRole();
+    return !!(currentUser || window.atmecCurrentUser412K) && (r.includes('developer') || r.includes('svilupp') || level() >= 80);
+  }
+  window.userHasPermission412K = function(permission){
+    try { return isRoot() || perms().includes(permission); } catch(_e){ return false; }
+  };
+  window.isAdminOrDeveloper412K = function(){ return isRoot() || isDeveloperLike(); };
+  window.canUseLayoutTools412K = function(){
+    return isRoot() || isDeveloperLike() || userHasPermission412K('edit_layout') || userHasPermission412K('test_elements');
+  };
+  window.canShowUiIds412K = function(){
+    return isRoot() || isDeveloperLike() || userHasPermission412K('show_ui_ids');
+  };
+  function featureAllowed(feature){
+    if(isRoot()) return true;
+    switch(feature){
+      case 'run': return userHasPermission412K('run_test');
+      case 'report': return userHasPermission412K('view_reports');
+      case 'recipe': return userHasPermission412K('edit_recipe');
+      case 'hardware': return userHasPermission412K('config_hardware');
+      case 'branding': return userHasPermission412K('manage_branding');
+      case 'users': return userHasPermission412K('manage_users');
+      case 'traceability': return userHasPermission412K('view_traceability');
+      case 'kpi': return userHasPermission412K('view_kpi');
+      case 'archive': return userHasPermission412K('manage_archive');
+      case 'layout': return canUseLayoutTools412K();
+      case 'uiids': return canShowUiIds412K();
+      default: return false;
+    }
+  }
+  window.atmecFeatureAllowed412K_FIX1 = featureAllowed;
+  const tabFeatureMap = {
+    'run-tab':'run',
+    'audit-tab':'report',
+    'recipe-tab':'recipe',
+    'meter-tab':'hardware','pl303-tab':'hardware','esp32-tab':'hardware','commhub-tab':'hardware','qr-tab':'hardware','flash-tab':'hardware','device-tab':'hardware','settings-tab':'hardware',
+    'branding-tab':'branding','users-tab':'users',
+    'traceability-tab':'traceability','unit-card-tab':'traceability',
+    'database-tab':'kpi','production-analysis-tab':'kpi',
+    'data-archive-tab':'archive'
+  };
+  function canOpenTab(id){ return featureAllowed(tabFeatureMap[id] || 'run'); }
+  const oldShowTab = window.showTab || showTab;
+  window.showTab = showTab = function(id, btn){
+    if(!requireLogin()) return;
+    if(!canOpenTab(id)){
+      alert('Permesso negato: questo menu non è abilitato per il tuo utente.');
+      try { refreshNavigationPermissions412K_FIX1(); } catch(_e){}
+      return;
+    }
+    return oldShowTab(id, btn);
+  };
+  const oldEnterProductionTestMode = window.enterProductionTestMode || enterProductionTestMode;
+  window.enterProductionTestMode = enterProductionTestMode = function(){
+    if(!requireLogin()) return;
+    if(!featureAllowed('run')){ alert('Permesso negato: modalità test non abilitata.'); return; }
+    return oldEnterProductionTestMode();
+  };
+  function featureFromButton(btn){
+    const oc = String(btn.getAttribute('onclick') || '');
+    const txt = String(btn.textContent || '').toLowerCase();
+    if(oc.includes("run-tab") || oc.includes('enterProductionTestMode') || oc.includes('startTest')) return 'run';
+    if(oc.includes("audit-tab") || txt.includes('test report')) return 'report';
+    if(oc.includes("recipe-tab")) return 'recipe';
+    if(oc.includes("traceability-tab") || oc.includes("unit-card-tab")) return 'traceability';
+    if(oc.includes("database-tab") || oc.includes("production-analysis-tab")) return 'kpi';
+    if(oc.includes("data-archive-tab")) return 'archive';
+    if(oc.includes("pl303-tab") || oc.includes("esp32-tab") || oc.includes("commhub-tab") || oc.includes("qr-tab") || oc.includes("meter-tab") || oc.includes("flash-tab") || oc.includes("device-tab") || oc.includes("settings-tab")) return 'hardware';
+    if(oc.includes("branding-tab")) return 'branding';
+    if(oc.includes("users-tab")) return 'users';
+    return null;
+  }
+  function setDisplay(el, visible, mode){
+    if(!el) return;
+    el.hidden = !visible;
+    el.style.display = visible ? (mode || '') : 'none';
+  }
+  function installAuditReturnButton(){
+    const audit = document.getElementById('audit-tab');
+    if(!audit || document.getElementById('audit-return-testmode-412k-fix1')) return;
+    const row = audit.querySelector('.row');
+    if(!row) return;
+    const b = document.createElement('button');
+    b.id = 'audit-return-testmode-412k-fix1';
+    b.className = 'btn btn-primary btn-sm operator-testmode-return-412k';
+    b.type = 'button';
+    b.textContent = '🖥 Torna a Test Mode';
+    b.onclick = function(){ enterProductionTestMode(); };
+    row.insertBefore(b, row.firstChild);
+  }
+  function refreshLayoutTools(){
+    const canLayout = canUseLayoutTools412K();
+    const canIds = canShowUiIds412K();
+    document.body.classList.toggle('atmec-can-layout-412k', canLayout);
+    document.body.classList.toggle('atmec-can-uiids-412k', canIds);
+    document.body.classList.toggle('atmec-operator-session-412k', !!currentUser && !canLayout);
+    const bar = document.getElementById('atmec-inspector-358-bar');
+    if(bar){
+      if(canLayout){ bar.hidden=false; bar.style.display='flex'; }
+      else { bar.hidden=true; bar.style.display='none'; }
+    }
+    ['atmec-layout-manager-362-panel','atmec-layout-373-panel','atmec-inspector-358-pop','atmec-move-handle-358','atmec-resize-handle-358'].forEach(id=>{
+      const el=document.getElementById(id); if(el && !canLayout){ el.hidden=true; el.style.display='none'; }
+    });
+    const dev=document.getElementById('ui-dev-toggle-336');
+    if(dev){ dev.hidden=!canIds; dev.style.display=canIds?'flex':'none'; }
+    if(!canIds){ try{ clearUiDevLabels336(); document.body.classList.remove('ui-dev-labels-on'); }catch(_e){} }
+    if(!canLayout){ try{ document.body.classList.remove('atmec-layout-edit-on','atmec-layout-grid-on'); }catch(_e){} }
+  }
+  window.refreshNavigationPermissions412K_FIX1 = function(){
+    try{
+      installAuditReturnButton();
+      refreshLayoutTools();
+      document.querySelectorAll('#sidebar button.side-nav-btn, #center .tab-bar button.tab-btn').forEach(btn=>{
+        const f = featureFromButton(btn);
+        if(!f) return;
+        setDisplay(btn, featureAllowed(f), btn.classList.contains('tab-btn') ? '' : '');
+      });
+      document.querySelectorAll('#sidebar details').forEach(det=>{
+        const visibleButtons = Array.from(det.querySelectorAll('button')).some(b=>!b.hidden && b.style.display !== 'none');
+        setDisplay(det, visibleButtons, '');
+      });
+      const ret=document.getElementById('audit-return-testmode-412k-fix1');
+      if(ret) setDisplay(ret, featureAllowed('run'), '');
+      const title=document.querySelector('#sidebar .side-card div[style*="font-size:17px"]');
+      if(title){ title.textContent='ATE-MEC HM '+VERSION_LABEL_412K_FIX1; title.style.fontSize='22px'; title.style.fontFamily="'Segoe UI Black','Arial Black','Segoe UI',sans-serif"; title.style.letterSpacing='2px'; }
+    }catch(e){ console.warn('[AT-MEC 4.12K_FIX1] refresh permessi menu', e); }
+  };
+  window.refreshSecurityUi412K = function(){ refreshNavigationPermissions412K_FIX1(); };
+  const oldRefreshRolesUsers = window.refreshRolesUsers || refreshRolesUsers;
+  window.refreshRolesUsers = refreshRolesUsers = async function(){
+    const r = await oldRefreshRolesUsers.apply(this, arguments);
+    try{ refreshNavigationPermissions412K_FIX1(); }catch(_e){}
+    return r;
+  };
+  const oldApplyRoleLevelPreset = window.applyRoleLevelPreset || applyRoleLevelPreset;
+  window.applyRoleLevelPreset = applyRoleLevelPreset = function(){
+    try { oldApplyRoleLevelPreset.apply(this, arguments); } catch(_e){}
+    const level = parseInt(document.getElementById('new-role-level')?.value || '10', 10);
+    const extra = {
+      view_reports: level >= 10,
+      view_traceability: level >= 30,
+      view_kpi: level >= 60,
+      manage_archive: level >= 60
+    };
+    Object.keys(extra).forEach(k=>{ const ch=document.querySelector('.perm-check[value="'+k+'"]'); if(ch) ch.checked=!!extra[k]; });
+  };
+  document.addEventListener('DOMContentLoaded', function(){
+    setTimeout(refreshNavigationPermissions412K_FIX1, 250);
+    setTimeout(refreshNavigationPermissions412K_FIX1, 900);
+    setInterval(refreshLayoutTools, 1500);
+  });
+})();
