@@ -34,6 +34,7 @@ let userManager: UserManager;
 let auditSystem: AuditSystem;
 let localDb: LocalDatabase;
 let dataProvider: DataProvider;
+let activeRunTraceMeta412I: any = {};
 
 
 type CommSessionType = 'serial' | 'telnet' | 'tcp';
@@ -110,7 +111,7 @@ function createWindow(): void {
     minWidth: 1280,
     minHeight: 800,
     backgroundColor: '#0d0d14',
-    title: 'AT-MEC HM 4.12G',
+    title: 'AT-MEC HM 4.12I_FIX1',
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
@@ -166,15 +167,26 @@ function initSystems(): void {
     mainWindow?.webContents.send('manual-step-request', data);
   });
   eventBus.subscribe('run_completed', (data) => {
+    const baseReport: TestReport | null = data.report || null;
+    const station = dataProvider?.getStationTraceInfo ? dataProvider.getStationTraceInfo() : {};
+    const report: TestReport | null = baseReport ? ({
+      ...baseReport,
+      station_id: station.stationId || '',
+      station_name: station.stationName || '',
+      station_department: station.stationDepartment || '',
+      station_site: station.stationSite || '',
+      customer_name: activeRunTraceMeta412I.customerName || '',
+      customer_logo: activeRunTraceMeta412I.customerLogo || '',
+      product_name: activeRunTraceMeta412I.productName || ''
+    } as any) : null;
+    if (report) data.report = report;
     mainWindow?.webContents.send('run-completed', data);
-    const report: TestReport | null = data.report || null;
     if (data.success) {
       kpiPassed++;
     } else {
       kpiFailed++;
     }
-    // AT-MEC_HM_2.28: genera PDF sia per PASS sia per FAIL, cosi il Test Report e sempre stampabile.
-    // AT-MEC_HM_3.14: duplica lo storico anche nel database locale per KPI/seriali/riparazioni.
+    // AT-MEC_HM_4.12I_FIX1: salva e stampa il report arricchito con tracciabilità postazione/cliente.
     if (report) { try { dataProvider.saveTestReport(report); } catch (err) { console.error('[DATA_PROVIDER] save report:', err); } }
     if (report) PdfGenerator.generateCertificate(report);
     kpiTotal++;
@@ -227,7 +239,7 @@ app.whenReady().then(async () => {
     await connectHardware();
     stateMachine.transitionTo('READY');
     mainWindow?.webContents.send('state-changed', stateMachine.getState());
-    mainWindow?.webContents.send('system-ready', { version: '4.12G' });
+    mainWindow?.webContents.send('system-ready', { version: '4.12I_FIX1' });
   });
 
   app.on('activate', () => {
@@ -344,6 +356,11 @@ safeIpcHandle('start-test', async (_e, payload: { recipe: Recipe; serialDut: str
   if (stateMachine.getState() !== 'READY') {
     return { ok: false, error: `Sistema non pronto (${stateMachine.getState()}). Premi RECOVER o riavvia connessione hardware.` };
   }
+  activeRunTraceMeta412I = {
+    customerName: (recipe as any).client_name || (recipe as any).customer || '',
+    customerLogo: (recipe as any).customer_logo || (recipe as any).client_logo || '',
+    productName: (recipe as any).product_name || (recipe as any).product || ''
+  };
   recipeEngine.run(recipe, serialDut, userManager.getCurrentOperator(), { lotNumber, workOrder: lotNumber, repairNote: payload.repairNote || '' }).catch(err => {
     console.error('[MAIN] Errore run ricetta:', err);
   }).finally(() => {
@@ -653,6 +670,7 @@ safeIpcHandle('export-local-reports-csv', async (_e, filters) => {
 
 safeIpcHandle('backup-local-database', async (_e, label) => dataProvider.backupSnapshot(label || 'manuale'));
 safeIpcHandle('get-data-provider-status', () => dataProvider.getStatus());
+safeIpcHandle('get-station-trace-info', () => dataProvider.getStationTraceInfo());
 safeIpcHandle('save-data-provider-config', (_e, cfg) => dataProvider.updateConfig(cfg || {}));
 safeIpcHandle('test-data-provider-server', (_e, url) => dataProvider.testServerConnection(url));
 safeIpcHandle('sync-data-provider-now', async () => dataProvider.syncNow());

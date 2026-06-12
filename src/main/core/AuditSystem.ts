@@ -18,6 +18,13 @@ export interface TestReport {
   lot_number?: string;
   work_order?: string;
   repair_note?: string;
+  station_id?: string;
+  station_name?: string;
+  station_department?: string;
+  station_site?: string;
+  customer_name?: string;
+  customer_logo?: string;
+  product_name?: string;
   final_result: TestResult;
   execution_time_ms: number;
   steps_log: Array<{

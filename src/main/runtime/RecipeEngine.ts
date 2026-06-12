@@ -59,6 +59,12 @@ export interface Recipe {
   recipe_name: string;
   version: number;
   power_metadata: string;
+  client_name?: string;
+  customer?: string;
+  customer_logo?: string;
+  client_logo?: string;
+  product_name?: string;
+  product?: string;
   enabled?: boolean;
   steps: TestStep[];
 }

@@ -1,13 +1,21 @@
 {
   "mode": "local_first",
   "server": {
-    "enabled": true,
-    "url": "http://localhost:8099",
+    "enabled": false,
+    "url": "",
     "timeoutMs": 5000
   },
   "sync": {
     "enabled": true,
-    "queuePath": "C:\\Users\\spea4060_tmv331ef\\Documents\\PROGETTI\\AT-MEC_HM_4.12G\\database\\sync_queue.json",
+    "queuePath": "C:\\Users\\spea4060_tmv331ef\\Documents\\PROGETTI\\AT-MEC_HM_4.12I_FIX1\\database\\sync_queue.json",
     "localFirst": true
+  },
+  "station": {
+    "id": "DESKTOP-54QO6OI",
+    "name": "Postazione locale",
+    "department": "COLLAUDO",
+    "site": "OSPITALETTO",
+    "autoSyncEnabled": false,
+    "autoSyncIntervalSec": 60
   }
 }

@@ -63,6 +63,7 @@ contextBridge.exposeInMainWorld('api', {
   backupLocalDatabase: (label?: string) => ipcRenderer.invoke('backup-local-database', label || 'manuale'),
   getKpi: () => ipcRenderer.invoke('get-kpi'),
   getDataProviderStatus: () => ipcRenderer.invoke('get-data-provider-status'),
+  getStationTraceInfo: () => ipcRenderer.invoke('get-station-trace-info'),
   saveDataProviderConfig: (cfg: any) => ipcRenderer.invoke('save-data-provider-config', cfg || {}),
   testDataProviderServer: (url: string) => ipcRenderer.invoke('test-data-provider-server', url),
   syncDataProviderNow: () => ipcRenderer.invoke('sync-data-provider-now'),
