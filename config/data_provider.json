@@ -7,7 +7,7 @@
   },
   "sync": {
     "enabled": true,
-    "queuePath": "C:\\Users\\spea4060_tmv331ef\\Documents\\PROGETTI\\AT-MEC_HM_4.12I_FIX1\\database\\sync_queue.json",
+    "queuePath": "C:\\Users\\spea4060_tmv331ef\\Documents\\PROGETTI\\AT-MEC_HM_4.12K_FIX1\\database\\sync_queue.json",
     "localFirst": true
   },
   "station": {

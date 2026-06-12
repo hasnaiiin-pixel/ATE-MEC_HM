@@ -2,44 +2,65 @@
   "roles": {
     "Operator": {
       "permissions": [
-        "run_test"
+        "run_test",
+        "view_reports"
       ],
       "level": 10
     },
     "Technician": {
       "permissions": [
         "run_test",
-        "debug_mode"
+        "view_reports",
+        "debug_mode",
+        "view_traceability"
       ],
       "level": 30
     },
     "Engineer": {
       "permissions": [
         "run_test",
+        "view_reports",
         "debug_mode",
         "edit_recipe",
-        "config_hardware"
+        "config_hardware",
+        "view_traceability",
+        "view_kpi",
+        "manage_archive"
       ],
       "level": 60
     },
     "Developer": {
       "permissions": [
         "run_test",
+        "view_reports",
         "debug_mode",
         "edit_recipe",
         "config_hardware",
-        "manage_branding"
+        "manage_branding",
+        "edit_layout",
+        "show_ui_ids",
+        "test_elements",
+        "view_traceability",
+        "view_kpi",
+        "manage_archive"
       ],
       "level": 80
     },
     "Admin": {
       "permissions": [
         "run_test",
+        "view_reports",
         "debug_mode",
         "edit_recipe",
         "config_hardware",
         "manage_users",
-        "manage_branding"
+        "manage_branding",
+        "edit_layout",
+        "show_ui_ids",
+        "test_elements",
+        "view_traceability",
+        "view_kpi",
+        "manage_archive"
       ],
       "level": 100
     }

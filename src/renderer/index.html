@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: file:; media-src 'self' blob: file:;">
-<title>ATE-MEC Suite v4.12I_FIX1</title>
+<title>ATE-MEC Suite v4.12K_FIX1_FIX1</title>
 <link rel="stylesheet" href="css/app.css">
 </head>
 <body class="locked">
@@ -18,7 +18,7 @@
   <div class="login-card">
     <img id="login-large-logo" class="login-hero-logo" title="Logo aziendale">
     <div class="login-brand">
-      <div><div class="login-title">ATE-MEC HM 4.12I_FIX1</div><div class="login-sub">Automatic Test & Measurement System</div></div>
+      <div><div class="login-title">ATE-MEC HM 4.12K</div><div class="login-sub">Automatic Test & Measurement System</div></div>
     </div>
     <div class="col"><label>Utente / Badge</label><input id="op-name" type="text" value="Operatore" placeholder="Inserisci utente"></div>
     <div class="col"><label>Password</label><input id="op-password" type="password" placeholder="Password"></div>
@@ -92,6 +92,11 @@
         </div>
         <div class="prod-sequence-log" id="prod-sequence-log"></div>
       </div>
+      <div class="prod-primary-actions-inline" aria-label="Comandi principali Test Mode">
+        <button class="btn btn-success btn-3d prod-main-action" onclick="startTest()"><span class="action-ico">▶️</span><span>START</span></button>
+        <button class="btn btn-warn btn-3d prod-main-action" onclick="pauseTest()"><span class="action-ico">⏸️</span><span>PAUSA</span></button>
+        <button class="btn btn-danger btn-3d prod-main-action" onclick="stopTestAndReset()"><span class="action-ico">⏹️</span><span>STOP</span></button>
+      </div>
       <div class="prod-progress-wrap">
         <div class="prod-progress-head"><span>Avanzamento test</span><b id="prod-progress-percent" data-ui-id="testmode.progress.percent">0%</b></div>
         <div class="prod-progress-bar"><div id="prod-progress-fill" class="prod-progress-fill"></div></div>
@@ -104,10 +109,7 @@
         <div class="prod-kpi"><div id="prod-kpi-fail" class="num" style="color:var(--fail)">0</div><div class="lbl">FAIL</div></div>
         <div class="prod-kpi"><div id="prod-kpi-todo" class="num" style="color:var(--text2)">0</div><div class="lbl">DA FARE</div></div>
       </div>
-      <div class="prod-actions prod-actions-vertical-318">
-        <button class="btn btn-success btn-3d prod-big-action" onclick="startTest()"><span class="action-ico">▶️</span><span>AVVIA TEST</span></button>
-        <button class="btn btn-warn btn-3d prod-big-action" onclick="pauseTest()"><span class="action-ico">⏸️</span><span>PAUSA / RIPRENDI</span></button>
-        <button class="btn btn-danger btn-3d stop-under-pause prod-big-action" onclick="stopTestAndReset()"><span class="action-ico">⏹️</span><span>STOP TEST</span></button>
+      <div class="prod-actions prod-actions-vertical-318 prod-secondary-actions-412j">
         <button class="btn btn-ghost btn-3d prod-big-action" onclick="requestExitProductionTestMode()"><span class="action-ico">🚪</span><span>ESCI TEST MODE</span></button>
         <button class="btn btn-ghost btn-3d prod-big-action" onclick="openTestReportFromTestMode()"><span class="action-ico">🧾</span><span>TEST REPORT</span></button>
       </div>
@@ -165,7 +167,7 @@
   <div id="sidebar">
     <div class="section-title">🏭 Banco prova</div>
     <div class="side-card">
-      <div style="font-size:17px;font-weight:900;color:var(--accent);letter-spacing:1px;">ATE-MEC HM 4.12I_FIX1</div>
+      <div style="font-size:17px;font-weight:900;color:var(--accent);letter-spacing:1px;">ATE-MEC HM 4.12K</div>
       <div id="logged-user-box" class="hint">Accesso non effettuato</div>
       <button class="btn btn-ghost btn-sm side-nav-btn" onclick="logoutAndLock()">🔒 Logout / cambia utente</button>
     </div>
@@ -830,7 +832,7 @@
       <div class="pa412a-page">
         <div class="recipe-big-card pa412a-hero">
           <div>
-            <div style="font-size:11px;color:var(--text2);letter-spacing:1px;">AT-MEC_HM_4.12I_FIX1</div>
+            <div style="font-size:11px;color:var(--text2);letter-spacing:1px;">AT-MEC_HM_4.12K_FIX1</div>
             <h3>📈 Analisi Produzione</h3>
             <div class="hint">Modulo separato per KPI industriali. Non modifica Dashboard, Storico Seriali, Scheda Unità, Test Mode o Layout Editor.</div>
           </div>
@@ -886,7 +888,7 @@
       <div class="da412b-page">
         <div class="recipe-big-card da412b-hero">
           <div>
-            <div style="font-size:11px;color:var(--text2);letter-spacing:1px;">AT-MEC_HM_4.12I_FIX1</div>
+            <div style="font-size:11px;color:var(--text2);letter-spacing:1px;">AT-MEC_HM_4.12K_FIX1</div>
             <h3>🗄️ Archivio Dati & Backup</h3>
             <div class="hint">Modulo separato per backup, esportazione e controllo archivio. Non modifica Test Mode, ricette, hardware, Layout Editor, Storico o Scheda Unità.</div>
           </div>
@@ -948,7 +950,7 @@
           </div>
           <div class="recipe-big-card da412e-sync-card">
             <h3>🔄 Data Provider & Sync</h3>
-            <div class="hint">4.12I_FIX1 aggiunge Station ID, multi-postazione e sync automatica periodica. Il comportamento resta LOCAL FIRST: il test salva sempre in locale e non si blocca se il server è offline.</div>
+            <div class="hint">4.12K aggiunge permessi Layout/Test elementi, accesso Test Report operatore e branding titolo. Il comportamento resta LOCAL FIRST: il test salva sempre in locale e non si blocca se il server è offline.</div>
             <div class="da412f-config-grid">
               <div class="col">
                 <label>Modalità dati</label>
@@ -1213,11 +1215,18 @@
             <label>Permessi</label>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;font-size:11px;">
               <label><input type="checkbox" class="perm-check" value="run_test" checked> Eseguire test</label>
+              <label><input type="checkbox" class="perm-check" value="view_reports"> Vedere Test Report</label>
+              <label><input type="checkbox" class="perm-check" value="view_traceability"> Storico/Scheda Unità</label>
+              <label><input type="checkbox" class="perm-check" value="view_kpi"> KPI / Analisi Produzione</label>
+              <label><input type="checkbox" class="perm-check" value="manage_archive"> Archivio Dati / Sync</label>
               <label><input type="checkbox" class="perm-check" value="debug_mode"> Debug</label>
               <label><input type="checkbox" class="perm-check" value="edit_recipe"> Modifica ricette</label>
               <label><input type="checkbox" class="perm-check" value="config_hardware"> Config. hardware</label>
               <label><input type="checkbox" class="perm-check" value="manage_users"> Gestione utenti</label>
               <label><input type="checkbox" class="perm-check" value="manage_branding"> Loghi/branding</label>
+              <label><input type="checkbox" class="perm-check" value="edit_layout"> Modifica layout</label>
+              <label><input type="checkbox" class="perm-check" value="test_elements"> Test elementi UI</label>
+              <label><input type="checkbox" class="perm-check" value="show_ui_ids"> Mostra ID UI</label>
             </div>
             <button class="btn btn-primary btn-sm" onclick="createRoleFromUi()">💾 Salva ruolo</button>
           </div>
