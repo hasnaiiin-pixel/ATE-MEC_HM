@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: file:; media-src 'self' blob: file:;">
-<title>ATE-MEC Suite v4.12G</title>
+<title>ATE-MEC Suite v4.12I_FIX1</title>
 <link rel="stylesheet" href="css/app.css">
 </head>
 <body class="locked">
@@ -18,7 +18,7 @@
   <div class="login-card">
     <img id="login-large-logo" class="login-hero-logo" title="Logo aziendale">
     <div class="login-brand">
-      <div><div class="login-title">ATE-MEC HM 4.12G</div><div class="login-sub">Automatic Test & Measurement System</div></div>
+      <div><div class="login-title">ATE-MEC HM 4.12I_FIX1</div><div class="login-sub">Automatic Test & Measurement System</div></div>
     </div>
     <div class="col"><label>Utente / Badge</label><input id="op-name" type="text" value="Operatore" placeholder="Inserisci utente"></div>
     <div class="col"><label>Password</label><input id="op-password" type="password" placeholder="Password"></div>
@@ -165,7 +165,7 @@
   <div id="sidebar">
     <div class="section-title">🏭 Banco prova</div>
     <div class="side-card">
-      <div style="font-size:17px;font-weight:900;color:var(--accent);letter-spacing:1px;">ATE-MEC HM 4.12G</div>
+      <div style="font-size:17px;font-weight:900;color:var(--accent);letter-spacing:1px;">ATE-MEC HM 4.12I_FIX1</div>
       <div id="logged-user-box" class="hint">Accesso non effettuato</div>
       <button class="btn btn-ghost btn-sm side-nav-btn" onclick="logoutAndLock()">🔒 Logout / cambia utente</button>
     </div>
@@ -608,11 +608,24 @@
           <button class="btn btn-ghost btn-sm" onclick="exportAuditCsv('PASS')">✅ Esporta PASS</button>
           <button class="btn btn-ghost btn-sm" onclick="exportAuditCsv('FAIL')">❌ Esporta FAIL</button>
           <button class="btn btn-primary btn-sm" onclick="exportSerialHistoryPdf()">🧾 PDF storico seriale/riparazioni</button>
+          <button class="btn btn-success btn-sm" onclick="generateMultiReportPdf412I()">📚 Report multiplo PDF</button>
+        </div>
+        <div class="recipe-big-card report-multi-412i" style="margin-top:10px;">
+          <h3>📚 Report multiplo / dossier lotto</h3>
+          <div class="hint">Usa i filtri sopra, scegli cosa includere e genera un unico documento multipagina. Dalla finestra di stampa puoi salvare come PDF.</div>
+          <div class="row" style="gap:12px;flex-wrap:wrap;margin-top:8px;">
+            <label><input id="multi-cover-412i" type="checkbox" checked> Copertina</label>
+            <label><input id="multi-kpi-412i" type="checkbox" checked> Riepilogo KPI</label>
+            <label><input id="multi-steps-412i" type="checkbox" checked> Step dettagliati</label>
+            <label><input id="multi-measures-412i" type="checkbox" checked> Misure</label>
+            <label><input id="multi-repairs-412i" type="checkbox" checked> Riparazioni/note</label>
+            <label><input id="multi-sign-412i" type="checkbox" checked> Firme</label>
+          </div>
         </div>
       </div>
       <div style="overflow:auto;flex:1;">
         <table class="audit-tbl" id="audit-tbl">
-          <thead><tr><th>Data test</th><th>Commessa</th><th>Operatore</th><th>Ricetta</th><th>Seriale</th><th>Tempo</th><th>Esito</th><th>Riparazione</th></tr></thead>
+          <thead><tr><th>Data test</th><th>Commessa</th><th>Operatore</th><th>Ricetta</th><th>Seriale</th><th>Postazione</th><th>Tempo</th><th>Esito</th><th>Riparazione</th></tr></thead>
           <tbody id="audit-body"></tbody>
         </table>
       </div>
@@ -817,7 +830,7 @@
       <div class="pa412a-page">
         <div class="recipe-big-card pa412a-hero">
           <div>
-            <div style="font-size:11px;color:var(--text2);letter-spacing:1px;">AT-MEC_HM_4.12G</div>
+            <div style="font-size:11px;color:var(--text2);letter-spacing:1px;">AT-MEC_HM_4.12I_FIX1</div>
             <h3>📈 Analisi Produzione</h3>
             <div class="hint">Modulo separato per KPI industriali. Non modifica Dashboard, Storico Seriali, Scheda Unità, Test Mode o Layout Editor.</div>
           </div>
@@ -873,7 +886,7 @@
       <div class="da412b-page">
         <div class="recipe-big-card da412b-hero">
           <div>
-            <div style="font-size:11px;color:var(--text2);letter-spacing:1px;">AT-MEC_HM_4.12G</div>
+            <div style="font-size:11px;color:var(--text2);letter-spacing:1px;">AT-MEC_HM_4.12I_FIX1</div>
             <h3>🗄️ Archivio Dati & Backup</h3>
             <div class="hint">Modulo separato per backup, esportazione e controllo archivio. Non modifica Test Mode, ricette, hardware, Layout Editor, Storico o Scheda Unità.</div>
           </div>
@@ -935,7 +948,7 @@
           </div>
           <div class="recipe-big-card da412e-sync-card">
             <h3>🔄 Data Provider & Sync</h3>
-            <div class="hint">4.12G aggiunge la gestione server locale/centrale. Il comportamento resta LOCAL FIRST: il test salva sempre in locale e non si blocca se il server è offline.</div>
+            <div class="hint">4.12I_FIX1 aggiunge Station ID, multi-postazione e sync automatica periodica. Il comportamento resta LOCAL FIRST: il test salva sempre in locale e non si blocca se il server è offline.</div>
             <div class="da412f-config-grid">
               <div class="col">
                 <label>Modalità dati</label>
@@ -954,11 +967,36 @@
               </div>
               <label class="da412f-check"><input id="da412f-server-enabled" type="checkbox"> Abilita invio server</label>
             </div>
+            <div class="da412h-station-grid">
+              <div class="col">
+                <label>Station ID</label>
+                <input id="da412h-station-id" placeholder="es. ATE_LINEA1_01">
+              </div>
+              <div class="col">
+                <label>Nome postazione</label>
+                <input id="da412h-station-name" placeholder="es. Banco collaudo linea 1">
+              </div>
+              <div class="col">
+                <label>Reparto</label>
+                <input id="da412i-station-department" placeholder="es. COLLAUDO">
+              </div>
+              <div class="col">
+                <label>Sede</label>
+                <input id="da412i-station-site" placeholder="es. OSPITALETTO">
+              </div>
+              <div class="col">
+                <label>Sync automatica ogni (sec)</label>
+                <input id="da412h-auto-sync-interval" type="number" min="15" step="15" value="60">
+              </div>
+              <label class="da412f-check"><input id="da412h-auto-sync-enabled" type="checkbox"> Abilita sync automatica</label>
+            </div>
             <div class="da412e-sync-grid">
               <div><span>Modalità</span><b id="da412e-mode">LOCAL FIRST</b></div>
               <div><span>Backend locale</span><b id="da412e-backend">JSON</b></div>
               <div><span>Coda pending</span><b id="da412e-pending">0</b></div>
               <div><span>Server</span><b id="da412e-server">Non configurato</b></div>
+              <div><span>Station ID</span><b id="da412h-station-status">N/D</b></div>
+              <div><span>Auto Sync</span><b id="da412h-auto-sync-status">OFF</b></div>
             </div>
             <div class="row" style="margin-top:10px;">
               <button class="btn btn-ghost btn-sm" onclick="loadDataProviderStatus412E()">🔎 Stato sync</button>
@@ -987,6 +1025,7 @@
             <div class="col"><label>Nome ricetta</label><input id="recipe-name-page" data-ui-id="recipe.name.input" placeholder="Nome ricetta" oninput="syncRecipeNameInputs('page')"></div>
             <div class="col"><label>Cliente</label><input id="recipe-client-page" data-ui-id="recipe.client.input" placeholder="Cliente" oninput="syncRecipeClient(this.value)"></div>
             <div class="col"><label>Prodotto</label><input id="recipe-product-page" data-ui-id="recipe.product.input" placeholder="Prodotto" oninput="syncRecipeProduct(this.value)"></div>
+            <div class="col"><label>Logo cliente</label><input id="recipe-customer-logo-page" data-ui-id="recipe.customer.logo.input" placeholder="assets/customers/CLIENTE.png" oninput="syncRecipeCustomerLogo(this.value)"></div>
             <div class="col"><label>Alimentazione</label><select id="power-source-page" onchange="syncPowerInputs('page')"><option value="PL303_PROGRAMMABLE">PL303 Programmabile</option><option value="ESP32_RELAY_POWER">ESP32 Relay</option><option value="MANUAL_POWER">Manuale</option></select></div>
             <label style="display:flex;align-items:center;gap:6px;margin:0;min-width:170px;"><input id="recipe-enabled-page" type="checkbox" checked onchange="syncRecipeEnabledInputs('page')" style="width:auto;"> Ricetta abilitata</label>
           </div>

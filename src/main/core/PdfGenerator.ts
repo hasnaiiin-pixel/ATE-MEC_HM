@@ -9,7 +9,7 @@ import * as path from 'path';
 import { TestReport } from './AuditSystem';
 
 export class PdfGenerator {
-  private static readonly APP_VERSION = '4.12G';
+  private static readonly APP_VERSION = '4.12I';
 
   private static safeFilePart(value: any): string {
     return String(value || 'ND').trim().replace(/[^a-zA-Z0-9_\-]+/g, '_').replace(/^_+|_+$/g, '').slice(0, 80) || 'ND';
@@ -50,8 +50,24 @@ export class PdfGenerator {
     return { reportLarge, reportSmall, logoBackgroundMode };
   }
 
-  private static drawHeader(doc: PDFKit.PDFDocument, title: string, subtitle: string, resultColor: string): void {
+  private static resolveCustomerLogo(report: any): string {
+    const explicit = String(report?.customer_logo || report?.client_logo || '').trim();
+    if (explicit && fs.existsSync(explicit)) return explicit;
+    const customer = PdfGenerator.safeFilePart(report?.customer_name || report?.client_name || report?.customer || '');
+    if (!customer || customer === 'ND') return '';
+    const candidates = [
+      path.join(process.cwd(), 'assets', 'customers', `${customer}.png`),
+      path.join(process.cwd(), 'assets', 'customers', `${customer}.jpg`),
+      path.join(process.cwd(), 'assets', 'customers', `${customer}.jpeg`),
+      path.join(process.cwd(), 'src', 'renderer', 'assets', 'customers', `${customer}.png`)
+    ];
+    return candidates.find(c => fs.existsSync(c)) || '';
+  }
+
+  private static drawHeader(doc: PDFKit.PDFDocument, title: string, subtitle: string, resultColor: string, report?: any): void {
     const { reportLarge, reportSmall, logoBackgroundMode } = PdfGenerator.loadReportLogos();
+    const customerLogo = PdfGenerator.resolveCustomerLogo(report || {});
+    const customerName = PdfGenerator.text((report as any)?.customer_name || (report as any)?.client_name || (report as any)?.customer, '');
     doc.rect(0, 0, 600, 16).fill(resultColor);
     if (logoBackgroundMode === 'white') {
       doc.roundedRect(32, 24, 188, 70, 8).fill('#ffffff').stroke('#e4e7ee');
@@ -59,6 +75,12 @@ export class PdfGenerator {
     }
     try { if (reportLarge && fs.existsSync(reportLarge)) doc.image(reportLarge, 40, 30, { fit: [168, 56] }); } catch {}
     try { if (reportSmall && fs.existsSync(reportSmall)) doc.image(reportSmall, 394, 28, { fit: [154, 58], align: 'right' }); } catch {}
+    if (customerLogo) {
+      try { doc.roundedRect(232, 24, 128, 54, 8).fill('#ffffff').stroke('#e4e7ee'); doc.image(customerLogo, 240, 30, { fit: [112, 42], align: 'center' }); } catch {}
+    } else if (customerName) {
+      doc.roundedRect(232, 24, 128, 54, 8).fill('#ffffff').stroke('#e4e7ee');
+      doc.fillColor('#1f2937').font('Helvetica-Bold').fontSize(11).text(customerName, 238, 43, { width: 116, align: 'center' });
+    }
     doc.fillColor('#1a1a24').font('Helvetica-Bold').fontSize(19).text(title, 40, 102, { width: 510, align: 'center' });
     doc.font('Helvetica').fontSize(9).fillColor('#667085').text(subtitle, 40, 128, { width: 510, align: 'center' });
     doc.moveTo(40, 150).lineTo(550, 150).lineWidth(1).stroke('#d0d5dd');
@@ -118,21 +140,23 @@ export class PdfGenerator {
     const stopColor = '#f79009';
     const resultColor = report.final_result === 'PASS' ? passColor : (String(report.final_result || '').includes('STOP') ? stopColor : failColor);
 
-    PdfGenerator.drawHeader(doc, 'AT-MEC HM - TEST REPORT', 'Certificato di collaudo, misure universali e tracciabilità prodotto', resultColor);
+    PdfGenerator.drawHeader(doc, 'AT-MEC HM - TEST REPORT', 'Certificato di collaudo, misure universali e tracciabilità prodotto', resultColor, report as any);
 
-    doc.roundedRect(40, 164, 315, 110, 10).stroke('#d0d5dd');
+    doc.roundedRect(40, 164, 315, 148, 10).stroke('#d0d5dd');
     PdfGenerator.drawKeyValue(doc, 54, 178, 'Data test', PdfGenerator.dateText(report.timestamp), 140);
     PdfGenerator.drawKeyValue(doc, 205, 178, 'Operatore', report.operator, 135);
     PdfGenerator.drawKeyValue(doc, 54, 214, 'Ricetta', `${PdfGenerator.text(report.recipe_name)} v${PdfGenerator.text(report.recipe_version, '-')}`, 286);
     PdfGenerator.drawKeyValue(doc, 54, 250, 'Seriale DUT', PdfGenerator.text(report.serial_dut, 'N/D'), 130);
     PdfGenerator.drawKeyValue(doc, 205, 250, 'Commessa / Lotto', (report as any).lot_number || (report as any).work_order || 'N/D', 135);
+    PdfGenerator.drawKeyValue(doc, 54, 286, 'Postazione', (report as any).station_name || (report as any).station_id || 'N/D', 140);
+    PdfGenerator.drawKeyValue(doc, 205, 286, 'Station ID / Sede', [((report as any).station_id || ''), ((report as any).station_site || '')].filter(Boolean).join(' / ') || 'N/D', 135);
 
     doc.roundedRect(380, 164, 170, 78, 12).fill(resultColor);
     doc.fillColor('#ffffff').font('Helvetica-Bold').fontSize(25).text(PdfGenerator.text(report.final_result), 380, 185, { width: 170, align: 'center' });
     doc.font('Helvetica').fontSize(9).text('RISULTATO FINALE', 380, 218, { width: 170, align: 'center' });
     doc.fillColor('#1f2937').font('Helvetica').fontSize(10).text(`Tempo esecuzione: ${((report.execution_time_ms || 0) / 1000).toFixed(2)} s`, 380, 254, { width: 170, align: 'center' });
 
-    let yPos = 296;
+    let yPos = 334;
     if ((report as any).repair_note) {
       doc.roundedRect(40, yPos, 510, 42, 8).fill('#fff7ed').stroke('#fed7aa');
       doc.fillColor('#9a3412').font('Helvetica-Bold').fontSize(9).text('NOTA RIPARAZIONE / INTERVENTO', 54, yPos + 8);

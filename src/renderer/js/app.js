@@ -1469,6 +1469,7 @@ function renderAuditTable(data) {
       <td>${escapeHtml(r.operator || '')}</td>
       <td>${escapeHtml(r.recipe_name || '')} v${escapeHtml(String(r.recipe_version || ''))}</td>
       <td style="font-family:monospace;">${escapeHtml(r.serial_dut || '')}</td>
+      <td>${escapeHtml(r.station_name || r.station_id || '')}</td>
       <td>${((r.execution_time_ms || 0) / 1000).toFixed(2)}s</td>
       <td class="${r.final_result === 'PASS' ? 'tag-pass' : 'tag-fail'}">${escapeHtml(r.final_result || '')}</td>
       <td>${escapeHtml(r.repair_note || '')}</td>
@@ -2380,6 +2381,7 @@ function syncLoadedRecipeToUi(name) {
   document.getElementById('recipe-name-inp').value = recipe.recipe_name || name;
   if (document.getElementById('recipe-name-page')) document.getElementById('recipe-name-page').value = recipe.recipe_name || name;
   if (document.getElementById('recipe-client-page')) document.getElementById('recipe-client-page').value = recipe.client_name || recipe.customer || '';
+  if (document.getElementById('recipe-customer-logo-page')) document.getElementById('recipe-customer-logo-page').value = recipe.customer_logo || recipe.client_logo || '';
   setPowerSourceValue(recipe.power_metadata || 'MANUAL_POWER');
   if (document.getElementById('recipe-enabled')) document.getElementById('recipe-enabled').checked = recipe.enabled !== false;
   if (document.getElementById('recipe-enabled-page')) document.getElementById('recipe-enabled-page').checked = recipe.enabled !== false;
@@ -4127,6 +4129,8 @@ renderRecipePage = function(){
   __atmec_renderRecipePage_317();
   const el=document.getElementById('recipe-client-page');
   if(el) el.value = recipe.client_name || recipe.customer || localStorage.getItem('atmec_last_recipe_client') || '';
+  const logoEl=document.getElementById('recipe-customer-logo-page');
+  if(logoEl) logoEl.value = recipe.customer_logo || recipe.client_logo || localStorage.getItem('atmec_last_recipe_customer_logo') || '';
 };
 function recipeMatchesClientFilter(recipeObj, filter){
   if(!filter) return true;
@@ -4217,6 +4221,11 @@ function syncRecipeProduct(value){
   recipe.product = value || '';
   try{ localStorage.setItem('atmec_last_recipe_product', value || ''); }catch{}
 }
+function syncRecipeCustomerLogo(value){
+  recipe.customer_logo = value || '';
+  recipe.client_logo = value || '';
+  try{ localStorage.setItem('atmec_last_recipe_customer_logo', value || ''); }catch{}
+}
 function getRecipeCustomerProductSummary(r){
   const c = r?.client_name || r?.customer || '';
   const p = r?.product_name || r?.product || '';
@@ -4236,6 +4245,7 @@ if(__syncLoadedRecipeToUi319){
     __syncLoadedRecipeToUi319(name);
     const c=document.getElementById('recipe-client-page'); if(c) c.value = recipe.client_name || recipe.customer || '';
     const p=document.getElementById('recipe-product-page'); if(p) p.value = recipe.product_name || recipe.product || '';
+    const lg=document.getElementById('recipe-customer-logo-page'); if(lg) lg.value = recipe.customer_logo || recipe.client_logo || '';
     const pf=document.getElementById('prod-client-filter'); if(pf && !pf.value && (recipe.client_name||recipe.customer)) pf.value = recipe.client_name || recipe.customer || '';
   };
 }
@@ -4245,6 +4255,7 @@ if(__renderRecipePage319){
     __renderRecipePage319();
     const c=document.getElementById('recipe-client-page'); if(c) c.value = recipe.client_name || recipe.customer || localStorage.getItem('atmec_last_recipe_client') || '';
     const p=document.getElementById('recipe-product-page'); if(p) p.value = recipe.product_name || recipe.product || localStorage.getItem('atmec_last_recipe_product') || '';
+    const lg=document.getElementById('recipe-customer-logo-page'); if(lg) lg.value = recipe.customer_logo || recipe.client_logo || localStorage.getItem('atmec_last_recipe_customer_logo') || '';
     document.querySelectorAll('#recipe-steps-page-list .recipe-flow-card').forEach((card, idx)=>{
       if(card.querySelector('.recipe-compact-step-details')) return;
       const st=recipe.steps[idx]||{};
@@ -4634,7 +4645,7 @@ function printTraceabilitySerialHistory(){
   html += tests.map(r=>`<tr><td>${escapeHtml(new Date(r.timestamp).toLocaleString('it-IT'))}</td><td class="${String(r.final_result||'').toLowerCase()}">${escapeHtml(r.final_result||'')}</td><td>${escapeHtml(r.recipe_name||'')}</td><td>${escapeHtml(r.recipe_version||'')}</td><td>${escapeHtml(r.lot_number||r.work_order||'')}</td><td>${escapeHtml(r.operator||'')}</td><td>${escapeHtml(r.repair_note||'')}</td></tr>`).join('') || '<tr><td colspan="7">Nessun test.</td></tr>';
   html += '</tbody></table><h2>Riparazioni</h2><table><thead><tr><th>Data</th><th>Lotto</th><th>Operatore</th><th>Intervento</th></tr></thead><tbody>';
   html += repairs.map(r=>`<tr><td>${escapeHtml(new Date(r.timestamp).toLocaleString('it-IT'))}</td><td>${escapeHtml(r.lot_number||r.work_order||'')}</td><td>${escapeHtml(r.operator||'')}</td><td>${escapeHtml(r.repair_note||'')}</td></tr>`).join('') || '<tr><td colspan="4">Nessuna riparazione.</td></tr>';
-  html += '</tbody></table><p style="margin-top:22px;font-size:11px">Generato da AT-MEC HM 4.12G</p></body></html>';
+  html += '</tbody></table><p style="margin-top:22px;font-size:11px">Generato da AT-MEC HM 4.12I_FIX1</p></body></html>';
   const w=window.open('', '_blank');
   if(!w){ downloadTextFile(`storico_seriale_${serial}.html`, html, 'text/html'); return; }
   w.document.write(html); w.document.close(); setTimeout(()=>{ try{ w.print(); }catch{} }, 350);
@@ -4737,7 +4748,7 @@ function printUnitGenealogy410E(){
   html+=tests.map((r,i)=>`<tr><td>${i+1}</td><td>${escapeHtml(unitDate410E(r.timestamp))}</td><td class="${String(r.final_result||'').toLowerCase()}">${escapeHtml(r.final_result||'')}</td><td>${escapeHtml(r.recipe_name||'')}</td><td>${escapeHtml(r.recipe_version||'')}</td><td>${escapeHtml(r.operator||'')}</td><td>${escapeHtml(r.repair_note||'')}</td></tr>`).join('') || '<tr><td colspan="7">Nessun test.</td></tr>';
   html+='</tbody></table><h2>Riparazioni</h2><table><thead><tr><th>#</th><th>Data</th><th>Lotto</th><th>Operatore</th><th>Intervento</th></tr></thead><tbody>';
   html+=repairs.map((r,i)=>`<tr><td>${i+1}</td><td>${escapeHtml(unitDate410E(r.timestamp))}</td><td>${escapeHtml(r.lot_number||r.work_order||'')}</td><td>${escapeHtml(r.operator||'')}</td><td>${escapeHtml(r.repair_note||'')}</td></tr>`).join('') || '<tr><td colspan="5">Nessuna riparazione.</td></tr>';
-  html+='</tbody></table><p style="margin-top:22px;font-size:11px">Generato da AT-MEC HM 4.12G</p></body></html>';
+  html+='</tbody></table><p style="margin-top:22px;font-size:11px">Generato da AT-MEC HM 4.12I_FIX1</p></body></html>';
   const w=window.open('', '_blank');
   if(!w){ downloadTextFile(`scheda_unita_${serial}.html`, html, 'text/html'); return; }
   w.document.write(html); w.document.close(); setTimeout(()=>{ try{ w.print(); }catch{} },350);
@@ -4778,9 +4789,9 @@ function atmecPrintMeasureCell412D(step){
   ].filter(Boolean).join('<br>');
 }
 function atmecReportFooter412D(){
-  // 4.12G: footer statico. Non richiamare questa funzione dentro se stessa.
+  // 4.12I_FIX1: footer statico. Non richiamare questa funzione dentro se stessa.
   // La vecchia versione causava ricorsione infinita e Maximum call stack size exceeded.
-  return `<div class="signature-grid"><div class="signature-box"><b>Firma operatore</b><div class="signature-line"></div></div><div class="signature-box"><b>Approvazione qualità</b><div class="signature-line"></div></div></div><div class="atmec-print-footer"><span>AT-MEC HM 4.12G</span><span>Report generato automaticamente</span></div>`;
+  return `<div class="signature-grid"><div class="signature-box"><b>Firma operatore</b><div class="signature-line"></div></div><div class="signature-box"><b>Approvazione qualità</b><div class="signature-line"></div></div></div><div class="atmec-print-footer"><span>AT-MEC HM 4.12I_FIX1</span><span>Report generato automaticamente</span></div>`;
 }
 // Sovrascrittura conservativa export storico da pagina Test Report/Audit: stessa logica, solo header loghi.
 function exportSerialHistoryPdf() {
@@ -4836,7 +4847,7 @@ function printUnitGenealogy410E(){
   w.document.write(html); w.document.close(); setTimeout(()=>{ try{ w.print(); }catch{} },350);
 }
 
-// AT-MEC_HM_4.12G - Analisi Produzione separata.
+// AT-MEC_HM_4.12I_FIX1 - Analisi Produzione separata.
 // Modulo additivo: usa solo getLocalDbStats e non modifica Test Mode, Dashboard, Storico, Scheda Unità o Layout Editor.
 function productionAnalysisFilters412A(){
   return {
@@ -4887,7 +4898,7 @@ async function loadProductionAnalysisDashboard412A(){
     if(status) status.textContent=`KPI aggiornati · ${st.total || 0} test filtrati · DB: ${st.dbPath || 'N/D'}`;
   }catch(e){
     if(status) status.textContent='Errore calcolo KPI: '+normalizeError(e);
-    console.error('[AT-MEC 4.12G] Analisi Produzione', e);
+    console.error('[AT-MEC 4.12I_FIX1] Analisi Produzione', e);
   }
 }
 function clearProductionAnalysisFilters412A(){
@@ -4897,7 +4908,7 @@ function clearProductionAnalysisFilters412A(){
 }
 
 
-// AT-MEC_HM_4.12G - Archivio Dati & Backup separato.
+// AT-MEC_HM_4.12I_FIX1 - Archivio Dati & Backup separato.
 // Modulo additivo: usa API gia esistenti e non modifica Test Mode, Ricette, Hardware, Layout Editor, Storico o Scheda Unità.
 function archiveFilters412B(){
   return {
@@ -4934,7 +4945,7 @@ async function loadDataArchiveDashboard412B(){
     if(typeof loadDataProviderStatus412E==='function') await loadDataProviderStatus412E();
   }catch(e){
     da412bStatus('da412b-maint-status','Errore archivio: '+normalizeError(e));
-    console.error('[AT-MEC 4.12G] Archivio dati', e);
+    console.error('[AT-MEC 4.12I_FIX1] Archivio dati', e);
   }
 }
 async function previewDataArchive412B(){
@@ -5001,7 +5012,58 @@ function clearArchiveFilters412B(){
 }
 
 
-// AT-MEC_HM_4.12G - Data Provider Layer / Sync Queue.
+
+// AT-MEC_HM_4.12I_FIX1 - Report multiplo / dossier PDF via stampa browser.
+function multiReportOpt412I(id){ return !!document.getElementById(id)?.checked; }
+function reportStationLine412I(r){ return [r.station_id, r.station_name, r.station_department, r.station_site].filter(Boolean).join(' · ') || 'N/D'; }
+async function generateMultiReportPdf412I(){
+  try{
+    if(!Array.isArray(auditCache) || !auditCache.length) await loadAudit();
+    const rows = Array.isArray(auditCache) ? auditCache.slice().reverse() : [];
+    if(!rows.length){ alert('Nessun report filtrato da stampare. Applica i filtri e riprova.'); return; }
+    const includeCover=multiReportOpt412I('multi-cover-412i');
+    const includeKpi=multiReportOpt412I('multi-kpi-412i');
+    const includeSteps=multiReportOpt412I('multi-steps-412i');
+    const includeMeasures=multiReportOpt412I('multi-measures-412i');
+    const includeRepairs=multiReportOpt412I('multi-repairs-412i');
+    const includeSign=multiReportOpt412I('multi-sign-412i');
+    const pass=rows.filter(r=>r.final_result==='PASS').length;
+    const fail=rows.filter(r=>r.final_result==='FAIL').length;
+    const lot=(document.getElementById('audit-lot')?.value||'TUTTI_LOTTI').trim() || 'TUTTI_LOTTI';
+    let html='<!doctype html><html><head><meta charset="utf-8"><title>Report multiplo '+escapeHtml(lot)+'</title>'+atmecReportStyle410J()+'</head><body>';
+    if(includeCover){
+      html+=atmecReportHeader410J('Dossier Report Multiplo','Lotto/Commessa: '+escapeHtml(lot)+' · Report inclusi: '+rows.length);
+      html+=`<div class="atmec-print-summary"><div class="atmec-print-card"><b>${rows.length}</b><span>Report</span></div><div class="atmec-print-card"><b>${pass}</b><span>PASS</span></div><div class="atmec-print-card"><b>${fail}</b><span>FAIL</span></div><div class="atmec-print-card"><b>${new Date().toLocaleDateString('it-IT')}</b><span>Generato</span></div></div>`;
+      html+='<div style="page-break-after:always"></div>';
+    }
+    if(includeKpi){
+      html+='<h2>Riepilogo KPI</h2><table><thead><tr><th>Totale</th><th>PASS</th><th>FAIL</th><th>Yield</th></tr></thead><tbody><tr><td>'+rows.length+'</td><td class="pass">'+pass+'</td><td class="fail">'+fail+'</td><td>'+ (rows.length?((pass/rows.length)*100).toFixed(1):'0.0') +'%</td></tr></tbody></table>';
+    }
+    rows.forEach((r,idx)=>{
+      html+=`<section style="page-break-before:${idx===0&&!includeCover?'auto':'always'}"><h2>${escapeHtml(r.serial_dut||'N/D')} — ${escapeHtml(r.final_result||'')}</h2>`;
+      html+='<table><tbody>'+
+        `<tr><th>Data</th><td>${escapeHtml(new Date(r.timestamp).toLocaleString('it-IT'))}</td><th>Ricetta</th><td>${escapeHtml(r.recipe_name||'')} v${escapeHtml(String(r.recipe_version||''))}</td></tr>`+
+        `<tr><th>Lotto</th><td>${escapeHtml(r.lot_number||r.work_order||'')}</td><th>Operatore</th><td>${escapeHtml(r.operator||'')}</td></tr>`+
+        `<tr><th>Postazione</th><td>${escapeHtml(reportStationLine412I(r))}</td><th>Cliente</th><td>${escapeHtml(r.customer_name||r.customer||'')}</td></tr>`+
+        '</tbody></table>';
+      if(includeRepairs && r.repair_note) html+=`<h2>Riparazione / Note</h2><p>${escapeHtml(r.repair_note)}</p>`;
+      if(includeSteps){
+        const steps=Array.isArray(r.steps_log)?r.steps_log:[];
+        html+='<h2>Step'+(includeMeasures?' e misure':'')+'</h2><table><thead><tr><th>#</th><th>Tipo</th><th>Valore</th><th>Range</th><th>Origine</th><th>Esito</th></tr></thead><tbody>'+
+          steps.map(st=>`<tr><td>${escapeHtml(st.step_id||'')}</td><td>${escapeHtml(st.type||'')}</td><td>${escapeHtml(st.measured ?? '')} ${escapeHtml(st.unit||'')}</td><td>${escapeHtml(st.min ?? '')} → ${escapeHtml(st.max ?? '')}</td><td>${escapeHtml(st.measurement_source||'')} ${escapeHtml(st.measurement_device||'')}</td><td class="${String(st.result||'').toLowerCase()}">${escapeHtml(st.result||'')}</td></tr>`).join('')+
+          '</tbody></table>';
+      }
+      if(includeSign) html+=atmecReportFooter412D();
+      html+='</section>';
+    });
+    html+='</body></html>';
+    const w=window.open('', '_blank');
+    if(!w){ downloadTextFile('report_multiplo_'+lot+'.html', html, 'text/html'); return; }
+    w.document.write(html); w.document.close(); setTimeout(()=>{ try{ w.print(); }catch{} }, 450);
+  }catch(e){ alert('Errore report multiplo: '+normalizeError(e)); console.error('[AT-MEC 4.12I_FIX1] report multiplo', e); }
+}
+
+// AT-MEC_HM_4.12I_FIX1 - Data Provider Layer / Sync Queue.
 // Modulo additivo: default LOCAL FIRST. Non blocca Test Mode se server/SQLite non sono disponibili.
 function da412eSetText(id, value){ const el=document.getElementById(id); if(el) el.textContent=String(value ?? ''); }
 function da412eSetValue(id, value){ const el=document.getElementById(id); if(el) el.value=String(value ?? ''); }
@@ -5019,10 +5081,18 @@ async function loadDataProviderStatus412E(){
     da412eSetValue('da412f-server-url', st.serverUrl || '');
     da412eSetValue('da412f-timeout', st.timeoutMs || 5000);
     da412eSetChecked('da412f-server-enabled', !!st.serverEnabled);
-    da412eStatus(`${st.message || 'Data Provider pronto.'} · Queue: ${st.queuePath || 'N/D'} · DB: ${st.localDbPath || 'N/D'} · Last sync: ${st.lastSyncAt || 'mai'}`);
+    da412eSetValue('da412h-station-id', st.stationId || '');
+    da412eSetValue('da412h-station-name', st.stationName || '');
+    da412eSetValue('da412i-station-department', st.stationDepartment || '');
+    da412eSetValue('da412i-station-site', st.stationSite || '');
+    da412eSetValue('da412h-auto-sync-interval', st.autoSyncIntervalSec || 60);
+    da412eSetChecked('da412h-auto-sync-enabled', !!st.autoSyncEnabled);
+    da412eSetText('da412h-station-status', st.stationId || 'N/D');
+    da412eSetText('da412h-auto-sync-status', st.autoSyncEnabled ? `ON / ${st.autoSyncIntervalSec || 60}s` : 'OFF');
+    da412eStatus(`${st.message || 'Data Provider pronto.'} · Station: ${st.stationId || 'N/D'} / ${st.stationName || 'N/D'} · ${st.stationDepartment || 'N/D'} · ${st.stationSite || 'N/D'} · Queue: ${st.queuePath || 'N/D'} · DB: ${st.localDbPath || 'N/D'} · Last sync: ${st.lastSyncAt || 'mai'}`);
   }catch(e){
     da412eStatus('Errore stato Data Provider: '+normalizeError(e));
-    console.error('[AT-MEC 4.12G] Data Provider status', e);
+    console.error('[AT-MEC 4.12I_FIX1] Data Provider status', e);
   }
 }
 function da412fReadConfig(){
@@ -5035,7 +5105,15 @@ function da412fReadConfig(){
       url: serverUrl,
       timeoutMs: Number(document.getElementById('da412f-timeout')?.value || 5000)
     },
-    sync: { enabled: true, localFirst: true }
+    sync: { enabled: true, localFirst: true },
+    station: {
+      id: (document.getElementById('da412h-station-id')?.value || '').trim() || 'STATION_01',
+      name: (document.getElementById('da412h-station-name')?.value || '').trim() || 'Postazione locale',
+      department: (document.getElementById('da412i-station-department')?.value || '').trim() || 'COLLAUDO',
+      site: (document.getElementById('da412i-station-site')?.value || '').trim() || 'OSPITALETTO',
+      autoSyncEnabled: !!document.getElementById('da412h-auto-sync-enabled')?.checked,
+      autoSyncIntervalSec: Number(document.getElementById('da412h-auto-sync-interval')?.value || 60)
+    }
   };
 }
 async function saveDataProviderConfig412F(){
@@ -5047,7 +5125,7 @@ async function saveDataProviderConfig412F(){
     await loadDataProviderStatus412E();
   }catch(e){
     da412eStatus('Errore salvataggio configurazione: '+normalizeError(e));
-    console.error('[AT-MEC 4.12G] Save Data Provider config', e);
+    console.error('[AT-MEC 4.12I_FIX1] Save Data Provider config', e);
   }
 }
 async function testDataProviderServer412F(){
@@ -5060,7 +5138,7 @@ async function testDataProviderServer412F(){
     da412eStatus(res?.ok ? `Server ONLINE (${res?.message || 'OK'})` : `Server NON raggiungibile: ${res?.message || 'errore'}`);
   }catch(e){
     da412eStatus('Errore verifica server: '+normalizeError(e));
-    console.error('[AT-MEC 4.12G] Test server', e);
+    console.error('[AT-MEC 4.12I_FIX1] Test server', e);
   }
 }
 async function syncDataProviderNow412E(){
@@ -5072,7 +5150,7 @@ async function syncDataProviderNow412E(){
     await loadDataProviderStatus412E();
   }catch(e){
     da412eStatus('Errore sync: '+normalizeError(e));
-    console.error('[AT-MEC 4.12G] Data Provider sync', e);
+    console.error('[AT-MEC 4.12I_FIX1] Data Provider sync', e);
   }
 }
 
@@ -5087,11 +5165,11 @@ async function refreshSyncQueue412G(){
     if(!items.length){ box.innerHTML='<div class="hint">Coda sync vuota. Nessun record da inviare.</div>'; return; }
     box.innerHTML=items.map(i=>{
       const cls=String(i.status||'').toLowerCase();
-      return `<div class="da412g-queue-row ${cls}"><div><b>${escapeHtml(i.type||'record')}</b><span>${escapeHtml(i.payloadSummary||'')}</span></div><div><strong>${escapeHtml(i.status||'')}</strong><small>tentativi ${Number(i.attempts||0)}</small></div><div><small>${escapeHtml((i.updatedAt||i.createdAt||'').slice(0,19))}</small>${i.lastError?`<em>${escapeHtml(i.lastError)}</em>`:''}</div></div>`;
+      return `<div class="da412g-queue-row ${cls}"><div><b>${escapeHtml(i.type||'record')}</b><span>${escapeHtml(i.payloadSummary||'')}</span>${i.stationId?`<small>Station: ${escapeHtml(i.stationId)}</small>`:''}</div><div><strong>${escapeHtml(i.status||'')}</strong><small>tentativi ${Number(i.attempts||0)}</small></div><div><small>${escapeHtml((i.updatedAt||i.createdAt||'').slice(0,19))}</small>${i.lastError?`<em>${escapeHtml(i.lastError)}</em>`:''}</div></div>`;
     }).join('');
   }catch(e){
     if(box) box.innerHTML='<div class="hint">Errore lettura coda sync: '+escapeHtml(normalizeError(e))+'</div>';
-    console.error('[AT-MEC 4.12G] Queue preview', e);
+    console.error('[AT-MEC 4.12I_FIX1] Queue preview', e);
   }
 }
 async function retryFailedSyncQueue412G(){
@@ -5102,7 +5180,7 @@ async function retryFailedSyncQueue412G(){
     da412eStatus(`${res?.message || 'Retry completato.'} · synced: ${res?.synced ?? 0} · failed: ${res?.failed ?? 0} · pending: ${res?.pending ?? 0}`);
     await loadDataProviderStatus412E();
     await refreshSyncQueue412G();
-  }catch(e){ da412eStatus('Errore retry sync: '+normalizeError(e)); console.error('[AT-MEC 4.12G] Retry queue', e); }
+  }catch(e){ da412eStatus('Errore retry sync: '+normalizeError(e)); console.error('[AT-MEC 4.12I_FIX1] Retry queue', e); }
 }
 async function clearSyncedSyncQueue412G(){
   if(!confirm('Rimuovere dalla coda i record già sincronizzati? I dati locali non vengono cancellati.')) return;
@@ -5113,5 +5191,5 @@ async function clearSyncedSyncQueue412G(){
     da412eStatus(`Pulizia completata. Rimossi: ${res?.removed ?? 0}`);
     await loadDataProviderStatus412E();
     await refreshSyncQueue412G();
-  }catch(e){ da412eStatus('Errore pulizia coda: '+normalizeError(e)); console.error('[AT-MEC 4.12G] Clear synced', e); }
+  }catch(e){ da412eStatus('Errore pulizia coda: '+normalizeError(e)); console.error('[AT-MEC 4.12I_FIX1] Clear synced', e); }
 }

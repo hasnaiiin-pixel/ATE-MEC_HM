@@ -24,6 +24,7 @@ interface DataProviderConfig {
   mode: DataProviderMode;
   server: { enabled: boolean; url: string; apiKey?: string; timeoutMs: number };
   sync: { enabled: boolean; queuePath: string; localFirst: boolean };
+  station: { id: string; name: string; department?: string; site?: string; autoSyncEnabled: boolean; autoSyncIntervalSec: number };
 }
 
 interface SyncQueueItem {
@@ -36,6 +37,10 @@ interface SyncQueueItem {
   attempts: number;
   lastError?: string;
   syncedAt?: string;
+  stationId?: string;
+  stationName?: string;
+  stationDepartment?: string;
+  stationSite?: string;
 }
 
 interface SyncQueueShape {
@@ -57,7 +62,8 @@ function defaultConfig(): DataProviderConfig {
   return {
     mode: 'local_first',
     server: { enabled: false, url: '', timeoutMs: 5000 },
-    sync: { enabled: true, queuePath: path.join(process.cwd(), 'database', 'sync_queue.json'), localFirst: true }
+    sync: { enabled: true, queuePath: path.join(process.cwd(), 'database', 'sync_queue.json'), localFirst: true },
+    station: { id: process.env.COMPUTERNAME || 'STATION_01', name: 'Postazione locale', department: 'COLLAUDO', site: 'OSPITALETTO', autoSyncEnabled: false, autoSyncIntervalSec: 60 }
   };
 }
 
@@ -65,12 +71,14 @@ export class DataProvider {
   private localDb: LocalDatabase;
   private configPath: string;
   private config: DataProviderConfig;
+  private autoSyncTimer: NodeJS.Timeout | null = null;
 
   constructor(localDb: LocalDatabase, configPath?: string) {
     this.localDb = localDb;
     this.configPath = configPath || path.join(process.cwd(), 'config', 'data_provider.json');
     this.config = this.loadConfig();
     this.ensureQueue();
+    this.configureAutoSync();
   }
 
   public getConfig(): DataProviderConfig { return this.config; }
@@ -88,7 +96,8 @@ export class DataProvider {
         ...base,
         ...parsed,
         server: { ...base.server, ...(parsed.server || {}) },
-        sync: { ...base.sync, ...(parsed.sync || {}) }
+        sync: { ...base.sync, ...(parsed.sync || {}) },
+        station: { ...base.station, ...(parsed.station || {}) }
       };
     } catch {
       return base;
@@ -139,7 +148,11 @@ export class DataProvider {
       payload,
       createdAt: nowIso(),
       updatedAt: nowIso(),
-      attempts: 0
+      attempts: 0,
+      stationId: this.config.station.id,
+      stationName: this.config.station.name,
+      stationDepartment: this.config.station.department || '',
+      stationSite: this.config.station.site || ''
     });
     this.writeQueue(queue);
   }
@@ -148,7 +161,11 @@ export class DataProvider {
     const urlText = String(this.config.server.url || '').trim();
     if (!this.config.server.enabled || !urlText) return Promise.reject(new Error('Server non configurato'));
     const url = new URL(urlText.replace(/\/$/, '') + '/sync');
-    const body = JSON.stringify({ source: 'AT-MEC_HM', item });
+    const body = JSON.stringify({
+      source: 'AT-MEC_HM',
+      station: { id: this.config.station.id, name: this.config.station.name, department: this.config.station.department || '', site: this.config.station.site || '' },
+      item
+    });
     const lib = url.protocol === 'https:' ? https : http;
     return new Promise((resolve, reject) => {
       const req = lib.request({
@@ -220,6 +237,12 @@ export class DataProvider {
       serverEnabled: !!this.config.server.enabled,
       serverUrl: this.config.server.url || '',
       timeoutMs: Number(this.config.server.timeoutMs || 5000),
+      stationId: this.config.station.id || '',
+      stationName: this.config.station.name || '',
+      stationDepartment: this.config.station.department || '',
+      stationSite: this.config.station.site || '',
+      autoSyncEnabled: !!this.config.station.autoSyncEnabled,
+      autoSyncIntervalSec: Number(this.config.station.autoSyncIntervalSec || 60),
       serverConfigured: !!(this.config.server.enabled && this.config.server.url),
       syncEnabled: !!this.config.sync.enabled,
       pending,
@@ -233,22 +256,51 @@ export class DataProvider {
     };
   }
 
+  public getStationTraceInfo(): any {
+    return {
+      stationId: this.config.station.id || '',
+      stationName: this.config.station.name || '',
+      stationDepartment: this.config.station.department || '',
+      stationSite: this.config.station.site || ''
+    };
+  }
+
   public updateConfig(partial: Partial<DataProviderConfig>): any {
     const next: DataProviderConfig = {
       ...this.config,
       ...(partial || {}),
       server: { ...this.config.server, ...((partial || {}) as any).server },
-      sync: { ...this.config.sync, ...((partial || {}) as any).sync }
+      sync: { ...this.config.sync, ...((partial || {}) as any).sync },
+      station: { ...this.config.station, ...((partial || {}) as any).station }
     };
     next.server.url = String(next.server.url || '').trim();
     next.server.enabled = !!next.server.url && !!next.server.enabled;
     next.server.timeoutMs = Math.max(1000, Number(next.server.timeoutMs || 5000));
     next.mode = next.server.enabled ? 'local_first' : (next.mode || 'local_first');
+    next.station.id = String(next.station.id || process.env.COMPUTERNAME || 'STATION_01').trim();
+    next.station.name = String(next.station.name || 'Postazione locale').trim();
+    next.station.department = String(next.station.department || 'COLLAUDO').trim();
+    next.station.site = String(next.station.site || 'OSPITALETTO').trim();
+    next.station.autoSyncIntervalSec = Math.max(15, Number(next.station.autoSyncIntervalSec || 60));
     this.config = next;
     ensureDir(this.configPath);
     fs.writeFileSync(this.configPath, JSON.stringify(this.config, null, 2), 'utf8');
     this.ensureQueue();
+    this.configureAutoSync();
     return this.getStatus();
+  }
+
+
+  private configureAutoSync(): void {
+    if (this.autoSyncTimer) {
+      clearInterval(this.autoSyncTimer);
+      this.autoSyncTimer = null;
+    }
+    if (!this.config.station.autoSyncEnabled || !this.config.server.enabled || !this.config.server.url) return;
+    const intervalMs = Math.max(15, Number(this.config.station.autoSyncIntervalSec || 60)) * 1000;
+    this.autoSyncTimer = setInterval(() => {
+      this.syncNow().catch(err => console.error('[DATA_PROVIDER] auto sync:', err));
+    }, intervalMs);
   }
 
   public async testServerConnection(urlText?: string): Promise<any> {
@@ -324,6 +376,10 @@ export class DataProvider {
         createdAt: i.createdAt,
         updatedAt: i.updatedAt,
         syncedAt: i.syncedAt || '',
+        stationId: i.stationId || '',
+        stationName: i.stationName || '',
+        stationDepartment: i.stationDepartment || '',
+        stationSite: i.stationSite || '',
         lastError: i.lastError || '',
         payloadSummary: this.summarizePayload(i.payload)
       }));
