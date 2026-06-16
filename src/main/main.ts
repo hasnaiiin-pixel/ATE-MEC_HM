@@ -104,6 +104,33 @@ function safeIpcHandle(channel: string, handler: (...args: any[]) => any): void 
   });
 }
 
+
+function requirePermission(action: string): { ok: boolean; error?: string } | null {
+  if (!userManager?.canCurrentUser(action)) {
+    return { ok: false, error: `Permessi insufficienti: ${action} richiesto.` };
+  }
+  return null;
+}
+
+function requireAnyPermission(actions: string[]): { ok: boolean; error?: string } | null {
+  if (!actions.some(a => userManager?.canCurrentUser(a))) {
+    return { ok: false, error: `Permessi insufficienti: richiesto uno tra ${actions.join(', ')}.` };
+  }
+  return null;
+}
+
+function classifySettingsPermissions(settings: any): string[] {
+  const keys = Object.keys(settings || {});
+  const required = new Set<string>();
+  const brandingRe = /(logo|Logo|brand|Brand|signature|Signature|report.*Logo|customerLogo|developerSmall|companyLogo|builderLogo|loginLarge|hmiLarge|logoBackground|logoBg)/;
+  const hardwareRe = /(keysight|pl303|esp32|serial|baud|visa|port|hardware|device|station)/i;
+  for (const k of keys) {
+    if (brandingRe.test(k)) required.add('manage_branding');
+    if (hardwareRe.test(k)) required.add('config_hardware');
+  }
+  return Array.from(required);
+}
+
 function createWindow(): void {
   mainWindow = new BrowserWindow({
     width: 1600,
@@ -111,7 +138,7 @@ function createWindow(): void {
     minWidth: 1280,
     minHeight: 800,
     backgroundColor: '#0d0d14',
-    title: 'AT-MEC HM 4.12K_FIX1',
+    title: 'AT-MEC HM 6.0 WORK ORDER PRODUCT MANAGEMENT',
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
@@ -186,7 +213,7 @@ function initSystems(): void {
     } else {
       kpiFailed++;
     }
-    // AT-MEC_HM_4.12K_FIX1: salva e stampa il report arricchito con tracciabilità postazione/cliente.
+    // AT-MEC_HM_4.13G: salva e stampa il report arricchito con tracciabilità postazione/cliente.
     if (report) { try { dataProvider.saveTestReport(report); } catch (err) { console.error('[DATA_PROVIDER] save report:', err); } }
     if (report) PdfGenerator.generateCertificate(report);
     kpiTotal++;
@@ -239,7 +266,7 @@ app.whenReady().then(async () => {
     await connectHardware();
     stateMachine.transitionTo('READY');
     mainWindow?.webContents.send('state-changed', stateMachine.getState());
-    mainWindow?.webContents.send('system-ready', { version: '4.12K_FIX1' });
+    mainWindow?.webContents.send('system-ready', { version: '6.0_WORK_ORDER_PRODUCT_MANAGEMENT' });
   });
 
   app.on('activate', () => {
@@ -261,20 +288,45 @@ app.on('before-quit', async () => {
 
 safeIpcHandle('get-state', () => stateMachine.getState());
 
+// AT-MEC_HM_6.0_WORK_ORDER_PRODUCT_MANAGEMENT - Printer discovery e adapter stampa base.
+safeIpcHandle('print420a5-list-printers', async () => {
+  try {
+    const printers = mainWindow ? await mainWindow.webContents.getPrintersAsync() : [];
+    return (printers || []).map((p: any) => ({
+      id: p.name,
+      name: p.name,
+      driver: p.description || p.status || 'Windows Driver',
+      type: /pdf/i.test(p.name || '') ? 'Virtuale' : 'Windows',
+      port: p.options?.printerLocation || '',
+      online: true,
+      isDefault: !!p.isDefault
+    }));
+  } catch (err: any) {
+    return { ok: false, error: err?.message || String(err), printers: [] };
+  }
+});
+
+safeIpcHandle('print420a5-print-job', async (_e, job: any) => {
+  // Fase A5: adapter reale future-ready. Per sicurezza non forza stampa raw senza driver specifico.
+  // Il renderer mantiene storico/coda anche quando la stampa reale non è disponibile.
+  return { ok: true, simulatedByMain: true, jobId: job?.id || '', printer: job?.printer || '' };
+});
+
 safeIpcHandle('get-hardware-statuses', () => hal.getAllStatuses());
 safeIpcHandle('get-professional-devices', () => hal.getProfessionalDeviceList());
 safeIpcHandle('scan-serial-ports', async () => hal.scanSerialPorts());
 safeIpcHandle('scan-visa-resources', async () => hal.scanVisaResources());
 safeIpcHandle('get-esp32-io-catalog', () => hal.getEsp32IoCatalog());
 
-safeIpcHandle('user-login', (_e, { username, password }) => {
-  return userManager.login(username, password);
-});
+safeIpcHandle('user-login', (_e, { username, password }) => userManager.login(username, password));
+safeIpcHandle('verify-user-credentials', (_e, { username, password }) => userManager.verifyCredentials(username, password));
+safeIpcHandle('user-logout', () => { userManager.logout(); return { ok: true }; });
+safeIpcHandle('get-current-user', () => userManager.getCurrentUser());
 
 safeIpcHandle('list-roles', () => userManager.listRoles());
 safeIpcHandle('list-users', () => userManager.listUsers());
 safeIpcHandle('create-role', (_e, { role, permissions, level }) => userManager.createRole(role, permissions || [], level));
-safeIpcHandle('create-user', (_e, { username, displayName, role, password }) => userManager.createUser(username, displayName, role, password));
+safeIpcHandle('create-user', (_e, { username, displayName, role, password, operatorCode, photoDataUrl }) => userManager.createUser(username, displayName, role, password, operatorCode, photoDataUrl));
 safeIpcHandle('delete-user', (_e, username) => userManager.deleteUser(username));
 safeIpcHandle('set-user-enabled', (_e, { username, enabled }) => userManager.setUserEnabled(username, enabled));
 
@@ -282,6 +334,7 @@ safeIpcHandle('set-user-enabled', (_e, { username, enabled }) => userManager.set
 // Connessione rapida e dedicata ESP32: usata dalla validazione ricette per non bloccare
 // l'avvio tentando anche PL303/Keysight. Mantiene il nome logico modbus_serial.
 safeIpcHandle('connect-esp32-only', async (_e, cfg: { port?: string; baud?: number }) => {
+  const denied = requirePermission('config_hardware'); if (denied) return denied;
   const port = String(cfg?.port || '').trim();
   const baud = Number(cfg?.baud || 115200);
   if (!port || port === 'mock') return { ok: false, error: 'Porta ESP32 non selezionata', statuses: hal.getAllStatuses() };
@@ -293,6 +346,7 @@ safeIpcHandle('connect-esp32-only', async (_e, cfg: { port?: string; baud?: numb
 });
 
 safeIpcHandle('reconnect-hardware', async (_e, configs: Array<{ name: string; conn: string; baud: number }>) => {
+  const denied = requirePermission('config_hardware'); if (denied) return denied;
   for (const c of configs) {
     try {
       await timeoutPromise(hal.connectDevice(c.name, c.conn, c.baud), 3500, `connect ${c.name}`);
@@ -304,6 +358,7 @@ safeIpcHandle('reconnect-hardware', async (_e, configs: Array<{ name: string; co
 });
 
 safeIpcHandle('start-test', async (_e, payload: { recipe: Recipe; serialDut: string; lotNumber?: string; workOrder?: string; overrideDuplicate?: boolean; repairNote?: string }) => {
+  const denied = requirePermission('run_test'); if (denied) return denied;
   const { recipe, serialDut } = payload;
   const currentState = stateMachine.getState();
   if (currentState === 'FAULT') {
@@ -436,6 +491,7 @@ safeIpcHandle('resume-test', () => {
 });
 
 safeIpcHandle('set-debug-mode', (_e, enabled: boolean) => {
+  const denied = requirePermission('debug_mode'); if (denied) return denied;
   if (!userManager.canCurrentUser('debug_mode')) {
     return { ok: false, error: 'Permessi insufficienti.' };
   }
@@ -476,6 +532,7 @@ safeIpcHandle('flash-firmware', async (_e, { tool, operation, filePath }) => {
 });
 
 safeIpcHandle('query-multimeter', async (_e, { device, cmd }) => {
+  const denied = requirePermission('config_hardware'); if (denied) return denied;
   const val = await timeoutPromise(hal.querySCPI(device, cmd), 2500, `query ${device}`);
   const parsed = parseFloat(val);
   if (!isNaN(parsed)) {
@@ -531,28 +588,34 @@ safeIpcHandle('measure-pl303-current', async (_e, channel: number = 1) => {
 
 
 safeIpcHandle('read-digital-input', async (_e, channel: number) => {
+  const denied = requirePermission('config_hardware'); if (denied) return denied;
   return timeoutPromise(hal.readDigitalInput(Number(channel) || 0), 2000, 'read DI');
 });
 
 safeIpcHandle('read-digital-output', async (_e, channel: number) => {
+  const denied = requirePermission('config_hardware'); if (denied) return denied;
   return timeoutPromise(hal.readDigitalOutput(Number(channel) || 0), 2000, 'read DO');
 });
 
 safeIpcHandle('read-analog-input', async (_e, channel: number) => {
+  const denied = requirePermission('config_hardware'); if (denied) return denied;
   return timeoutPromise(hal.readAnalogInput(Number(channel) || 0), 2000, 'read AI');
 });
 
 safeIpcHandle('set-digital-output', async (_e, { channel, state }) => {
+  const denied = requirePermission('config_hardware'); if (denied) return denied;
   await timeoutPromise(hal.setDigitalOutput(Number(channel) || 0, Boolean(state)), 2500, 'write DO');
   return { ok: true };
 });
 
 safeIpcHandle('write-analog-output', async (_e, { channel, value }) => {
+  const denied = requirePermission('config_hardware'); if (denied) return denied;
   await timeoutPromise(hal.writeAnalogOutput(Number(channel) || 0, Number(value) || 0), 2500, 'write AO');
   return { ok: true };
 });
 
 safeIpcHandle('get-esp32-info', async () => {
+  const denied = requirePermission('config_hardware'); if (denied) return denied;
   return timeoutPromise(hal.getEsp32Info(), 3500, 'get ESP32 info');
 });
 
@@ -617,20 +680,22 @@ safeIpcHandle('comm-send', async (_e, payload: { data?: string; appendNewline?: 
 });
 
 safeIpcHandle('comm-close', async () => {
+  const denied = requirePermission('config_hardware'); if (denied) return denied;
   closeCommunicationHub();
   pushComm('SYS', 'Communication Hub disconnesso');
   return { ok: true };
 });
 
-safeIpcHandle('comm-read-log', async () => ({ ok: true, type: commType, rows: commBuffer.slice(-500) }));
+safeIpcHandle('comm-read-log', async () => { const denied = requirePermission('config_hardware'); if (denied) return denied; return { ok: true, type: commType, rows: commBuffer.slice(-500) }; });
 
-safeIpcHandle('get-audit-history', (_e, filters) => auditSystem.filterHistory(filters || {}).slice(-1000));
-safeIpcHandle('check-serial-history', (_e, { serialDut, lotNumber }) => auditSystem.findBySerialAndLot(serialDut, lotNumber));
-safeIpcHandle('get-local-db-stats', (_e, filters) => dataProvider.getStats(filters || {}));
-safeIpcHandle('get-serial-history', (_e, { serialDut, lotNumber }) => dataProvider.getSerialHistory(serialDut, lotNumber));
-safeIpcHandle('add-repair-record', (_e, payload) => dataProvider.addRepairRecord({ ...(payload || {}), operator: userManager.getCurrentOperator() }));
+safeIpcHandle('get-audit-history', (_e, filters) => { const denied = requirePermission('view_reports'); if (denied) return denied; return auditSystem.filterHistory(filters || {}).slice(-1000); });
+safeIpcHandle('check-serial-history', (_e, { serialDut, lotNumber }) => { const denied = requirePermission('view_traceability'); if (denied) return denied; return auditSystem.findBySerialAndLot(serialDut, lotNumber); });
+safeIpcHandle('get-local-db-stats', (_e, filters) => { const denied = requirePermission('view_kpi'); if (denied) return denied; return dataProvider.getStats(filters || {}); });
+safeIpcHandle('get-serial-history', (_e, { serialDut, lotNumber }) => { const denied = requirePermission('view_traceability'); if (denied) return denied; return dataProvider.getSerialHistory(serialDut, lotNumber); });
+safeIpcHandle('add-repair-record', (_e, payload) => { const denied = requirePermission('view_traceability'); if (denied) return denied; return dataProvider.addRepairRecord({ ...(payload || {}), operator: userManager.getCurrentOperator() }); });
 
 safeIpcHandle('delete-recipe', async (_e, name: string) => {
+  const denied = requirePermission('edit_recipe'); if (denied) return denied;
   const role = String((userManager as any).getCurrentUser?.()?.role || userManager.getCurrentOperator?.() || '').toLowerCase();
   const allowed = ['admin','administrator','sviluppatore','developer','tecnico','technician'].some(x => role.includes(x));
   // Fallback: nelle versioni precedenti il controllo completo dei permessi e gia lato HMI.
@@ -641,12 +706,14 @@ safeIpcHandle('delete-recipe', async (_e, name: string) => {
   return { ok:true };
 });
 
-safeIpcHandle('list-recipe-versions', (_e, name: string) => dataProvider.listRecipeVersions(name));
+safeIpcHandle('list-recipe-versions', (_e, name: string) => { const denied = requirePermission('view_reports'); if (denied) return denied; return dataProvider.listRecipeVersions(name); });
 safeIpcHandle('load-recipe-version', (_e, { name, version }) => {
+  const denied = requirePermission('view_reports'); if (denied) return denied;
   const recipe = dataProvider.loadRecipe(name, Number(version));
   return recipe ? { ok: true, recipe } : { ok: false, error: 'Versione ricetta non trovata.' };
 });
 safeIpcHandle('export-local-database', async () => {
+  const denied = requirePermission('manage_data'); if (denied) return denied;
   const result = await dialog.showSaveDialog({
     title: 'Esporta database locale AT-MEC',
     defaultPath: `AT-MEC_database_${new Date().toISOString().slice(0,10)}.json`,
@@ -658,6 +725,7 @@ safeIpcHandle('export-local-database', async () => {
 });
 
 safeIpcHandle('export-local-reports-csv', async (_e, filters) => {
+  const denied = requirePermission('manage_data'); if (denied) return denied;
   const result = await dialog.showSaveDialog({
     title: 'Esporta storico test filtrato in CSV',
     defaultPath: `AT-MEC_storico_test_${new Date().toISOString().slice(0,10)}.csv`,
@@ -668,25 +736,71 @@ safeIpcHandle('export-local-reports-csv', async (_e, filters) => {
   return { ok: true, filePath: result.filePath };
 });
 
-safeIpcHandle('backup-local-database', async (_e, label) => dataProvider.backupSnapshot(label || 'manuale'));
-safeIpcHandle('get-data-provider-status', () => dataProvider.getStatus());
-safeIpcHandle('get-station-trace-info', () => dataProvider.getStationTraceInfo());
-safeIpcHandle('save-data-provider-config', (_e, cfg) => dataProvider.updateConfig(cfg || {}));
-safeIpcHandle('test-data-provider-server', (_e, url) => dataProvider.testServerConnection(url));
-safeIpcHandle('sync-data-provider-now', async () => dataProvider.syncNow());
-safeIpcHandle('get-sync-queue-preview', (_e, limit) => dataProvider.getQueuePreview(Number(limit || 30)));
+safeIpcHandle('backup-local-database', async (_e, label) => { const denied = requirePermission('manage_data'); if (denied) return denied; return dataProvider.backupSnapshot(label || 'manuale'); });
+safeIpcHandle('get-data-provider-status', () => { const denied = requireAnyPermission(['manage_data','config_hardware','view_kpi']); if (denied) return denied; return dataProvider.getStatus(); });
+safeIpcHandle('get-station-trace-info', () => { const denied = requireAnyPermission(['view_traceability','view_kpi','manage_data']); if (denied) return denied; return dataProvider.getStationTraceInfo(); });
+safeIpcHandle('save-data-provider-config', (_e, cfg) => { const denied = requireAnyPermission(['manage_data','config_hardware']); if (denied) return denied; return dataProvider.updateConfig(cfg || {}); });
+safeIpcHandle('test-data-provider-server', (_e, url) => { const denied = requireAnyPermission(['manage_data','config_hardware']); if (denied) return denied; return dataProvider.testServerConnection(url); });
+safeIpcHandle('sync-data-provider-now', async () => { const denied = requirePermission('manage_data'); if (denied) return denied; return dataProvider.syncNow(); });
+safeIpcHandle('get-sync-queue-preview', (_e, limit) => { const denied = requirePermission('manage_data'); if (denied) return denied; return dataProvider.getQueuePreview(Number(limit || 30)); });
 safeIpcHandle('retry-failed-sync-queue', async () => {
+  const denied = requirePermission('manage_data'); if (denied) return denied;
   dataProvider.markFailedForRetry();
   return dataProvider.syncNow();
 });
-safeIpcHandle('clear-synced-sync-queue', () => dataProvider.clearSyncedItems());
+safeIpcHandle('clear-synced-sync-queue', () => { const denied = requirePermission('manage_data'); if (denied) return denied; return dataProvider.clearSyncedItems(); });
 
-safeIpcHandle('get-kpi', () => ({
-  total: kpiTotal, passed: kpiPassed, failed: kpiFailed,
-  yield: kpiTotal > 0 ? ((kpiPassed / kpiTotal) * 100).toFixed(1) + '%' : '0%'
-}));
+safeIpcHandle('get-enterprise-database-dashboard', () => {
+  const denied = requirePermission('manage_data'); if (denied) return denied;
+  return dataProvider.getEnterpriseDashboard();
+});
+
+safeIpcHandle('migrate-enterprise-database', () => {
+  const denied = requirePermission('manage_data'); if (denied) return denied;
+  let authData: any = { users: [], roles: [] };
+  try {
+    const usersPath = path.join(process.cwd(), 'config', 'users.json');
+    if (fs.existsSync(usersPath)) authData = JSON.parse(fs.readFileSync(usersPath, 'utf8'));
+  } catch {}
+  const roleRows = Array.isArray(authData.roles)
+    ? authData.roles
+    : Object.keys(authData.roles || {}).map(name => ({ role: name, ...(authData.roles[name] || {}) }));
+  return dataProvider.migrateEnterpriseFoundation({
+    users: Array.isArray(authData.users) ? authData.users : [],
+    roles: roleRows
+  });
+});
+
+safeIpcHandle('backup-enterprise-database', (_e, label) => {
+  const denied = requirePermission('manage_data'); if (denied) return denied;
+  return dataProvider.backupEnterpriseDatabase(label || 'manuale');
+});
+
+safeIpcHandle('verify-enterprise-database', () => {
+  const denied = requirePermission('manage_data'); if (denied) return denied;
+  return dataProvider.verifyEnterpriseDatabase();
+});
+
+safeIpcHandle('export-enterprise-database', async () => {
+  const denied = requirePermission('manage_data'); if (denied) return denied;
+  const save = await dialog.showSaveDialog(mainWindow!, {
+    title: 'Esporta database enterprise AT-MEC',
+    defaultPath: `AT-MEC_enterprise_database_${new Date().toISOString().slice(0,10)}.json`,
+    filters: [{ name: 'JSON', extensions: ['json'] }]
+  });
+  if (save.canceled || !save.filePath) return { ok: false, canceled: true };
+  fs.writeFileSync(save.filePath, JSON.stringify(dataProvider.exportEnterpriseDatabase(), null, 2), 'utf8');
+  return { ok: true, filePath: save.filePath };
+});
+
+
+safeIpcHandle('get-kpi', () => {
+  const denied = requirePermission('view_kpi'); if (denied) return denied;
+  return { total: kpiTotal, passed: kpiPassed, failed: kpiFailed, yield: kpiTotal > 0 ? ((kpiPassed / kpiTotal) * 100).toFixed(1) + '%' : '0%' };
+});
 
 safeIpcHandle('save-recipe', async (_e, { name, recipe }: { name: string; recipe: Recipe }) => {
+  const denied = requirePermission('edit_recipe'); if (denied) return denied;
   const recipesDir = path.join(process.cwd(), 'recipes');
   if (!fs.existsSync(recipesDir)) fs.mkdirSync(recipesDir, { recursive: true });
   const baseName = String(name || recipe?.recipe_name || 'Nuova Ricetta').trim() || 'Nuova Ricetta';
@@ -735,19 +849,19 @@ function getDefaultLogoSettings(): any {
   const base = path.join(process.cwd(), 'assets', 'default_logos');
   const mLogo = path.join(base, 'M_LOGO.png');
   const mecLogo = path.join(base, 'MEC.PNG');
-  const mirzaLogo = path.join(base, 'MIRZA_LOGO.png');
-  const mirzaGif = path.join(base, 'MIRZA_Animation.gif');
+  const mirzaLogo = fs.existsSync(path.join(base, 'MIRZA.png')) ? path.join(base, 'MIRZA.png') : path.join(base, 'MIRZA_LOGO.png');
+  const mirzaGif = fs.existsSync(path.join(base, 'MIRZA_Animation.gif')) ? path.join(base, 'MIRZA_Animation.gif') : mirzaLogo;
   return {
-    loginLargeLogoPath: mirzaGif,
-    loginLargeLogoDataUrl: logoDataUrl(mirzaGif),
-    loginSmallLogoPath: mirzaLogo,
-    loginSmallLogoDataUrl: logoDataUrl(mirzaLogo),
-    hmiLargeLogoPath: mirzaGif,
-    hmiLargeLogoDataUrl: logoDataUrl(mirzaGif),
-    appLargeLogoPath: mirzaGif,
-    appLargeLogoDataUrl: logoDataUrl(mirzaGif),
-    developerSmallLogoPath: mirzaGif,
-    developerSmallLogoDataUrl: logoDataUrl(mirzaGif),
+    loginLargeLogoPath: mirzaLogo,
+    loginLargeLogoDataUrl: logoDataUrl(mirzaLogo),
+    loginSmallLogoPath: mecLogo,
+    loginSmallLogoDataUrl: logoDataUrl(mecLogo),
+    hmiLargeLogoPath: mecLogo,
+    hmiLargeLogoDataUrl: logoDataUrl(mecLogo),
+    appLargeLogoPath: mecLogo,
+    appLargeLogoDataUrl: logoDataUrl(mecLogo),
+    developerSmallLogoPath: mirzaLogo,
+    developerSmallLogoDataUrl: logoDataUrl(mirzaLogo),
     reportLargeLogoPath: mecLogo,
     reportLargeLogoDataUrl: logoDataUrl(mecLogo),
     reportSmallLogoPath: mirzaLogo,
@@ -780,9 +894,14 @@ function writeAppSettings(settings: any): any {
 }
 
 safeIpcHandle('get-app-settings', () => readAppSettings());
-safeIpcHandle('reset-default-logos', () => ({ ok: true, settings: writeAppSettings(getDefaultLogoSettings()) }));
-safeIpcHandle('save-app-settings', (_e, settings) => ({ ok: true, settings: writeAppSettings(settings) }));
+safeIpcHandle('reset-default-logos', () => { const denied = requirePermission('manage_branding'); if (denied) return denied; return { ok: true, settings: writeAppSettings(getDefaultLogoSettings()) }; });
+safeIpcHandle('save-app-settings', (_e, settings) => {
+  const required = classifySettingsPermissions(settings);
+  for (const perm of required) { const denied = requirePermission(perm); if (denied) return denied; }
+  return { ok: true, settings: writeAppSettings(settings) };
+});
 safeIpcHandle('select-logo-file', async (_e, kind: string) => {
+  const denied = requirePermission('manage_branding'); if (denied) return denied;
   const safeKind = String(kind || 'company').replace(/[^a-zA-Z0-9_-]/g, '_');
   const result = await dialog.showOpenDialog({
     filters: [{ name: 'Immagini', extensions: ['png', 'jpg', 'jpeg', 'webp', 'gif'] }],
@@ -802,7 +921,64 @@ safeIpcHandle('select-logo-file', async (_e, kind: string) => {
   return { ok: true, path: dst, dataUrl, settings };
 });
 
+
+
+// AT-MEC_HM_4.13G - selezione loghi cliente/firme da percorso libero con copia nel progetto.
+safeIpcHandle('select-customer-logo-file-413c', async (_e, customerName: string) => {
+  const denied = requirePermission('manage_branding'); if (denied) return denied;
+  const safeName = String(customerName || 'CLIENTE').replace(/[^a-zA-Z0-9_-]/g, '_') || 'CLIENTE';
+  const result = await dialog.showOpenDialog({
+    title: 'Seleziona logo cliente',
+    filters: [{ name: 'Immagini', extensions: ['png', 'jpg', 'jpeg', 'webp', 'svg'] }],
+    properties: ['openFile']
+  });
+  if (result.canceled || !result.filePaths[0]) return { ok: false };
+  const src = result.filePaths[0];
+  const ext = (path.extname(src) || '.png').toLowerCase();
+  if (!['.png', '.jpg', '.jpeg', '.webp', '.svg'].includes(ext)) {
+    return { ok: false, error: 'Formato logo non supportato. Usa PNG, JPG, WEBP o SVG.' };
+  }
+  const stat = fs.statSync(src);
+  if (stat.size > 5 * 1024 * 1024) {
+    return { ok: false, error: 'Logo troppo grande. Limite consigliato: 5 MB.' };
+  }
+  const customersDir = path.join(process.cwd(), 'assets', 'customers');
+  if (!fs.existsSync(customersDir)) fs.mkdirSync(customersDir, { recursive: true });
+  const fileName = `${safeName}${ext}`;
+  const dst = path.join(customersDir, fileName);
+  fs.copyFileSync(src, dst);
+  // IMPORTANTE: non ritorniamo base64/dataUrl. Il renderer salva solo il percorso relativo.
+  return { ok: true, sourcePath: src, path: dst, relativePath: `assets/customers/${fileName}`, fileName };
+});
+
+safeIpcHandle('select-signature-file-413c', async (_e, username: string) => {
+  const denied = requirePermission('manage_branding'); if (denied) return denied;
+  const safeName = String(username || 'firma').replace(/[^a-zA-Z0-9_-]/g, '_') || 'firma';
+  const result = await dialog.showOpenDialog({
+    title: 'Seleziona immagine firma',
+    filters: [{ name: 'Immagini', extensions: ['png', 'jpg', 'jpeg', 'webp', 'svg'] }],
+    properties: ['openFile']
+  });
+  if (result.canceled || !result.filePaths[0]) return { ok: false };
+  const src = result.filePaths[0];
+  const ext = (path.extname(src) || '.png').toLowerCase();
+  if (!['.png', '.jpg', '.jpeg', '.webp', '.svg'].includes(ext)) {
+    return { ok: false, error: 'Formato firma non supportato. Usa PNG, JPG, WEBP o SVG.' };
+  }
+  const stat = fs.statSync(src);
+  if (stat.size > 5 * 1024 * 1024) {
+    return { ok: false, error: 'Immagine firma troppo grande. Limite consigliato: 5 MB.' };
+  }
+  const sigDir = path.join(process.cwd(), 'assets', 'signatures');
+  if (!fs.existsSync(sigDir)) fs.mkdirSync(sigDir, { recursive: true });
+  const fileName = `${safeName}_signature${ext}`;
+  const dst = path.join(sigDir, fileName);
+  fs.copyFileSync(src, dst);
+  // IMPORTANTE: non ritorniamo base64/dataUrl. Il renderer salva solo il percorso relativo.
+  return { ok: true, sourcePath: src, path: dst, relativePath: `assets/signatures/${fileName}`, fileName };
+});
 safeIpcHandle('export-recipe-as', async (_e, { name, recipe }) => {
+  const denied = requirePermission('edit_recipe'); if (denied) return denied;
   const safeName = String(name || recipe?.recipe_name || 'ricetta').replace(/[\/:*?"<>|]/g, '_');
   const result = await dialog.showSaveDialog({
     title: 'Esporta ricetta',
@@ -815,6 +991,7 @@ safeIpcHandle('export-recipe-as', async (_e, { name, recipe }) => {
 });
 
 safeIpcHandle('import-recipe-from', async () => {
+  const denied = requirePermission('edit_recipe'); if (denied) return denied;
   const result = await dialog.showOpenDialog({
     title: 'Importa ricetta',
     filters: [{ name: 'Ricetta ATE-MEC', extensions: ['json'] }],
@@ -827,6 +1004,7 @@ safeIpcHandle('import-recipe-from', async () => {
 });
 
 safeIpcHandle('open-file-dialog', async () => {
+  const denied = requirePermission('edit_recipe'); if (denied) return denied;
   const result = await dialog.showOpenDialog({
     filters: [{ name: 'Firmware', extensions: ['hex', 'bin', 'elf'] }],
     properties: ['openFile']
@@ -835,6 +1013,7 @@ safeIpcHandle('open-file-dialog', async () => {
 });
 
 safeIpcHandle('select-instruction-image', async () => {
+  const denied = requirePermission('edit_recipe'); if (denied) return denied;
   const result = await dialog.showOpenDialog({
     filters: [{ name: 'Immagini', extensions: ['png', 'jpg', 'jpeg', 'webp', 'gif'] }],
     properties: ['openFile']
@@ -848,6 +1027,7 @@ safeIpcHandle('select-instruction-image', async () => {
 });
 
 safeIpcHandle('open-certificates-folder', () => {
+  const denied = requirePermission('manage_data'); if (denied) return denied;
   const certDir = path.join(process.cwd(), 'certificates');
   if (!fs.existsSync(certDir)) fs.mkdirSync(certDir, { recursive: true });
   require('electron').shell.openPath(certDir);

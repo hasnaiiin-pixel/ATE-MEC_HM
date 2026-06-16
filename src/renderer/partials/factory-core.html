@@ -1,0 +1,64 @@
+<div id="factory-core-tab" class="tab-content">
+  <div class="factory418b-card factory418b-hero">
+    <div>
+      <div style="font-size:11px;color:var(--text2);letter-spacing:1px;">AT-MEC HM 4.18B</div>
+      <h3>🏭 Factory Enterprise</h3>
+      <div class="hint">Dashboard multi-postazione locale: configurazione postazione, sync queue, KPI aggregati e stato dispositivi.</div>
+    </div>
+    <div class="factory418b-actions">
+      <button class="btn btn-primary btn-sm" onclick="loadFactoryEnterprise418B()">🔄 Aggiorna Enterprise</button>
+      <button class="btn btn-ghost btn-sm" onclick="saveFactoryStation418B()">💾 Salva postazione</button>
+    </div>
+  </div>
+
+  <div class="factory418b-card">
+    <h3>⚙️ Configurazione postazione</h3>
+    <div class="factory418b-config-grid">
+      <div class="col"><label>Station ID</label><input id="factory-station-id-418b" placeholder="STATION_A"></div>
+      <div class="col"><label>Nome postazione</label><input id="factory-station-name-418b" placeholder="ATE Banco 01"></div>
+      <div class="col"><label>Reparto / Linea</label><input id="factory-line-418b" placeholder="Linea Collaudo"></div>
+      <div class="col"><label>Sito</label><input id="factory-plant-418b" placeholder="MIRZA LAB"></div>
+      <div class="col"><label>Server Factory</label><input id="factory-server-418b" placeholder="http://localhost:8090"></div>
+      <div class="col"><label>Modalità Sync</label><select id="factory-sync-mode-418b"><option value="local">Locale</option><option value="queue">Queue</option><option value="server">Server</option></select></div>
+    </div>
+    <div id="factory-config-status-418b" class="hint">Configurazione non ancora caricata.</div>
+  </div>
+
+  <div class="factory418b-kpi-grid">
+    <div class="factory418b-kpi-card"><div class="label">Postazioni</div><div id="factory-kpi-stations-418b" class="num">1</div><div class="hint">Locale + configurate</div></div>
+    <div class="factory418b-kpi-card"><div class="label">Online</div><div id="factory-kpi-online-418b" class="num">1</div><div class="hint">Postazioni operative</div></div>
+    <div class="factory418b-kpi-card"><div class="label">FPY</div><div id="factory-kpi-fpy-418b" class="num">—</div><div class="hint">First Pass Yield</div></div>
+    <div class="factory418b-kpi-card"><div class="label">Throughput</div><div id="factory-kpi-throughput-418b" class="num">—</div><div class="hint">Test registrati</div></div>
+    <div class="factory418b-kpi-card"><div class="label">Sync Pending</div><div id="factory-kpi-sync-418b" class="num">—</div><div class="hint">Coda sync</div></div>
+    <div class="factory418b-kpi-card"><div class="label">Health</div><div id="factory-kpi-health-418b" class="num">—</div><div class="hint">Stato complessivo</div></div>
+  </div>
+
+  <div class="factory418b-grid">
+    <div class="factory418b-card">
+      <h3>🖥️ Monitor postazione locale</h3>
+      <div id="factory-station-monitor-418b" class="factory418b-panel">In attesa aggiornamento...</div>
+    </div>
+    <div class="factory418b-card">
+      <h3>🧰 Device Factory Monitor</h3>
+      <div id="factory-device-monitor-418b" class="factory418b-panel">In attesa aggiornamento...</div>
+    </div>
+  </div>
+
+  <div class="factory418b-grid">
+    <div class="factory418b-card">
+      <h3>🔄 Sync Manager 2.0</h3>
+      <div class="hint">Vista sulla coda sync esistente. Questa release prepara il livello factory senza rompere il runtime locale.</div>
+      <div id="factory-sync-queue-418b" class="factory418b-panel">In attesa aggiornamento...</div>
+    </div>
+    <div class="factory418b-card">
+      <h3>📋 Storico globale Factory</h3>
+      <div class="factory418b-filter"><input id="factory-history-filter-418b" placeholder="Filtra seriale, ricetta, collaboratore..." oninput="filterFactoryHistory418B()"></div>
+      <div id="factory-global-history-418b" class="factory418b-panel">In attesa aggiornamento...</div>
+    </div>
+  </div>
+
+  <div class="factory418b-card">
+    <h3>🧠 Factory Health Score</h3>
+    <div id="factory-health-detail-418b" class="factory418b-panel">In attesa aggiornamento...</div>
+  </div>
+</div>

@@ -1,16 +1,13 @@
-// AT-MEC HM 4.1 - versione UI centralizzata
+// AT-MEC_HM 4.22A - UI Navigation Cleanup version consistency
 (function(){
-  'use strict';
-  var VERSION = '4.12K_FIX1';
-  function setText(sel, txt){ var el=document.querySelector(sel); if(el) el.textContent=txt; }
-  function applyVersion(){
-    document.title = 'ATE-MEC Suite v4.12K_FIX1_FIX1';
-    setText('.login-title', 'ATE-MEC HM ' + VERSION);
-    setText('#topbar .ver', 'Suite v4.12K_FIX1');
-    var logo = document.getElementById('app-title-logo');
-    if(logo) logo.setAttribute('title','AT-MEC HM '+VERSION);
-    try{ window.AT_MEC_VERSION = VERSION; }catch(_e){}
-  }
-  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', applyVersion);
-  else applyVersion();
+  window.AT_MEC_VERSION = '4.22.1';
+  window.AT_MEC_RELEASE = 'AT-MEC_HM_4.22A_UI_NAVIGATION_CLEANUP';
+  window.AT_MEC_RELEASE_LABEL = '4.22A UI NAVIGATION CLEANUP';
+  try {
+    document.addEventListener('DOMContentLoaded', function(){
+      document.querySelectorAll('.ver').forEach(function(el){ el.textContent = '4.22A'; });
+      var titles = document.querySelectorAll('.login-title');
+      titles.forEach(function(el){ el.textContent = 'ATE-MEC HM 4.22A UI NAVIGATION CLEANUP'; });
+    });
+  } catch(e){}
 })();

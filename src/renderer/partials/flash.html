@@ -1,0 +1,42 @@
+<div id="flash-tab" class="tab-content">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div class="col">
+          <label>Programmatore</label>
+          <select id="flash-tool">
+            <option value="JLinkLite">J-LINK LITE</option>
+            <option value="JLink">J-LINK</option>
+            <option value="STLink">ST-LINK</option>
+            <option value="JTAG">JTAG generico</option>
+            <option value="SWD">SWD generico</option>
+            <option value="SPI">SPI programmer</option>
+            <option value="I2C">I2C programmer</option>
+          </select>
+        </div>
+        <div class="col">
+          <label>Operazione</label>
+          <select id="flash-op">
+            <option value="FLASH">FLASH (Programma)</option>
+            <option value="ERASE">ERASE (Cancella)</option>
+            <option value="VERIFY">VERIFY (Verifica)</option>
+          </select>
+        </div>
+      </div>
+      <div class="col">
+        <label>File Firmware (.hex / .bin)</label>
+        <div class="row">
+          <input id="flash-path" placeholder="Percorso file..." readonly>
+          <button class="btn btn-ghost btn-sm" onclick="browseFile()">📂</button>
+          <button class="btn btn-ghost btn-sm" onclick="document.getElementById('flash-path').value='mock'">Demo</button>
+        </div>
+      </div>
+      <div class="row">
+        <button class="btn btn-danger" onclick="runFlash()">⚡ ESEGUI OPERAZIONE</button>
+        <button class="btn btn-ghost btn-sm" onclick="clearFlashLog()">Clear Log</button>
+      </div>
+      <div style="display:flex;gap:4px;align-items:center;margin-top:4px;">
+        <div style="font-size:10px;color:var(--text2)">OUTPUT CLI</div>
+        <div style="flex:1;border-top:1px solid var(--border);"></div>
+        <div id="flash-status" style="font-size:10px;"></div>
+      </div>
+      <div id="flash-log" class="log-list" style="min-height:200px;font-size:11px;"></div>
+    </div>

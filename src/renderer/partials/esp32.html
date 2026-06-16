@@ -1,0 +1,50 @@
+<div id="esp32-tab" class="tab-content">
+      <div class="esp32-page-grid">
+        <div class="esp32-card">
+          <h3>🧩 ESP32 — connessione semplificata</h3>
+          <div class="esp32-status-line">
+            <span id="esp32-control-conn">Stato: n/d</span>
+            <span id="esp32-control-port">Porta: n/d</span>
+            <span id="esp32-control-fw">FW: n/d</span>
+          </div>
+          <div class="row">
+            <select id="esp32-control-com" style="flex:1"><option value="mock">mock</option></select>
+            <button class="btn btn-ghost btn-sm" onclick="esp32ControlScanPorts()">🔎 Trova ESP32</button>
+            <button class="btn btn-primary btn-sm" onclick="esp32ControlConnect()">🔌 Connetti</button>
+            <button class="btn btn-ghost btn-sm" onclick="esp32ControlInfo()">ℹ️ Info</button>
+          </div>
+          <div id="esp32-control-ports" class="detail-line">Premi “Trova ESP32” o “Auto collega ESP32”. La porta viene salvata anche in Settings e usata dalle ricette come <b>modbus_serial</b>.</div>
+          <div class="esp32-quick-actions">
+            <button class="btn btn-success big-action" onclick="esp32AutoConnectAndUseForRecipes()">✅ Auto collega ESP32 per ricette</button>
+            <button class="btn btn-danger big-action" onclick="esp32EmergencyLow()">⛔ Tutte DO LOW</button>
+          </div>
+          <div class="row">
+            <label style="display:flex;align-items:center;gap:6px;margin:0;flex:0 0 auto;">
+              <input id="esp32-live-enable" type="checkbox" onchange="toggleEsp32ControlLive(this.checked)" style="width:auto;"> Live I/O
+            </label>
+            <select id="esp32-live-rate" style="max-width:150px">
+              <option value="300">300 ms</option>
+              <option value="500" selected>500 ms</option>
+              <option value="1000">1000 ms</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="esp32-card">
+          <h3>📟 Log ESP32</h3>
+          <div id="esp32-control-log" class="log-list esp32-log"></div>
+        </div>
+      </div>
+
+      <div class="esp32-card">
+        <h3>🔘 Uscite digitali — attivazione singola</h3>
+        <div class="hint">Ogni uscita può essere messa HIGH/LOW singolarmente. Il feedback viene letto dopo il comando e durante il live.</div>
+        <div id="esp32-do-grid" class="io-control-grid"></div>
+      </div>
+
+      <div class="esp32-card">
+        <h3>👁️ Ingressi digitali e analogici — lettura live</h3>
+        <div class="hint">Gli ingressi sono solo lettura. I canali non adatti alla funzione restano disattivati.</div>
+        <div id="esp32-input-grid" class="io-control-grid"></div>
+      </div>
+    </div>

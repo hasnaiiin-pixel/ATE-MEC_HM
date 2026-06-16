@@ -14,6 +14,7 @@ import * as path from 'path';
 import * as http from 'http';
 import * as https from 'https';
 import { LocalDatabase, RepairRecord } from './LocalDatabase';
+import { EnterpriseDatabase } from './EnterpriseDatabase';
 import type { TestReport } from './AuditSystem';
 import type { Recipe } from '../runtime/RecipeEngine';
 
@@ -72,9 +73,11 @@ export class DataProvider {
   private configPath: string;
   private config: DataProviderConfig;
   private autoSyncTimer: NodeJS.Timeout | null = null;
+  private enterpriseDb: EnterpriseDatabase;
 
   constructor(localDb: LocalDatabase, configPath?: string) {
     this.localDb = localDb;
+    this.enterpriseDb = new EnterpriseDatabase();
     this.configPath = configPath || path.join(process.cwd(), 'config', 'data_provider.json');
     this.config = this.loadConfig();
     this.ensureQueue();
@@ -194,9 +197,10 @@ export class DataProvider {
     });
   }
 
-  // API dati: comportamento invariato, backend attivo = JSON locale esistente.
+  // API dati: comportamento stabile local-first + mirror enterprise 4.17B.
   public saveTestReport(report: TestReport): void {
     this.localDb.saveTestReport(report);
+    try { this.enterpriseDb.storeTestReport(report); } catch (err) { console.error('[ENTERPRISE_DB] mirror test_report:', err); }
     this.enqueue('test_report', report);
   }
   public getReports(): TestReport[] { return this.localDb.getReports(); }
@@ -210,12 +214,14 @@ export class DataProvider {
 
   public addRepairRecord(payload: Partial<RepairRecord>): RepairRecord {
     const rec = this.localDb.addRepairRecord(payload);
+    try { this.enterpriseDb.storeRepairRecord(rec); } catch (err) { console.error('[ENTERPRISE_DB] mirror repair_record:', err); }
     this.enqueue('repair_record', rec);
     return rec;
   }
 
   public saveRecipeVersion(recipe: Recipe, author = 'Sistema', note = ''): any {
     const rev = this.localDb.saveRecipeVersion(recipe, author, note);
+    try { this.enterpriseDb.storeRecipeRevision(rev); } catch (err) { console.error('[ENTERPRISE_DB] mirror recipe_revision:', err); }
     this.enqueue('recipe_revision', rev);
     return rev;
   }
@@ -231,7 +237,9 @@ export class DataProvider {
     return {
       ok: true,
       mode: this.config.mode,
-      localBackend: 'json',
+      localBackend: 'json+enterprise',
+      enterpriseBackend: this.enterpriseDb.isSqliteActive() ? 'sqlite+json' : 'json_enterprise',
+      enterprise: this.enterpriseDb.getDashboard(),
       localDbPath: this.localDb.getPath(),
       queuePath: this.config.sync.queuePath,
       serverEnabled: !!this.config.server.enabled,
@@ -289,6 +297,34 @@ export class DataProvider {
     this.configureAutoSync();
     return this.getStatus();
   }
+
+
+  public getEnterpriseDashboard(): any {
+    const localStats = this.localDb.getStats({});
+    const dash = this.enterpriseDb.getDashboard();
+    return { ok: true, ...dash, localStats };
+  }
+
+  public migrateEnterpriseFoundation(extra: any = {}): any {
+    const snapshot = this.localDb.exportSnapshot();
+    const users = Array.isArray(extra.users) ? extra.users : [];
+    const roles = Array.isArray(extra.roles)
+      ? extra.roles
+      : Object.keys(extra.roles || {}).map(name => ({ role: name, ...(extra.roles[name] || {}) }));
+    const devices = Array.isArray(extra.devices) ? extra.devices : [];
+    return this.enterpriseDb.migrateFoundation({
+      users,
+      roles,
+      devices,
+      recipes: snapshot.recipes || [],
+      reports: snapshot.testReports || [],
+      repairs: snapshot.repairs || []
+    });
+  }
+
+  public backupEnterpriseDatabase(label = 'manuale'): any { return this.enterpriseDb.backup(label); }
+  public verifyEnterpriseDatabase(): any { return this.enterpriseDb.verifyIntegrity(); }
+  public exportEnterpriseDatabase(): any { return this.enterpriseDb.exportSnapshot(); }
 
 
   private configureAutoSync(): void {

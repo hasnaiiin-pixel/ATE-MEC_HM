@@ -1,0 +1,12 @@
+<div id="qr-tab" class="tab-content">
+      <div class="recipe-big-card">
+        <h3>▦ Scanner QR / Serial Number</h3>
+        <div class="hint">Scanner USB HID, inserimento manuale o webcam. Il valore viene usato come Serial Number della singola scheda.</div>
+        <div class="row">
+          <input id="qr-manual-input-standalone" class="qr-big-input" placeholder="Scansiona o inserisci seriale" oninput="setSerialFromQrPanel(this.value); const q=document.getElementById('qr-manual-input'); if(q) q.value=this.value;">
+          <button class="btn btn-primary" onclick="startQr()">📷 Camera</button>
+          <button class="btn btn-ghost" onclick="stopQr()">Stop</button>
+        </div>
+        <div class="hint">Suggerimento: uno scanner QR USB si comporta come tastiera. Clicca nel campo e scansiona.</div>
+      </div>
+    </div>

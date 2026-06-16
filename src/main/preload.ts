@@ -11,10 +11,13 @@ contextBridge.exposeInMainWorld('api', {
   getHardwareStatuses: () => ipcRenderer.invoke('get-hardware-statuses'),
   getProfessionalDevices: () => ipcRenderer.invoke('get-professional-devices'),
   userLogin: (username: string, password: string) => ipcRenderer.invoke('user-login', { username, password }),
+  verifyUserCredentials: (username: string, password: string) => ipcRenderer.invoke('verify-user-credentials', { username, password }),
+  userLogout: () => ipcRenderer.invoke('user-logout'),
+  getCurrentUser: () => ipcRenderer.invoke('get-current-user'),
   listRoles: () => ipcRenderer.invoke('list-roles'),
   listUsers: () => ipcRenderer.invoke('list-users'),
   createRole: (role: string, permissions: string[], level?: number) => ipcRenderer.invoke('create-role', { role, permissions, level }),
-  createUser: (username: string, displayName: string, role: string, password: string) => ipcRenderer.invoke('create-user', { username, displayName, role, password }),
+  createUser: (username: string, displayName: string, role: string, password: string, operatorCode?: string, photoDataUrl?: string) => ipcRenderer.invoke('create-user', { username, displayName, role, password, operatorCode, photoDataUrl }),
   deleteUser: (username: string) => ipcRenderer.invoke('delete-user', username),
   setUserEnabled: (username: string, enabled: boolean) => ipcRenderer.invoke('set-user-enabled', { username, enabled }),
   reconnectHardware: (configs: any[]) => ipcRenderer.invoke('reconnect-hardware', configs),
@@ -71,6 +74,12 @@ contextBridge.exposeInMainWorld('api', {
   retryFailedSyncQueue: () => ipcRenderer.invoke('retry-failed-sync-queue'),
   clearSyncedSyncQueue: () => ipcRenderer.invoke('clear-synced-sync-queue'),
 
+  getEnterpriseDatabaseDashboard: () => ipcRenderer.invoke('get-enterprise-database-dashboard'),
+  migrateEnterpriseDatabase: () => ipcRenderer.invoke('migrate-enterprise-database'),
+  backupEnterpriseDatabase: (label?: string) => ipcRenderer.invoke('backup-enterprise-database', label || 'manuale'),
+  verifyEnterpriseDatabase: () => ipcRenderer.invoke('verify-enterprise-database'),
+  exportEnterpriseDatabase: () => ipcRenderer.invoke('export-enterprise-database'),
+
   saveRecipe: (name: string, recipe: any) => ipcRenderer.invoke('save-recipe', { name, recipe }),
   loadRecipe: (name: string) => ipcRenderer.invoke('load-recipe', name),
   listRecipes: () => ipcRenderer.invoke('list-recipes'),
@@ -80,6 +89,8 @@ contextBridge.exposeInMainWorld('api', {
   getAppSettings: () => ipcRenderer.invoke('get-app-settings'),
   saveAppSettings: (settings: any) => ipcRenderer.invoke('save-app-settings', settings),
   selectLogoFile: (kind: string) => ipcRenderer.invoke('select-logo-file', kind),
+  selectCustomerLogoFile413C: (customerName: string) => ipcRenderer.invoke('select-customer-logo-file-413c', customerName),
+  selectSignatureFile413C: (username: string) => ipcRenderer.invoke('select-signature-file-413c', username),
   resetDefaultLogos: () => ipcRenderer.invoke('reset-default-logos'),
   exportRecipeAs: (name: string, recipe: any) => ipcRenderer.invoke('export-recipe-as', { name, recipe }),
   importRecipeFrom: () => ipcRenderer.invoke('import-recipe-from'),
@@ -90,6 +101,9 @@ contextBridge.exposeInMainWorld('api', {
   commSend: (payload: any) => ipcRenderer.invoke('comm-send', payload || {}),
   commClose: () => ipcRenderer.invoke('comm-close'),
   commReadLog: () => ipcRenderer.invoke('comm-read-log'),
+
+  getInstalledPrinters420A5: () => ipcRenderer.invoke('print420a5-list-printers'),
+  printLabelJob420A5: (job: any) => ipcRenderer.invoke('print420a5-print-job', job || {}),
 
   on: (channel: string, callback: (...args: any[]) => void) => {
     const validChannels = [

@@ -1,0 +1,58 @@
+{
+  "release": "AT-MEC_HM_4.22_ENTERPRISE_STABLE",
+  "createdAt": "2026-06-16T06:23:46.387Z",
+  "versionOk": true,
+  "package": {
+    "name": "at-mec-hm-4-22-enterprise-stable",
+    "version": "4.22.0",
+    "description": "AT-MEC_HM_4.22_ENTERPRISE_STABLE",
+    "productName": "AT-MEC HM 4.22 ENTERPRISE STABLE"
+  },
+  "checks": [
+    {
+      "file": "package.json",
+      "exists": true,
+      "lines": 81
+    },
+    {
+      "file": "src/renderer/index.html",
+      "exists": true,
+      "lines": 715
+    },
+    {
+      "file": "src/renderer/js/version.js",
+      "exists": true,
+      "lines": 14
+    },
+    {
+      "file": "src/renderer/js/modules/printers/print-engine-420a5.js",
+      "exists": true,
+      "lines": 142
+    },
+    {
+      "file": "src/renderer/js/modules/audio/audio-voice-421ab.js",
+      "exists": true,
+      "lines": 64
+    },
+    {
+      "file": "src/renderer/js/modules/factory/work-order-product-60.js",
+      "exists": true,
+      "lines": 49
+    },
+    {
+      "file": "src/renderer/js/modules/factory/revision-firmware-61.js",
+      "exists": true,
+      "lines": 45
+    },
+    {
+      "file": "src/renderer/js/modules/core/enterprise-stable-422.js",
+      "exists": true,
+      "lines": 77
+    },
+    {
+      "file": "src/renderer/partials/enterprise-stable-422.html",
+      "exists": true,
+      "lines": 63
+    }
+  ]
+}

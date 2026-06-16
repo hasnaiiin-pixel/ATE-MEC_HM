@@ -1,0 +1,63 @@
+<div id="settings-tab" class="tab-content">
+      <div style="font-size:11px;color:var(--text2);margin-bottom:8px;">
+        Configura le porte hardware reali del banco. Dopo la modifica premi APPLICA.
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div class="col">
+          <label>Keysight 34461A — Tipo connessione</label>
+          <select id="cfg-keysight-mode" onchange="updateKeysightConnectionHint()">
+            <option value="ETH">Ethernet / LAN SCPI</option>
+            <option value="USB_COM">USB / COM</option>
+            <option value="USB_VISA">USB / VISA Resource</option>
+          </select>
+        </div>
+        <div class="col">
+          <label>Keysight 34461A — IP Ethernet / COM / VISA Resource</label>
+          <input id="cfg-keysight-ip" value="127.0.0.1" placeholder="LAN: 192.168.1.101 oppure COM8 oppure USB0::...::INSTR">
+          <div class="hint" id="keysight-conn-hint">Ethernet consigliata: porta SCPI 5025.</div>
+        </div>
+        <div class="col">
+          <label>Keysight 34461A — Porta TCP / Baud USB</label>
+          <input id="cfg-keysight-port" value="5025" type="number">
+        </div>
+        <div class="col">
+          <label>Aim-TTi PL303 — COM</label>
+          <input id="cfg-tti-com" value="mock" placeholder="COM4">
+        </div>
+        <div class="col">
+          <label>Aim-TTi — Baud Rate</label>
+          <input id="cfg-tti-baud" value="9600" type="number">
+        </div>
+        <div class="col">
+          <label>ESP32-S3 — COM (Modbus)</label>
+          <div class="row">
+            <select id="cfg-esp-com" style="flex:1"><option value="mock">mock</option></select>
+            <button class="btn btn-ghost btn-sm" onclick="scanSerialPorts()">🔎 Cerca</button>
+          </div>
+          <div class="hint">Seleziona dalla lista: non serve scrivere il nome della porta.</div>
+        </div>
+        <div class="col">
+          <label>ESP32-S3 — Baud Rate</label>
+          <input id="cfg-esp-baud" value="115200" type="number">
+        </div>
+      </div>
+      <button class="btn btn-primary" onclick="applyHwSettings()">🔌 APPLICA E RICONNETTI</button>
+      <button class="btn btn-ghost" onclick="testManualPowerStart()">🧪 Test start con alimentazione manuale</button>
+      <div id="serial-port-list" style="margin-top:8px;"></div>
+      <div id="hw-detail-status" style="font-size:10px;color:var(--text2);margin-top:6px;"></div>
+
+      <div style="height:1px;background:var(--border);margin:14px 0;"></div>
+      <div class="section-title" style="padding:0;margin-bottom:8px;">🏷️ Loghi programma, login e report</div>
+      <div class="logo-grid">
+        <div class="logo-box"><b>Login — logo grande</b><br><button class="btn btn-ghost btn-sm" onclick="selectLogo('loginLarge')">Scegli file</button><img id="loginLarge-logo-preview"></div>
+        <div class="logo-box"><b>Login — logo piccolo</b><br><button class="btn btn-ghost btn-sm" onclick="selectLogo('loginSmall')">Scegli file</button><img id="loginSmall-logo-preview"></div>
+        <div class="logo-box"><b>App — logo aziendale grande</b><br><button class="btn btn-ghost btn-sm" onclick="selectLogo('appLarge')">Scegli file</button><img id="appLarge-logo-preview"></div>
+        <div class="logo-box"><b>App — logo sviluppatore piccolo</b><br><button class="btn btn-ghost btn-sm" onclick="selectLogo('developerSmall')">Scegli file</button><img id="developerSmall-logo-preview"></div>
+        <div class="logo-box"><b>Report — logo azienda</b><br><button class="btn btn-ghost btn-sm" onclick="selectLogo('company')">Scegli file</button><img id="company-logo-preview"></div>
+        <div class="logo-box"><b>Report — logo costruttore</b><br><button class="btn btn-ghost btn-sm" onclick="selectLogo('builder')">Scegli file</button><img id="builder-logo-preview"></div>
+      </div>
+      <div class="driver-card" style="margin-top:12px;">
+        <b>Multimetro / driver:</b> ATE-MEC usa Keysight 34461A via Ethernet SCPI TCP/IP o USB/COM/VISA configurabile. Se l'indirizzo resta 127.0.0.1 oppure lo strumento non è LIVE, le misure sono simulate/casuali. Imposta IP reale del multimetro in Settings e verifica LIVE prima di usare step Voltage/Current/Resistance/Frequency.
+      </div>
+
+    </div>

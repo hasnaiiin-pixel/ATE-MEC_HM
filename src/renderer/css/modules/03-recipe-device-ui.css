@@ -1,0 +1,33 @@
+/* AT-MEC_HM_4.16G_CSS_SPLIT - Recipe builder grafico e Device Manager base
+   Estratto da app.css originale, ordine preservato. */
+
+/* AT-MEC_HM_3.13 BIG TEST - Recipe Builder grafico + Device Manager */
+.recipe-simple-switch{display:flex;gap:8px;align-items:center;justify-content:space-between;border:1px solid var(--border);background:rgba(255,255,255,.045);border-radius:14px;padding:10px;margin:10px 0;}
+.recipe-template-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin:10px 0;}
+.recipe-template-btn{border:1px solid var(--border);border-radius:14px;background:rgba(255,255,255,.05);padding:12px;cursor:pointer;text-align:left;font-weight:900;color:var(--text);min-height:72px;}
+.recipe-template-btn:hover{border-color:var(--accent);box-shadow:0 0 0 1px rgba(0,212,255,.22) inset;}
+.recipe-template-btn span{display:block;font-size:11px;color:var(--text2);font-weight:600;margin-top:4px;line-height:1.25;}
+.recipe-flow-board{display:flex;flex-direction:column;gap:10px;}
+.recipe-flow-card{display:grid;grid-template-columns:58px minmax(0,1fr) auto;gap:12px;align-items:center;border:1px solid var(--border);border-radius:16px;background:linear-gradient(135deg,rgba(255,255,255,.06),rgba(255,255,255,.025));padding:12px;box-shadow:0 10px 28px rgba(0,0,0,.16);}
+.recipe-flow-card:hover{border-color:var(--accent);}
+.recipe-flow-icon{width:48px;height:48px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:25px;background:rgba(0,212,255,.10);border:1px solid rgba(0,212,255,.25);}
+.recipe-flow-title{font-size:15px;font-weight:900;margin-bottom:4px;}
+.recipe-flow-desc{font-size:12px;color:var(--text2);line-height:1.45;}
+.recipe-value-chip{display:inline-flex;gap:4px;align-items:center;border:1px solid var(--border);border-radius:999px;padding:3px 8px;margin:2px 3px 2px 0;background:rgba(255,255,255,.045);font-size:11px;}
+body.recipe-simple-mode .advanced-recipe-only{display:none!important;}
+body.recipe-simple-mode .recipe-page-layout{grid-template-columns:330px 1fr;}
+body.recipe-simple-mode .large-step-meta{font-size:12px;}
+.recipe-inline-edit{display:grid;grid-template-columns:repeat(auto-fit,minmax(105px,1fr));gap:6px;margin-top:9px;padding:8px;border:1px dashed rgba(255,255,255,.12);border-radius:12px;background:rgba(0,0,0,.12);}
+.recipe-inline-edit label{font-size:10px;color:var(--text2);margin:0 0 2px;}
+.recipe-inline-edit input,.recipe-inline-edit select{height:32px;font-size:12px;padding:5px 7px;}
+.recipe-flow-card.dragging{opacity:.55;transform:scale(.995);}
+.recipe-flow-card.drop-target{border-color:var(--accent);box-shadow:0 0 0 2px rgba(0,212,255,.22) inset;}
+.device-manager-mini{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:8px;margin-top:10px;}
+.device-mini-card{border:1px solid var(--border);border-radius:14px;padding:10px;background:rgba(255,255,255,.04);}
+.device-mini-card b{display:block;margin-bottom:4px;}
+.device-state-online{color:var(--pass);font-weight:900}.device-state-offline{color:var(--warn);font-weight:900}.device-state-error{color:var(--fail);font-weight:900}
+.quality-mini-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-top:10px;}
+.quality-mini-card{border:1px solid var(--border);border-radius:14px;padding:10px;text-align:center;background:rgba(255,255,255,.04);}
+.quality-mini-card .num{font-size:24px;font-weight:900;color:var(--accent);}
+
+

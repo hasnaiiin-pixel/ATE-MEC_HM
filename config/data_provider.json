@@ -7,15 +7,22 @@
   },
   "sync": {
     "enabled": true,
-    "queuePath": "C:\\Users\\spea4060_tmv331ef\\Documents\\PROGETTI\\AT-MEC_HM_4.12K_FIX1\\database\\sync_queue.json",
+    "queuePath": "C:\\Users\\spea4060_tmv331ef\\Documents\\PROGETTI\\AT-MEC_HM_4.13G\\database\\sync_queue.json",
     "localFirst": true
   },
   "station": {
-    "id": "DESKTOP-54QO6OI",
-    "name": "Postazione locale",
+    "id": "BANCHETT111",
+    "name": "ATE0150",
     "department": "COLLAUDO",
-    "site": "OSPITALETTO",
+    "site": "LAB01220",
     "autoSyncEnabled": false,
     "autoSyncIntervalSec": 60
+  },
+  "database": {
+    "mode": "enterprise_json",
+    "sqlitePath": "database/ate_mec_enterprise.db",
+    "jsonMirrorPath": "database/ate_mec_enterprise_db.json",
+    "schema": "docs/sqlite_schema_enterprise.sql",
+    "version": "4.17B"
   }
 }

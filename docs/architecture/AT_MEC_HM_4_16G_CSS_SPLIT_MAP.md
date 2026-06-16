@@ -1,0 +1,9 @@
+- `01-base-branding.css`: Base, variabili, componenti comuni e branding
+- `02-test-mode-layout.css`: Test Mode layout e produzione
+- `03-recipe-device-ui.css`: Recipe builder grafico e Device Manager base
+- `04-reports-traceability-kpi.css`: Report, export, KPI, storico e communication hub
+- `05-testmode-fixes.css`: Fix storici Test Mode, SN e produzione
+- `06-dashboard-database-layout.css`: Dashboard, database, scheda unità e analisi produzione
+- `07-recipe-sync-station.css`: Misure universali, sync, station ID e barra test
+- `08-traceability-enterprise.css`: Traceability enterprise, report e layout editor fixes
+- `09-device-profile-recipe-pro.css`: Device Manager enterprise, profili e Recipe Pro

@@ -1,0 +1,60 @@
+<div id="users-tab" class="tab-content">
+      <div class="recipe-big-card">
+        <h3>🔐 Utenti, ruoli e livelli accesso</h3>
+        <div class="hint">Ogni accesso è deciso da <b>username + password</b>. Al collaboratore assegni ruolo e livello: Amministratore, Ingegnere, Qualità, Tecnico, Collaboratore o un ruolo personalizzato.</div>
+        <div style="display:grid;grid-template-columns:minmax(280px,0.9fr) minmax(340px,1.1fr);gap:12px;align-items:start;">
+          <div class="wizard-card">
+            <h4>1) Crea / aggiorna ruolo</h4>
+            <label>Seleziona ruolo esistente</label>
+            <select id="existing-role-select" onchange="loadRoleIntoEditor(this.value)"><option value="">— nuovo ruolo —</option></select>
+            <label id="new-role-name-label">Nome ruolo nuovo / rilevato automaticamente</label>
+            <input id="new-role-name" placeholder="Se selezioni un ruolo sopra viene compilato da solo">
+            <div id="role-editor-hint-413p" class="detail-line">Se scegli un ruolo esistente, il nome viene rilevato automaticamente. Scrivi qui solo per creare un nuovo ruolo.</div>
+            <label>Livello accesso</label>
+            <select id="new-role-level" onchange="applyRoleLevelPreset()">
+              <option value="10">10 — Collaboratore</option>
+              <option value="30">30 — Tecnico</option>
+              <option value="60" selected>60 — Engineer</option>
+              <option value="80">80 — Sviluppatore</option>
+              <option value="100">100 — Admin</option>
+            </select>
+            <label>Permessi</label>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;font-size:11px;">
+              <label><input type="checkbox" class="perm-check" value="run_test" checked> Eseguire test</label>
+              <label><input type="checkbox" class="perm-check" value="view_reports"> Vedere Test Report</label>
+              <label><input type="checkbox" class="perm-check" value="view_traceability"> Storico/Scheda Unità</label>
+              <label><input type="checkbox" class="perm-check" value="view_kpi"> KPI / Analisi Produzione</label>
+              <label><input type="checkbox" class="perm-check" value="manage_data"> Archivio Dati / Sync</label>
+              <label><input type="checkbox" class="perm-check" value="debug_mode"> Debug</label>
+              <label><input type="checkbox" class="perm-check" value="edit_recipe"> Modifica ricette</label>
+              <label><input type="checkbox" class="perm-check" value="config_hardware"> Config. hardware</label>
+              <label><input type="checkbox" class="perm-check" value="manage_users"> Gestione utenti</label>
+              <label><input type="checkbox" class="perm-check" value="manage_branding"> Loghi/branding</label>
+              <label><input type="checkbox" class="perm-check" value="edit_layout"> Modifica layout</label>
+              <label><input type="checkbox" class="perm-check" value="test_elements"> Test elementi UI</label>
+              <label><input type="checkbox" class="perm-check" value="show_ui_ids"> Mostra ID UI</label>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="createRoleFromUi()">💾 Salva ruolo</button>
+          </div>
+          <div class="wizard-card">
+            <h4>2) Credenziali utente</h4>
+            <label>Seleziona utente</label><select id="users-select" onchange="selectUserFromList(this.value)"></select>
+            <label>Nome utente login</label><input id="new-user-name" placeholder="username usato nel login">
+            <label>Nome visualizzato</label><input id="new-user-display" placeholder="nome operatore mostrato nei report">
+            <label>Codice operatore</label><input id="new-user-code" placeholder="es. OP001, MATRICOLA, badge">
+            <label>Foto profilo</label><div class="user-photo-picker-413o"><div id="new-user-photo-preview" class="avatar-preview-413o"><span>👤</span></div><input type="file" accept="image/*" onchange="loadUserPhotoFromInput413O(this)"></div>
+            <label>Ruolo / livello accesso</label><select id="new-user-role"></select>
+            <label>Password</label><input id="new-user-pass" type="password" placeholder="nuovo utente: min 4 caratteri; utente esistente: vuota = mantiene password">
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">
+              <button class="btn btn-primary btn-sm user-admin-only" onclick="createUserFromUi()">🔐 Salva utente</button>
+              <button class="btn btn-ghost btn-sm user-admin-only" onclick="clearUserForm()">➕ Nuovo</button>
+              <button class="btn btn-danger btn-sm user-admin-only" onclick="deleteSelectedUser()">🗑 Elimina</button>
+              <button class="btn btn-ghost btn-sm user-admin-only" onclick="toggleSelectedUser(false)">🚫 Disabilita</button>
+              <button class="btn btn-ghost btn-sm user-admin-only" onclick="toggleSelectedUser(true)">✅ Abilita</button>
+            </div>
+            <div class="hint" id="user-admin-hint" style="margin-top:8px;">Solo Admin può modificare utenti e ruoli.</div>
+          </div>
+        </div>
+        <div id="roles-users-list" class="detail-line"></div>
+      </div>
+    </div>

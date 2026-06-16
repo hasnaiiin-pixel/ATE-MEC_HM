@@ -1,9 +1,0 @@
-Keysight 34461A - Driver e software richiesti
-
-1) Keysight IO Libraries Suite
-   Cercare sul sito ufficiale Keysight: "IO Libraries Suite download".
-
-2) Keysight 34400 Digital Multimeters IVI Instrument Drivers
-   Cercare sul sito ufficiale Keysight: "34400 IVI Instrument Drivers".
-
-Nota: AT-MEC consiglia Ethernet/LAN SCPI su porta 5025 per massima semplicità e stabilità.

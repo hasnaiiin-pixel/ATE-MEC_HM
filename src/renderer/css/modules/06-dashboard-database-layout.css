@@ -1,0 +1,412 @@
+/* AT-MEC_HM_4.16G_CSS_SPLIT - Dashboard, database, scheda unità e analisi produzione
+   Estratto da app.css originale, ordine preservato. */
+
+/* AT-MEC 3.933 - Dashboard action buttons isolated for Layout Editor */
+.dashboard-start-row{align-items:start!important;justify-items:start!important;}
+.dashboard-start-row .btn.atmec-dashboard-action{align-self:start!important;justify-self:start!important;place-self:start!important;flex:0 0 auto!important;box-sizing:border-box!important;}
+body.atmec-layout-edit-on .dashboard-start-row .btn.atmec-dashboard-action{min-height:unset!important;}
+
+
+/* AT-MEC_HM_4.10M - KPI/Storico/Scheda layout isolation fix
+   - kpi-grid/kpi-card solo per Dashboard KPI
+   - traceability-stats-grid per Storico Seriali
+   - unit-card-stats-grid per Scheda Unità
+   - database-tab non deve essere sempre display:block */
+/* AT-MEC_HM_4.10J - KPI database layout fix conservativo
+   Corregge la pagina Database/KPI senza toccare Test Mode, Layout Editor, Ricette o hardware.
+   Nota: le vecchie patch usavano #db-tab, ma l'id reale della pagina è #database-tab. */
+#database-tab.tab-content.active{
+  display:block !important;
+  position:relative !important;
+  overflow:auto !important;
+  padding:12px 14px 36px !important;
+  box-sizing:border-box !important;
+}
+#database-tab *{box-sizing:border-box !important;}
+#database-tab .recipe-big-card,
+#database-tab .kpi-card,
+#database-tab .log-list,
+#database-tab .signature-box,
+#database-tab .serial-history-card{
+  position:relative !important;
+  z-index:auto !important;
+  transform:none !important;
+  max-width:100% !important;
+}
+#database-tab .recipe-big-card{
+  display:block !important;
+  width:100% !important;
+  margin:0 0 14px 0 !important;
+  padding:14px !important;
+  clear:both !important;
+}
+#database-tab h3{
+  margin:0 0 8px 0 !important;
+  line-height:1.25 !important;
+}
+#database-tab .hint{
+  line-height:1.35 !important;
+  white-space:normal !important;
+}
+#database-tab .recipe-page-toolbar{
+  display:grid !important;
+  grid-template-columns:repeat(auto-fit,minmax(190px,1fr)) !important;
+  gap:10px !important;
+  align-items:end !important;
+  margin:10px 0 8px 0 !important;
+  width:100% !important;
+}
+#database-tab .recipe-page-toolbar .col{
+  min-width:0 !important;
+  width:100% !important;
+}
+#database-tab .recipe-page-toolbar input,
+#database-tab .recipe-page-toolbar select{
+  width:100% !important;
+  min-width:0 !important;
+}
+#database-tab .row{
+  display:flex !important;
+  flex-wrap:wrap !important;
+  gap:8px !important;
+  align-items:center !important;
+}
+#database-tab .row .btn{flex:0 0 auto !important;}
+#database-tab .signature-box{
+  margin-top:12px !important;
+  padding:12px !important;
+  display:block !important;
+  clear:both !important;
+}
+#database-tab .kpi-grid{
+  display:grid !important;
+  grid-template-columns:repeat(auto-fit,minmax(170px,1fr)) !important;
+  gap:12px !important;
+  margin:14px 0 !important;
+  clear:both !important;
+  width:100% !important;
+}
+#database-tab .kpi-card{
+  min-height:92px !important;
+  padding:14px !important;
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  justify-content:center !important;
+  text-align:center !important;
+  overflow:hidden !important;
+}
+#database-tab .kpi-card .kpi-val{
+  font-size:clamp(24px,2.1vw,38px) !important;
+  line-height:1.05 !important;
+  white-space:nowrap !important;
+}
+#database-tab .kpi-card .kpi-lbl{
+  margin-top:5px !important;
+  font-size:11px !important;
+  letter-spacing:.09em !important;
+  line-height:1.2 !important;
+}
+#database-tab .db-panel-grid{
+  display:grid !important;
+  grid-template-columns:repeat(auto-fit,minmax(360px,1fr)) !important;
+  gap:14px !important;
+  align-items:start !important;
+  margin:14px 0 !important;
+  clear:both !important;
+}
+#database-tab #db-industrial-kpi{
+  min-height:120px !important;
+}
+#database-tab .db-mini-table{
+  width:100% !important;
+  table-layout:auto !important;
+}
+#database-tab .log-list{
+  overflow:auto !important;
+  white-space:normal !important;
+}
+/* In Layout Editor ON non lasciare che trasformazioni salvate su card KPI rompano il flusso della pagina Database. */
+body.atmec-layout-edit-on #database-tab .recipe-big-card,
+body.atmec-layout-edit-on #database-tab .kpi-card,
+body.atmec-layout-edit-on #database-tab .signature-box,
+body.atmec-layout-edit-on #database-tab .db-panel-grid{
+  transform:none !important;
+}
+@media(max-width:900px){
+  #database-tab .recipe-page-toolbar{grid-template-columns:1fr !important;}
+  #database-tab .kpi-grid{grid-template-columns:repeat(2,minmax(0,1fr)) !important;}
+  #database-tab .db-panel-grid{grid-template-columns:1fr !important;}
+}
+@media(max-width:520px){
+  #database-tab .kpi-grid{grid-template-columns:1fr !important;}
+}
+
+
+/* AT-MEC_HM_4.10M - layout dedicato per Storico Seriali e Scheda Unità.
+   Non riutilizzare kpi-grid/kpi-card fuori dalla Dashboard KPI: causava sovrapposizioni. */
+#traceability-tab.tab-content.active,
+#unit-card-tab.tab-content.active{
+  display:block !important;
+  position:relative !important;
+  overflow:auto !important;
+  padding:12px 14px 36px !important;
+  box-sizing:border-box !important;
+}
+#traceability-tab *,
+#unit-card-tab *{box-sizing:border-box !important;}
+#traceability-tab .recipe-big-card,
+#unit-card-tab .recipe-big-card,
+#traceability-tab .log-list,
+#unit-card-tab .log-list,
+#traceability-tab .serial-history-card,
+#unit-card-tab .serial-history-card{
+  position:relative !important;
+  z-index:auto !important;
+  transform:none !important;
+  max-width:100% !important;
+}
+#traceability-tab .recipe-big-card,
+#unit-card-tab .recipe-big-card{
+  display:block !important;
+  width:100% !important;
+  margin:0 0 14px 0 !important;
+  padding:14px !important;
+  clear:both !important;
+}
+#traceability-tab h3,
+#unit-card-tab h3{
+  margin:0 0 8px 0 !important;
+  line-height:1.25 !important;
+}
+#traceability-tab .hint,
+#unit-card-tab .hint{
+  line-height:1.35 !important;
+  white-space:normal !important;
+}
+#traceability-tab .recipe-page-toolbar,
+#unit-card-tab .recipe-page-toolbar{
+  display:grid !important;
+  grid-template-columns:repeat(auto-fit,minmax(210px,1fr)) !important;
+  gap:10px !important;
+  align-items:end !important;
+  margin:10px 0 8px 0 !important;
+  width:100% !important;
+}
+#traceability-tab .recipe-page-toolbar .col,
+#unit-card-tab .recipe-page-toolbar .col{
+  min-width:0 !important;
+  width:100% !important;
+}
+#traceability-tab .recipe-page-toolbar input,
+#unit-card-tab .recipe-page-toolbar input,
+#traceability-tab .recipe-page-toolbar select,
+#unit-card-tab .recipe-page-toolbar select{
+  width:100% !important;
+  min-width:0 !important;
+}
+#traceability-tab .row,
+#unit-card-tab .row{
+  display:flex !important;
+  flex-wrap:wrap !important;
+  gap:8px !important;
+  align-items:center !important;
+  margin:10px 0 !important;
+}
+#traceability-tab .row .btn,
+#unit-card-tab .row .btn{flex:0 0 auto !important;}
+.traceability-stats-grid,
+.unit-card-stats-grid{
+  display:grid !important;
+  grid-template-columns:repeat(auto-fit,minmax(170px,1fr)) !important;
+  gap:12px !important;
+  margin:14px 0 !important;
+  clear:both !important;
+  width:100% !important;
+}
+.traceability-stat-card,
+.unit-card-stat{
+  min-height:86px !important;
+  padding:14px !important;
+  border-radius:16px !important;
+  border:1px solid rgba(126,231,255,.18) !important;
+  background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.025)) !important;
+  box-shadow:0 10px 26px rgba(0,0,0,.22) !important;
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  justify-content:center !important;
+  text-align:center !important;
+  overflow:hidden !important;
+}
+.traceability-stat-val,
+.unit-card-stat-val{
+  font-size:clamp(22px,2vw,34px) !important;
+  line-height:1.05 !important;
+  font-weight:900 !important;
+  white-space:nowrap !important;
+  color:var(--text,#eaf6ff) !important;
+}
+.traceability-stat-lbl,
+.unit-card-stat-lbl{
+  margin-top:6px !important;
+  font-size:11px !important;
+  letter-spacing:.09em !important;
+  line-height:1.2 !important;
+  color:var(--muted,#9fb8cc) !important;
+  font-weight:800 !important;
+  text-transform:uppercase !important;
+}
+#traceability-tab .db-panel-grid,
+#unit-card-tab .db-panel-grid{
+  display:grid !important;
+  grid-template-columns:repeat(auto-fit,minmax(360px,1fr)) !important;
+  gap:14px !important;
+  align-items:start !important;
+  margin:14px 0 !important;
+  clear:both !important;
+}
+#traceability-tab .log-list,
+#unit-card-tab .log-list{
+  overflow:auto !important;
+  white-space:normal !important;
+}
+body.atmec-layout-edit-on #traceability-tab .recipe-big-card,
+body.atmec-layout-edit-on #traceability-tab .traceability-stat-card,
+body.atmec-layout-edit-on #traceability-tab .db-panel-grid,
+body.atmec-layout-edit-on #unit-card-tab .recipe-big-card,
+body.atmec-layout-edit-on #unit-card-tab .unit-card-stat,
+body.atmec-layout-edit-on #unit-card-tab .db-panel-grid{
+  transform:none !important;
+}
+@media(max-width:900px){
+  #traceability-tab .recipe-page-toolbar,
+  #unit-card-tab .recipe-page-toolbar{grid-template-columns:1fr !important;}
+  .traceability-stats-grid,
+  .unit-card-stats-grid{grid-template-columns:repeat(2,minmax(0,1fr)) !important;}
+  #traceability-tab .db-panel-grid,
+  #unit-card-tab .db-panel-grid{grid-template-columns:1fr !important;}
+}
+@media(max-width:520px){
+  .traceability-stats-grid,
+  .unit-card-stats-grid{grid-template-columns:1fr !important;}
+}
+
+
+/* AT-MEC_HM_4.11 - Storico Seriali professionale
+   Modulo isolato: non tocca Dashboard KPI, Test Mode, hardware o Layout Editor. */
+#traceability-tab .traceability-filter-toolbar{
+  grid-template-columns:repeat(auto-fit,minmax(170px,1fr)) !important;
+}
+#traceability-tab .traceability-action-row{
+  border-top:1px solid rgba(255,255,255,.08) !important;
+  padding-top:10px !important;
+}
+#traceability-tab .traceability-summary-strip{
+  display:grid !important;
+  grid-template-columns:repeat(auto-fit,minmax(180px,1fr)) !important;
+  gap:10px !important;
+  margin:10px 0 0 0 !important;
+}
+#traceability-tab .traceability-summary-item{
+  border:1px solid rgba(126,231,255,.14) !important;
+  border-radius:14px !important;
+  padding:10px 12px !important;
+  background:rgba(255,255,255,.035) !important;
+  color:var(--text2,#9fb8cc) !important;
+  font-size:12px !important;
+  line-height:1.35 !important;
+}
+#traceability-tab .traceability-summary-item b{
+  display:block !important;
+  color:var(--text,#eaf6ff) !important;
+  font-size:14px !important;
+  margin-top:2px !important;
+}
+#traceability-tab .traceability-timeline{
+  display:grid !important;
+  gap:9px !important;
+}
+#traceability-tab .traceability-event{
+  border:1px solid rgba(255,255,255,.12) !important;
+  border-left:4px solid rgba(126,231,255,.55) !important;
+  border-radius:14px !important;
+  padding:10px 12px !important;
+  background:rgba(255,255,255,.035) !important;
+}
+#traceability-tab .traceability-event.pass{border-left-color:#37ffb0 !important;}
+#traceability-tab .traceability-event.fail{border-left-color:#ff5a6a !important;}
+#traceability-tab .traceability-event .event-head{
+  display:flex !important;
+  justify-content:space-between !important;
+  gap:10px !important;
+  flex-wrap:wrap !important;
+  font-weight:900 !important;
+}
+#traceability-tab .traceability-event .event-meta{
+  margin-top:5px !important;
+  color:var(--text2,#9fb8cc) !important;
+  font-size:12px !important;
+}
+#traceability-tab .traceability-event .event-note{
+  margin-top:7px !important;
+  padding:7px 9px !important;
+  border-radius:10px !important;
+  background:rgba(0,0,0,.18) !important;
+  font-size:12px !important;
+}
+#traceability-tab .db-mini-table th,
+#traceability-tab .db-mini-table td{
+  vertical-align:top !important;
+}
+
+/* AT-MEC_HM_4.12A - Analisi Produzione separata.
+   Non usa kpi-grid/kpi-card della Dashboard e non tocca Storico/Scheda Unità. */
+#production-analysis-tab.tab-content.active{
+  display:block !important;
+  overflow:auto !important;
+  padding:16px !important;
+}
+#production-analysis-tab *{box-sizing:border-box !important;}
+#production-analysis-tab .pa412a-page{display:grid !important;gap:14px !important;width:100% !important;max-width:1500px !important;margin:0 auto !important;}
+#production-analysis-tab .pa412a-hero{display:flex !important;align-items:center !important;justify-content:space-between !important;gap:14px !important;}
+#production-analysis-tab .pa412a-hero h3{margin:2px 0 4px !important;color:var(--accent) !important;}
+#production-analysis-tab .pa412a-filter-grid{display:grid !important;grid-template-columns:repeat(4,minmax(170px,1fr)) !important;gap:10px !important;align-items:end !important;}
+#production-analysis-tab .pa412a-kpi-grid{display:grid !important;grid-template-columns:repeat(4,minmax(160px,1fr)) !important;gap:12px !important;}
+#production-analysis-tab .pa412a-kpi-card{min-height:112px !important;border:1px solid rgba(126,231,255,.20) !important;border-radius:18px !important;background:linear-gradient(180deg,rgba(255,255,255,.075),rgba(255,255,255,.032)) !important;box-shadow:0 12px 28px rgba(0,0,0,.22) !important;padding:16px !important;display:grid !important;align-content:center !important;gap:7px !important;}
+#production-analysis-tab .pa412a-kpi-card span{font-size:12px !important;color:var(--text2) !important;text-transform:uppercase !important;letter-spacing:.9px !important;font-weight:900 !important;}
+#production-analysis-tab .pa412a-kpi-card b{font-size:31px !important;line-height:1 !important;color:var(--accent) !important;}
+#production-analysis-tab .pa412a-kpi-card small{font-size:11px !important;color:var(--text2) !important;}
+#production-analysis-tab .pa412a-panel-grid{display:grid !important;grid-template-columns:1fr 1fr 1fr !important;gap:12px !important;align-items:start !important;}
+#production-analysis-tab .pa412a-list{display:grid !important;gap:8px !important;min-height:120px !important;}
+#production-analysis-tab .pa412a-row{display:flex !important;justify-content:space-between !important;gap:12px !important;align-items:center !important;padding:9px 10px !important;border:1px solid rgba(255,255,255,.10) !important;border-radius:12px !important;background:rgba(255,255,255,.045) !important;}
+#production-analysis-tab .pa412a-row b{color:#fff !important;}
+#production-analysis-tab .pa412a-row span{color:var(--text2) !important;font-size:12px !important;}
+@media(max-width:1100px){#production-analysis-tab .pa412a-filter-grid,#production-analysis-tab .pa412a-kpi-grid,#production-analysis-tab .pa412a-panel-grid{grid-template-columns:repeat(2,minmax(0,1fr)) !important;}}
+@media(max-width:700px){#production-analysis-tab .pa412a-filter-grid,#production-analysis-tab .pa412a-kpi-grid,#production-analysis-tab .pa412a-panel-grid{grid-template-columns:1fr !important;}#production-analysis-tab .pa412a-hero{display:grid !important;}}
+
+
+/* AT-MEC_HM_4.12B - Archivio Dati & Backup separato.
+   Non usa kpi-grid/kpi-card e non modifica layout delle pagine esistenti. */
+#data-archive-tab.tab-content.active{display:block !important;overflow:auto !important;padding:16px !important;}
+#data-archive-tab *{box-sizing:border-box !important;}
+#data-archive-tab .da412b-page{display:grid !important;gap:14px !important;width:100% !important;max-width:1500px !important;margin:0 auto !important;}
+#data-archive-tab .da412b-hero{display:flex !important;align-items:center !important;justify-content:space-between !important;gap:14px !important;}
+#data-archive-tab .da412b-hero h3{margin:2px 0 4px !important;color:var(--accent) !important;}
+#data-archive-tab .da412b-grid{display:grid !important;grid-template-columns:1fr 1.4fr !important;gap:14px !important;align-items:start !important;}
+#data-archive-tab .da412b-toolbar{display:grid !important;grid-template-columns:repeat(auto-fit,minmax(160px,1fr)) !important;gap:10px !important;align-items:end !important;}
+#data-archive-tab .da412b-stats-grid{display:grid !important;grid-template-columns:repeat(4,minmax(150px,1fr)) !important;gap:12px !important;}
+#data-archive-tab .da412b-stat-card{min-height:104px !important;border:1px solid rgba(126,231,255,.20) !important;border-radius:18px !important;background:linear-gradient(180deg,rgba(255,255,255,.075),rgba(255,255,255,.032)) !important;box-shadow:0 12px 28px rgba(0,0,0,.22) !important;padding:16px !important;display:grid !important;align-content:center !important;gap:7px !important;}
+#data-archive-tab .da412b-stat-card span{font-size:12px !important;color:var(--text2) !important;text-transform:uppercase !important;letter-spacing:.9px !important;font-weight:900 !important;}
+#data-archive-tab .da412b-stat-card b{font-size:30px !important;line-height:1 !important;color:var(--accent) !important;}
+#data-archive-tab .da412b-stat-card small{font-size:11px !important;color:var(--text2) !important;}
+#data-archive-tab .da412b-panel-grid{display:grid !important;grid-template-columns:1.2fr .8fr !important;gap:14px !important;align-items:start !important;}
+#data-archive-tab .da412b-list{display:grid !important;gap:8px !important;min-height:120px !important;}
+#data-archive-tab .da412b-row{display:flex !important;justify-content:space-between !important;gap:12px !important;align-items:center !important;padding:9px 10px !important;border:1px solid rgba(255,255,255,.10) !important;border-radius:12px !important;background:rgba(255,255,255,.045) !important;}
+#data-archive-tab .da412b-row.pass{border-left:4px solid #37ffb0 !important;}
+#data-archive-tab .da412b-row.fail{border-left:4px solid #ff5a6a !important;}
+#data-archive-tab .da412b-row b{color:#fff !important;}
+#data-archive-tab .da412b-row span{color:var(--text2) !important;font-size:12px !important;text-align:right !important;}
+@media(max-width:1100px){#data-archive-tab .da412b-grid,#data-archive-tab .da412b-stats-grid,#data-archive-tab .da412b-panel-grid{grid-template-columns:repeat(2,minmax(0,1fr)) !important;}}
+@media(max-width:700px){#data-archive-tab .da412b-grid,#data-archive-tab .da412b-stats-grid,#data-archive-tab .da412b-panel-grid{grid-template-columns:1fr !important;}#data-archive-tab .da412b-hero{display:grid !important;}#data-archive-tab .da412b-row{display:grid !important;}#data-archive-tab .da412b-row span{text-align:left !important;}}
+

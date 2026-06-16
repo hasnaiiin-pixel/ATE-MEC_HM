@@ -1,0 +1,79 @@
+<div id="work-order-product-tab" class="tab-content">
+  <div class="wo60-page">
+    <div class="wo60-hero">
+      <div>
+        <div class="wo60-kicker">AT-MEC_HM_6.0 · Melexis style foundation</div>
+        <h2>📋 Work Order & Product Management</h2>
+        <p>Gestione industriale di clienti, prodotti e commesse. La commessa carica automaticamente prodotto, firmware, revisione, ricetta e template etichetta nel Test Mode.</p>
+      </div>
+      <div class="wo60-actions">
+        <button class="btn btn-primary" onclick="seedDemoWorkOrder60()">✨ Demo dati</button>
+        <button class="btn btn-ghost" onclick="exportWorkOrderData60()">⬇ Export JSON</button>
+        <button class="btn btn-ghost" onclick="refreshWorkOrderProduct60()">🔄 Aggiorna</button>
+      </div>
+    </div>
+
+    <div class="wo60-grid wo60-kpis">
+      <div class="wo60-card"><span>Clienti</span><b id="wo60-kpi-customers">0</b></div>
+      <div class="wo60-card"><span>Prodotti</span><b id="wo60-kpi-products">0</b></div>
+      <div class="wo60-card"><span>Commesse attive</span><b id="wo60-kpi-active">0</b></div>
+      <div class="wo60-card"><span>Residuo totale</span><b id="wo60-kpi-remaining">0</b></div>
+    </div>
+
+    <div class="wo60-layout">
+      <section class="panel wo60-panel">
+        <h3>👥 Customer Manager</h3>
+        <div class="wo60-form two">
+          <input id="wo60-customer-code" placeholder="Codice cliente">
+          <input id="wo60-customer-name" placeholder="Nome cliente">
+          <input id="wo60-customer-email" placeholder="Email">
+          <input id="wo60-customer-phone" placeholder="Telefono">
+          <textarea id="wo60-customer-notes" placeholder="Note cliente"></textarea>
+        </div>
+        <div class="wo60-row"><button class="btn btn-primary" onclick="saveCustomer60()">💾 Salva cliente</button><button class="btn btn-ghost" onclick="clearCustomerForm60()">Pulisci</button></div>
+        <div id="wo60-customers-list" class="wo60-list"></div>
+      </section>
+
+      <section class="panel wo60-panel">
+        <h3>📦 Product Master</h3>
+        <div class="wo60-form two">
+          <input id="wo60-product-part" placeholder="Part Number">
+          <input id="wo60-product-description" placeholder="Descrizione prodotto">
+          <select id="wo60-product-customer"></select>
+          <input id="wo60-product-firmware" placeholder="Firmware default">
+          <input id="wo60-product-revision" placeholder="Revisione default">
+          <input id="wo60-product-recipe" placeholder="Ricetta default">
+          <input id="wo60-product-label" placeholder="Template etichetta default">
+          <input id="wo60-product-category" placeholder="Categoria / famiglia">
+        </div>
+        <div class="wo60-row"><button class="btn btn-primary" onclick="saveProduct60()">💾 Salva prodotto</button><button class="btn btn-ghost" onclick="clearProductForm60()">Pulisci</button></div>
+        <div id="wo60-products-list" class="wo60-list"></div>
+      </section>
+    </div>
+
+    <section class="panel wo60-panel">
+      <div class="wo60-title-row"><h3>📋 Work Order Manager</h3><div class="hint">Flusso: Commessa → Prodotto → Firmware → Ricetta → Etichetta → Test</div></div>
+      <div class="wo60-form four">
+        <input id="wo60-wo-number" placeholder="WO Number / Commessa">
+        <select id="wo60-wo-product"></select>
+        <input id="wo60-wo-lot" placeholder="Lotto">
+        <input id="wo60-wo-qty" type="number" min="1" placeholder="Quantità richiesta">
+        <select id="wo60-wo-status"><option>Planned</option><option>Released</option><option>Running</option><option>Hold</option><option>Completed</option><option>Cancelled</option></select>
+        <input id="wo60-wo-produced" type="number" min="0" placeholder="Quantità prodotta">
+        <input id="wo60-wo-priority" placeholder="Priorità">
+        <input id="wo60-wo-note" placeholder="Note commessa">
+      </div>
+      <div class="wo60-row"><button class="btn btn-primary" onclick="saveWorkOrder60()">💾 Salva commessa</button><button class="btn btn-ghost" onclick="clearWorkOrderForm60()">Pulisci</button></div>
+      <div id="wo60-workorders-list" class="wo60-table"></div>
+    </section>
+
+    <section class="panel wo60-panel wo60-selected">
+      <h3>🚀 Commessa selezionata per Test Mode</h3>
+      <div id="wo60-selected-box" class="wo60-selected-box">Nessuna commessa selezionata.</div>
+      <div class="wo60-row">
+        <button class="btn btn-success" onclick="applySelectedWorkOrderToTestMode60()">➡ Carica nel Test Mode</button>
+        <button class="btn btn-primary" onclick="openTestModeWithWorkOrder60()">🖥️ Apri Test Mode</button>
+      </div>
+    </section>
+  </div>
+</div>

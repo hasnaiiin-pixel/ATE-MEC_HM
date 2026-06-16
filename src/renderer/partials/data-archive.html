@@ -1,0 +1,131 @@
+<div id="data-archive-tab" class="tab-content">
+      <div class="da412b-page">
+        <div class="recipe-big-card da412b-hero">
+          <div>
+            <div style="font-size:11px;color:var(--text2);letter-spacing:1px;">AT-MEC_HM_4.17B</div>
+            <h3>🗄️ Archivio Dati & Backup</h3>
+            <div class="hint">Modulo separato per backup, esportazione e controllo archivio. Non modifica Test Mode, ricette, hardware, Layout Editor, Storico o Scheda Unità.</div>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="loadDataArchiveDashboard412B()">🔄 Aggiorna</button>
+        </div>
+        <div class="da412b-grid">
+          <div class="recipe-big-card">
+            <h3>🧰 Backup database</h3>
+            <div class="hint">Crea una copia JSON del database locale nella cartella backup dell'applicazione.</div>
+            <div class="recipe-page-toolbar da412b-toolbar">
+              <div class="col"><label>Etichetta backup</label><input id="da412b-backup-label" placeholder="es. prima_modifica / stabile"></div>
+            </div>
+            <div class="row">
+              <button class="btn btn-success btn-sm" onclick="createArchiveBackup412B()">🧰 Crea backup</button>
+              <button class="btn btn-ghost btn-sm" onclick="verifyDataArchive412B()">✅ Verifica archivio</button>
+            </div>
+            <div id="da412b-backup-status" class="hint" style="margin-top:8px;">Nessun backup creato in questa sessione.</div>
+          </div>
+          <div class="recipe-big-card">
+            <h3>📤 Esporta dati</h3>
+            <div class="hint">Esporta lo storico filtrato per analisi esterna, qualità o backup manuale.</div>
+            <div class="recipe-page-toolbar da412b-toolbar">
+              <div class="col"><label>Seriale</label><input id="da412b-serial" placeholder="tutti"></div>
+              <div class="col"><label>Lotto/Commessa</label><input id="da412b-lot" placeholder="tutti"></div>
+              <div class="col"><label>Operatore</label><input id="da412b-operator" placeholder="tutti"></div>
+              <div class="col"><label>Ricetta</label><input id="da412b-recipe" placeholder="tutte"></div>
+              <div class="col"><label>Esito</label><select id="da412b-result"><option value="ALL">Tutti</option><option value="PASS">PASS</option><option value="FAIL">FAIL</option></select></div>
+              <div class="col"><label>Dal</label><input id="da412b-date-from" type="date"></div>
+              <div class="col"><label>Al</label><input id="da412b-date-to" type="date"></div>
+            </div>
+            <div class="row">
+              <button class="btn btn-primary btn-sm" onclick="previewDataArchive412B()">🔎 Anteprima</button>
+              <button class="btn btn-ghost btn-sm" onclick="exportArchiveCsv412B()">📄 CSV storico</button>
+              <button class="btn btn-ghost btn-sm" onclick="exportArchiveJson412B()">🧾 JSON snapshot</button>
+              <button class="btn btn-ghost btn-sm" onclick="clearArchiveFilters412B()">🧹 Pulisci</button>
+            </div>
+            <div id="da412b-export-status" class="hint" style="margin-top:8px;">Imposta filtri o esporta tutto.</div>
+          </div>
+        </div>
+        <div class="da412b-stats-grid">
+          <div class="da412b-stat-card"><span>Record test</span><b id="da412b-total">0</b><small>storico filtrato</small></div>
+          <div class="da412b-stat-card"><span>Seriali unici</span><b id="da412b-serials">0</b><small>unità tracciate</small></div>
+          <div class="da412b-stat-card"><span>Yield</span><b id="da412b-yield">0%</b><small>PASS / totale</small></div>
+          <div class="da412b-stat-card"><span>Retest</span><b id="da412b-retest">0%</b><small>seriali con più test</small></div>
+        </div>
+        <div class="da412b-panel-grid">
+          <div class="recipe-big-card">
+            <h3>🔎 Anteprima risultati</h3>
+            <div id="da412b-preview" class="da412b-list"><div class="hint">Premi Anteprima per visualizzare gli ultimi record filtrati.</div></div>
+          </div>
+          <div class="recipe-big-card">
+            <h3>🛠 Manutenzione archivio</h3>
+            <div class="da412b-list">
+              <div class="da412b-row"><b>Verifica archivio</b><span>Controlla conteggi e API dati.</span></div>
+              <div class="da412b-row"><b>Backup manuale</b><span>Crea snapshot JSON datato.</span></div>
+              <div class="da412b-row"><b>Preparazione SQLite</b><span>Modulo isolato per futura migrazione JSON → SQLite.</span></div>
+            </div>
+            <div id="da412b-maint-status" class="hint" style="margin-top:8px;">Archivio pronto.</div>
+          </div>
+          <div class="recipe-big-card da412e-sync-card">
+            <h3>🔄 Data Provider & Sync</h3>
+            <div class="hint">4.16E separa le prime viste HTML in partials mantenendo Core Module Split modulare mantenendo Traceability & Repair Pro mantenendo i fix permessi realtime e Device Manager stabile. Il comportamento resta LOCAL FIRST: il test salva sempre in locale e non si blocca se il server è offline.</div>
+            <div class="da412f-config-grid">
+              <div class="col">
+                <label>Modalità dati</label>
+                <select id="da412f-mode">
+                  <option value="local_first">LOCAL FIRST - Locale + sync quando disponibile</option>
+                  <option value="local_json">SOLO LOCALE JSON</option>
+                </select>
+              </div>
+              <div class="col">
+                <label>URL Server Sync</label>
+                <input id="da412f-server-url" placeholder="http://localhost:8099">
+              </div>
+              <div class="col">
+                <label>Timeout server (ms)</label>
+                <input id="da412f-timeout" type="number" min="1000" step="500" value="5000">
+              </div>
+              <label class="da412f-check"><input id="da412f-server-enabled" type="checkbox"> Abilita invio server</label>
+            </div>
+            <div class="da412h-station-grid">
+              <div class="col">
+                <label>Station ID</label>
+                <input id="da412h-station-id" placeholder="es. ATE_LINEA1_01">
+              </div>
+              <div class="col">
+                <label>Nome postazione</label>
+                <input id="da412h-station-name" placeholder="es. Banco collaudo linea 1">
+              </div>
+              <div class="col">
+                <label>Reparto</label>
+                <input id="da412i-station-department" placeholder="es. COLLAUDO">
+              </div>
+              <div class="col">
+                <label>Sede</label>
+                <input id="da412i-station-site" placeholder="es. OSPITALETTO">
+              </div>
+              <div class="col">
+                <label>Sync automatica ogni (sec)</label>
+                <input id="da412h-auto-sync-interval" type="number" min="15" step="15" value="60">
+              </div>
+              <label class="da412f-check"><input id="da412h-auto-sync-enabled" type="checkbox"> Abilita sync automatica</label>
+            </div>
+            <div class="da412e-sync-grid">
+              <div><span>Modalità</span><b id="da412e-mode">LOCAL FIRST</b></div>
+              <div><span>Backend locale</span><b id="da412e-backend">JSON</b></div>
+              <div><span>Coda pending</span><b id="da412e-pending">0</b></div>
+              <div><span>Server</span><b id="da412e-server">Non configurato</b></div>
+              <div><span>Station ID</span><b id="da412h-station-status">N/D</b></div>
+              <div><span>Auto Sync</span><b id="da412h-auto-sync-status">OFF</b></div>
+            </div>
+            <div class="row" style="margin-top:10px;">
+              <button class="btn btn-ghost btn-sm" onclick="loadDataProviderStatus412E()">🔎 Stato sync</button>
+              <button class="btn btn-ghost btn-sm" onclick="saveDataProviderConfig412F()">💾 Salva configurazione</button>
+              <button class="btn btn-ghost btn-sm" onclick="testDataProviderServer412F()">🌐 Verifica server</button>
+              <button class="btn btn-primary btn-sm" onclick="syncDataProviderNow412E()">🔄 Sincronizza ora</button>
+              <button class="btn btn-ghost btn-sm" onclick="refreshSyncQueue412G()">📋 Vedi coda</button>
+              <button class="btn btn-ghost btn-sm" onclick="retryFailedSyncQueue412G()">🔁 Retry errori</button>
+              <button class="btn btn-ghost btn-sm" onclick="clearSyncedSyncQueue412G()">🧹 Pulisci inviati</button>
+            </div>
+            <div id="da412e-sync-status" class="hint" style="margin-top:8px;">Sync locale pronto.</div>
+            <div id="da412g-queue-preview" class="da412g-queue-preview"><div class="hint">Premi “Vedi coda” per controllare PENDING / FAILED / SYNCED.</div></div>
+          </div>
+        </div>
+      </div>
+    </div>

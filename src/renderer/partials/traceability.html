@@ -1,0 +1,55 @@
+<div id="traceability-tab" class="tab-content">
+      <div class="recipe-big-card">
+        <h3>🔎 Storico Seriali & Riparazioni</h3>
+        <div class="hint">Modulo indipendente di consultazione seriale. Non modifica ricette, Test Mode, Layout Editor o gestione hardware.</div>
+        <div class="recipe-page-toolbar traceability-filter-toolbar">
+          <div class="col"><label>Seriale scheda</label><input id="trace-serial-input" placeholder="Scansiona o inserisci SN"></div>
+          <div class="col"><label>Cliente</label><select id="trace-client-input"><option value="">Tutti</option></select></div>
+          <div class="col"><label>Commessa / Lotto</label><input id="trace-lot-input" placeholder="opzionale"></div>
+          <div class="col"><label>Operatore</label><input id="trace-operator-input" placeholder="opzionale"></div>
+          <div class="col"><label>Postazione</label><input id="trace-station-input" placeholder="Station ID / Nome"></div>
+          <div class="col"><label>Ricetta</label><select id="trace-recipe-input"><option value="">Tutte</option></select></div>
+          <div class="col"><label>Esito</label><select id="trace-result-input"><option value="ALL">Tutti</option><option value="PASS">PASS</option><option value="FAIL">FAIL</option></select></div>
+          <div class="col"><label>Data da</label><input id="trace-date-from-input" type="date"></div>
+          <div class="col"><label>Data a</label><input id="trace-date-to-input" type="date"></div>
+        </div>
+        <div class="row traceability-action-row" style="margin:8px 0;">
+          <button class="btn btn-primary btn-sm" onclick="loadTraceabilitySerialHistory()">🔎 Cerca storico</button>
+          <button class="btn btn-ghost btn-sm" onclick="clearTraceabilitySerialPage()">🧹 Pulisci</button>
+          <button class="btn btn-ghost btn-sm" onclick="exportTraceabilityCsv411()">📤 CSV</button>
+          <button class="btn btn-ghost btn-sm" onclick="printTraceabilitySerialHistory()">🧾 Stampa / PDF</button>
+          <button class="btn btn-ghost btn-sm" onclick="openTraceabilityUnitCard411()">🧬 Apri Scheda Unità</button>
+          <button class="btn btn-ghost btn-sm" onclick="generateUnitDossier413A()">📚 Dossier unità</button>
+        </div>
+      </div>
+      <div class="traceability-stats-grid">
+        <div class="traceability-stat-card"><div class="traceability-stat-val" id="trace-total-tests">0</div><div class="traceability-stat-lbl">TEST</div></div>
+        <div class="traceability-stat-card"><div class="traceability-stat-val" id="trace-last-result" style="color:var(--accent)">N/D</div><div class="traceability-stat-lbl">ULTIMO ESITO</div></div>
+        <div class="traceability-stat-card"><div class="traceability-stat-val" id="trace-repair-count">0</div><div class="traceability-stat-lbl">RIPARAZIONI</div></div>
+        <div class="traceability-stat-card"><div class="traceability-stat-val" id="trace-retest-count">0</div><div class="traceability-stat-lbl">RETEST</div></div>
+      </div>
+      <div class="recipe-big-card" style="margin-top:12px;">
+        <h3>🛠 Aggiungi intervento riparazione</h3>
+        <div class="recipe-page-toolbar">
+          <div class="col"><label>Nota intervento</label><input id="trace-repair-note" placeholder="es. sostituito componente / saldatura / verifica"></div>
+          <div class="col"><label>Difetto / causa</label><input id="trace-repair-cause" placeholder="opzionale"></div>
+        </div>
+        <div class="row" style="margin:8px 0;">
+          <button class="btn btn-success btn-sm" onclick="saveTraceabilityRepairNote()">🛠 Salva riparazione</button>
+        </div>
+      </div>
+      <div class="recipe-big-card traceability-enterprise-card" style="margin-top:12px;">
+        <h3>🏭 Tracciabilità Enterprise</h3>
+        <div id="trace-enterprise-summary" class="trace-enterprise-grid"><div class="hint">Esegui una ricerca per vedere cliente, ricette, operatori, postazioni e report associati.</div></div>
+      </div>
+      <div class="db-panel-grid" style="margin-top:12px;">
+        <div class="recipe-big-card">
+          <h3>📋 Cronologia test</h3>
+          <div id="trace-tests-result" class="log-list" style="min-height:180px;"><div class="hint">Inserisci un seriale e premi Cerca storico.</div></div>
+        </div>
+        <div class="recipe-big-card">
+          <h3>🧯 Cronologia riparazioni</h3>
+          <div id="trace-repairs-result" class="log-list" style="min-height:180px;"><div class="hint">Nessuna ricerca eseguita.</div></div>
+        </div>
+      </div>
+    </div>

@@ -1,0 +1,95 @@
+<div id="analytics-center-tab" class="tab-content">
+  <div class="analytics419-page">
+    <div class="analytics419-hero">
+      <div>
+        <div class="analytics419-kicker">AT-MEC HM 4.19B2</div>
+        <h2>📊 Analytics Center</h2>
+        <div class="hint">Centro analitico per produzione, collaboratori, ricette, dispositivi, riparazioni e postazioni.</div>
+      </div>
+      <div class="analytics419-actions">
+        <button class="btn btn-primary btn-sm" onclick="loadAnalyticsCenter419B2()">🔄 Aggiorna Analytics</button>
+        <button class="btn btn-ghost btn-sm" onclick="showTab('production-analysis-tab', null); loadProductionAnalysisDashboard412A()">📈 Analisi Produzione</button>
+        <button class="btn btn-ghost btn-sm" onclick="showTab('factory-core-tab', null); loadFactoryEnterprise418B()">🏭 Factory Enterprise</button>
+      </div>
+    </div>
+
+    <div class="analytics419-filter-card">
+      <div class="col"><label>Periodo</label><select id="an419-period"><option value="today">Oggi</option><option value="7d">Ultimi 7 giorni</option><option value="30d">Ultimi 30 giorni</option><option value="all">Tutto</option></select></div>
+      <div class="col"><label>Ricetta</label><input id="an419-recipe" placeholder="tutte"></div>
+      <div class="col"><label>Collaboratore</label><input id="an419-operator" placeholder="tutti"></div>
+      <div class="col"><label>Postazione</label><input id="an419-station" placeholder="tutte"></div>
+      <button class="btn btn-primary btn-sm" onclick="loadAnalyticsCenter419B2()">📊 Calcola</button>
+      <button class="btn btn-ghost btn-sm" onclick="clearAnalyticsFilters419B2()">🧹 Pulisci</button>
+    </div>
+
+    <div class="analytics419-kpi-grid">
+      <div class="analytics419-kpi"><span>Test totali</span><b id="an419-total">0</b><small>Periodo selezionato</small></div>
+      <div class="analytics419-kpi ok"><span>PASS</span><b id="an419-pass">0</b><small>Conformi</small></div>
+      <div class="analytics419-kpi fail"><span>FAIL</span><b id="an419-fail">0</b><small>Non conformi</small></div>
+      <div class="analytics419-kpi cyan"><span>FPY / Yield</span><b id="an419-fpy">0%</b><small>Qualità primo passaggio</small></div>
+      <div class="analytics419-kpi purple"><span>Tempo medio</span><b id="an419-avg">0s</b><small>Durata media test</small></div>
+      <div class="analytics419-kpi orange"><span>Riparazioni</span><b id="an419-repairs">0</b><small>Interventi registrati</small></div>
+    </div>
+
+    <div class="analytics419-grid analytics419-grid-2">
+      <div class="analytics419-card">
+        <h3>👥 Analytics collaboratori</h3>
+        <div id="an419-operators" class="analytics419-list"><div class="hint">Premi Aggiorna Analytics.</div></div>
+      </div>
+      <div class="analytics419-card">
+        <h3>📋 Analytics ricette</h3>
+        <div id="an419-recipes" class="analytics419-list"><div class="hint">Premi Aggiorna Analytics.</div></div>
+      </div>
+    </div>
+
+    <div class="analytics419-grid analytics419-grid-3">
+      <div class="analytics419-card">
+        <h3>🔌 Analytics dispositivi</h3>
+        <div id="an419-devices" class="analytics419-list"><div class="hint">Nessun dato dispositivo caricato.</div></div>
+      </div>
+      <div class="analytics419-card">
+        <h3>🔧 Analytics riparazioni</h3>
+        <div id="an419-repairs-list" class="analytics419-list"><div class="hint">Nessun dato riparazioni caricato.</div></div>
+      </div>
+      <div class="analytics419-card">
+        <h3>🏭 Factory analytics</h3>
+        <div id="an419-factory" class="analytics419-list"><div class="hint">Nessun dato factory caricato.</div></div>
+      </div>
+    </div>
+
+    <div class="analytics419-grid analytics419-grid-2">
+      <div class="analytics419-card">
+        <h3>📈 Trend produzione</h3>
+        <div id="an419-trend" class="analytics419-bars"><div class="hint">Nessun trend disponibile.</div></div>
+      </div>
+      <div class="analytics419-card ai">
+        <h3>🤖 AI Insight Placeholder</h3>
+        <div id="an419-ai" class="analytics419-ai-box">Analisi AI pronta per futura integrazione: il sistema potrà spiegare cause FAIL, trend qualità e criticità per ricetta/postazione.</div>
+      </div>
+    </div>
+
+
+    <div class="analytics419-enterprise-panel">
+      <div class="analytics419-enterprise-head">
+        <div>
+          <div class="analytics419-kicker">Executive analytics</div>
+          <h3>📈 Analytics Enterprise</h3>
+          <div class="hint">Indicatori direzionali: OEE, MTTR, MTBF, Retest, Top difetti e Heatmap qualità.</div>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="loadAnalyticsEnterprise419B2()">⚡ Aggiorna Enterprise</button>
+      </div>
+      <div class="analytics419-enterprise-kpis">
+        <div class="analytics419-kpi cyan"><span>OEE stimato</span><b id="an419-oee">0%</b><small>Disponibilità × qualità</small></div>
+        <div class="analytics419-kpi ok"><span>Yield</span><b id="an419-yield">0%</b><small>Conformità globale</small></div>
+        <div class="analytics419-kpi orange"><span>Retest</span><b id="an419-retest">0%</b><small>Ripetizioni stimate</small></div>
+        <div class="analytics419-kpi purple"><span>MTTR</span><b id="an419-mttr">N/D</b><small>Tempo medio repair</small></div>
+        <div class="analytics419-kpi"><span>MTBF</span><b id="an419-mtbf">N/D</b><small>Tempo medio tra guasti</small></div>
+      </div>
+      <div class="analytics419-grid analytics419-grid-3">
+        <div class="analytics419-card"><h3>🔥 Top difetti / FAIL</h3><div id="an419-top-defects" class="analytics419-list"><div class="hint">Premi Aggiorna Enterprise.</div></div></div>
+        <div class="analytics419-card"><h3>⚠️ Ricette critiche</h3><div id="an419-critical-recipes" class="analytics419-list"><div class="hint">Premi Aggiorna Enterprise.</div></div></div>
+        <div class="analytics419-card"><h3>🧭 Heatmap qualità</h3><div id="an419-heatmap" class="analytics419-heatmap"><div class="hint">Dati disponibili dopo test multipli.</div></div></div>
+      </div>
+    </div>
+  </div>
+</div>

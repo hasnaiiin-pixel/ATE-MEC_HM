@@ -1,0 +1,78 @@
+<div id="pl303-tab" class="tab-content">
+      <div class="pl303-grid">
+        <div class="pl303-card">
+          <h3>🔋 Aim-TTi PL303QMD-P — Alimentatore programmabile 2 canali</h3>
+          <div class="hint">Pagina dedicata per collegamento USB o Ethernet e impostazione manuale separata di CH1 e CH2. I comandi sono protetti da timeout per non bloccare la HMI.</div>
+          <div class="col">
+            <label>Modalità collegamento</label>
+            <select id="pl303-mode" onchange="syncPl303ModeFields()">
+              <option value="USB">USB / seriale COM</option>
+              <option value="ETHERNET">Ethernet / TCP SCPI</option>
+            </select>
+          </div>
+          <div id="pl303-usb-fields" class="pl303-mode-fields">
+            <div class="col"><label>Porta COM</label><div class="row"><select id="pl303-com" style="flex:1"><option value="mock">mock</option></select><button class="btn btn-ghost btn-sm" onclick="scanPl303SerialPorts()">🔎</button></div></div>
+            <div class="col"><label>Baud</label><input id="pl303-baud" type="number" value="9600"></div>
+          </div>
+          <div id="pl303-eth-fields" class="pl303-mode-fields" style="display:none;">
+            <div class="col"><label>IP / Host</label><input id="pl303-host" placeholder="192.168.0.50"></div>
+            <div class="col"><label>Porta TCP</label><input id="pl303-port" type="number" value="9221"></div>
+          </div>
+          <div class="row" style="margin-top:10px;">
+            <button class="btn btn-primary" onclick="connectPl303()">🔌 Collega PL303</button>
+            <button class="btn btn-danger" onclick="safePl303Off()">🛑 CH1+CH2 OFF SICURO</button>
+            <button class="btn btn-ghost" onclick="queryPl303Status()">📡 Leggi stato</button>
+            <button class="btn btn-ghost" onclick="savePl303SettingsOnly()">💾 Salva impostazioni</button>
+          </div>
+          <div class="row" style="margin-top:10px;align-items:end;">
+            <label class="row" style="gap:6px;align-items:center;"><input id="pl303-live-enabled" type="checkbox" onchange="togglePl303Live(this.checked)"> Live PL303</label>
+            <div class="col" style="max-width:160px;"><label>Intervallo live ms</label><input id="pl303-live-interval" type="number" min="1000" step="500" value="2500" onchange="restartPl303LiveIfEnabled()"></div>
+            <button class="btn btn-secondary btn-sm" onclick="pl303LiveOnce(true)">🔄 Aggiorna ora</button>
+            <span id="pl303-live-state" class="detail-line">Live OFF</span>
+          </div>
+          <div id="pl303-port-list" class="detail-line" style="margin-top:8px;"></div>
+        </div>
+
+        <div class="pl303-card wide">
+          <h3>⚙️ Uscite indipendenti PL303QMD-P</h3>
+          <div class="hint">AT-MEC_HM_3.6: il PL303QMD-P viene gestito come alimentatore a due canali indipendenti. Ogni canale ha setpoint, ON/OFF e lettura separata.</div>
+          <div class="pl303-channel-grid">
+            <div class="pl303-channel-card">
+              <h4>CH1</h4>
+              <div class="pl303-display">
+                <div class="pl303-meter"><div id="pl303-ch1-v-read" class="num">--.--</div><div class="lbl">VOLT</div></div>
+                <div class="pl303-meter"><div id="pl303-ch1-i-read" class="num">--.--</div><div class="lbl">AMPERE</div></div>
+              </div>
+              <div class="pl303-mode-fields">
+                <div class="col"><label>CH1 Tensione V</label><input id="pl303-ch1-set-v" type="number" step="0.001" min="0" max="30" value="5.000"></div>
+                <div class="col"><label>CH1 Corrente A</label><input id="pl303-ch1-set-i" type="number" step="0.001" min="0" max="3" value="0.500"></div>
+              </div>
+              <div class="row" style="margin-top:12px;">
+                <button class="btn btn-success btn-3d" onclick="setPl303Output(1,true)">⚡ CH1 SET + ON</button>
+                <button class="btn btn-danger btn-3d" onclick="setPl303Output(1,false)">⏹ CH1 OFF</button>
+                <button class="btn btn-ghost" onclick="queryPl303Status(1)">📡 CH1 READ</button>
+                <button class="btn btn-secondary" onclick="measurePl303Current(1)">📈 CH1 MISURA I</button>
+              </div>
+            </div>
+            <div class="pl303-channel-card">
+              <h4>CH2</h4>
+              <div class="pl303-display">
+                <div class="pl303-meter"><div id="pl303-ch2-v-read" class="num">--.--</div><div class="lbl">VOLT</div></div>
+                <div class="pl303-meter"><div id="pl303-ch2-i-read" class="num">--.--</div><div class="lbl">AMPERE</div></div>
+              </div>
+              <div class="pl303-mode-fields">
+                <div class="col"><label>CH2 Tensione V</label><input id="pl303-ch2-set-v" type="number" step="0.001" min="0" max="30" value="12.000"></div>
+                <div class="col"><label>CH2 Corrente A</label><input id="pl303-ch2-set-i" type="number" step="0.001" min="0" max="3" value="0.500"></div>
+              </div>
+              <div class="row" style="margin-top:12px;">
+                <button class="btn btn-success btn-3d" onclick="setPl303Output(2,true)">⚡ CH2 SET + ON</button>
+                <button class="btn btn-danger btn-3d" onclick="setPl303Output(2,false)">⏹ CH2 OFF</button>
+                <button class="btn btn-ghost" onclick="queryPl303Status(2)">📡 CH2 READ</button>
+                <button class="btn btn-secondary" onclick="measurePl303Current(2)">📈 CH2 MISURA I</button>
+              </div>
+            </div>
+          </div>
+          <div id="pl303-status" class="log-list" style="height:160px;margin-top:12px;"></div>
+        </div>
+      </div>
+</div>

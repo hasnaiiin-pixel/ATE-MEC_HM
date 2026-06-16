@@ -1,0 +1,45 @@
+<div id="commhub-tab" class="tab-content">
+      <div class="comm-grid">
+        <div class="comm-card">
+          <h3>💬 Communication Hub</h3>
+          <div class="hint">Terminale stile PuTTY per Seriale, Telnet e TCP. I valori RX possono diventare variabili e regole PASS/FAIL.</div>
+          <label>Tipo collegamento</label>
+          <select id="comm-type" onchange="updateCommModeUi()"><option value="serial">Seriale COM</option><option value="telnet">Telnet</option><option value="tcp">TCP Client</option></select>
+          <div id="comm-serial-box">
+            <label>Porta COM</label><div class="row"><select id="comm-port"><option value="">seleziona porta</option></select><button class="btn btn-ghost btn-sm" onclick="scanCommPorts()">🔎</button></div>
+            <label>Baudrate</label><input id="comm-baud" value="115200" inputmode="numeric">
+          </div>
+          <div id="comm-tcp-box" style="display:none;">
+            <label>IP / Host</label><input id="comm-host" placeholder="192.168.1.100">
+            <label>Porta</label><input id="comm-tcp-port" value="23" inputmode="numeric">
+          </div>
+          <div class="row" style="margin-top:10px;"><button class="btn btn-success btn-sm" onclick="openCommunication()">🔌 Connetti</button><button class="btn btn-danger btn-sm" onclick="closeCommunication()">⛔ Disconnetti</button></div>
+          <div id="comm-status" class="hint" style="margin-top:8px;">Non connesso.</div>
+          <hr style="border-color:var(--border);margin:12px 0;">
+          <label>Comando TX</label>
+          <textarea id="comm-tx" rows="4" placeholder="es. *IDN? oppure READ"></textarea>
+          <label style="display:flex;gap:8px;align-items:center;margin-top:6px;"><input id="comm-newline" type="checkbox" checked> Aggiungi newline</label>
+          <button class="btn btn-primary" onclick="sendCommunication()">📤 Invia comando</button>
+        </div>
+        <div class="comm-card">
+          <h3>📟 RX / TX Live</h3>
+          <div id="comm-log" class="comm-log"></div>
+        </div>
+        <div class="comm-card">
+          <h3>🧪 Parser PASS/FAIL</h3>
+          <label>Nome variabile da cercare</label><input id="comm-parser-key" value="VOLT" placeholder="es. VOLT, TEMP, CURR">
+          <div class="row"><div class="col"><label>Min</label><input id="comm-parser-min" value="23" inputmode="decimal"></div><div class="col"><label>Max</label><input id="comm-parser-max" value="25" inputmode="decimal"></div></div>
+          <label>Salva come variabile ricetta</label><input id="comm-parser-var" value="VIN" placeholder="VIN">
+          <button class="btn btn-warn" onclick="testCommParserLast()">🧪 Test parser su ultimo RX</button>
+          <div class="comm-step-actions">
+            <button class="btn btn-primary btn-sm" onclick="addCommReadStepToRecipe326()">➕ Step lettura RX</button>
+            <button class="btn btn-primary btn-sm" onclick="addCommWriteStepToRecipe326()">➕ Step scrittura TX</button>
+            <button class="btn btn-success btn-sm" onclick="addCommVerifyStepToRecipe326()">➕ Step verifica PASS/FAIL</button>
+            <button class="btn btn-ghost btn-sm" onclick="exportCommLog326()">📤 Export esiti/log</button>
+            <button class="btn btn-ghost btn-sm" onclick="importCommLog326()">📥 Import esiti</button>
+            <button class="btn btn-ghost btn-sm" onclick="registerSerialFromCommRx326()">▦ Registra seriale da RX</button>
+          </div>
+          <div id="comm-parser-result" class="manual-input-panel" style="min-height:90px;"><b>Risultato parser</b><div class="hint">Esempio RX: VOLT=24.1 → PASS se dentro min/max.</div></div>
+        </div>
+      </div>
+    </div>

@@ -1,0 +1,337 @@
+/* AT-MEC_HM_4.16G_CSS_SPLIT - Test Mode layout e produzione
+   Estratto da app.css originale, ordine preservato. */
+
+/* AT-MEC_HM_2.29 - Production Test Mode evoluta */
+.prod-test-header { grid-template-columns: 190px 1fr 190px !important; min-height:74px !important; padding:10px 16px !important; }
+.prod-test-logo { max-width:180px !important; max-height:52px !important; }
+.prod-test-title h1 { font-size:30px !important; }
+.prod-emergency-top { display:flex; align-items:center; justify-content:center; }
+.siren-icon { display:inline-block; animation: sirenPulse .55s infinite alternate; filter:drop-shadow(0 0 10px rgba(255,0,0,.85)); margin-right:8px; }
+@keyframes sirenPulse { from { transform:scale(1) rotate(-5deg); opacity:.65; } to { transform:scale(1.18) rotate(5deg); opacity:1; } }
+.prod-top-emergency { min-height:58px !important; font-size:17px !important; padding:8px 14px !important; }
+.prod-test-body { grid-template-columns: minmax(0,1fr) 460px !important; }
+.prod-selector-row { display:grid; grid-template-columns:1fr auto; gap:8px; align-items:end; margin:10px 0 12px; }
+.prod-sequence-log { margin-top:14px; max-height:250px; overflow:auto; border:1px solid var(--border); border-radius:18px; background:rgba(0,0,0,.18); padding:8px; }
+.prod-seq-row { display:grid; grid-template-columns:78px 1fr 112px; gap:8px; align-items:center; padding:8px 10px; border-radius:12px; margin-bottom:6px; background:rgba(255,255,255,.04); font-size:12px; }
+.prod-seq-row.pass { border-left:5px solid var(--pass); }
+.prod-seq-row.fail { border-left:5px solid var(--fail); }
+.prod-seq-row.running { border-left:5px solid var(--accent); box-shadow:0 0 16px rgba(0,212,255,.14); }
+.prod-seq-row.todo { border-left:5px solid rgba(255,255,255,.18); opacity:.82; }
+.prod-status-pill { border-radius:999px; padding:5px 8px; font-weight:900; text-align:center; }
+.prod-status-pill.pass { background:rgba(0,255,136,.14); color:var(--pass); }
+.prod-status-pill.fail { background:rgba(255,51,102,.14); color:var(--fail); }
+.prod-status-pill.running { background:rgba(0,212,255,.14); color:var(--accent); }
+.prod-status-pill.todo { background:rgba(255,255,255,.08); color:var(--text2); }
+.prod-hw-card { border:1px solid var(--border); border-radius:16px; padding:10px; background:rgba(255,255,255,.04); margin-top:10px; }
+.prod-hw-row { display:grid; grid-template-columns:1fr auto auto; gap:8px; align-items:center; padding:7px 0; border-bottom:1px solid rgba(255,255,255,.06); font-size:12px; }
+.prod-hw-row:last-child { border-bottom:0; }
+.debug-box { display:none; border:1px solid rgba(255,193,7,.35); background:rgba(255,193,7,.08); border-radius:16px; padding:10px; margin-top:12px; }
+.debug-box.show { display:block; }
+
+
+/* AT-MEC_HM_2.29 - Layout test mode responsive/compatto */
+#production-test-mode {
+  padding: clamp(8px, 1.4vw, 18px) !important;
+}
+body.production-test-active #production-test-mode {
+  grid-template-rows: auto minmax(0,1fr) auto !important;
+  gap: clamp(8px, 1.1vw, 14px) !important;
+}
+.prod-test-header {
+  grid-template-columns: clamp(110px, 13vw, 170px) minmax(0,1fr) clamp(160px, 18vw, 230px) !important;
+  min-height: clamp(56px, 8vh, 74px) !important;
+  padding: clamp(6px, .8vw, 10px) clamp(8px, 1vw, 14px) !important;
+}
+.prod-test-logo {
+  max-width: clamp(95px, 12vw, 160px) !important;
+  max-height: clamp(36px, 6vh, 50px) !important;
+}
+.prod-test-title h1 {
+  font-size: clamp(18px, 2.1vw, 28px) !important;
+  letter-spacing: clamp(1px, .25vw, 3px) !important;
+}
+.prod-test-title .subtitle {
+  font-size: clamp(9px, .85vw, 12px) !important;
+}
+.prod-top-emergency {
+  min-height: clamp(42px, 6.5vh, 56px) !important;
+  font-size: clamp(12px, 1.2vw, 16px) !important;
+  padding: 6px 10px !important;
+}
+.prod-test-body {
+  grid-template-columns: minmax(0, 1.35fr) minmax(280px, .65fr) !important;
+  gap: clamp(8px, 1.1vw, 14px) !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+}
+.prod-panel {
+  padding: clamp(10px, 1.3vw, 16px) !important;
+  border-radius: clamp(14px, 1.5vw, 22px) !important;
+  overflow: auto !important;
+}
+.prod-recipe-name {
+  font-size: clamp(20px, 2.5vw, 30px) !important;
+  margin-bottom: 4px !important;
+}
+.prod-status-line { font-size: clamp(11px, .9vw, 13px) !important; gap:8px !important; }
+.running-indicator { padding:6px 10px !important; font-size: clamp(10px,.9vw,12px) !important; }
+.running-indicator .spinner { width:14px !important; height:14px !important; border-width:2px !important; }
+.prod-progress-wrap { margin: 6px 0 0 !important; position: sticky; bottom: 0; z-index: 20; background: rgba(13,13,20,.96); padding: 7px 10px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 -8px 24px rgba(0,0,0,.25); }
+.prod-progress-head b { font-size: clamp(26px, 3.2vw, 40px) !important; }
+.prod-progress-bar { height: clamp(18px, 3vh, 28px) !important; }
+.prod-current-step {
+  margin-top: clamp(10px, 1.4vh, 16px) !important;
+  padding: clamp(10px, 1.4vw, 16px) !important;
+  min-height: clamp(62px, 9vh, 92px) !important;
+}
+.prod-current-step .value { font-size: clamp(17px, 2vw, 24px) !important; }
+.prod-sequence-log {
+  max-height: clamp(140px, 28vh, 250px) !important;
+  margin-top: 10px !important;
+}
+.prod-seq-row {
+  grid-template-columns: 62px 1fr 92px !important;
+  padding: 6px 8px !important;
+  font-size: clamp(10px, .8vw, 12px) !important;
+}
+.prod-kpis { gap:8px !important; }
+.prod-kpi { padding: clamp(8px, 1vw, 12px) !important; border-radius:14px !important; }
+.prod-kpi .num { font-size: clamp(22px, 3vw, 34px) !important; }
+.prod-kpi .lbl { font-size: clamp(9px, .75vw, 11px) !important; }
+.prod-actions { gap:8px !important; margin-top:10px !important; }
+.prod-actions .btn-3d { min-height: clamp(36px, 5vh, 44px) !important; font-size: clamp(12px, 1vw, 14px) !important; }
+.prod-hw-card { margin-top:10px !important; padding:8px !important; }
+.prod-hw-row { padding:5px 0 !important; font-size: clamp(10px, .82vw, 12px) !important; }
+.prod-footer { font-size: clamp(9px,.75vw,11px) !important; min-height:18px !important; }
+@media (max-width: 1180px), (max-height: 760px) {
+  .prod-test-body { grid-template-columns: minmax(0,1fr) minmax(250px, 330px) !important; }
+  .prod-kpis { grid-template-columns: repeat(4, minmax(0,1fr)) !important; }
+  .prod-hw-card .detail-line { display:none; }
+  .prod-sequence-log { max-height: 22vh !important; }
+}
+@media (max-width: 900px) {
+  body.production-test-active #production-test-mode { overflow:auto !important; }
+  .prod-test-header { grid-template-columns:1fr !important; }
+  .prod-test-body { grid-template-columns:1fr !important; overflow:visible !important; }
+  .prod-panel { overflow: visible !important; }
+}
+
+
+
+/* AT-MEC_HM_2.29 - Pagina alimentatore PL303 e scanner QR produzione */
+.pl303-channel-grid{display:grid;grid-template-columns:repeat(2,minmax(280px,1fr));gap:14px;}
+.pl303-channel-card{border:1px solid rgba(255,255,255,.14);border-radius:14px;padding:14px;background:rgba(255,255,255,.045);}
+.pl303-card.wide{grid-column:1/-1;}
+@media(max-width:1100px){.pl303-channel-grid{grid-template-columns:1fr;}}
+.pl303-grid { display:grid; grid-template-columns:minmax(320px,.9fr) minmax(380px,1.1fr); gap:14px; align-items:start; }
+.pl303-card { border:1px solid var(--border); border-radius:20px; padding:16px; background:rgba(255,255,255,.045); box-shadow:0 12px 32px rgba(0,0,0,.20); }
+.pl303-display { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:12px 0; }
+.pl303-meter { border:1px solid var(--border); border-radius:18px; padding:16px; text-align:center; background:rgba(0,0,0,.20); }
+.pl303-meter .num { font-size: clamp(28px, 4vw, 46px); font-weight:900; color:var(--accent); font-family:monospace; }
+.pl303-meter .lbl { color:var(--text2); font-size:11px; letter-spacing:1px; }
+.pl303-mode-fields { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.qr-panel { border:1px solid var(--border); border-radius:18px; padding:12px; background:rgba(255,255,255,.04); }
+.qr-big-input { font-size:20px !important; font-weight:900; letter-spacing:1px; }
+@media (max-width: 1050px) { .pl303-grid { grid-template-columns:1fr; } }
+
+
+
+/* AT-MEC_HM_2.29 - Dashboard produzione, wizard tipizzato, Device Manager e branding migliorato */
+#sidebar { overflow-y:auto !important; overflow-x:hidden !important; }
+#sidebar .section-title { flex:0 0 auto; }
+.submenu-title { margin:8px 0 2px; padding:6px 8px; border-radius:10px; background:rgba(0,212,255,.07); color:var(--accent); font-size:11px; font-weight:900; letter-spacing:.7px; }
+.submenu-btn { padding-left:20px !important; border-left:3px solid rgba(0,212,255,.25) !important; }
+.prod-emergency-top { display:flex; flex-direction:column; align-items:center; gap:8px; }
+.prod-test-dev-logo { display:none; max-width:210px; max-height:48px; object-fit:contain; background:transparent; border-radius:10px; padding:4px; }
+.prod-status-banner { margin-top:10px; border-radius:18px; min-height:54px; display:flex; align-items:center; justify-content:center; font-size:clamp(24px,4vw,48px); font-weight:1000; letter-spacing:4px; border:1px solid var(--border); background:rgba(255,255,255,.05); }
+.prod-status-banner.pass { background:rgba(46,204,113,.20); color:var(--pass); border-color:var(--pass); box-shadow:0 0 26px rgba(46,204,113,.22); }
+.prod-status-banner.fail { background:rgba(255,65,54,.20); color:var(--fail); border-color:var(--fail); box-shadow:0 0 26px rgba(255,65,54,.22); }
+.prod-status-banner.running { background:rgba(0,212,255,.14); color:var(--accent); border-color:var(--accent); }
+.prod-status-banner.todo { color:var(--text2); }
+.prod-selector-row { grid-template-columns: minmax(170px,1.1fr) auto minmax(150px,.7fr) minmax(180px,.9fr) !important; gap:8px !important; align-items:end !important; }
+.prod-recipe-name { font-size:clamp(18px,2vw,26px) !important; margin:6px 0 !important; }
+.prod-status-line { padding:6px 8px; border:1px solid rgba(255,255,255,.08); border-radius:12px; background:rgba(255,255,255,.025); }
+.prod-hw-card { max-height:30vh; overflow:auto; }
+.prod-hw-row { display:grid !important; grid-template-columns: minmax(100px,1fr) minmax(70px,.7fr) auto auto; gap:6px; align-items:center; }
+.io-chip .io-state-line { font-size:10px; font-weight:900; margin-top:3px; }
+.io-chip.high .io-state-line { color:var(--pass); }
+.io-chip.low .io-state-line { color:var(--text2); }
+body.logo-white-bg .prod-test-dev-logo, .logo-white-local.prod-test-dev-logo { background:#fff !important; padding:8px !important; }
+@media (max-height:820px) {
+  .prod-test-header { min-height:58px !important; padding:8px 12px !important; }
+  .prod-test-logo { max-height:42px !important; }
+  .prod-test-dev-logo { max-height:34px !important; }
+  .prod-status-banner { min-height:42px; font-size:clamp(20px,3vw,34px); }
+}
+
+
+/* AT-MEC_HM_2.29 - Dashboard produzione moderna e layout responsive definitivo */
+.dashboard-production-grid { display:grid; grid-template-columns:minmax(320px,1.05fr) minmax(300px,.95fr); gap:12px; align-items:start; }
+.dashboard-card { border:1px solid var(--border); border-radius:18px; padding:14px; background:linear-gradient(145deg,rgba(255,255,255,.06),rgba(255,255,255,.018)); box-shadow:0 12px 34px rgba(0,0,0,.18); min-width:0; }
+.dashboard-card h3 { margin:0 0 10px 0; font-size:15px; color:var(--accent); }
+.dashboard-recipe-row { display:grid; grid-template-columns:minmax(170px,1fr) auto auto; gap:8px; align-items:end; }
+.dashboard-meta-row { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:8px; }
+.dashboard-start-row { display:grid; grid-template-columns:1.2fr .8fr; gap:10px; align-items:stretch; margin-top:12px; }
+.dashboard-start-row .btn { min-height:56px; font-size:16px; }
+.dashboard-hw-list { display:grid; gap:7px; }
+.dashboard-hw-row, .device-row-217 { display:grid; grid-template-columns:minmax(120px,1fr) minmax(80px,auto) minmax(58px,auto); gap:8px; align-items:center; border:1px solid var(--border); border-radius:12px; padding:8px 10px; background:rgba(255,255,255,.035); }
+.dashboard-hw-row.live, .device-row-217.live { border-color:rgba(46,204,113,.45); }
+.dashboard-hw-row.fail, .device-row-217.fail { border-color:rgba(231,76,60,.45); }
+.side-card details.submenu-device { border:1px solid var(--border); border-radius:12px; margin:6px 0; background:rgba(0,0,0,.1); }
+.side-card details.submenu-device summary { padding:8px 10px; cursor:pointer; color:var(--accent); font-weight:900; }
+.logo-halo-fix { background:transparent !important; filter: drop-shadow(0 0 1px rgba(0,0,0,.8)) drop-shadow(0 6px 18px rgba(0,0,0,.35)); mix-blend-mode:normal; }
+.logo-white-local, .logo-bg-white { filter:none !important; }
+.recipe-type-tabs { display:grid; grid-template-columns:repeat(auto-fit,minmax(125px,1fr)); gap:8px; margin:10px 0; }
+.recipe-type-tab { border:1px solid var(--border); border-radius:14px; padding:10px; background:rgba(255,255,255,.04); cursor:pointer; text-align:center; font-weight:900; font-size:12px; }
+.recipe-type-tab.active { border-color:var(--accent); color:var(--accent); box-shadow:0 0 0 1px rgba(0,212,255,.25) inset; }
+.large-step-meta .io-live-inline { display:inline-flex; margin-left:8px; }
+@media (max-width: 1250px) { .dashboard-production-grid { grid-template-columns:1fr; } .dashboard-recipe-row, .dashboard-start-row { grid-template-columns:1fr; } }
+@media (max-height: 760px) { .brand-hero { min-height:92px; padding:10px; } .hmi-main-logo-large { max-height:84px; } .kpi-val { font-size:22px; } }
+
+
+
+/* AT-MEC_HM_2.29 - layout test mode, popup sempre in primo piano, wizard/flash/stop */
+.modal-backdrop { z-index: 9800 !important; }
+.modal-backdrop.show { display:flex !important; }
+#fail-decision-modal, #manual-step-modal, #step-wizard { z-index: 9900 !important; }
+.ate-front-modal { position:fixed; inset:0; z-index:9950; display:grid; place-items:center; background:rgba(0,0,0,.72); backdrop-filter:blur(4px); }
+.ate-front-card { width:min(620px,94vw); background:#101826; border:1px solid var(--border); border-radius:20px; padding:18px; box-shadow:0 28px 90px rgba(0,0,0,.72); }
+.ate-front-card h3 { margin:0 0 8px; color:var(--accent); }
+.ate-front-card textarea { width:100%; min-height:110px; resize:vertical; }
+.prod-selector-row-221 { display:grid; grid-template-columns:minmax(180px,1fr) auto auto; gap:8px; align-items:end; margin:6px 0 8px; }
+.prod-meta-row-221 { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin:6px 0 8px; }
+.prod-main-split-221 { display:grid; grid-template-columns:minmax(230px,.75fr) minmax(280px,1.25fr); gap:10px; align-items:start; }
+.prod-main-split-221 .prod-current-step { margin-top:0 !important; min-height:88px !important; }
+.prod-main-split-221 .prod-sequence-log { margin-top:0 !important; max-height:clamp(180px,34vh,330px) !important; }
+.prod-actions .stop-under-pause { margin-top:-4px; }
+.flash-protocol-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; }
+@media (max-width: 1050px) { .prod-selector-row-221,.prod-meta-row-221,.prod-main-split-221,.flash-protocol-grid { grid-template-columns:1fr; } }
+
+
+/* AT-MEC 2.23: layout Test Mode compatto, popup sempre sopra e manual step migliorato */
+.prod-test-body { gap: 10px !important; align-items: start !important; }
+.prod-panel { padding: clamp(8px, 1vh, 12px) !important; }
+.prod-recipe-name { font-size: clamp(14px, 1.35vw, 20px) !important; margin: 3px 0 !important; }
+.prod-status-line { margin: 2px 0 4px !important; }
+.prod-main-split-221 { display:grid; grid-template-columns:minmax(260px,.9fr) minmax(360px,1.25fr); gap:10px; align-items:start; }
+.prod-current-step { min-height: 88px !important; padding: 10px !important; }
+.prod-current-step .value { font-size: clamp(16px, 1.7vw, 24px) !important; }
+.prod-sequence-log { max-height: clamp(180px, 38vh, 360px) !important; overflow:auto !important; }
+.prod-status-banner { font-size: clamp(20px, 3vw, 42px) !important; padding: 8px !important; margin-top: 8px !important; }
+.prod-kpis { gap: 7px !important; }
+.prod-kpi { padding: 8px !important; }
+.prod-kpi .num { font-size: clamp(18px, 2.2vw, 30px) !important; }
+.prod-actions { gap: 7px !important; }
+.prod-actions .btn { padding: 9px 10px !important; }
+#manual-step-modal, #fail-decision-modal, #front-input-modal, .ate-front-modal { z-index: 2147483000 !important; }
+.modal-backdrop.show { z-index: 2147482500 !important; }
+.manual-action-grid { display:grid; grid-template-columns: repeat(auto-fit,minmax(150px,1fr)); gap:8px; width:100%; }
+.sample-wizard-list { display:grid; gap:8px; margin-top:10px; }
+.sample-wizard-item { display:flex; justify-content:space-between; align-items:center; padding:9px; border:1px solid var(--border); border-radius:10px; background:rgba(255,255,255,.04); }
+@media (max-width: 1150px) { .prod-main-split-221 { grid-template-columns:1fr; } .prod-progress-wrap { position:relative; } }
+
+
+
+/* AT-MEC_HM_2.29 - Layout produzione a celle + startup wizard stabile */
+.prod-test-header{padding:8px 14px !important; min-height:54px !important; display:grid !important; grid-template-columns:90px 1fr 170px !important; gap:10px !important; align-items:center !important;}
+.prod-test-logo{max-height:42px !important; max-width:86px !important; object-fit:contain !important;}
+.prod-test-dev-logo{max-height:34px !important; max-width:90px !important; object-fit:contain !important;}
+.prod-test-title h1{font-size:clamp(18px,1.5vw,24px) !important; margin:0 !important;}
+.prod-test-title .subtitle{font-size:11px !important;}
+.prod-test-body{display:grid !important; grid-template-columns:minmax(520px,1.35fr) minmax(360px,.8fr) !important; gap:10px !important; padding:8px 12px 8px !important; height:calc(100vh - 92px) !important; overflow:hidden !important;}
+.prod-panel{padding:10px !important; border-radius:14px !important; min-height:0 !important; overflow:hidden !important;}
+.prod-selector-row-221{display:grid !important; grid-template-columns:minmax(210px,1fr) minmax(110px,.35fr) auto auto !important; gap:8px !important; align-items:end !important;}
+.prod-meta-row-221{display:grid !important; grid-template-columns:1fr 1.2fr !important; gap:8px !important; margin-top:6px !important;}
+.prod-recipe-name{font-size:clamp(13px,1.1vw,17px) !important; margin:4px 0 !important;}
+.prod-status-line{font-size:11px !important; padding:4px 0 !important;}
+.prod-main-split-221{display:grid !important; grid-template-columns:minmax(220px,.85fr) minmax(280px,1.15fr) !important; gap:8px !important; min-height:0 !important; height:min(46vh,380px) !important;}
+.prod-current-step,.prod-sequence-log,.prod-hw-card,.prod-kpis,.prod-actions{border:1px solid var(--border); border-radius:12px; background:rgba(255,255,255,.035);}
+.prod-current-step{min-height:130px !important; padding:10px !important;}
+.prod-current-step .value{font-size:clamp(14px,1.2vw,20px) !important; line-height:1.25 !important;}
+.prod-sequence-log{height:100% !important; overflow:auto !important; padding:8px !important;}
+.prod-progress-wrap{position:fixed !important; left:12px !important; right:12px !important; bottom:22px !important; z-index:20 !important; padding:6px 10px !important; border-radius:12px !important; background:rgba(10,12,20,.94) !important; border:1px solid var(--border) !important;}
+.prod-progress-head{font-size:11px !important;}
+.prod-progress-bar{height:10px !important;}
+.prod-kpis{grid-template-columns:repeat(4,1fr) !important; gap:6px !important; padding:8px !important;}
+.prod-kpi{padding:8px !important;}
+.prod-kpi .num{font-size:clamp(18px,2vw,26px) !important;}
+.prod-actions{display:grid !important; grid-template-columns:1fr !important; gap:8px !important; padding:8px !important; margin-top:8px !important;}
+.prod-hw-card{margin-top:8px !important; padding:10px !important; max-height:34vh !important; overflow:auto !important;}
+.prod-status-banner{font-size:clamp(16px,2vw,26px) !important; padding:10px !important; margin-top:8px !important;}
+.prod-footer{height:18px !important; font-size:10px !important; padding:2px 10px !important;}
+.startup-wizard-modal{position:fixed;inset:0;background:rgba(0,0,0,.78);display:none;align-items:center;justify-content:center;z-index:2147483200;padding:18px;}
+.startup-wizard-modal.show{display:flex;}
+.startup-wizard-card{width:min(980px,calc(100vw - 36px));max-height:calc(100vh - 36px);overflow:auto;background:var(--panel);border:1px solid var(--border);border-radius:18px;box-shadow:0 25px 90px rgba(0,0,0,.65);padding:16px;}
+.startup-wizard-grid{display:grid;grid-template-columns:220px 1fr;gap:12px;}
+.startup-wizard-steps{display:grid;gap:8px;}
+.startup-wizard-step{padding:10px;border-radius:12px;border:1px solid var(--border);background:rgba(255,255,255,.04);font-weight:900;font-size:12px;}
+.startup-wizard-step.active{border-color:var(--accent);color:var(--accent);box-shadow:0 0 0 1px rgba(0,212,255,.25) inset;}
+.startup-cell-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;}
+.startup-cell{border:1px solid var(--border);border-radius:12px;background:rgba(255,255,255,.04);padding:10px;min-height:74px;}
+.startup-cell b{display:block;margin-bottom:5px;}
+@media(max-width:1100px){.prod-test-body{grid-template-columns:1fr !important; overflow:auto !important; height:calc(100vh - 92px) !important; padding-bottom:80px !important;}.prod-main-split-221{height:auto !important;grid-template-columns:1fr !important;}.prod-selector-row-221,.prod-meta-row-221{grid-template-columns:1fr !important;}.startup-wizard-grid{grid-template-columns:1fr;}}
+/* AT-MEC_HM_2.29 - ripristino Test Mode compatto, wizard solo in Test Mode */
+#production-test-mode { grid-template-rows: auto 1fr auto !important; gap: 8px !important; padding: 8px !important; }
+.prod-test-header { min-height: 56px !important; padding: 6px 10px !important; gap: 10px !important; align-items:center !important; }
+.prod-test-logo { max-height: 42px !important; max-width: 120px !important; object-fit:contain !important; }
+.prod-test-dev-logo { max-height: 34px !important; max-width: 92px !important; object-fit:contain !important; }
+.prod-test-title h1 { font-size: clamp(18px, 2.1vw, 28px) !important; margin: 0 !important; line-height: 1.05 !important; }
+.prod-test-title .subtitle { font-size: 11px !important; margin-top: 2px !important; }
+.prod-emergency-top { gap: 8px !important; }
+.prod-top-emergency { padding: 8px 12px !important; font-size: 13px !important; line-height: 1.05 !important; }
+.prod-test-body { gap: 10px !important; grid-template-columns: minmax(0, 1.6fr) minmax(280px, .74fr) !important; overflow: hidden !important; min-height: 0 !important; }
+.prod-panel { padding: 10px !important; min-height:0 !important; overflow:hidden !important; }
+.prod-selector-row-221 { grid-template-columns: minmax(220px,1fr) 120px auto auto auto !important; align-items:end !important; gap: 8px !important; }
+.prod-meta-row-225 { display:grid; grid-template-columns: minmax(180px,1fr) minmax(220px,1.2fr) minmax(210px,.9fr); gap:8px; margin-top:8px; }
+.prod-info-cell { border:1px solid var(--border); border-radius:12px; background:rgba(255,255,255,.035); padding:8px; min-height:72px; }
+.prod-info-cell label:first-child { font-weight:900; font-size:12px; color:var(--accent); }
+.prod-info-cell input, .prod-info-cell select { min-height:34px !important; }
+.prod-recipe-name { font-size: 13px !important; padding: 6px 8px !important; margin: 8px 0 4px !important; }
+.prod-status-line { font-size: 11px !important; padding: 4px 6px !important; min-height: 24px !important; }
+.prod-main-split-221 { grid-template-columns: minmax(240px,.82fr) minmax(280px,1.18fr) !important; gap:8px !important; height: min(36vh, 310px) !important; min-height: 220px !important; }
+.prod-current-step { padding: 10px !important; min-height: 110px !important; }
+.prod-current-step .label { font-size: 11px !important; }
+.prod-current-step .value { font-size: clamp(18px, 2.6vw, 28px) !important; line-height:1.15 !important; }
+.prod-status-banner { min-height: 56px !important; font-size: clamp(22px, 4vw, 42px) !important; border-radius:14px !important; }
+.prod-sequence-log { max-height: 100% !important; overflow:auto !important; }
+.prod-progress-wrap { margin-top:8px !important; padding:8px !important; }
+.prod-kpis { grid-template-columns: repeat(4,1fr) !important; gap:6px !important; }
+.prod-kpi { padding:7px !important; }
+.prod-kpi .num { font-size:20px !important; }
+.prod-actions { display:grid !important; grid-template-columns:1fr !important; gap:6px !important; margin:8px 0 !important; }
+.prod-actions .btn { min-height: 34px !important; padding: 7px 10px !important; }
+.prod-hw-card { max-height: 34vh !important; overflow:auto !important; }
+.startup-wizard-modal { z-index:2147483600 !important; }
+@media (max-height: 780px) { .prod-test-header{min-height:46px!important;padding:4px 8px!important}.prod-test-logo{max-height:32px!important}.prod-test-dev-logo{max-height:28px!important}.prod-test-title h1{font-size:18px!important}.prod-test-title .subtitle{display:none}.prod-main-split-221{height:min(34vh,240px)!important;min-height:185px!important}.prod-info-cell{min-height:62px!important;padding:6px!important}.prod-hw-card{max-height:28vh!important} }
+@media (max-width: 1100px) { .prod-test-body{grid-template-columns:1fr!important; overflow:auto!important}.prod-selector-row-221,.prod-meta-row-225{grid-template-columns:1fr!important}.prod-main-split-221{grid-template-columns:1fr!important;height:auto!important}.prod-panel{overflow:visible!important} }
+
+
+
+/* AT-MEC_HM_2.29 - Test Mode timing/header and logo placement fixes */
+.prod-emergency-top { flex-direction: row !important; align-items:center !important; justify-content:flex-end !important; gap:12px !important; }
+.prod-test-logo { max-width: 192px !important; max-height: 67px !important; }
+.prod-test-dev-logo { max-width: 129px !important; max-height: 48px !important; }
+.prod-timing-strip { display:grid; grid-template-columns: 1.1fr .8fr .8fr; gap:8px; margin:6px 0 8px; }
+.prod-time-cell { border:1px solid rgba(255,255,255,.12); border-radius:12px; background:rgba(0,0,0,.18); padding:8px 10px; min-height:46px; display:flex; flex-direction:column; justify-content:center; }
+.prod-time-cell label { font-size:10px; color:var(--text2); text-transform:uppercase; letter-spacing:.08em; }
+.prod-time-cell b { font-size:18px; color:var(--text); }
+.prod-time-cell.running b { color:#61dafb; }
+.prod-time-cell.pass b { color:var(--pass); }
+.prod-time-cell.fail b { color:var(--fail); }
+.prod-time-cell.stop b { color:var(--warn); }
+.ate-front-modal, #front-choice-modal, #front-input-modal, #manual-step-modal, #fail-decision-modal { z-index:2147483646 !important; }
+.ate-front-card { position:relative; z-index:2147483647 !important; }
+.logo-halo-fix { filter: drop-shadow(0 0 1px rgba(20,20,20,.9)) drop-shadow(0 4px 10px rgba(0,0,0,.30)); }
+body.logo-white-bg .logo-halo-fix { filter:none; }
+@media (max-height: 780px) { .prod-timing-strip{grid-template-columns:1fr 1fr 1fr;gap:6px;margin:4px 0}.prod-time-cell{min-height:38px;padding:5px 8px}.prod-time-cell b{font-size:15px}.prod-test-logo{max-height:44px!important}.prod-test-dev-logo{max-height:34px!important} }
+
+
+/* AT-MEC_HM_3.11 TEST - logo/polling fixes */
+#hmi-main-large-logo { max-width:288px !important; max-height:120px !important; object-fit:contain !important; }
+#app-large-logo { max-width:208px !important; max-height:52px !important; object-fit:contain !important; }
+#prod-company-logo { max-width:154px !important; max-height:54px !important; object-fit:contain !important; }
+#prod-dev-logo { max-width:130px !important; max-height:48px !important; object-fit:contain !important; }
+.pl303-meter-value { transition: color .12s ease; }
+.pl303-meter-value.updated { color: var(--pass); }
+
+
