@@ -1,0 +1,62 @@
+<div id="enterprise-stable-tab" class="tab-content enterprise422-page">
+  <div class="enterprise422-hero">
+    <div>
+      <div class="enterprise422-eyebrow">AT-MEC_HM_4.22_ENTERPRISE_STABLE</div>
+      <h2>🛡️ Enterprise Stability Center</h2>
+      <p>Centro di consolidamento per audit, backup, permessi, logging e consistenza versione. Questa release non cambia il flusso Test Mode: mette in sicurezza i moduli già sviluppati.</p>
+    </div>
+    <div class="enterprise422-score" id="enterprise422-score">--%</div>
+  </div>
+
+  <div class="enterprise422-grid">
+    <section class="enterprise422-card">
+      <h3>🔍 Audit rapido</h3>
+      <p class="hint">Controlla versioni, moduli caricati, localStorage critici, menu Manufacturing, Label, Print, Audio/Voice e handler principali.</p>
+      <div class="row wrap">
+        <button class="btn btn-primary" onclick="runEnterpriseAudit422()">Esegui audit</button>
+        <button class="btn btn-ghost" onclick="exportEnterpriseAudit422()">Esporta audit JSON</button>
+      </div>
+      <div id="enterprise422-audit-list" class="enterprise422-list"></div>
+    </section>
+
+    <section class="enterprise422-card">
+      <h3>💾 Backup / Restore configurazioni</h3>
+      <p class="hint">Backup browser-side delle configurazioni salvate in localStorage: ricette, label, print, audio/voice, work orders, revisioni/firmware e impostazioni UI.</p>
+      <div class="row wrap">
+        <button class="btn btn-success" onclick="exportEnterpriseBackup422()">Backup JSON</button>
+        <label class="btn btn-ghost enterprise422-file">Import backup<input type="file" accept="application/json" onchange="importEnterpriseBackup422(event)"></label>
+      </div>
+      <div id="enterprise422-backup-status" class="enterprise422-status">Nessun backup eseguito in questa sessione.</div>
+    </section>
+
+    <section class="enterprise422-card">
+      <h3>🔐 Permission Audit</h3>
+      <p class="hint">Riepilogo ruoli e utenti da config locale. Il controllo runtime resta affidato ai moduli Users/Roles esistenti.</p>
+      <button class="btn btn-ghost" onclick="renderPermissionAudit422()">Aggiorna permessi</button>
+      <div id="enterprise422-permission-list" class="enterprise422-list"></div>
+    </section>
+
+    <section class="enterprise422-card">
+      <h3>📋 Logging Enterprise</h3>
+      <p class="hint">Registro eventi normalizzato per SYSTEM, DATABASE, TEST, DEVICE, PRINT, AUDIO, VOICE, USER.</p>
+      <div class="row wrap">
+        <select id="enterprise422-log-category">
+          <option>SYSTEM</option><option>DATABASE</option><option>TEST</option><option>DEVICE</option><option>PRINT</option><option>AUDIO</option><option>VOICE</option><option>USER</option>
+        </select>
+        <input id="enterprise422-log-message" placeholder="Messaggio log manuale / verifica">
+        <button class="btn btn-primary" onclick="addEnterpriseLog422()">Aggiungi log</button>
+      </div>
+      <div class="row wrap">
+        <input id="enterprise422-log-filter" placeholder="Filtro log" oninput="renderEnterpriseLogs422()">
+        <button class="btn btn-ghost" onclick="exportEnterpriseLogs422()">Esporta log</button>
+        <button class="btn btn-danger" onclick="clearEnterpriseLogs422()">Svuota log</button>
+      </div>
+      <div id="enterprise422-log-list" class="enterprise422-log-list"></div>
+    </section>
+  </div>
+
+  <div class="enterprise422-card enterprise422-wide">
+    <h3>✅ Checklist stabilità 4.22</h3>
+    <div id="enterprise422-checklist" class="enterprise422-checklist"></div>
+  </div>
+</div>

@@ -1,0 +1,105 @@
+/* AT-MEC_HM_4.16G_CSS_SPLIT - Traceability enterprise, report e layout editor fixes
+   Estratto da app.css originale, ordine preservato. */
+
+/* AT-MEC_HM_4.13A - Storico Seriali & Scheda Unità Enterprise
+   Solo layout dedicato a traceability/unit-card: non tocca Dashboard KPI, Test Mode o Layout Editor. */
+.trace-enterprise-grid{
+  display:grid !important;
+  grid-template-columns:repeat(auto-fit,minmax(210px,1fr)) !important;
+  gap:10px !important;
+  margin-top:10px !important;
+}
+.trace-enterprise-item{
+  border:1px solid rgba(126,231,255,.15) !important;
+  border-radius:14px !important;
+  padding:10px 12px !important;
+  background:rgba(255,255,255,.035) !important;
+  min-height:58px !important;
+}
+.trace-enterprise-item span{
+  display:block !important;
+  color:var(--text2,#9fb8cc) !important;
+  font-size:11px !important;
+  text-transform:uppercase !important;
+  letter-spacing:.07em !important;
+  margin-bottom:4px !important;
+}
+.trace-enterprise-item b{
+  color:var(--text,#eaf6ff) !important;
+  font-size:13px !important;
+  word-break:break-word !important;
+}
+.trace-report-chip{
+  display:inline-flex !important;
+  align-items:center !important;
+  gap:5px !important;
+  border:1px solid rgba(126,231,255,.18) !important;
+  border-radius:999px !important;
+  padding:3px 8px !important;
+  margin:2px !important;
+  background:rgba(126,231,255,.07) !important;
+  color:var(--text,#eaf6ff) !important;
+  font-size:11px !important;
+}
+#traceability-tab .db-mini-table th,
+#unit-card-tab .db-mini-table th{white-space:nowrap !important;}
+@media(max-width:700px){.trace-enterprise-grid{grid-template-columns:1fr !important;}}
+
+
+/* AT-MEC_HM_4.13E_FIX1 - barra superiore, postazione, clienti/loghi, firme */
+.atmec-top-station-bar-413b{
+  position:sticky;top:0;z-index:900;background:linear-gradient(90deg,rgba(8,14,24,.98),rgba(12,24,38,.96));
+  border:1px solid rgba(126,231,255,.22);border-radius:14px;margin:0 0 10px 0;padding:10px 14px;
+  display:flex;align-items:center;justify-content:space-between;gap:12px;box-shadow:0 12px 32px rgba(0,0,0,.25);
+}
+.atmec-app-title-413b{font-size:26px;font-weight:1000;letter-spacing:1.8px;color:#7ee7ff;text-shadow:0 0 18px rgba(126,231,255,.35);font-family:'Segoe UI Semibold','Arial Black',system-ui,sans-serif;white-space:nowrap;}
+.atmec-top-meta-413b{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;font-size:11px;color:var(--text2)}
+.atmec-top-pill-413b{border:1px solid rgba(126,231,255,.25);border-radius:999px;padding:5px 9px;background:rgba(126,231,255,.08)}
+.atmec-top-pill-413b b{color:#fff;margin-left:4px}
+.customer-logo-row-413b{display:grid;grid-template-columns:1fr 1.4fr 1fr auto;gap:8px;align-items:center;border:1px solid var(--border);border-radius:12px;padding:8px;margin:6px 0;background:rgba(255,255,255,.035)}
+.customer-logo-row-413b img{max-height:36px;max-width:100px;object-fit:contain;background:#fff;border-radius:6px;padding:3px}
+.signature-chip-413b{display:inline-flex;gap:6px;align-items:center;border:1px solid rgba(55,255,176,.28);background:rgba(55,255,176,.08);border-radius:999px;padding:5px 9px;margin:2px;color:#dfffea;font-size:11px}
+#sync-settings-host-413b .da412e-sync-card{margin:0!important;}
+
+/* AT-MEC 4.13E_FIX1_LAYOUTFIX1 - Layout Editor save visibility */
+#atmec-save-layout-bar-412lf{background:linear-gradient(135deg,#00d5ff,#37ffb0)!important;color:#06121d!important;border-color:rgba(255,255,255,.55)!important;font-weight:950!important}
+#atmec-autosave-layout-412lf{border-color:rgba(55,255,176,.45)!important;color:#dfffee!important}
+
+/* AT-MEC_HM_4.13E_FIX1 - layout pulito per header, firme, clienti e Data Provider. Additivo, non sovrascrive Test Mode. */
+.atmec-top-station-bar-413c{
+  display:flex;align-items:center;justify-content:space-between;gap:14px;
+  padding:12px 16px;margin:0 0 12px 0;border:1px solid rgba(126,231,255,.22);
+  border-radius:16px;background:linear-gradient(135deg,rgba(7,18,34,.96),rgba(12,34,56,.88));
+  box-shadow:0 12px 28px rgba(0,0,0,.22);position:sticky;top:0;z-index:1000;backdrop-filter:blur(8px)
+}
+.atmec-brand-main-413c{font-family:'Segoe UI Black','Arial Black','Segoe UI',sans-serif;font-size:27px;line-height:1;font-weight:1000;letter-spacing:2.4px;color:#eaf9ff;text-shadow:0 0 16px rgba(0,213,255,.35)}
+.atmec-brand-sub-413c{font-size:11px;font-weight:800;letter-spacing:1.4px;color:#7ee7ff;text-transform:uppercase;margin-top:4px}
+.atmec-top-meta-413c{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.atmec-top-meta-413c span{font-size:11px;font-weight:800;color:#a8c7dd;border:1px solid rgba(126,231,255,.18);background:rgba(255,255,255,.05);padding:6px 9px;border-radius:999px}
+.atmec-top-meta-413c b{color:#fff}
+.atmec-sidebar-title-413c{font-size:20px!important;font-family:'Segoe UI Black','Arial Black','Segoe UI',sans-serif!important;letter-spacing:2px!important;color:#eaf9ff!important;text-shadow:0 0 12px rgba(0,213,255,.30)}
+.page-clean-413c{display:block!important;max-width:100%;overflow:visible!important}
+.settings-grid-413c{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;align-items:end;margin-top:12px}
+.settings-grid-413c .span2{grid-column:span 2}
+.inline-field-413c{display:flex;gap:8px;align-items:center}.inline-field-413c input{flex:1}
+.action-row-413c{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:12px 0}
+.clean-list-413c{display:grid;gap:8px;margin-top:10px;max-height:360px;overflow:auto}
+.customer-row-413c{display:grid;grid-template-columns:minmax(150px,.65fr) minmax(220px,1fr) auto;gap:10px;align-items:center;padding:10px;border:1px solid rgba(255,255,255,.10);border-radius:12px;background:rgba(255,255,255,.04)}
+.customer-row-413c small{display:block;color:#9fb8cc;margin-top:3px}.cl413c-logo-preview{display:flex;align-items:center;gap:10px;min-height:46px}.cl413c-logo-preview img{max-width:96px;max-height:44px;object-fit:contain;background:rgba(255,255,255,.08);border-radius:8px;padding:4px}.cl413c-logo-preview span{font-size:11px;color:#b9cfe0;word-break:break-all}
+.compact-check-grid-413c{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px;margin:8px 0 12px 0}.compact-check-grid-413c label{display:flex!important;flex-direction:row!important;align-items:center!important;gap:8px!important;min-height:34px;border:1px solid rgba(255,255,255,.10);border-radius:10px;padding:7px 9px;background:rgba(255,255,255,.04);font-size:12px!important}.compact-check-grid-413c input{width:auto!important}
+.preview-card-413c{border:1px dashed rgba(126,231,255,.28);border-radius:12px;padding:10px;background:rgba(126,231,255,.05);min-height:76px}.sig-text-413c{font-family:'Segoe Script','Brush Script MT','Segoe UI',sans-serif;color:#fff;line-height:1.15;margin-top:6px}.sig-img-413c{display:block;max-height:70px;object-fit:contain;margin-top:6px;background:rgba(255,255,255,.06);border-radius:8px;padding:3px}.report-signature-413c{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:18px;padding-top:10px;border-top:1px solid #d7e4ee;color:#111}.quality-panel-413c{margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}.quality-panel-413c h4{width:100%;margin:0 0 4px 0}
+.sync-redesign-413c{border:1px solid rgba(126,231,255,.30)!important;border-radius:16px!important;background:linear-gradient(135deg,rgba(8,18,32,.96),rgba(13,31,50,.94))!important;box-shadow:0 14px 34px rgba(0,0,0,.24)!important}.sync-redesign-413c .da412f-config-grid,.sync-redesign-413c .da412h-station-grid{display:grid!important;grid-template-columns:repeat(auto-fit,minmax(210px,1fr))!important;gap:10px!important}.sync-redesign-413c .da412f-check{display:flex!important;flex-direction:row!important;align-items:center!important;gap:8px!important;padding:8px 10px!important;border:1px solid rgba(255,255,255,.10)!important;border-radius:10px!important;background:rgba(255,255,255,.04)!important}.sync-redesign-413c .da412f-check input{width:auto!important}.sync-redesign-413c .da412e-sync-grid{display:grid!important;grid-template-columns:repeat(auto-fit,minmax(150px,1fr))!important;gap:8px!important;margin-top:12px!important}.sync-redesign-413c .row{gap:8px!important;align-items:center!important}
+#data-archive-tab .da412e-sync-card{display:none!important}#sync-settings-tab .da412e-sync-card{display:block!important}
+@media(max-width:900px){.atmec-top-station-bar-413c{position:relative;align-items:flex-start;flex-direction:column}.atmec-top-meta-413c{justify-content:flex-start}.settings-grid-413c .span2{grid-column:span 1}.customer-row-413c{grid-template-columns:1fr}.report-signature-413c{grid-template-columns:1fr}}
+
+
+/* AT-MEC_HM_4.13E_FIX1 - fix barra unica + anteprima report */
+.atmec-report-preview-toolbar{position:sticky;top:0;z-index:9999;display:flex;gap:12px;align-items:center;justify-content:space-between;padding:10px 14px;margin:-10px -10px 18px -10px;background:#111827;color:#fff;border-bottom:2px solid #0ea5e9;font-family:Arial,Helvetica,sans-serif}
+.atmec-report-preview-toolbar span{font-size:12px;color:#cbd5e1;flex:1}.atmec-report-preview-toolbar button{border:0;border-radius:9px;background:#0ea5e9;color:#fff;font-weight:800;padding:8px 12px;cursor:pointer}
+@media print{.atmec-report-preview-toolbar{display:none!important}}
+
+/* AT-MEC_HM_4.13E_FIX1 - Layout drag stability */
+body.atmec-layout-dragging-413e-fix1, body.atmec-layout-dragging-413e-fix1 *{ user-select:none!important; cursor:move!important; }
+#atmec-inspector-358-bar #atmec-save-layout-bar-412lf{background:linear-gradient(135deg,#00d5ff,#37ffb0)!important;color:#06121d!important;border-color:rgba(255,255,255,.45)!important;box-shadow:0 0 0 2px rgba(55,255,176,.18)!important;}
+
+

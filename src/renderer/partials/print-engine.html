@@ -1,0 +1,64 @@
+<div id="print-engine-tab" class="tab-content">
+  <div class="print420-page">
+    <div class="print420-hero">
+      <div>
+        <div class="print420-kicker">AT-MEC_HM_4.20A5_PRINT_ENGINE</div>
+        <h2>🖨️ Industrial Print Engine</h2>
+        <p>Gestione stampanti, code di stampa, storico, diagnostica e ristampa industriale collegata al Test Mode.</p>
+      </div>
+      <div class="print420-actions">
+        <button class="btn btn-primary btn-sm" onclick="refreshPrinters420A5()">🔄 Aggiorna stampanti</button>
+        <button class="btn btn-ghost btn-sm" onclick="createTestPrintJob420A5()">🧪 Test stampa</button>
+        <button class="btn btn-success btn-sm" onclick="processPrintQueue420A5()">▶️ Elabora coda</button>
+      </div>
+    </div>
+
+    <div class="print420-grid-main">
+      <div class="print420-card">
+        <h3>🖨️ Printer Manager</h3>
+        <div class="print420-config-grid">
+          <label>Stampante predefinita<select id="print420-default-printer" onchange="setDefaultPrinter420A5(this.value)"></select></label>
+          <label>Formato etichetta<select id="print420-label-format" onchange="savePrintSettings420A5()"><option>50x30 mm</option><option>58x40 mm</option><option>80x50 mm</option><option>100x50 mm</option><option>Zebra Standard</option><option>TSC Standard</option><option>Custom</option></select></label>
+          <label>Orientamento<select id="print420-orientation" onchange="savePrintSettings420A5()"><option value="portrait">Portrait</option><option value="landscape">Landscape</option></select></label>
+          <label>Ritardo stampa sec.<input id="print420-delay" type="number" min="0" value="0" onchange="savePrintSettings420A5()"></label>
+        </div>
+        <div class="print420-switches">
+          <label><input id="print420-enabled" type="checkbox" onchange="savePrintSettings420A5()"> Abilita stampante</label>
+          <label><input id="print420-simulate" type="checkbox" onchange="savePrintSettings420A5()"> Simula stampa</label>
+          <label><input id="print420-auto-pass" type="checkbox" onchange="savePrintSettings420A5()"> Auto PASS</label>
+          <label><input id="print420-auto-fail" type="checkbox" onchange="savePrintSettings420A5()"> Auto FAIL</label>
+          <label><input id="print420-auto-error" type="checkbox" onchange="savePrintSettings420A5()"> Auto ERROR</label>
+        </div>
+        <div class="print420-config-grid copies">
+          <label>Copie PASS<input id="print420-copies-pass" type="number" min="1" value="1" onchange="savePrintSettings420A5()"></label>
+          <label>Copie FAIL<input id="print420-copies-fail" type="number" min="1" value="1" onchange="savePrintSettings420A5()"></label>
+          <label>Copie ERROR<input id="print420-copies-error" type="number" min="1" value="1" onchange="savePrintSettings420A5()"></label>
+        </div>
+        <div id="print420-printer-list" class="print420-list"></div>
+      </div>
+
+      <div class="print420-card">
+        <h3>🩺 Diagnostica</h3>
+        <div class="print420-diagnostic-grid">
+          <div class="print420-diag ok" id="print420-diag-spooler"><span>Spooler</span><b>OK</b></div>
+          <div class="print420-diag warn" id="print420-diag-default"><span>Default</span><b>Da verificare</b></div>
+          <div class="print420-diag ok" id="print420-diag-driver"><span>Driver</span><b>Disponibile</b></div>
+          <div class="print420-diag info" id="print420-diag-mode"><span>Modalità</span><b>Simulazione</b></div>
+        </div>
+        <div id="print420-status" class="print420-status">Print Engine pronto.</div>
+      </div>
+    </div>
+
+    <div class="print420-grid-2">
+      <div class="print420-card">
+        <div class="print420-card-head"><h3>📋 Print Queue Monitor</h3><button class="btn btn-ghost btn-xs" onclick="clearCompletedPrintJobs420A5()">Pulisci completati</button></div>
+        <div id="print420-queue" class="print420-table"></div>
+      </div>
+      <div class="print420-card">
+        <div class="print420-card-head"><h3>🕘 Print History</h3><button class="btn btn-ghost btn-xs" onclick="exportPrintHistory420A5()">Export JSON</button></div>
+        <div class="print420-filter-row"><input id="print420-history-filter" placeholder="Cerca seriale, commessa, template..." oninput="renderPrintHistory420A5()"></div>
+        <div id="print420-history" class="print420-table"></div>
+      </div>
+    </div>
+  </div>
+</div>

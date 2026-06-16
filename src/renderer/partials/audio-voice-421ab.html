@@ -1,0 +1,90 @@
+<div id="audio-voice-tab" class="tab-content">
+  <div class="av421-page">
+    <div class="av421-hero">
+      <div>
+        <div class="av421-kicker">AT-MEC_HM_4.21AB · Audio + Voice Platform</div>
+        <h2>🔊🎤 Audio Manager & Voice Assistant</h2>
+        <p>Audio eventi, libreria suoni, Text-To-Speech, assistente operatore e comandi vocali base. Modulo indipendente da Melexis/MES.</p>
+      </div>
+      <div class="av421-actions">
+        <button class="btn btn-primary" onclick="audioVoice421PlayEvent('PASS')">▶ Test PASS</button>
+        <button class="btn btn-danger" onclick="audioVoice421PlayEvent('FAIL')">▶ Test FAIL</button>
+        <button class="btn btn-ghost" onclick="refreshAudioVoice421()">🔄 Aggiorna</button>
+      </div>
+    </div>
+
+    <div class="av421-grid av421-kpis">
+      <div class="av421-card"><span>Audio</span><b id="av421-kpi-audio">OFF</b></div>
+      <div class="av421-card"><span>TTS</span><b id="av421-kpi-tts">OFF</b></div>
+      <div class="av421-card"><span>Voice Cmd</span><b id="av421-kpi-voice">OFF</b></div>
+      <div class="av421-card"><span>Eventi log</span><b id="av421-kpi-log">0</b></div>
+    </div>
+
+    <section class="panel av421-panel">
+      <h3>⚙️ Configurazione generale</h3>
+      <div class="av421-form four">
+        <label class="av421-check"><input id="av421-audio-enabled" type="checkbox" onchange="setAudioVoice421Flag('audioEnabled',this.checked)"> Abilita Audio</label>
+        <label class="av421-check"><input id="av421-events-enabled" type="checkbox" onchange="setAudioVoice421Flag('eventAudio',this.checked)"> Audio Eventi</label>
+        <label class="av421-check"><input id="av421-prod-enabled" type="checkbox" onchange="setAudioVoice421Flag('productionAudio',this.checked)"> Audio Produzione</label>
+        <label class="av421-check"><input id="av421-system-enabled" type="checkbox" onchange="setAudioVoice421Flag('systemAudio',this.checked)"> Audio Sistema</label>
+        <label class="av421-check"><input id="av421-recipe-enabled" type="checkbox" onchange="setAudioVoice421Flag('recipeAudio',this.checked)"> Audio Ricette/Step</label>
+        <label class="av421-check"><input id="av421-tts-enabled" type="checkbox" onchange="setAudioVoice421Flag('ttsEnabled',this.checked)"> Text To Speech</label>
+        <label class="av421-check"><input id="av421-voice-enabled" type="checkbox" onchange="setAudioVoice421Flag('voiceCommands',this.checked)"> Comandi vocali</label>
+        <select id="av421-language" onchange="setAudioVoice421Value('language',this.value)"><option value="it-IT">Italiano</option><option value="en-US">English</option><option value="de-DE">Deutsch ready</option><option value="fr-FR">Français ready</option></select>
+      </div>
+      <div class="av421-sliders">
+        <label>Master <input id="av421-vol-master" type="range" min="0" max="100" onchange="setAudioVoice421Value('volumeMaster',this.value)"></label>
+        <label>Eventi <input id="av421-vol-events" type="range" min="0" max="100" onchange="setAudioVoice421Value('volumeEvents',this.value)"></label>
+        <label>Voce <input id="av421-vol-voice" type="range" min="0" max="100" onchange="setAudioVoice421Value('volumeVoice',this.value)"></label>
+      </div>
+    </section>
+
+    <div class="av421-layout">
+      <section class="panel av421-panel">
+        <h3>🔔 Event Engine</h3>
+        <div class="av421-event-grid" id="av421-event-grid"></div>
+      </section>
+
+      <section class="panel av421-panel">
+        <h3>🗣️ Text To Speech</h3>
+        <div class="av421-form">
+          <input id="av421-tts-text" value="Inserire seriale e premere Start Test" placeholder="Testo da pronunciare">
+        </div>
+        <div class="av421-row">
+          <button class="btn btn-primary" onclick="audioVoice421SpeakManual()">🔊 Pronuncia</button>
+          <button class="btn btn-ghost" onclick="audioVoice421StopSpeech()">⏹ Stop voce</button>
+        </div>
+        <div class="hint">Usa la sintesi vocale di Windows/Chrome/Electron. Se non disponibile, il sistema non blocca il Test Mode.</div>
+      </section>
+    </div>
+
+    <section class="panel av421-panel">
+      <h3>🎧 Mapping eventi → audio / testo vocale</h3>
+      <div id="av421-mapping-table" class="av421-table"></div>
+      <div class="av421-row">
+        <button class="btn btn-primary" onclick="saveAudioVoice421Mappings()">💾 Salva mapping</button>
+        <button class="btn btn-ghost" onclick="resetAudioVoice421Mappings()">↩ Reset default</button>
+      </div>
+      <div class="hint">File audio: puoi inserire percorso relativo, es. <b>assets/audio/pass/pass.wav</b>. Se il file non esiste viene usato un tono interno di fallback.</div>
+    </section>
+
+    <div class="av421-layout">
+      <section class="panel av421-panel">
+        <h3>🎤 Voice Commands</h3>
+        <div class="av421-command-box">
+          <div id="av421-voice-state" class="av421-voice-state">Microfono non avviato.</div>
+          <div class="av421-row">
+            <button class="btn btn-success" onclick="startVoiceCommands421()">🎙 Avvia ascolto</button>
+            <button class="btn btn-danger" onclick="stopVoiceCommands421()">⏹ Ferma ascolto</button>
+          </div>
+          <div class="hint">Comandi: “avvia test”, “stop test”, “pausa test”, “ristampa etichetta”, “apri report”. Richiede supporto Web Speech API.</div>
+        </div>
+      </section>
+
+      <section class="panel av421-panel">
+        <h3>📜 Event Log</h3>
+        <div id="av421-event-log" class="av421-log"></div>
+      </section>
+    </div>
+  </div>
+</div>

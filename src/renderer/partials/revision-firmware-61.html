@@ -1,0 +1,90 @@
+<div id="revision-firmware-tab" class="tab-content">
+  <div class="rf61-page">
+    <div class="rf61-hero">
+      <div>
+        <div class="rf61-kicker">AT-MEC_HM_6.1 · Melexis style control</div>
+        <h2>🔧 Revision & Firmware Management</h2>
+        <p>Gestione firmware, revisioni prodotto, binding prodotto→revisione→firmware/ricetta/etichetta e validazioni prima del Test Mode.</p>
+      </div>
+      <div class="rf61-actions">
+        <label class="rf61-switch"><input id="rf61-manufacturing-mode" type="checkbox" onchange="toggleManufacturingMode61(this.checked)"><span>Manufacturing Mode</span></label>
+        <button class="btn btn-primary" onclick="seedDemoRevisionFirmware61()">✨ Demo 6.1</button>
+        <button class="btn btn-ghost" onclick="exportRevisionFirmwareData61()">⬇ Export JSON</button>
+        <button class="btn btn-ghost" onclick="refreshRevisionFirmware61()">🔄 Aggiorna</button>
+      </div>
+    </div>
+
+    <div class="rf61-grid rf61-kpis">
+      <div class="rf61-card"><span>Firmware</span><b id="rf61-kpi-fw">0</b></div>
+      <div class="rf61-card"><span>Revisioni</span><b id="rf61-kpi-rev">0</b></div>
+      <div class="rf61-card"><span>Binding prodotto</span><b id="rf61-kpi-bind">0</b></div>
+      <div class="rf61-card"><span>Change log</span><b id="rf61-kpi-log">0</b></div>
+    </div>
+
+    <section class="panel rf61-panel rf61-mode-panel">
+      <h3>🏭 Manufacturing Layer opzionale</h3>
+      <div class="rf61-mode-grid">
+        <div><b>Standalone OFF</b><br><small>AT-MEC resta ATE classico: Ricetta → Test → Report → Etichetta.</small></div>
+        <div><b>Manufacturing ON</b><br><small>Abilita Work Orders, Product Master, Firmware, Revisioni e validazioni stile Melexis.</small></div>
+      </div>
+      <div id="rf61-mode-state" class="rf61-mode-state">Stato non caricato.</div>
+    </section>
+
+    <div class="rf61-layout">
+      <section class="panel rf61-panel">
+        <h3>🔧 Firmware Manager</h3>
+        <div class="rf61-form two">
+          <input id="rf61-fw-name" placeholder="Nome firmware es. FW_LED_CTRL">
+          <input id="rf61-fw-version" placeholder="Versione es. 2.15.0">
+          <select id="rf61-fw-product"></select>
+          <input id="rf61-fw-release-date" type="date">
+          <select id="rf61-fw-status"><option>Draft</option><option>Test</option><option>Approved</option><option>Obsolete</option></select>
+          <input id="rf61-fw-notes" placeholder="Note rilascio / checksum / path file">
+        </div>
+        <div class="rf61-row"><button class="btn btn-primary" onclick="saveFirmware61()">💾 Salva firmware</button><button class="btn btn-ghost" onclick="clearFirmwareForm61()">Pulisci</button></div>
+        <div id="rf61-firmware-list" class="rf61-list"></div>
+      </section>
+
+      <section class="panel rf61-panel">
+        <h3>📄 Revision Manager</h3>
+        <div class="rf61-form two">
+          <input id="rf61-rev-code" placeholder="Revisione es. REV_C">
+          <input id="rf61-rev-description" placeholder="Descrizione modifica">
+          <select id="rf61-rev-product"></select>
+          <select id="rf61-rev-firmware"></select>
+          <input id="rf61-rev-recipe" placeholder="Ricetta associata">
+          <input id="rf61-rev-label" placeholder="Template etichetta associato">
+          <select id="rf61-rev-status"><option>Draft</option><option>Released</option><option>Approved</option><option>Obsolete</option></select>
+          <input id="rf61-rev-reason" placeholder="Motivo modifica / ECO">
+        </div>
+        <div class="rf61-row"><button class="btn btn-primary" onclick="saveRevision61()">💾 Salva revisione</button><button class="btn btn-ghost" onclick="clearRevisionForm61()">Pulisci</button></div>
+        <div id="rf61-revision-list" class="rf61-list"></div>
+      </section>
+    </div>
+
+    <section class="panel rf61-panel">
+      <div class="rf61-title-row"><h3>🔗 Product Revision Binding</h3><div class="hint">Ogni prodotto può avere più revisioni, ma una revisione attiva per la produzione.</div></div>
+      <div class="rf61-form four">
+        <select id="rf61-bind-product"></select>
+        <select id="rf61-bind-revision"></select>
+        <select id="rf61-bind-firmware"></select>
+        <select id="rf61-bind-mode"><option value="BLOCK">Blocca se mismatch</option><option value="WARN">Solo warning</option><option value="OFF">Validazione OFF</option></select>
+        <input id="rf61-bind-recipe" placeholder="Override ricetta opzionale">
+        <input id="rf61-bind-label" placeholder="Override etichetta opzionale">
+        <input id="rf61-bind-note" placeholder="Note binding">
+      </div>
+      <div class="rf61-row"><button class="btn btn-primary" onclick="saveBinding61()">💾 Salva binding</button><button class="btn btn-ghost" onclick="clearBindingForm61()">Pulisci</button><button class="btn btn-success" onclick="validateSelectedWorkOrder61()">✅ Valida WO selezionata</button></div>
+      <div id="rf61-binding-list" class="rf61-table"></div>
+    </section>
+
+    <section class="panel rf61-panel rf61-validation">
+      <h3>🛡️ Validation Engine</h3>
+      <div id="rf61-validation-box" class="rf61-validation-box">Seleziona una Work Order nella pagina 6.0 e premi Valida WO selezionata.</div>
+    </section>
+
+    <section class="panel rf61-panel">
+      <h3>🕘 Change History</h3>
+      <div id="rf61-change-history" class="rf61-table"></div>
+    </section>
+  </div>
+</div>

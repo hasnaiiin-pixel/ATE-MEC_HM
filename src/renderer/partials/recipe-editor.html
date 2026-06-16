@@ -1,0 +1,86 @@
+<div id="recipe-tab" data-ui-id="recipe.page" class="tab-content">
+      <div class="recipe-page-layout">
+        <div class="recipe-big-card">
+          <h3>🧾 Gestione ricetta</h3>
+          <div class="recipe-page-toolbar">
+            <div class="col"><label>Ricette salvate</label><div class="row"><select id="recipe-list" onchange="refreshRecipeVersions()"></select><button class="btn btn-ghost btn-sm" onclick="loadSavedRecipe(); renderRecipePage()">📂 Carica</button><button class="btn btn-danger btn-sm" onclick="deleteSelectedRecipe()">🗑 Elimina</button></div></div>
+            <div class="col"><label>Versione</label><div class="row"><select id="recipe-version-list"></select><button class="btn btn-ghost btn-sm" onclick="loadSelectedRecipeVersion()">🕘 Carica versione</button></div></div>
+            <div class="col"><label>Nome ricetta</label><input id="recipe-name-page" data-ui-id="recipe.name.input" placeholder="Nome ricetta" oninput="syncRecipeNameInputs('page')"></div>
+            <div class="col"><label>Cliente</label><input id="recipe-client-page" data-ui-id="recipe.client.input" placeholder="Cliente" oninput="syncRecipeClient(this.value)"></div>
+            <div class="col"><label>Prodotto</label><input id="recipe-product-page" data-ui-id="recipe.product.input" placeholder="Prodotto" oninput="syncRecipeProduct(this.value)"></div>
+            <div class="col"><label>Logo cliente</label><input id="recipe-customer-logo-page" data-ui-id="recipe.customer.logo.input" placeholder="assets/customers/CLIENTE.png" oninput="syncRecipeCustomerLogo(this.value)"></div>
+            <div class="col"><label>Alimentazione</label><select id="power-source-page" onchange="syncPowerInputs('page')"><option value="PL303_PROGRAMMABLE">PL303 Programmabile</option><option value="ESP32_RELAY_POWER">ESP32 Relay</option><option value="MANUAL_POWER">Manuale</option></select></div>
+            <label style="display:flex;align-items:center;gap:6px;margin:0;min-width:170px;"><input id="recipe-enabled-page" type="checkbox" checked onchange="syncRecipeEnabledInputs('page')" style="width:auto;"> Ricetta abilitata</label>
+          </div>
+          <div class="modern-panel">
+            <div class="recipe-simple-switch">
+              <div><b>🧩 Recipe Builder 2.0</b><div class="hint">Crea gli step con blocchi grafici e template pronti. I campi avanzati restano disponibili solo quando servono.</div></div>
+              <label style="display:flex;align-items:center;gap:6px;margin:0;"><input id="recipe-simple-mode" type="checkbox" checked onchange="toggleRecipeSimpleMode(this.checked)" style="width:auto;"> Modalità semplice</label>
+            </div>
+            <label>Template rapidi</label>
+            <div class="recipe-template-grid">
+              <button class="recipe-template-btn" onclick="addQuickRecipeStep('ps_on')">🔋 Alimentatore ON<span>CH1/CH2, tensione e limite corrente.</span></button>
+              <button class="recipe-template-btn" onclick="addQuickRecipeStep('ps_off')">🛑 Alimentatore OFF<span>Step sicuro per spegnere uscita.</span></button>
+              <button class="recipe-template-btn" onclick="addQuickRecipeStep('measure_voltage')">📏 Misura tensione<span>Valore atteso con min/max.</span></button>
+              <button class="recipe-template-btn" onclick="addQuickRecipeStep('measure_current')">📈 Misura corrente<span>Consumo reale in ampere.</span></button>
+              <button class="recipe-template-btn" onclick="addQuickRecipeStep('measure_ohm')">Ω Misura ohm<span>Resistenza con tolleranza.</span></button>
+              <button class="recipe-template-btn" onclick="addQuickRecipeStep('multi_channel_resistance')">🧪 Test multi-canale Ω<span>Uscite associate, valori separati e canali guasti.</span></button>
+              <button class="recipe-template-btn" onclick="addQuickRecipeStep('measure_freq')">Hz Frequenza<span>Frequenza con limiti.</span></button>
+              <button class="recipe-template-btn" onclick="addQuickRecipeStep('measure_continuity')">🔔 Continuità<span>Controllo circuito aperto/chiuso.</span></button>
+              <button class="recipe-template-btn" onclick="addQuickRecipeStep('measure_temp')">🌡 Temperatura<span>Misura manuale o sensore futuro.</span></button>
+              <button class="recipe-template-btn" onclick="addQuickRecipeStep('measure_power')">⚡ Potenza<span>Calcolo/controllo Watt.</span></button>
+              <button class="recipe-template-btn" onclick="addQuickRecipeStep('manual_value')">✍️ Valore manuale<span>L’operatore inserisce la misura.</span></button>
+              <button class="recipe-template-btn" onclick="addQuickRecipeStep('delay')">⏱ Attesa<span>Tempo di stabilizzazione.</span></button>
+              <button class="recipe-template-btn advanced-recipe-only" onclick="addQuickRecipeStep('save_variable')">💾 Salva variabile<span>Memorizza una misura per step successivi.</span></button>
+              <button class="recipe-template-btn advanced-recipe-only" onclick="addQuickRecipeStep('if_fail_goto')">🔀 IF FAIL → Step<span>Salto condizionato base su errore.</span></button>
+              <button class="recipe-template-btn advanced-recipe-only" onclick="addQuickRecipeStep('loop_3x')">🔁 Loop 3x<span>Ripete un gruppo di step.</span></button>
+            </div>
+            <div class="advanced-recipe-only">
+              <label>Nuovo step guidato per tipologia avanzata</label>
+              <div class="recipe-type-tabs">
+                <div class="recipe-type-tab active" onclick="selectRecipeStepType('DigitalOutputSet', this)">🔌 Uscita digitale<br><span class="hint">solo DO</span></div>
+                <div class="recipe-type-tab" onclick="selectRecipeStepType('DigitalInputCheck', this)">👁️ Ingresso digitale<br><span class="hint">solo DI</span></div>
+                <div class="recipe-type-tab" onclick="selectRecipeStepType('VoltageMeasurement', this)">📊 Multimetro<br><span class="hint">V/I/Ω/Hz</span></div>
+                <div class="recipe-type-tab" onclick="selectRecipeStepType('PowerSupplySet', this)">🔋 Alimentatore<br><span class="hint">PL303 CH1/CH2</span></div>
+                <div class="recipe-type-tab" onclick="selectRecipeStepType('PowerSupplyMeasureCurrent', this)">📈 Consumo<br><span class="hint">Misura corrente PL303</span></div>
+                <div class="recipe-type-tab" onclick="selectRecipeStepType('ManualMeasurement', this)">✋ Manuale<br><span class="hint">istruzioni + misura</span></div>
+                <div class="recipe-type-tab" onclick="selectRecipeStepType('Delay', this)">⏱ Timer<br><span class="hint">attesa</span></div>
+                <div class="recipe-type-tab" onclick="selectRecipeStepType('SCPICommand', this)">💬 SCPI<br><span class="hint">strumenti</span></div>
+              </div>
+            </div>
+            <select id="new-step-type-page" style="display:none"><option value="DigitalOutputSet">DigitalOutputSet</option><option value="DigitalInputCheck">DigitalInputCheck</option><option value="VoltageMeasurement">VoltageMeasurement</option><option value="CurrentMeasurement">CurrentMeasurement</option><option value="AnalogInputMeasurement">AnalogInputMeasurement</option><option value="ResistanceTest">ResistanceTest</option><option value="FrequencyTest">FrequencyTest</option><option value="ManualMeasurement">ManualMeasurement</option><option value="PowerSupplySet">PowerSupplySet</option><option value="PowerSupplyMeasureCurrent">PowerSupplyMeasureCurrent</option><option value="SCPICommand">SCPICommand</option><option value="Delay">Delay</option><option value="FirmwareFlash">FirmwareFlash</option></select>
+            <div class="recipe-actions-grid">
+              <button class="btn btn-primary" onclick="openStepWizardFromPage()">🧙 Aggiungi step</button>
+              <button class="btn btn-primary" onclick="saveRecipe()">💾 Salva</button>
+              <button class="btn btn-warn" onclick="validateRecipeAdvanced(true)">🩺 Valida ricetta</button>
+              <button class="btn btn-ghost" onclick="exportCurrentRecipe()">📤 Esporta</button>
+              <button class="btn btn-ghost" onclick="importRecipeFile()">📥 Importa</button>
+              <button class="btn btn-ghost" onclick="duplicateRecipe(); renderRecipePage()">📑 Duplica</button>
+              <button class="btn btn-danger" onclick="clearRecipe(); renderRecipePage()">🗑️ Pulisci</button>
+            </div>
+          </div>
+
+          <div class="modern-panel label420-recipe-panel">
+            <b>🏷️ Label Configuration</b>
+            <div class="hint">Associa template etichetta alla ricetta. Questi valori vengono usati in Test Mode per auto-stampa PASS / FAIL / ERRORE.</div>
+            <div class="recipe-actions-grid">
+              <button class="btn btn-ghost" onclick="openLabelManagerForCurrentRecipe420A4()">🏷 Apri Label Manager su questa ricetta</button>
+              <button class="btn btn-ghost" onclick="loadLabelRecipeBindingIntoRecipe420A4()">🔄 Leggi associazione etichette</button>
+              <button class="btn btn-primary" onclick="saveLabelRecipeBindingFromRecipe420A4()">💾 Salva binding etichette</button>
+            </div>
+            <div id="recipe-label-binding-summary" class="hint">Nessuna associazione etichetta caricata.</div>
+          </div>
+          <div class="visual-flow-hint"><span class="flow-block">START</span><span class="flow-block">I/O</span><span class="flow-block">MISURA</span><span class="flow-block">MANUALE</span><span class="flow-block">REPORT</span></div>
+          <div id="recipe-health" class="recipe-health">Verifica ricetta non ancora calcolata.</div>
+          <div class="modern-panel">
+            <b>📊 Qualità base</b>
+            <div id="quality-mini" class="quality-mini-grid"></div>
+          </div>
+          <div class="hint">Gli step sono blocchi grafici: modifica i valori direttamente sul blocco, usa i template rapidi, poi salva la ricetta.</div>
+        </div>
+        <div class="recipe-big-card recipe-step-workspace">
+          <div class="row" style="align-items:center;"><h3 style="flex:1;">🧩 Step ricetta</h3><button class="btn btn-ghost btn-sm" onclick="toggleRecipeDetailsPanel()">👁 Dettagli</button><button class="btn btn-ghost btn-sm" onclick="renderRecipePage()">🔄 Aggiorna</button></div>
+          <div id="recipe-steps-page-list" data-ui-id="recipe.steps.list"></div>
+        </div>
+      </div>
+    </div>

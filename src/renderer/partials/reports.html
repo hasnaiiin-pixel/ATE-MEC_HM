@@ -1,0 +1,43 @@
+<div id="audit-tab" class="tab-content">
+      <div class="recipe-big-card">
+        <h3>📁 Test Report</h3>
+        <div class="hint">Filtra storico per commessa, data test, serial number, operatore, schede PASS/FAIL.</div>
+        <div class="recipe-page-toolbar">
+          <div class="col"><label>Commessa/Lotto</label><input id="audit-lot" placeholder="commessa"></div>
+          <div class="col"><label>Serial Number</label><input id="audit-serial" placeholder="seriale"></div>
+          <div class="col"><label>Operatore</label><input id="audit-operator" placeholder="operatore"></div>
+          <div class="col"><label>Esito</label><select id="audit-result"><option value="ALL">Tutti</option><option value="PASS">PASS</option><option value="FAIL">FAIL</option></select></div>
+          <div class="col"><label>Dal</label><input id="audit-date-from" type="date"></div>
+          <div class="col"><label>Al</label><input id="audit-date-to" type="date"></div>
+          <div class="col"><label>Filtro libero</label><input id="audit-filter" placeholder="ricetta, seriale, note..."></div>
+        </div>
+        <div class="row" style="margin:8px 0;">
+          <button class="btn btn-primary btn-sm" onclick="loadAudit()">🔎 Applica filtri</button>
+          <button class="btn btn-ghost btn-sm" onclick="clearAuditFilters()">🧹 Pulisci</button>
+          <button class="btn btn-ghost btn-sm" onclick="window.api.openCertificatesFolder()">📁 Certificati PDF</button>
+          <button class="btn btn-ghost btn-sm" onclick="exportAuditCsv('ALL')">📤 Esporta storico filtrato CSV</button>
+          <button class="btn btn-ghost btn-sm" onclick="exportAuditCsv('PASS')">✅ Esporta PASS</button>
+          <button class="btn btn-ghost btn-sm" onclick="exportAuditCsv('FAIL')">❌ Esporta FAIL</button>
+          <button class="btn btn-primary btn-sm" onclick="exportSerialHistoryPdf()">🧾 PDF storico seriale/riparazioni</button>
+          <button class="btn btn-success btn-sm" onclick="generateMultiReportPdf412I()">📚 Report multiplo PDF</button>
+        </div>
+        <div class="recipe-big-card report-multi-412i" style="margin-top:10px;">
+          <h3>📚 Report multiplo / dossier lotto</h3>
+          <div class="hint">Usa i filtri sopra, scegli cosa includere e genera un unico documento multipagina. Dalla finestra di stampa puoi salvare come PDF.</div>
+          <div class="row" style="gap:12px;flex-wrap:wrap;margin-top:8px;">
+            <label><input id="multi-cover-412i" type="checkbox" checked> Copertina</label>
+            <label><input id="multi-kpi-412i" type="checkbox" checked> Riepilogo KPI</label>
+            <label><input id="multi-steps-412i" type="checkbox" checked> Step dettagliati</label>
+            <label><input id="multi-measures-412i" type="checkbox" checked> Misure</label>
+            <label><input id="multi-repairs-412i" type="checkbox" checked> Riparazioni/note</label>
+            <label><input id="multi-sign-412i" type="checkbox" checked> Firme</label>
+          </div>
+        </div>
+      </div>
+      <div style="overflow:auto;flex:1;">
+        <table class="audit-tbl" id="audit-tbl">
+          <thead><tr><th>Data test</th><th>Commessa</th><th>Operatore</th><th>Ricetta</th><th>Seriale</th><th>Postazione</th><th>Tempo</th><th>Esito</th><th>Riparazione</th></tr></thead>
+          <tbody id="audit-body"></tbody>
+        </table>
+      </div>
+    </div>

@@ -1,0 +1,115 @@
+<div id="database-tab" class="tab-content">
+      <div class="recipe-big-card">
+        <h3>📊 Database locale & KPI produzione</h3>
+        <div class="hint">Database locale semplice in JSON: ricette versionate, test report, seriali, riparazioni e statistiche. Non richiede installazione server.</div>
+        <div class="recipe-page-toolbar">
+          <div class="col"><label>Commessa/Lotto</label><input id="db-lot" placeholder="commessa"></div>
+          <div class="col"><label>Seriale</label><input id="db-serial" placeholder="seriale"></div>
+          <div class="col"><label>Operatore</label><input id="db-operator" placeholder="operatore"></div>
+          <div class="col"><label>Ricetta</label><input id="db-recipe" placeholder="ricetta"></div>
+          <div class="col"><label>Esito</label><select id="db-result"><option value="ALL">Tutti</option><option value="PASS">PASS</option><option value="FAIL">FAIL</option></select></div>
+          <div class="col"><label>Dal</label><input id="db-date-from" type="date"></div>
+          <div class="col"><label>Al</label><input id="db-date-to" type="date"></div>
+        </div>
+        <div class="row" style="margin:8px 0;">
+          <button class="btn btn-primary btn-sm" onclick="loadDatabaseDashboard()">🔎 Aggiorna KPI</button>
+          <button class="btn btn-ghost btn-sm" onclick="clearDatabaseFilters()">🧹 Pulisci filtri</button>
+          <button class="btn btn-ghost btn-sm" onclick="exportLocalDatabase()">💾 Esporta database locale</button>
+          <button class="btn btn-ghost btn-sm" onclick="exportFilteredReportsCsv()">📤 Export CSV filtrato</button>
+          <button class="btn btn-ghost btn-sm" onclick="backupLocalDatabaseNow()">🧰 Backup DB</button>
+        </div>
+        <div id="db-path" class="hint"></div>
+
+        <div class="recipe-big-card" style="margin-top:12px;border:1px solid rgba(55,182,255,.24);background:rgba(8,20,38,.62);">
+          <h3>🏢 Database Enterprise 4.17B</h3>
+          <div class="hint">Layer dati enterprise con mirror JSON sicuro e SQLite opzionale se il modulo better-sqlite3 è installato. Il runtime stabile resta local-first.</div>
+          <div class="row" style="margin:8px 0;gap:8px;flex-wrap:wrap;">
+            <button class="btn btn-primary btn-sm" onclick="loadEnterpriseDatabaseDashboard()">📊 Stato Enterprise</button>
+            <button class="btn btn-ghost btn-sm" onclick="migrateEnterpriseDatabaseNow()">🔁 Migra 4.17A+B</button>
+            <button class="btn btn-ghost btn-sm" onclick="verifyEnterpriseDatabaseNow()">✅ Verifica integrità</button>
+            <button class="btn btn-ghost btn-sm" onclick="backupEnterpriseDatabaseNow()">🧰 Backup Enterprise</button>
+            <button class="btn btn-ghost btn-sm" onclick="exportEnterpriseDatabaseNow()">📤 Export Enterprise</button>
+          </div>
+          <div class="kpi-grid" style="margin-top:8px;">
+            <div class="kpi-card"><div class="kpi-val" id="edb-users">0</div><div class="kpi-lbl">UTENTI</div></div>
+            <div class="kpi-card"><div class="kpi-val" id="edb-recipes">0</div><div class="kpi-lbl">RICETTE</div></div>
+            <div class="kpi-card"><div class="kpi-val" id="edb-tests">0</div><div class="kpi-lbl">TEST</div></div>
+            <div class="kpi-card"><div class="kpi-val" id="edb-serials">0</div><div class="kpi-lbl">SERIALI</div></div>
+            <div class="kpi-card"><div class="kpi-val" id="edb-repairs">0</div><div class="kpi-lbl">RIPARAZIONI</div></div>
+            <div class="kpi-card"><div class="kpi-val" id="edb-devices">0</div><div class="kpi-lbl">DEVICE</div></div>
+          </div>
+          <div id="enterprise-db-result" class="log-list" style="min-height:90px;margin-top:10px;"><div class="hint">Premi Stato Enterprise o Migra 4.17A+B.</div></div>
+        </div>
+
+        <div class="signature-box" style="margin-top:10px;">
+          <b>✍️ Firma operatore base</b>
+          <div class="recipe-page-toolbar" style="margin-top:8px;">
+            <div class="col"><label>Nome firma</label><input id="operator-signature-name" placeholder="Nome e cognome"></div>
+            <div class="col"><label>PIN / conferma</label><input id="operator-signature-pin" type="password" placeholder="facoltativo"></div>
+            <div class="col"><label>Nota firma</label><input id="operator-signature-note" placeholder="conferma collaudo"></div>
+          </div>
+          <button class="btn btn-ghost btn-sm" onclick="saveOperatorSignature()">💾 Salva firma locale</button>
+          <span id="operator-signature-status" class="hint"></span>
+        </div>
+      </div>
+      <div class="recipe-big-card" style="margin-top:12px;">
+        <h3>📦 Gestione lotti 3.16</h3>
+        <div class="hint">Riepilogo immediato per lotto/commessa: seriali collegati, PASS/FAIL, yield e difetti principali.</div>
+        <div class="recipe-page-toolbar">
+          <div class="col"><label>Lotto / commessa</label><input id="lot-manager-input" placeholder="es. LOT-2026-001"></div>
+          <div class="col"><label>Filtro seriale</label><input id="lot-manager-serial" placeholder="opzionale"></div>
+          <div class="col"><label>Esito</label><select id="lot-manager-result"><option value="ALL">Tutti</option><option value="PASS">PASS</option><option value="FAIL">FAIL</option></select></div>
+        </div>
+        <div class="row" style="margin:8px 0;">
+          <button class="btn btn-primary btn-sm" onclick="loadLotDashboard()">🔎 Carica lotto</button>
+          <button class="btn btn-ghost btn-sm" onclick="exportLotCsv()">📤 CSV lotto</button>
+          <button class="btn btn-ghost btn-sm" onclick="exportLotPdf()">🧾 PDF lotto</button>
+          <button class="btn btn-ghost btn-sm" onclick="copyLotToDbFilters()">↗ Usa filtri KPI</button>
+        </div>
+        <div id="lot-dashboard-result" class="lot-card"><div class="hint">Inserisci un lotto per visualizzare riepilogo produzione.</div></div>
+      </div>
+      <div class="kpi-grid" style="margin-top:12px;">
+        <div class="kpi-card"><div class="kpi-val" id="db-total">0</div><div class="kpi-lbl">TEST</div></div>
+        <div class="kpi-card"><div class="kpi-val" id="db-pass" style="color:var(--pass)">0</div><div class="kpi-lbl">PASS</div></div>
+        <div class="kpi-card"><div class="kpi-val" id="db-fail" style="color:var(--fail)">0</div><div class="kpi-lbl">FAIL</div></div>
+        <div class="kpi-card"><div class="kpi-val" id="db-yield" style="color:var(--accent)">0%</div><div class="kpi-lbl">YIELD</div></div>
+        <div class="kpi-card"><div class="kpi-val" id="db-repairs">0</div><div class="kpi-lbl">RIPARAZIONI</div></div>
+        <div class="kpi-card"><div class="kpi-val" id="db-recipes">0</div><div class="kpi-lbl">RICETTE</div></div>
+        <div class="kpi-card"><div class="kpi-val" id="db-fpy" style="color:var(--accent)">0%</div><div class="kpi-lbl">FPY</div></div>
+        <div class="kpi-card"><div class="kpi-val" id="db-retest-rate">0%</div><div class="kpi-lbl">RETEST</div></div>
+        <div class="kpi-card"><div class="kpi-val" id="db-avg-time">0s</div><div class="kpi-lbl">TEMPO MEDIO</div></div>
+        <div class="kpi-card"><div class="kpi-val" id="db-unique-serials">0</div><div class="kpi-lbl">SERIALI</div></div>
+      </div>
+      <div class="recipe-big-card" style="margin-top:12px;">
+        <h3>📈 KPI per ricetta</h3>
+        <div id="db-by-recipe" class="log-list" style="min-height:160px;"></div>
+      </div>
+      <div class="db-panel-grid">
+        <div class="recipe-big-card">
+          <h3>📉 Trend ultimi giorni</h3>
+          <div id="db-daily-trend" class="log-list" style="min-height:140px;"></div>
+        </div>
+        <div class="recipe-big-card">
+          <h3>🧯 Top guasti / step FAIL</h3>
+          <div id="db-top-failures" class="log-list" style="min-height:140px;"></div>
+        </div>
+        <div class="recipe-big-card">
+          <h3>🏭 KPI industriali 4.10I</h3>
+          <div id="db-industrial-kpi" class="log-list" style="min-height:140px;"><div class="hint">Premi Aggiorna KPI.</div></div>
+        </div>
+      </div>
+      <div class="recipe-big-card" style="margin-top:12px;">
+        <h3>🔎 Storico seriale e riparazioni</h3>
+        <div class="recipe-page-toolbar">
+          <div class="col"><label>Seriale</label><input id="serial-history-input" placeholder="SN da cercare"></div>
+          <div class="col"><label>Commessa/Lotto</label><input id="serial-history-lot" placeholder="opzionale"></div>
+          <div class="col"><label>Nota riparazione</label><input id="serial-repair-note" placeholder="cosa è stato riparato"></div>
+        </div>
+        <div class="row" style="margin:8px 0;">
+          <button class="btn btn-primary btn-sm" onclick="loadSerialHistoryPanel()">🔎 Cerca storico seriale</button>
+          <button class="btn btn-success btn-sm" onclick="saveSerialRepairNote()">🛠 Salva riparazione</button>
+          <button class="btn btn-ghost btn-sm" onclick="exportSerialHistoryPdf()">🧾 PDF storico seriale</button>
+        </div>
+        <div id="serial-history-result" class="serial-history-card"><div class="hint">Inserisci un seriale per vedere test precedenti e riparazioni.</div></div>
+      </div>
+    </div>

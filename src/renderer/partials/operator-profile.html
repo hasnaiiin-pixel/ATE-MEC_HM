@@ -1,0 +1,30 @@
+<div id="operator-profile-tab" class="tab-content">
+      <div class="operator-profile-page-413p">
+        <div class="operator-profile-toolbar-413p">
+          <div>
+            <h2>👤 Profilo collaboratore</h2>
+            <div class="detail-line">Seleziona un operatore per vedere ruolo, permessi, attività e statistiche filtrabili.</div>
+          </div>
+          <div class="operator-profile-controls-413p">
+            <label>Collaboratore
+              <select id="operator-profile-select-413p" onchange="refreshOperatorProfile413O()"><option value="">Collaboratore corrente</option></select>
+            </label>
+            <label>Esito
+              <select id="operator-profile-result-filter-413p" onchange="refreshOperatorProfile413O()">
+                <option value="all">Tutti</option><option value="pass">Solo PASS</option><option value="fail">Solo FAIL</option>
+              </select>
+            </label>
+            <label>Dal
+              <input id="operator-profile-date-from-413p" type="date" onchange="refreshOperatorProfile413O()">
+            </label>
+            <label>Al
+              <input id="operator-profile-date-to-413p" type="date" onchange="refreshOperatorProfile413O()">
+            </label>
+            <label>Cerca seriale/ricetta
+              <input id="operator-profile-search-413p" placeholder="SN, ricetta, lotto..." oninput="refreshOperatorProfile413O()">
+            </label>
+          </div>
+        </div>
+        <div id="operator-profile-content" class="hint">Esegui il login per vedere profilo, autorizzazioni e statistiche personali.</div>
+      </div>
+    </div>

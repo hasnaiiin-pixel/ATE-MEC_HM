@@ -1,0 +1,146 @@
+<div id="run-tab" class="tab-content active">
+  <div class="fcc-page" data-ui-id="dashboard.command.center">
+    <div class="fcc-hero">
+      <div class="fcc-hero-main">
+        <div class="fcc-eyebrow">🏭 FACTORY COMMAND CENTER</div>
+        <h1>AT-MEC HM</h1>
+        <div class="fcc-subtitle">Centro operativo produzione, qualità, dispositivi e traceability</div>
+        <div class="fcc-context-row">
+          <span>Station <b id="fcc-station-id">—</b></span>
+          <span>Postazione <b id="fcc-station-name">—</b></span>
+          <span>Utente <b id="fcc-user-name">—</b></span>
+          <span>Ora <b id="fcc-clock">--:--:--</b></span>
+        </div>
+      </div>
+      <img id="hmi-main-large-logo" class="hmi-main-logo-large fcc-logo" title="Logo HMI principale">
+      <div class="fcc-ai-box">
+        <div class="fcc-ai-title">🤖 AI Factory Copilot</div>
+        <div class="fcc-ai-placeholder">Pronto per comandi naturali: produzione, FAIL, ricette, dispositivi.</div>
+        <div class="fcc-ai-prompt">“Mostrami la produzione di oggi”</div>
+      </div>
+    </div>
+
+    <div class="fcc-kpi-grid">
+      <div class="fcc-kpi pass"><div class="fcc-kpi-value" id="kpi-passed">0</div><div class="fcc-kpi-label">PASS</div><div class="fcc-kpi-note">Unità conformi</div></div>
+      <div class="fcc-kpi fail"><div class="fcc-kpi-value" id="kpi-failed">0</div><div class="fcc-kpi-label">FAIL</div><div class="fcc-kpi-note">Da analizzare</div></div>
+      <div class="fcc-kpi"><div class="fcc-kpi-value" id="kpi-yield">0%</div><div class="fcc-kpi-label">FPY / Yield</div><div class="fcc-kpi-note">Qualità primo passaggio</div></div>
+      <div class="fcc-kpi"><div class="fcc-kpi-value" id="fcc-oee">--%</div><div class="fcc-kpi-label">OEE stimato</div><div class="fcc-kpi-note">Disponibilità + qualità</div></div>
+      <div class="fcc-kpi"><div class="fcc-kpi-value" id="kpi-total">0</div><div class="fcc-kpi-label">Test totali</div><div class="fcc-kpi-note">Periodo corrente</div></div>
+    </div>
+
+    <div class="fcc-main-grid">
+      <section class="fcc-panel fcc-production-panel">
+        <div class="fcc-panel-head"><h3>🧪 Produzione / Ricetta</h3><span class="fcc-status-chip ready">READY</span></div>
+        <div class="dashboard-recipe-row fcc-form-grid">
+          <div class="col"><label>Cliente</label><input id="dash-client-filter" placeholder="filtra cliente" oninput="refreshDashboardRecipes()"></div>
+          <div class="col"><label>Ricetta</label><select id="dash-recipe-select" onchange="loadDashboardRecipeSelection()"></select></div>
+          <button class="btn btn-ghost btn-sm" onclick="refreshDashboardRecipes()">🔄 Ricette</button>
+          <button class="btn btn-primary btn-sm" onclick="loadDashboardRecipeSelection()">📂 Seleziona</button>
+        </div>
+        <div class="dashboard-meta-row fcc-form-grid two">
+          <div class="col"><label>Commessa / Lotto</label><input id="lot-number-dash" placeholder="Commessa produzione" oninput="setLotNumber(this.value); if(window.refreshTestModeLabelPanel420A4) refreshTestModeLabelPanel420A4();"></div>
+          <div class="col"><label>Serial Number scheda</label><input id="serial-dut-dash" placeholder="QR o manuale" oninput="setSerialFromQrPanel(this.value); if(window.refreshTestModeLabelPanel420A4) refreshTestModeLabelPanel420A4();"><label class="hint fcc-inline-check"><input id="serial-required-dash" type="checkbox" checked onchange="setSerialRequired(this.checked)"> SN obbligatorio</label></div>
+        </div>
+        <div class="dashboard-start-row fcc-action-row">
+          <button id="btn-start-dashboard" data-ui-id="dashboard.action.start" class="btn btn-success btn-3d exec-btn atmec-dashboard-action" onclick="startTestFromDashboard()">🚀 Avvia test</button>
+          <button id="btn-pause-dashboard" data-ui-id="dashboard.action.pause" class="btn btn-warn btn-3d exec-btn atmec-dashboard-action" onclick="pauseTest()">⏸ Pausa</button>
+          <button id="btn-stop-dashboard" data-ui-id="dashboard.action.stop" class="btn btn-danger btn-3d exec-btn atmec-dashboard-action" onclick="stopTestAndReset()">🛑 Stop test</button>
+          <button id="btn-testmode-dashboard" data-ui-id="dashboard.action.testmode" class="btn btn-primary btn-3d exec-btn atmec-dashboard-action" onclick="enterProductionTestMode()">🖥 Test Mode</button>
+        </div>
+        <div class="tm-label-panel420" id="tm-label-panel420">
+          <div class="tm-label-head420">
+            <div><b>🏷️ Etichetta Test Mode</b><span id="tm-label-status420">Stampante non configurata</span></div>
+            <button class="btn btn-ghost btn-xs" onclick="openLabelManagerFromTestMode420A4()">👁️ Label Manager</button>
+          </div>
+          <div class="tm-label-body420">
+            <div id="tm-label-preview420" class="tm-label-preview420 waiting">
+              <div class="tm-label-brand420">AT-MEC HM</div>
+              <div class="tm-label-sn420">SN: —</div>
+              <div class="tm-label-meta420">WO: — · LOT: —</div>
+              <div class="tm-label-result420">IN ATTESA</div>
+              <div class="tm-label-qr420">QR</div>
+            </div>
+            <div class="tm-label-controls420">
+              <label><input type="checkbox" id="tm-label-printer-enabled420" onchange="setLabelPrinterEnabled420A4(this.checked)"> Abilita stampante</label>
+              <label><input type="checkbox" id="tm-label-auto-pass420" onchange="setLabelAutoFlag420A4('pass',this.checked)"> Auto PASS</label>
+              <label><input type="checkbox" id="tm-label-auto-fail420" onchange="setLabelAutoFlag420A4('fail',this.checked)"> Auto FAIL</label>
+              <label><input type="checkbox" id="tm-label-auto-error420" onchange="setLabelAutoFlag420A4('error',this.checked)"> Auto ERROR</label>
+              <label><input type="checkbox" id="tm-label-simulate420" onchange="setLabelSimulatePrint420A4(this.checked)"> Simula stampa</label>
+              <button id="tm-label-reprint420" class="btn btn-primary btn-sm" onclick="reprintLastTestLabelFromTestMode420A4()" disabled>🖨️ Ristampa ultima etichetta</button>
+              <small id="tm-label-last420">Ultima stampa: —</small>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="fcc-panel">
+        <div class="fcc-panel-head"><h3>🏭 Factory Overview</h3><button class="btn btn-ghost btn-xs" onclick="refreshFactoryCommandCenter419A1()">Aggiorna</button></div>
+        <div class="fcc-station-grid" id="fcc-station-grid">
+          <div class="fcc-station online"><b>ATE-01</b><span>Online</span></div>
+          <div class="fcc-station online"><b>ATE-02</b><span>Online</span></div>
+          <div class="fcc-station warning"><b>ATE-03</b><span>Warning</span></div>
+          <div class="fcc-station offline"><b>ATE-04</b><span>Offline</span></div>
+        </div>
+      </section>
+
+      <section class="fcc-panel">
+        <div class="fcc-panel-head"><h3>🔌 Device Health</h3><button class="btn btn-ghost btn-xs" onclick="renderDashboardDevices(); refreshFactoryCommandCenter419A1();">Aggiorna</button></div>
+        <div id="dashboard-device-list" class="dashboard-hw-list fcc-device-list"><div class="hint">Caricamento strumenti...</div></div>
+      </section>
+
+      <section class="fcc-panel">
+        <div class="fcc-panel-head"><h3>📊 Produzione oggi</h3><span class="fcc-muted">PASS / FAIL / REPAIR</span></div>
+        <div class="fcc-bars">
+          <div><span>PASS</span><div class="fcc-bar"><i id="fcc-bar-pass"></i></div><b id="fcc-pass-small">0</b></div>
+          <div><span>FAIL</span><div class="fcc-bar fail"><i id="fcc-bar-fail"></i></div><b id="fcc-fail-small">0</b></div>
+          <div><span>REPAIR</span><div class="fcc-bar repair"><i id="fcc-bar-repair"></i></div><b id="fcc-repair-small">0</b></div>
+        </div>
+      </section>
+
+      <section class="fcc-panel fcc-alerts">
+        <div class="fcc-panel-head"><h3>⚠️ Alert Center</h3><span class="fcc-status-chip" id="fcc-alert-count">0 alert</span></div>
+        <div id="fcc-alert-list" class="fcc-alert-list">
+          <div class="fcc-alert ok">✅ Sistema pronto. Nessun allarme critico.</div>
+        </div>
+      </section>
+
+      <section class="fcc-panel fcc-actions-panel">
+        <div class="fcc-panel-head"><h3>⚡ Azioni rapide</h3></div>
+        <div class="fcc-quick-actions">
+          <button class="btn btn-primary" onclick="enterProductionTestMode()">🖥 Test Mode</button>
+          <button class="btn btn-ghost" onclick="showTab('recipe-tab', document.querySelector('[data-tab=recipe]')); renderRecipePage()">📋 Ricette</button>
+          <button class="btn btn-ghost" onclick="showTab('device-tab', null); renderDeviceManagerPage413RA()">🔌 Device Manager</button>
+          <button class="btn btn-ghost" onclick="showTab('production-analysis-tab', null); loadProductionAnalysisDashboard412A()">📊 Analytics</button>
+          <button class="btn btn-ghost" onclick="showTab('traceability-tab', null); initTraceabilitySerialPage()">🔎 Traceability</button>
+          <button class="btn btn-ghost" onclick="showTab('factory-core-tab', null); loadFactoryEnterprise418B()">🏭 Factory</button>
+        </div>
+      </section>
+    </div>
+
+    <div id="result-banner" class="result-banner"></div>
+    <div id="fault-panel" class="fault-panel">
+      <h4>⚠️ FAULT RILEVATO</h4>
+      <p id="fault-cause"></p>
+      <p id="fault-check" style="font-style:italic;"></p>
+      <button class="btn btn-warn btn-sm" onclick="recoverFault()">🔄 RECUPERA</button>
+    </div>
+    <div class="fcc-log-row">
+      <div class="fcc-panel">
+        <div class="fcc-panel-head"><h3>📜 Step Log</h3><button class="btn btn-ghost btn-xs" onclick="clearLog()">Clear</button></div>
+        <div id="run-log" class="log-list fcc-run-log"></div>
+      </div>
+    </div>
+
+    <div class="fcc-hidden-compat" aria-hidden="true">
+      <div class="kpi-val" id="kpi-total-mini">0</div>
+      <div class="kpi-val" id="kpi-passed-mini">0</div>
+      <div class="kpi-val" id="kpi-failed-mini">0</div>
+      <div class="kpi-val" id="kpi-yield-mini">0%</div>
+      <button id="btn-start" onclick="startTest()"></button>
+      <button id="btn-pause" onclick="pauseTest()" disabled></button>
+      <button id="btn-stop" onclick="stopTest()" disabled></button>
+      <input type="checkbox" id="debug-chk" onchange="toggleDebug(this.checked)">
+      <button id="btn-next-step" onclick="nextStep()" disabled></button>
+    </div>
+  </div>
+</div>

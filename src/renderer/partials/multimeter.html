@@ -1,0 +1,91 @@
+<div id="meter-tab" class="tab-content">
+      <div class="wizard-card" style="margin-bottom:12px;">
+        <h3>📊 Keysight 34461A — Multimetro digitale</h3>
+        <div class="hint">Connessione supportata: Ethernet/LAN SCPI TCP 5025, USB/COM se Windows espone una porta seriale, oppure USB/VISA tramite Keysight IO Libraries e bridge VISA esterno. Usa TEST CONNESSIONE prima delle ricette con misure DMM.</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;align-items:end;">
+          <div class="col">
+            <label>Tipo connessione</label>
+            <select id="meter-conn-mode" onchange="syncKeysightMeterMode()">
+              <option value="ETH">Ethernet / LAN SCPI</option>
+              <option value="USB_COM">USB / COM</option>
+              <option value="USB_VISA">USB / VISA Resource</option>
+            </select>
+          </div>
+          <div class="col" id="meter-host-box">
+            <label id="meter-host-label">IP / Host</label>
+            <input id="meter-host" placeholder="192.168.1.100">
+          </div>
+          <div class="col">
+            <label id="meter-port-label">Porta TCP / Baud</label>
+            <input id="meter-port" type="number" value="5025">
+          </div>
+          <div class="col" id="meter-com-box" style="display:none;">
+            <label>Porta USB/COM</label>
+            <div class="row"><select id="meter-com" style="flex:1"><option value="">Seleziona COM</option></select><button class="btn btn-ghost btn-sm" onclick="scanKeysightUsbPorts()">🔎 USB</button></div>
+          </div>
+          <div class="col" id="meter-visa-box" style="display:none;">
+            <label>VISA Resource</label>
+            <div class="row"><input id="meter-visa" style="flex:1" placeholder="USB0::0x2A8D::0x1301::MY57216945::0::INSTR"><button class="btn btn-ghost btn-sm" onclick="scanKeysightVisaResources()">🔎 VISA</button></div>
+          </div>
+          <div class="col">
+            <label>Comando manuale SCPI</label>
+            <input id="meter-manual-cmd" value="*IDN?" placeholder="*IDN? / MEAS:VOLT:DC?">
+          </div>
+        </div>
+        <div class="row" style="margin-top:10px;flex-wrap:wrap;">
+          <button class="btn btn-primary btn-sm" onclick="connectKeysightFromPage()">🔌 Collega Keysight</button>
+          <button class="btn btn-ghost btn-sm" onclick="keysightIdn()">🧾 *IDN?</button>
+          <button class="btn btn-ghost btn-sm" onclick="keysightManualQuery()">⌨ Interroga SCPI</button>
+          <button class="btn btn-ghost btn-sm" onclick="saveKeysightSettingsFromPage()">💾 Salva impostazioni</button>
+        </div>
+        <div id="keysight-status" class="detail-line" style="margin-top:8px;">Stato Keysight: N/D</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div class="meter-display">
+          <div class="meter-label">TENSIONE DC</div>
+          <div class="meter-value" id="m-volt">---</div>
+          <div class="meter-unit">V</div>
+        </div>
+        <div class="meter-display">
+          <div class="meter-label">CORRENTE DC</div>
+          <div class="meter-value" id="m-curr">---</div>
+          <div class="meter-unit">A</div>
+        </div>
+        <div class="meter-display">
+          <div class="meter-label">RESISTENZA</div>
+          <div class="meter-value" id="m-res">---</div>
+          <div class="meter-unit">Ω</div>
+        </div>
+        <div class="meter-display">
+          <div class="meter-label">FREQUENZA</div>
+          <div class="meter-value" id="m-freq">---</div>
+          <div class="meter-unit">Hz</div>
+        </div>
+      </div>
+      <div class="col">
+        <label>Strumento usato dalla ricetta</label>
+        <select id="meter-device">
+          <option value="Keysight_34461A">Keysight 34461A</option>
+          <option value="AimTTi_PL303">Aim-TTi PL303</option>
+        </select>
+      </div>
+      <div class="row" style="flex-wrap:wrap;">
+        <button class="btn btn-primary btn-sm" onclick="queryMeter('MEAS:VOLT:DC?','m-volt','V')">Misura Volt DC</button>
+        <button class="btn btn-primary btn-sm" onclick="queryMeter('MEAS:VOLT:AC?','m-volt','V')">Volt AC</button>
+        <button class="btn btn-primary btn-sm" onclick="queryMeter('MEAS:CURR:DC?','m-curr','A')">Corrente DC</button>
+        <button class="btn btn-primary btn-sm" onclick="queryMeter('MEAS:CURR:AC?','m-curr','A')">Corrente AC</button>
+        <button class="btn btn-primary btn-sm" onclick="queryMeter('MEAS:RES?','m-res','Ω')">Resistenza</button>
+        <button class="btn btn-primary btn-sm" onclick="queryMeter('MEAS:FREQ?','m-freq','Hz')">Frequenza</button>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <label style="margin:0;">Live:</label>
+        <select id="meter-live-command"><option value="MEAS:VOLT:DC?">VDC</option><option value="MEAS:VOLT:AC?">VAC</option><option value="MEAS:CURR:DC?">IDC</option><option value="MEAS:RES?">OHM</option></select>
+        <input type="checkbox" id="auto-poll-chk" onchange="toggleAutoPoll(this.checked)">
+        <span style="font-size:10px;color:var(--text2)">aggiornamento ogni 1500 ms</span>
+      </div>
+      <div>
+        <label>Trend Tensione</label>
+        <canvas id="trendChart" width="800" height="160"></canvas>
+      </div>
+      <div class="log-list" id="keysight-log" style="height:120px;margin-top:8px;"></div>
+    </div>

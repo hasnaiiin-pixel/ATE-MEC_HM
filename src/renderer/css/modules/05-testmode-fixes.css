@@ -1,0 +1,411 @@
+/* AT-MEC_HM_4.16G_CSS_SPLIT - Fix storici Test Mode, SN e produzione
+   Estratto da app.css originale, ordine preservato. */
+
+/* AT-MEC_HM_3.31 - correzioni richieste: login INVIO, FAIL per step, layout KPI/Test Mode/Ricette */
+html, body { min-height:100%; overflow:auto !important; }
+body.production-test-active { overflow:auto !important; }
+body.production-test-active #production-test-mode { overflow-y:auto !important; overflow-x:hidden !important; padding-bottom:28px !important; }
+body.production-test-active .prod-test-body { align-items:start !important; padding-bottom:30px !important; }
+body.production-test-active .prod-kpis { display:grid !important; grid-template-columns:1fr 1fr !important; gap:12px !important; width:100% !important; max-width:430px !important; }
+body.production-test-active .prod-kpi { min-height:86px !important; padding:14px !important; display:flex !important; flex-direction:column !important; justify-content:center !important; }
+body.production-test-active .prod-kpi .num { font-size:clamp(28px,3vw,42px) !important; line-height:1 !important; }
+body.production-test-active .prod-kpi .lbl { font-size:12px !important; white-space:normal !important; }
+body.production-test-active .prod-actions-vertical-318 { margin-top:12px !important; display:flex !important; flex-direction:column !important; align-items:stretch !important; gap:10px !important; }
+body.production-test-active .prod-big-action { justify-content:flex-start !important; text-align:center !important; min-height:58px !important; padding:12px 16px !important; font-size:15px !important; border-radius:14px !important; }
+body.production-test-active .prod-big-action span:last-child { flex:1; text-align:center; }
+body.production-test-active .action-ico { font-size:22px !important; width:36px !important; text-align:center !important; }
+body.production-test-active .prod-current-step { overflow:visible !important; min-height:110px !important; }
+body.production-test-active #prod-current-step { white-space:normal !important; overflow-wrap:anywhere !important; word-break:break-word !important; line-height:1.25 !important; }
+body.production-test-active .prod-status-banner { width:100% !important; min-height:58px !important; font-size:22px !important; display:flex !important; align-items:center !important; justify-content:center !important; }
+body.production-test-active .prod-meta-row-318 { align-items:stretch !important; }
+body.production-test-active .prod-check-card { min-height:112px !important; padding:10px 12px !important; display:grid !important; grid-template-rows:auto auto 1fr !important; }
+body.production-test-active .prod-inline-control { justify-content:space-between !important; gap:12px !important; }
+body.production-test-active .prod-inline-control input[type="checkbox"] { width:48px !important; height:24px !important; flex:0 0 auto !important; accent-color:var(--accent) !important; }
+body.production-test-active .prod-input-row input { min-height:34px !important; }
+body.production-test-active .prod-boxed-hint { min-height:34px !important; padding:6px 8px !important; }
+body.production-test-active .prod-right-timing-326, body.production-test-active .prod-timing-strip { display:grid !important; grid-template-columns:1fr !important; gap:8px !important; margin:0 0 12px 0 !important; }
+body.production-test-active .prod-time-cell { min-height:54px !important; }
+#db-tab, #audit-tab { overflow:auto !important; }
+#db-tab .recipe-big-card, #db-tab .kpi-card, #db-tab .log-list { position:relative !important; z-index:auto !important; }
+#db-tab .kpi-grid { display:grid !important; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)) !important; gap:12px !important; margin:12px 0 !important; }
+#db-tab .db-panel-grid { display:grid !important; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)) !important; gap:12px !important; align-items:start !important; }
+#db-tab .recipe-page-toolbar { display:grid !important; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)) !important; gap:10px !important; align-items:end !important; }
+#recipe-tab { overflow:auto !important; }
+#recipe-tab .recipe-page-toolbar { display:grid !important; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)) !important; gap:10px !important; align-items:end !important; margin-bottom:8px !important; }
+#recipe-tab .recipe-actions-grid { display:flex !important; flex-wrap:wrap !important; align-items:center !important; justify-content:flex-start !important; gap:8px !important; margin:8px 0 12px !important; padding:8px !important; border:1px solid var(--border) !important; border-radius:12px !important; background:rgba(0,0,0,.14) !important; position:sticky !important; top:0 !important; z-index:5 !important; }
+#recipe-tab .recipe-page-layout { display:grid !important; grid-template-columns:280px minmax(0,1fr) !important; gap:14px !important; align-items:start !important; }
+#recipe-tab .recipe-template-grid { display:grid !important; grid-template-columns:1fr !important; gap:8px !important; max-height:calc(100vh - 260px) !important; overflow:auto !important; }
+#recipe-tab .recipe-template-btn { width:100% !important; text-align:left !important; min-height:48px !important; }
+#recipe-tab #recipe-steps-page-list { display:grid !important; gap:10px !important; }
+.recipe-stopfail-331 { margin-top:8px; padding:8px 10px; border:1px solid rgba(255,193,7,.35); border-radius:10px; background:rgba(255,193,7,.08); display:flex; align-items:center; justify-content:space-between; gap:10px; font-size:12px; font-weight:800; }
+.recipe-stopfail-331 input[type="checkbox"] { width:46px; height:22px; accent-color:var(--warn); flex:0 0 auto; }
+.step-live-measure-panel { margin-top:10px !important; border:1px solid rgba(0,212,255,.28) !important; border-radius:14px !important; background:rgba(0,212,255,.07) !important; padding:10px !important; }
+.step-live-measure-panel .live-value { font-size:30px !important; font-weight:900 !important; text-align:center !important; color:var(--accent) !important; }
+.step-live-measure-panel .live-grid { display:grid !important; grid-template-columns:repeat(3,minmax(0,1fr)) !important; gap:6px !important; }
+.step-live-measure-panel .live-cell { border:1px solid var(--border); border-radius:9px; padding:6px; font-size:10px; color:var(--text2); }
+.step-live-measure-panel .live-cell b { display:block; color:var(--text); font-size:12px; margin-top:2px; overflow:hidden; text-overflow:ellipsis; }
+@media(max-width:1150px){ #recipe-tab .recipe-page-layout{grid-template-columns:1fr!important} body.production-test-active .prod-test-body{grid-template-columns:1fr!important} }
+
+
+
+/* AT-MEC_HM_3.33 - correzione reale layout Test Mode da screenshot utente */
+html, body { overflow-y:auto !important; }
+body.production-test-active { overflow-y:auto !important; height:auto !important; min-height:100vh !important; }
+body.production-test-active #production-test-mode{
+  display:flex !important;
+  flex-direction:column !important;
+  height:auto !important;
+  min-height:100vh !important;
+  max-height:none !important;
+  overflow-y:auto !important;
+  overflow-x:hidden !important;
+  padding:8px 10px 28px !important;
+  box-sizing:border-box !important;
+}
+body.production-test-active .prod-test-body{
+  display:grid !important;
+  grid-template-columns:minmax(0,1fr) minmax(300px,360px) !important;
+  gap:10px !important;
+  align-items:start !important;
+  height:auto !important;
+  min-height:0 !important;
+  max-height:none !important;
+  overflow:visible !important;
+  padding-bottom:24px !important;
+}
+body.production-test-active .prod-panel{ overflow:visible !important; min-height:0 !important; }
+body.production-test-active .prod-main-split-221{
+  display:grid !important;
+  grid-template-columns:minmax(0,0.42fr) minmax(0,0.58fr) !important;
+  gap:8px !important;
+  height:auto !important;
+  min-height:280px !important;
+  max-height:none !important;
+  overflow:visible !important;
+}
+body.production-test-active .prod-current-step{
+  min-height:0 !important;
+  height:auto !important;
+  padding:12px !important;
+  overflow:visible !important;
+  text-align:center !important;
+}
+body.production-test-active .prod-current-step .label{ text-align:left !important; }
+body.production-test-active #prod-current-step{
+  display:block !important;
+  width:100% !important;
+  text-align:center !important;
+  margin:6px auto 10px !important;
+  font-size:clamp(24px,2.4vw,36px) !important;
+  line-height:1.18 !important;
+  white-space:normal !important;
+  overflow:visible !important;
+}
+body.production-test-active .step-live-measure-panel{ text-align:left !important; margin-top:8px !important; }
+body.production-test-active .prod-status-banner{
+  position:static !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  width:100% !important;
+  min-height:64px !important;
+  height:auto !important;
+  margin:10px 0 0 !important;
+  padding:14px 18px !important;
+  box-sizing:border-box !important;
+  overflow:visible !important;
+  line-height:1.1 !important;
+  font-size:clamp(22px,2.2vw,34px) !important;
+  text-align:center !important;
+  border-radius:16px !important;
+}
+body.production-test-active .prod-progress-wrap{ margin-top:12px !important; position:static !important; }
+body.production-test-active .prod-meta-row-318{
+  display:grid !important;
+  grid-template-columns:minmax(220px,.9fr) minmax(260px,1.05fr) minmax(300px,1.25fr) !important;
+  gap:8px !important;
+  align-items:stretch !important;
+}
+body.production-test-active .prod-info-cell{ min-height:86px !important; padding:10px !important; }
+body.production-test-active .prod-check-card{
+  min-height:86px !important;
+  padding:10px !important;
+  display:grid !important;
+  grid-template-rows:auto auto 1fr !important;
+  gap:7px !important;
+}
+body.production-test-active .prod-inline-control{
+  width:100% !important;
+  min-height:28px !important;
+  height:28px !important;
+  padding:3px 6px 3px 10px !important;
+  box-sizing:border-box !important;
+  display:grid !important;
+  grid-template-columns:minmax(0,1fr) 44px !important;
+  align-items:center !important;
+  gap:8px !important;
+  font-size:11px !important;
+  border-radius:9px !important;
+}
+body.production-test-active .prod-inline-control span{
+  overflow:hidden !important;
+  text-overflow:ellipsis !important;
+  white-space:nowrap !important;
+  text-align:left !important;
+}
+body.production-test-active .prod-inline-control input[type="checkbox"]{
+  justify-self:end !important;
+  margin:0 !important;
+  width:38px !important;
+  min-width:38px !important;
+  height:20px !important;
+  transform:scale(.88) !important;
+  transform-origin:center right !important;
+}
+body.production-test-active .prod-input-row{ display:grid !important; grid-template-columns:minmax(0,1fr) 46px !important; gap:6px !important; }
+body.production-test-active .prod-input-row input{ min-height:30px !important; height:30px !important; }
+body.production-test-active .prod-boxed-hint{ min-height:30px !important; height:auto !important; padding:6px 8px !important; font-size:10px !important; }
+body.production-test-active .prod-kpis{ grid-template-columns:1fr 1fr !important; gap:10px !important; width:100% !important; max-width:none !important; transform:none !important; }
+body.production-test-active .prod-kpi{ min-height:76px !important; padding:10px !important; border-radius:14px !important; }
+body.production-test-active .prod-kpi .num{ font-size:clamp(30px,3vw,42px) !important; line-height:1 !important; }
+body.production-test-active .prod-kpi .lbl{ font-size:11px !important; }
+body.production-test-active .prod-actions-vertical-318{ display:grid !important; grid-template-columns:1fr !important; gap:10px !important; margin-top:10px !important; }
+body.production-test-active .prod-actions-vertical-318 .prod-big-action{
+  min-height:56px !important;
+  height:56px !important;
+  justify-content:flex-start !important;
+  text-align:center !important;
+  padding:12px 16px !important;
+  border-radius:14px !important;
+}
+body.production-test-active .prod-actions-vertical-318 .prod-big-action span:last-child{ flex:1 !important; text-align:center !important; }
+body.production-test-active .action-ico{ width:34px !important; font-size:20px !important; text-align:center !important; }
+@media(max-width:1150px){
+  body.production-test-active .prod-test-body,
+  body.production-test-active .prod-meta-row-318,
+  body.production-test-active .prod-main-split-221{ grid-template-columns:1fr !important; }
+}
+
+
+
+/* AT-MEC_HM_3.34_TEST_LIGHT - correzioni mirate Test Mode da screenshot utente */
+body.production-test-active #production-test-mode{
+  display:flex !important; flex-direction:column !important; height:100vh !important; max-height:100vh !important;
+  overflow-y:auto !important; overflow-x:hidden !important; padding:8px 12px 16px !important; box-sizing:border-box !important;
+}
+body.production-test-active .prod-test-header{
+  flex:0 0 auto !important; min-height:70px !important; height:auto !important; padding:8px 12px !important;
+  display:grid !important; grid-template-columns:minmax(90px,150px) minmax(0,1fr) minmax(260px,340px) !important;
+  gap:10px !important; align-items:center !important; overflow:visible !important;
+}
+body.production-test-active .prod-test-title{ min-width:0 !important; overflow:hidden !important; }
+body.production-test-active .prod-test-title h1{ font-size:clamp(18px,2vw,28px) !important; line-height:1.1 !important; white-space:nowrap !important; overflow:hidden !important; text-overflow:ellipsis !important; }
+body.production-test-active .prod-test-title .subtitle{ font-size:clamp(9px,.9vw,12px) !important; white-space:nowrap !important; overflow:hidden !important; text-overflow:ellipsis !important; }
+body.production-test-active .prod-emergency-top{
+  min-width:0 !important; width:100% !important; display:grid !important; grid-template-columns:minmax(76px,112px) minmax(150px,210px) !important;
+  gap:8px !important; align-items:center !important; justify-content:end !important; overflow:visible !important;
+}
+body.production-test-active .prod-test-dev-logo{ max-width:112px !important; max-height:44px !important; width:100% !important; object-fit:contain !important; justify-self:end !important; }
+body.production-test-active .prod-top-emergency{
+  width:100% !important; max-width:210px !important; min-height:58px !important; height:58px !important; padding:6px 10px !important;
+  font-size:13px !important; line-height:1.08 !important; border-radius:17px !important; white-space:normal !important; box-sizing:border-box !important; justify-self:end !important;
+}
+body.production-test-active .prod-top-emergency span[style]{ font-size:9px !important; line-height:1.05 !important; }
+body.production-test-active .prod-test-body{
+  flex:1 1 auto !important; min-height:0 !important; overflow-y:auto !important; overflow-x:hidden !important;
+  display:grid !important; grid-template-columns:minmax(0,1fr) minmax(270px,320px) !important; gap:10px !important; align-items:start !important;
+}
+body.production-test-active .prod-panel{ min-height:0 !important; overflow:visible !important; padding:12px !important; }
+body.production-test-active .prod-meta-row-318{ grid-template-columns:minmax(0,.9fr) minmax(0,1.05fr) minmax(0,1.25fr) !important; gap:8px !important; }
+body.production-test-active .prod-info-cell{ min-height:82px !important; padding:10px !important; }
+body.production-test-active .prod-check-card{ min-height:82px !important; display:grid !important; grid-template-rows:auto auto 1fr !important; gap:6px !important; }
+body.production-test-active .prod-inline-control{
+  width:100% !important; max-width:none !important; height:30px !important; min-height:30px !important; padding:3px 8px !important;
+  display:grid !important; grid-template-columns:minmax(0,1fr) 52px !important; gap:10px !important; align-items:center !important; justify-content:stretch !important; box-sizing:border-box !important;
+}
+body.production-test-active .prod-inline-control span{ min-width:0 !important; overflow:hidden !important; text-overflow:ellipsis !important; white-space:nowrap !important; }
+body.production-test-active .prod-inline-control input[type="checkbox"]{ justify-self:end !important; margin:0 !important; width:42px !important; min-width:42px !important; height:22px !important; transform:none !important; }
+body.production-test-active .prod-input-row input{ height:30px !important; min-height:30px !important; }
+body.production-test-active .prod-main-split-221{ grid-template-columns:minmax(320px,.43fr) minmax(0,.57fr) !important; gap:8px !important; min-height:0 !important; height:auto !important; }
+body.production-test-active .prod-current-step{ min-height:0 !important; padding:12px !important; display:flex !important; flex-direction:column !important; }
+body.production-test-active #prod-current-step{ text-align:center !important; align-self:center !important; width:100% !important; margin:4px auto 8px !important; font-size:clamp(26px,3vw,38px) !important; line-height:1.1 !important; }
+body.production-test-active .prod-current-step .label{ text-align:left !important; }
+body.production-test-active .step-live-measure-panel{ margin-top:8px !important; }
+body.production-test-active .prod-status-banner{ min-height:56px !important; margin-top:8px !important; font-size:clamp(28px,4vw,44px) !important; letter-spacing:.08em !important; width:100% !important; box-sizing:border-box !important; }
+body.production-test-active .prod-progress-wrap{
+  position:static !important; margin-top:8px !important; padding:10px !important; min-height:68px !important; display:grid !important;
+  grid-template-columns:minmax(0,1fr) auto !important; grid-template-rows:auto auto !important; align-items:center !important; gap:6px 12px !important;
+}
+body.production-test-active .prod-progress-head{ display:contents !important; }
+body.production-test-active .prod-progress-head span{ grid-column:1 !important; font-size:12px !important; font-weight:800 !important; }
+body.production-test-active .prod-progress-head b{ grid-column:2 !important; grid-row:1 / span 2 !important; font-size:clamp(34px,4vw,52px) !important; align-self:center !important; }
+body.production-test-active .prod-progress-bar{ grid-column:1 !important; height:12px !important; }
+body.production-test-active .prod-timing-strip .prod-time-cell.running,
+body.production-test-active .prod-time-cell.running,
+body.production-test-active #prod-state-cell.running{ animation: atmecStateBlink334 .75s ease-in-out infinite alternate !important; border-color:rgba(0,212,255,.75) !important; }
+body.production-test-active .prod-time-cell.running b,
+body.production-test-active #prod-state-cell.running b{ animation: atmecTextBlink334 .75s ease-in-out infinite alternate !important; }
+@keyframes atmecStateBlink334{from{box-shadow:0 0 0 rgba(0,212,255,0);background:rgba(255,255,255,.04)}to{box-shadow:0 0 18px rgba(0,212,255,.35);background:rgba(0,212,255,.10)}}
+@keyframes atmecTextBlink334{from{opacity:.55;filter:brightness(.9)}to{opacity:1;filter:brightness(1.35)}}
+body.production-test-active .prod-footer{ flex:0 0 auto !important; padding:4px 4px 0 !important; }
+@media(max-width:1200px){
+  body.production-test-active .prod-test-header{ grid-template-columns:1fr !important; }
+  body.production-test-active .prod-emergency-top{ grid-template-columns:1fr 1fr !important; justify-content:stretch !important; }
+  body.production-test-active .prod-test-body,
+  body.production-test-active .prod-meta-row-318,
+  body.production-test-active .prod-main-split-221{ grid-template-columns:1fr !important; }
+}
+
+
+
+/* === AT-MEC 3.35 FIX TEST MODE ===
+   Specifiche utente: switch dentro riquadro a destra, header emergenza compatibile,
+   stato esecuzione lampeggiante in test, progressione FAIL completata via JS. */
+body.production-test-active .prod-header,
+.prod-header{
+  min-height:72px !important;
+  height:auto !important;
+  padding:8px 14px !important;
+  display:grid !important;
+  grid-template-columns:150px minmax(340px,1fr) 260px !important;
+  align-items:center !important;
+  gap:12px !important;
+  overflow:visible !important;
+}
+body.production-test-active .prod-emergency-top,
+.prod-emergency-top{
+  min-height:64px !important;
+  height:auto !important;
+  display:flex !important;
+  flex-direction:row !important;
+  align-items:center !important;
+  justify-content:flex-end !important;
+  gap:12px !important;
+  overflow:visible !important;
+}
+body.production-test-active .prod-top-emergency,
+.prod-top-emergency{
+  min-height:62px !important;
+  height:62px !important;
+  width:150px !important;
+  max-width:150px !important;
+  padding:6px 10px !important;
+  border-radius:16px !important;
+  font-size:13px !important;
+  line-height:1.05 !important;
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  justify-content:center !important;
+  white-space:normal !important;
+  overflow:hidden !important;
+  text-align:center !important;
+  box-sizing:border-box !important;
+}
+body.production-test-active .prod-top-emergency .siren-icon{font-size:14px !important; line-height:1 !important;}
+body.production-test-active .prod-top-emergency span[style]{font-size:9px !important; line-height:1.05 !important;}
+
+/* Riquadro SN obbligatorio / scheda campione uguale al riferimento: testo a sinistra, switch a destra dentro la barra */
+body.production-test-active .prod-check-card,
+.prod-check-card{
+  overflow:visible !important;
+}
+body.production-test-active .prod-check-card .prod-inline-control,
+.prod-check-card .prod-inline-control{
+  width:100% !important;
+  max-width:none !important;
+  height:34px !important;
+  min-height:34px !important;
+  display:grid !important;
+  grid-template-columns:minmax(0,1fr) 52px !important;
+  align-items:center !important;
+  gap:10px !important;
+  padding:5px 8px !important;
+  border-radius:8px !important;
+  box-sizing:border-box !important;
+}
+body.production-test-active .prod-check-card .prod-inline-control span,
+.prod-check-card .prod-inline-control span{
+  min-width:0 !important;
+  overflow:hidden !important;
+  text-overflow:ellipsis !important;
+  white-space:nowrap !important;
+  text-align:left !important;
+}
+body.production-test-active .prod-check-card .prod-inline-control input[type="checkbox"],
+.prod-check-card .prod-inline-control input[type="checkbox"]{
+  justify-self:end !important;
+  align-self:center !important;
+  width:42px !important;
+  min-width:42px !important;
+  max-width:42px !important;
+  height:22px !important;
+  min-height:22px !important;
+  margin:0 !important;
+  transform:none !important;
+  flex:none !important;
+}
+body.production-test-active .prod-check-card .prod-input-row,
+.prod-check-card .prod-input-row{
+  display:grid !important;
+  grid-template-columns:minmax(120px,1fr) 54px !important;
+  gap:8px !important;
+  align-items:center !important;
+  margin-top:6px !important;
+}
+body.production-test-active .sample-cell .prod-boxed-hint,
+.sample-cell .prod-boxed-hint{
+  margin-top:6px !important;
+  min-height:26px !important;
+  display:flex !important;
+  align-items:center !important;
+}
+
+/* Stato esecuzione lampeggiante solo durante test/running */
+body.production-test-active .prod-time-cell.running b,
+body.production-test-active #prod-execution-state.running-blink{
+  animation: atmecExecBlink 0.85s ease-in-out infinite !important;
+  text-shadow:0 0 12px rgba(0,212,255,.65), 0 0 24px rgba(0,212,255,.35) !important;
+}
+@keyframes atmecExecBlink{
+  0%,100%{opacity:1; filter:brightness(1);}
+  50%{opacity:.35; filter:brightness(1.8);}
+}
+
+/* Progress bar: non deve fermarsi a metà dopo FAIL finale */
+body.production-test-active .prod-progress-wrap.final-fail{
+  border-color:rgba(255,59,59,.8) !important;
+  box-shadow:0 0 0 1px rgba(255,59,59,.25), 0 0 24px rgba(255,59,59,.16) !important;
+}
+body.production-test-active .prod-progress-wrap.final-fail .prod-progress-head b{
+  color:#ff4b4b !important;
+}
+
+
+
+/* AT-MEC_HM_3.56_TEST_LIGHT - toolbar ricette, contrasto step, dev UI, multi-canale, fail watchdog */
+#recipe-tab .recipe-actions-grid{position:sticky !important;top:0 !important;z-index:60 !important;display:flex !important;flex-wrap:wrap !important;gap:8px !important;justify-content:flex-start !important;margin:6px 0 12px !important;padding:10px !important;border:1px solid rgba(0,212,255,.25) !important;background:rgba(8,12,22,.97) !important;backdrop-filter:blur(8px);border-radius:14px !important;}
+#recipe-tab .recipe-actions-grid .btn{min-height:36px !important;font-weight:900 !important;}
+#recipe-tab .recipe-flow-card,#recipe-tab .step-row,#recipe-tab .large-step-row{background:linear-gradient(145deg,rgba(10,18,32,.98),rgba(18,28,48,.95)) !important;color:#eaf6ff !important;border:1px solid rgba(255,255,255,.14) !important;box-shadow:0 8px 20px rgba(0,0,0,.22) !important;}
+#recipe-tab .recipe-flow-card *,#recipe-tab .step-row *,#recipe-tab .large-step-row *{color:inherit;}
+#recipe-tab input,#recipe-tab select,#recipe-tab textarea{background:rgba(255,255,255,.08) !important;color:#f6fbff !important;border-color:rgba(255,255,255,.18) !important;}
+#recipe-tab option{background:#101827;color:#f6fbff;}
+.recipe-multichannel-336{margin-top:10px;border:1px solid rgba(0,212,255,.28);border-radius:14px;padding:10px;background:rgba(0,212,255,.06)}
+.recipe-multichannel-head{display:grid;grid-template-columns:1.2fr .9fr .8fr .8fr .8fr .8fr;gap:6px;font-size:11px;font-weight:900;color:var(--accent);margin-bottom:6px;}
+.recipe-multichannel-row{display:grid;grid-template-columns:1.2fr .9fr .8fr .8fr .8fr .8fr;gap:6px;margin-bottom:6px;align-items:center;}
+.recipe-multichannel-row input{min-width:0;height:32px;font-size:12px;}
+.recipe-stopfail-336{margin-top:8px;padding:8px 10px;border:1px solid rgba(255,193,7,.38);border-radius:12px;background:rgba(255,193,7,.09);display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:12px;font-weight:900;color:#fff;}
+.recipe-stopfail-336 .switch336{position:relative;width:54px;height:28px;display:inline-block;flex:0 0 auto;}
+.recipe-stopfail-336 .switch336 input{display:none;}
+.recipe-stopfail-336 .slider336{position:absolute;cursor:pointer;inset:0;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);border-radius:999px;transition:.2s;}
+.recipe-stopfail-336 .slider336:before{content:'';position:absolute;width:22px;height:22px;left:2px;top:2px;background:#fff;border-radius:50%;transition:.2s;box-shadow:0 3px 10px rgba(0,0,0,.45);}
+.recipe-stopfail-336 input:checked + .slider336{background:rgba(255,65,54,.75);border-color:rgba(255,65,54,.95);}
+.recipe-stopfail-336 input:checked + .slider336:before{transform:translateX(26px);}
+#ui-dev-toggle-336{position:fixed;right:14px;bottom:14px;z-index:2147483500;display:none;gap:6px;align-items:center;background:rgba(0,0,0,.75);border:1px solid rgba(0,212,255,.35);border-radius:999px;padding:8px 10px;box-shadow:0 12px 30px rgba(0,0,0,.4)}
+body.admin-session #ui-dev-toggle-336{display:flex;}
+.ui-dev-label-336{position:absolute;z-index:2147483499;pointer-events:none;background:#ffcc00;color:#000;font-size:10px;font-weight:1000;border-radius:5px;padding:2px 5px;box-shadow:0 2px 8px rgba(0,0,0,.5);}
+body.ui-dev-labels-on [data-ui-id]{outline:2px dashed rgba(255,204,0,.85) !important;outline-offset:2px;}
+body.production-test-active #prod-execution-state.running-blink{animation:atmecBlink336 .65s ease-in-out infinite alternate;}
+@keyframes atmecBlink336{from{opacity:.38;text-shadow:none}to{opacity:1;text-shadow:0 0 14px rgba(0,212,255,.85)}}
+
+

@@ -1,0 +1,213 @@
+<div id="label-manager-tab" class="tab-content">
+  <div class="label420-page">
+    <div class="label420-hero">
+      <div>
+        <div class="label420-kicker">AT-MEC HM 4.20A4 FIX1</div>
+        <h2>🏷️ Label Industrial Integration & Designer</h2>
+        <div class="hint">Gestione etichette industriali collegate a ricette, Test Mode, template personalizzati, QR/DataMatrix dinamici, ristampa e print runtime.</div>
+      </div>
+      <div class="label420-actions">
+        <button class="btn btn-primary btn-sm" onclick="loadLabelManager420A2()">🔄 Aggiorna preview</button>
+        <button class="btn btn-ghost btn-sm" onclick="saveLabelTemplate420A2()">💾 Salva template</button>
+        <button class="btn btn-ghost btn-sm" onclick="printLabelPreview420A2()">🖨️ Stampa prova</button>
+      </div>
+    </div>
+
+    <div class="label420-grid-main label420-designer-layout">
+      <div class="label420-card">
+        <h3>⚙️ Configurazione etichetta</h3>
+        <div class="label420-subtitle">📋 Dati ricetta e test</div>
+        <div class="label420-form-grid">
+          <label>Ricetta da sistema
+            <select id="label420-recipe-select" onchange="selectRecipeForLabel420A4()"><option value="">Carica ricette...</option></select>
+          </label>
+          <label>Revisione ricetta
+            <select id="label420-revision-select" onchange="selectRecipeRevision420A3()"><option value="">Ultima</option></select>
+          </label>
+          <label>Template
+            <select id="label420-template" onchange="switchLabelTemplate420A2()">
+              <option value="PASS">PASS</option>
+              <option value="FAIL">FAIL</option>
+              <option value="ERROR">ERRORE</option>
+              <option value="REPAIR">REPAIR</option>
+              <option value="LOTTO">LOTTO</option>
+              <option value="CAMPIONE">CAMPIONE</option>
+            </select>
+          </label>
+          <label>Stampante
+            <select id="label420-printer">
+              <option value="windows-default">Windows predefinita</option>
+              <option value="zebra">Zebra / ZPL</option>
+              <option value="brother">Brother</option>
+              <option value="dymo">Dymo</option>
+            </select>
+          </label>
+          <label>Formato
+            <select id="label420-format" onchange="applyLabelFormat420A2()">
+              <option value="60x40">60 × 40 mm</option>
+              <option value="80x50">80 × 50 mm</option>
+              <option value="100x50">100 × 50 mm</option>
+              <option value="custom">Custom</option>
+            </select>
+          </label>
+          <label>Formato custom W mm
+            <input id="label420-custom-w" type="number" value="60" min="20" max="200" oninput="applyLabelFormat420A2()">
+          </label>
+          <label>Formato custom H mm
+            <input id="label420-custom-h" type="number" value="40" min="10" max="150" oninput="applyLabelFormat420A2()">
+          </label>
+          <label>Griglia
+            <select id="label420-grid" onchange="applyLabelGrid420A2()">
+              <option value="on">Griglia mm ON</option>
+              <option value="off">Griglia OFF</option>
+            </select>
+          </label>
+          <label>Seriale
+            <input id="label420-serial" placeholder="SN12345" oninput="loadLabelManager420A2()">
+          </label>
+          <label>Commessa
+            <input id="label420-workorder" placeholder="COMM001" oninput="loadLabelManager420A2()">
+          </label>
+          <label>Lotto
+            <input id="label420-lot" placeholder="LOT001" oninput="loadLabelManager420A2()">
+          </label>
+          <label>Cliente
+            <input id="label420-customer" placeholder="Cliente" oninput="loadLabelManager420A2()">
+          </label>
+          <label>Ricetta
+            <input id="label420-recipe" placeholder="TEST_24V" oninput="loadLabelManager420A2()">
+          </label>
+          <label>Rev.
+            <input id="label420-recipe-rev" placeholder="REV A" oninput="loadLabelManager420A2()">
+          </label>
+          <label>Firmware
+            <input id="label420-fw" placeholder="FW 1.0" oninput="loadLabelManager420A2()">
+          </label>
+          <label>Report ID
+            <input id="label420-report" placeholder="RPT-0001" oninput="loadLabelManager420A2()">
+          </label>
+        </div>
+        <div class="label420-switches label420-switches-pro">
+          <label><input type="checkbox" id="label420-printer-enabled" onchange="setLabelPrinterEnabled420A4(this.checked)"> Abilita stampante</label>
+          <label><input type="checkbox" id="label420-auto-pass" onchange="setLabelAutoFlag420A4('pass',this.checked)"> Auto stampa PASS</label>
+          <label><input type="checkbox" id="label420-auto-fail" onchange="setLabelAutoFlag420A4('fail',this.checked)"> Auto stampa FAIL</label>
+          <label><input type="checkbox" id="label420-auto-error" onchange="setLabelAutoFlag420A4('error',this.checked)"> Auto stampa ERRORE</label>
+          <label><input type="checkbox" id="label420-simulate-print" onchange="setLabelSimulatePrint420A4(this.checked)"> Simula stampa</label>
+          <label><input type="checkbox" id="label420-log-reprint" checked> Log ristampe</label>
+        </div>
+        <div class="label420-actions-inline">
+          <button class="btn btn-primary btn-sm" onclick="loadRecipeListForLabels420A4()">📋 Carica ricette reali</button>
+          <button class="btn btn-ghost btn-sm" onclick="bindTemplateToRecipe420A4()">🔗 Salva binding ricetta</button>
+          <button class="btn btn-ghost btn-sm" onclick="exportLabelTemplate420A4()">📤 Export template</button>
+          <button class="btn btn-ghost btn-sm" onclick="importLabelTemplate420A4()">📥 Import template</button>
+          <button class="btn btn-ghost btn-sm" onclick="openPrinterManager420A3()">🖨️ Gestione stampanti</button>
+        </div>
+        <div class="label420-binding-panel">
+          <div class="label420-subtitle">🔗 Associazione ricetta → stampa automatica</div>
+          <div class="label420-form-grid">
+            <label>Template PASS<select id="label420-bind-pass"><option>PASS</option><option>FAIL</option><option>ERROR</option><option>REPAIR</option><option>LOTTO</option><option>CAMPIONE</option></select></label>
+            <label>Template FAIL<select id="label420-bind-fail"><option>FAIL</option><option>PASS</option><option>ERROR</option><option>REPAIR</option><option>LOTTO</option><option>CAMPIONE</option></select></label>
+            <label>Template ERRORE<select id="label420-bind-error"><option>ERROR</option><option>FAIL</option><option>PASS</option><option>REPAIR</option><option>LOTTO</option><option>CAMPIONE</option></select></label>
+            <label>Template REPAIR<select id="label420-bind-repair"><option>REPAIR</option><option>FAIL</option><option>PASS</option><option>ERROR</option><option>LOTTO</option><option>CAMPIONE</option></select></label>
+          </div>
+          <div class="label420-switches label420-switches-pro">
+            <label><input type="checkbox" id="label420-confirm-before-print"> Conferma prima di stampare</label>
+            <label><input type="checkbox" id="label420-enable-testmode-integration" checked> Collegamento Test Mode</label>
+            <label><input type="checkbox" id="label420-save-print-history" checked> Storico stampe</label>
+          </div>
+        </div>
+        <div class="label420-subtitle">🏷️ Payload QR / DataMatrix Builder</div>
+        <div class="label420-builder-card">
+          <div class="label420-builder-head"><b>Composizione campi</b><span>Seleziona campi, separatore e simboli. Il payload viene generato automaticamente.</span></div>
+          <div id="label420-payload-fields" class="label420-field-chip-grid"></div>
+          <div class="label420-form-grid label420-builder-controls">
+            <label>Separatore<select id="label420-payload-sep" onchange="buildLabelPayload420A4()"><option value=";">;</option><option value="|">|</option><option value="-">-</option><option value="_">_</option><option value=":">:</option><option value="/">/</option><option value=" ">Spazio</option></select></label>
+            <label>Prefisso opzionale<input id="label420-payload-prefix" placeholder="Es. AT-MEC" oninput="buildLabelPayload420A4()"></label>
+            <label>Simbolo extra<select id="label420-payload-symbol" onchange="buildLabelPayload420A4()"><option value="">Nessuno</option><option value="#">#</option><option value="@">@</option><option value="+">+</option><option value="=">=</option><option value=".">.</option><option value=",">,</option></select></label>
+            <label>Formato payload<select id="label420-payload-mode" onchange="buildLabelPayload420A4()"><option value="keyvalue">KEY=VALORE</option><option value="values">Solo valori</option><option value="compact">Compatto</option></select></label>
+          </div>
+          <textarea id="label420-qr-payload" class="label420-payload-output" readonly></textarea>
+          <textarea id="label420-dm-payload" class="label420-payload-output" readonly></textarea>
+          <div class="label420-actions-inline">
+            <button class="btn btn-primary btn-sm" onclick="buildLabelPayload420A4(true)">🔗 Genera e applica payload</button>
+            <button class="btn btn-ghost btn-sm" onclick="togglePayloadAdvanced420A4()">👁 Output tecnico</button>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="label420-card label420-preview-card label420-designer-card">
+        <div class="label420-designer-head">
+          <h3>👀 Designer & anteprima reale</h3>
+          <div class="label420-designer-info"><span id="label420-format-info">60 × 40 mm</span><span id="label420-selected-info">Nessun elemento selezionato</span></div>
+        </div>
+        <div id="label420-preview-wrap" class="label420-preview-wrap label420-canvas-wrap">
+          <div id="label420-preview" class="label420-preview label420-designer-canvas pass" data-format="60x40"></div>
+        </div>
+        <div class="hint">Trascina gli elementi nel canvas. Le posizioni sono salvate in mm logici e possono essere riutilizzate per PASS, FAIL, REPAIR, LOTTO e CAMPIONE.</div>
+
+        <div class="label420-toolbar">
+          <div class="label420-toolbar-title">🎨 Designer elementi</div>
+          <div class="label420-toolbar-grid">
+            <button class="btn btn-ghost btn-sm" onclick="addLabelElement420A2('text')">📝 Testo</button>
+            <button class="btn btn-ghost btn-sm" onclick="addLabelElement420A2('field')">📊 Campo</button>
+            <button class="btn btn-ghost btn-sm" onclick="addLabelElement420A2('logo')">🏢 Logo</button>
+            <button class="btn btn-ghost btn-sm" onclick="addLabelElement420A2('qr')">🏷️ QR</button>
+            <button class="btn btn-ghost btn-sm" onclick="addLabelElement420A2('barcode')">▌▌ Barcode</button>
+            <button class="btn btn-ghost btn-sm" onclick="addLabelElement420A2('datamatrix')">▦ DataMatrix</button>
+            <button class="btn btn-ghost btn-sm" onclick="duplicateLabelElement420A2()">📋 Duplica</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteLabelElement420A2()">🗑️ Elimina</button>
+          </div>
+        </div>
+
+        <div class="label420-inspector">
+          <h3>🧩 Proprietà elemento</h3>
+          <div id="label420-inspector-empty" class="hint">Seleziona un elemento nell'etichetta per modificarlo.</div>
+          <div id="label420-inspector-form" class="label420-inspector-form" style="display:none;">
+            <label>Testo / Campo
+              <input id="label420-prop-text" oninput="updateSelectedLabelElement420A2()" placeholder="Testo o ${SERIALE}">
+            </label>
+            <div class="label420-prop-grid">
+              <label>X mm<input id="label420-prop-x" type="number" step="1" oninput="updateSelectedLabelElement420A2()"></label>
+              <label>Y mm<input id="label420-prop-y" type="number" step="1" oninput="updateSelectedLabelElement420A2()"></label>
+              <label>W mm<input id="label420-prop-w" type="number" step="1" oninput="updateSelectedLabelElement420A2()"></label>
+              <label>H mm<input id="label420-prop-h" type="number" step="1" oninput="updateSelectedLabelElement420A2()"></label>
+              <label>Font<input id="label420-prop-font" type="number" step="1" oninput="updateSelectedLabelElement420A2()"></label>
+              <label>Allineamento
+                <select id="label420-prop-align" onchange="updateSelectedLabelElement420A2()">
+                  <option value="left">Sinistra</option>
+                  <option value="center">Centro</option>
+                  <option value="right">Destra</option>
+                </select>
+              </label>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="label420-card label420-runtime-card">
+      <h3>🔄 Ristampa etichetta da seriale / commessa</h3>
+      <div class="label420-form-grid">
+        <label>Seriale da ristampare<input id="label420-reprint-serial" placeholder="SN12345"></label>
+        <label>Commessa / Lotto<input id="label420-reprint-workorder" placeholder="COMM001 / LOT001"></label>
+        <label>Motivo ristampa<input id="label420-reprint-reason" placeholder="Es. etichetta danneggiata"></label>
+        <label>Template ristampa
+          <select id="label420-reprint-template"><option>PASS</option><option>FAIL</option><option>ERROR</option><option>REPAIR</option><option>LOTTO</option><option>CAMPIONE</option></select>
+        </label>
+      </div>
+      <div class="label420-actions-inline">
+        <button class="btn btn-ghost btn-sm" onclick="loadLastTestForReprint420A3()">🔎 Recupera ultimo test</button>
+        <button class="btn btn-primary btn-sm" onclick="reprintLabel420A3()">🖨️ Ristampa etichetta</button>
+      </div>
+      <div id="label420-runtime-status" class="label420-runtime-status">Pronto. La ristampa registra seriale, commessa, utente e motivo.</div>
+    </div>
+
+    <div class="label420-grid-3">
+      <div class="label420-card"><h3>📦 Template disponibili</h3><div id="label420-template-list" class="label420-list"></div></div>
+      <div class="label420-card"><h3>🔄 Dati dinamici</h3><div id="label420-fields-list" class="label420-list"></div></div>
+      <div class="label420-card"><h3>🖨️ Print Engine Foundation</h3><div id="label420-print-status" class="label420-list"></div></div>
+    </div>
+  </div>
+</div>

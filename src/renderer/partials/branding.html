@@ -1,0 +1,47 @@
+<div id="branding-tab" class="tab-content">
+      <div class="recipe-big-card">
+        <h3>🏷️ Loghi HMI, Login e Test Report</h3>
+        <div class="hint">Configurazione centralizzata dei loghi. Solo utenti Admin possono caricare o cambiare immagini.</div>
+        <div id="branding-admin-warning" class="brand-admin-warning">Per modificare i loghi devi accedere come Admin.</div>
+        <div class="logo-bg-mode-row"><div><b>Sfondo loghi</b><div class="detail-line">Scegli trasparenza originale PNG oppure sfondo bianco automatico.</div></div><select id="logo-bg-mode" class="brand-admin-only" onchange="saveLogoBackgroundMode()"><option value="transparent">Trasparente</option><option value="white">Sfondo bianco</option></select></div>
+        <button class="btn btn-ghost btn-sm brand-admin-only" onclick="resetDefaultLogos()">↩️ Ripristina loghi default M/MEC/MIRZA</button>
+        <div class="brand-grid">
+          <div class="brand-logo-card">
+            <div class="brand-logo-title">Login — logo grande</div>
+            <div class="brand-logo-desc">Default: M LOGO. Mostrato grande nella finestra login.</div>
+            <button class="btn btn-primary btn-sm brand-admin-only" onclick="selectLogo('loginLarge')">📂 Scegli logo grande login</button><select class="brand-admin-only logo-mode-select" data-logo-kind="loginLarge" onchange="saveLogoBgKind('loginLarge', this.value)"><option value="transparent">Trasparente</option><option value="white">Sfondo bianco</option></select>
+            <img id="loginLarge-logo-preview">
+          </div>
+          <div class="brand-logo-card">
+            <div class="brand-logo-title">Login — logo piccolo</div>
+            <div class="brand-logo-desc">Default: MEC. Logo piccolo/azienda nella pagina login.</div>
+            <button class="btn btn-primary btn-sm brand-admin-only" onclick="selectLogo('loginSmall')">📂 Scegli logo piccolo login</button><select class="brand-admin-only logo-mode-select" data-logo-kind="loginSmall" onchange="saveLogoBgKind('loginSmall', this.value)"><option value="transparent">Trasparente</option><option value="white">Sfondo bianco</option></select>
+            <img id="loginSmall-logo-preview">
+          </div>
+          <div class="brand-logo-card">
+            <div class="brand-logo-title">HMI principale — logo aziendale grande</div>
+            <div class="brand-logo-desc">Default: MEC. Logo azienda grande nella HMI principale.</div>
+            <button class="btn btn-primary btn-sm brand-admin-only" onclick="selectLogo('hmiLarge')">📂 Scegli logo HMI grande</button><select class="brand-admin-only logo-mode-select" data-logo-kind="hmiLarge" onchange="saveLogoBgKind('hmiLarge', this.value)"><option value="transparent">Trasparente</option><option value="white">Sfondo bianco</option></select>
+            <img id="hmiLarge-logo-preview">
+          </div>
+          <div class="brand-logo-card">
+            <div class="brand-logo-title">HMI principale — logo piccolo sviluppatore</div>
+            <div class="brand-logo-desc">Default: MIRZA. Logo piccolo sviluppatore nella barra superiore.</div>
+            <button class="btn btn-primary btn-sm brand-admin-only" onclick="selectLogo('developerSmall')">📂 Scegli logo sviluppatore</button><select class="brand-admin-only logo-mode-select" data-logo-kind="developerSmall" onchange="saveLogoBgKind('developerSmall', this.value)"><option value="transparent">Trasparente</option><option value="white">Sfondo bianco</option></select>
+            <img id="developerSmall-logo-preview">
+          </div>
+          <div class="brand-logo-card">
+            <div class="brand-logo-title">Test report — logo azienda</div>
+            <div class="brand-logo-desc">Default: MEC in alto a sinistra nel report, senza sovrapposizione testo.</div>
+            <button class="btn btn-primary btn-sm brand-admin-only" onclick="selectLogo('reportLarge')">📂 Scegli logo report grande</button><select class="brand-admin-only logo-mode-select" data-logo-kind="reportLarge" onchange="saveLogoBgKind('reportLarge', this.value)"><option value="transparent">Trasparente</option><option value="white">Sfondo bianco</option></select>
+            <img id="reportLarge-logo-preview">
+          </div>
+          <div class="brand-logo-card">
+            <div class="brand-logo-title">Test report — logo sviluppatore</div>
+            <div class="brand-logo-desc">Default: MIRZA in alto a destra nel report, senza sovrapposizione testo.</div>
+            <button class="btn btn-primary btn-sm brand-admin-only" onclick="selectLogo('reportSmall')">📂 Scegli logo report piccolo</button><select class="brand-admin-only logo-mode-select" data-logo-kind="reportSmall" onchange="saveLogoBgKind('reportSmall', this.value)"><option value="transparent">Trasparente</option><option value="white">Sfondo bianco</option></select>
+            <img id="reportSmall-logo-preview">
+          </div>
+        </div>
+      </div>
+    </div>

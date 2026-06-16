@@ -1,0 +1,223 @@
+/* AT-MEC_HM_4.18B_FACTORY_ENTERPRISE_FIX5
+   Definitive layout isolation for Factory Enterprise and login logo clamp. */
+
+/* Login logo clamp: prevent large MIRZA logo from overflowing outside the login card. */
+#login-gate .login-card{
+  width:min(520px,92vw)!important;
+  max-width:92vw!important;
+  overflow:hidden!important;
+  align-items:stretch!important;
+}
+#login-gate #login-large-logo.login-hero-logo,
+#login-gate #login-large-logo{
+  display:block!important;
+  width:auto!important;
+  max-width:min(390px,calc(100% - 36px))!important;
+  max-height:190px!important;
+  object-fit:contain!important;
+  align-self:center!important;
+  margin:0 auto 12px auto!important;
+  padding:0!important;
+  box-sizing:border-box!important;
+  transform:none!important;
+  background:transparent!important;
+  box-shadow:none!important;
+}
+#login-gate #login-developer-logo{
+  max-width:min(260px,calc(100% - 42px))!important;
+  width:auto!important;
+  align-self:center!important;
+  transform:none!important;
+}
+
+/* Factory Enterprise page: isolate from global compact transforms and generic KPI/card rules. */
+/* IMPORTANT FIX5: keep Factory Enterprise hidden when its tab is not active.
+   Previous FIX4 forced #factory-core-tab display:block globally, so menu navigation
+   appeared blocked because Factory Enterprise stayed visible above other pages. */
+#factory-core-tab.tab-content:not(.active){
+  display:none!important;
+}
+#factory-core-tab.tab-content.active{
+  display:block!important;
+  flex-direction:initial!important;
+}
+#factory-core-tab{
+  --factory-gap:18px;
+  width:100%!important;
+  max-width:100%!important;
+  padding:18px!important;
+  margin:0!important;
+  box-sizing:border-box!important;
+  overflow:visible!important;
+  position:relative!important;
+  transform:none!important;
+  clear:both!important;
+}
+#factory-core-tab,
+#factory-core-tab *{
+  box-sizing:border-box!important;
+}
+#factory-core-tab .factory418b-card,
+#factory-core-tab .factory418b-kpi-card,
+#factory-core-tab .factory418b-panel,
+#factory-core-tab .factory418b-table{
+  transform:none!important;
+  position:relative!important;
+  float:none!important;
+  clear:none!important;
+  z-index:auto!important;
+}
+#factory-core-tab .factory418b-card{
+  width:100%!important;
+  min-width:0!important;
+  min-height:auto!important;
+  height:auto!important;
+  margin:0 0 var(--factory-gap) 0!important;
+  padding:18px!important;
+  overflow:visible!important;
+  border:1px solid var(--border)!important;
+  border-radius:18px!important;
+  background:linear-gradient(145deg,rgba(255,255,255,.055),rgba(255,255,255,.018))!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.045),0 12px 30px rgba(0,0,0,.18)!important;
+}
+#factory-core-tab .factory418b-card h3{
+  display:block!important;
+  margin:0 0 12px 0!important;
+  padding:0!important;
+  line-height:1.2!important;
+  white-space:normal!important;
+}
+#factory-core-tab .factory418b-hero{
+  display:flex!important;
+  flex-direction:row!important;
+  align-items:flex-start!important;
+  justify-content:space-between!important;
+  gap:18px!important;
+  flex-wrap:wrap!important;
+}
+#factory-core-tab .factory418b-actions{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:flex-end!important;
+  gap:10px!important;
+  flex-wrap:wrap!important;
+  min-width:240px!important;
+  margin-left:auto!important;
+}
+#factory-core-tab .factory418b-config-grid{
+  display:grid!important;
+  grid-template-columns:repeat(3,minmax(230px,1fr))!important;
+  gap:16px!important;
+  width:100%!important;
+  margin:14px 0 12px 0!important;
+  padding:0!important;
+  align-items:start!important;
+}
+#factory-core-tab .factory418b-config-grid .col{
+  display:flex!important;
+  flex-direction:column!important;
+  gap:7px!important;
+  min-width:0!important;
+  width:100%!important;
+  margin:0!important;
+  padding:0!important;
+  position:relative!important;
+  transform:none!important;
+}
+#factory-core-tab .factory418b-config-grid label{
+  display:block!important;
+  position:static!important;
+  width:100%!important;
+  height:auto!important;
+  margin:0!important;
+  padding:0!important;
+  font-size:11px!important;
+  line-height:1.25!important;
+  letter-spacing:.04em!important;
+  color:var(--text2)!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+}
+#factory-core-tab .factory418b-config-grid input,
+#factory-core-tab .factory418b-config-grid select,
+#factory-core-tab #factory-history-filter-418b{
+  width:100%!important;
+  min-width:0!important;
+  max-width:100%!important;
+  height:38px!important;
+  min-height:38px!important;
+  margin:0!important;
+  position:static!important;
+  transform:none!important;
+}
+#factory-core-tab #factory-config-status-418b{
+  display:block!important;
+  margin-top:8px!important;
+  clear:both!important;
+}
+#factory-core-tab .factory418b-kpi-grid{
+  display:grid!important;
+  grid-template-columns:repeat(6,minmax(130px,1fr))!important;
+  gap:14px!important;
+  width:100%!important;
+  margin:18px 0!important;
+  padding:0!important;
+  clear:both!important;
+  align-items:stretch!important;
+}
+#factory-core-tab .factory418b-kpi-card{
+  display:flex!important;
+  flex-direction:column!important;
+  justify-content:center!important;
+  min-height:94px!important;
+  height:auto!important;
+  margin:0!important;
+  padding:15px!important;
+  border:1px solid var(--border)!important;
+  border-radius:16px!important;
+  background:rgba(255,255,255,.035)!important;
+  overflow:hidden!important;
+}
+#factory-core-tab .factory418b-kpi-card .label{font-size:10px!important;text-transform:uppercase!important;color:var(--text2)!important;margin-bottom:6px!important;}
+#factory-core-tab .factory418b-kpi-card .num{font-size:24px!important;line-height:1.1!important;font-weight:900!important;white-space:nowrap!important;}
+#factory-core-tab .factory418b-kpi-card .hint{font-size:10px!important;line-height:1.25!important;margin-top:6px!important;color:var(--text2)!important;}
+#factory-core-tab .factory418b-grid{
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(360px,1fr))!important;
+  gap:18px!important;
+  width:100%!important;
+  margin:18px 0!important;
+  padding:0!important;
+  align-items:start!important;
+  clear:both!important;
+}
+#factory-core-tab .factory418b-panel{
+  display:flex!important;
+  flex-direction:column!important;
+  gap:7px!important;
+  min-height:44px!important;
+  width:100%!important;
+  overflow:visible!important;
+}
+#factory-core-tab .factory418b-table{display:flex!important;flex-direction:column!important;width:100%!important;overflow:hidden!important;border:1px solid var(--border)!important;border-radius:14px!important;}
+#factory-core-tab .factory418b-row{display:grid!important;grid-template-columns:minmax(150px,1.2fr) minmax(110px,.7fr) minmax(180px,1.1fr)!important;gap:10px!important;align-items:center!important;min-height:38px!important;padding:9px 12px!important;border-bottom:1px solid rgba(255,255,255,.06)!important;}
+#factory-core-tab .factory418b-row.head{font-size:10px!important;text-transform:uppercase!important;letter-spacing:.06em!important;color:var(--text2)!important;background:rgba(255,255,255,.045)!important;}
+#factory-core-tab .factory418b-station-card{display:flex!important;align-items:center!important;gap:10px!important;width:100%!important;min-height:70px!important;padding:12px!important;border:1px solid var(--border)!important;border-radius:14px!important;background:rgba(255,255,255,.035)!important;}
+#factory-core-tab .factory418b-health-card{display:grid!important;grid-template-columns:120px minmax(0,1fr)!important;gap:16px!important;align-items:center!important;width:100%!important;}
+#factory-core-tab .factory418b-health-score{height:92px!important;border-radius:22px!important;display:flex!important;align-items:center!important;justify-content:center!important;font-size:28px!important;font-weight:900!important;border:1px solid var(--border)!important;background:rgba(255,255,255,.04)!important;}
+
+@media (max-width:1400px){
+  #factory-core-tab .factory418b-config-grid{grid-template-columns:repeat(2,minmax(220px,1fr))!important;}
+  #factory-core-tab .factory418b-kpi-grid{grid-template-columns:repeat(3,minmax(150px,1fr))!important;}
+}
+@media (max-width:900px){
+  #factory-core-tab{padding:12px!important;}
+  #factory-core-tab .factory418b-hero{flex-direction:column!important;}
+  #factory-core-tab .factory418b-actions{justify-content:flex-start!important;width:100%!important;margin-left:0!important;}
+  #factory-core-tab .factory418b-config-grid,
+  #factory-core-tab .factory418b-kpi-grid,
+  #factory-core-tab .factory418b-grid,
+  #factory-core-tab .factory418b-health-card{grid-template-columns:1fr!important;}
+  #factory-core-tab .factory418b-row{grid-template-columns:1fr!important;gap:4px!important;}
+}

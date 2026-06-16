@@ -1,46 +1,89 @@
 /**
- * UserManager - autenticazione, ruoli, livelli e permessi. Solo Admin puo gestire utenti/ruoli.
+ * UserManager 4.13L - gestione centralizzata autenticazione/RBAC.
  *
- * Commento introdotto in AT-MEC HM 2.14 per rendere esplicite responsabilita,
- * flusso dati e punti critici di stabilita del modulo.
+ * Correzioni strutturali rispetto a 4.13G:
+ * - deny-by-default: nessun ruolo corrente prima del login;
+ * - login reale separato da verifica credenziali non distruttiva;
+ * - logout reale lato backend;
+ * - salvataggio utenti/ruoli in userData/auth con migrazione legacy da config/users.json;
+ * - password legacy SHA-256 migrate progressivamente a scrypt;
+ * - update utente esistente senza obbligo di riscrivere password;
+ * - protezione ultimo account con manage_users.
  */
 import * as fs from 'fs';
 import * as path from 'path';
 import * as crypto from 'crypto';
+import { app } from 'electron';
 
 export type Role = 'Operator' | 'Technician' | 'Engineer' | 'Developer' | 'Admin' | string;
 
 interface RoleRecord { permissions: string[]; level: number; }
-interface StoredUser { username: string; displayName: string; role: Role; salt: string; passwordHash: string; enabled: boolean; }
+interface StoredUser {
+  username: string;
+  displayName: string;
+  role: Role;
+  salt: string;
+  passwordHash: string;
+  enabled: boolean;
+  operatorCode?: string;
+  photoDataUrl?: string;
+}
 interface UserDb { roles: Record<string, string[] | RoleRecord>; users: StoredUser[]; }
+export interface AuthResponse { ok: boolean; error?: string; operator?: string; username?: string; role?: Role; level?: number; permissions?: string[]; operatorCode?: string; photoDataUrl?: string; }
 
 export class UserManager {
-  private dbPath = path.join(process.cwd(), 'config', 'users.json');
+  private dbPath: string;
+  private legacyDbPath = path.join(process.cwd(), 'config', 'users.json');
   private roles: Record<string, RoleRecord> = {
-    Operator:   { level: 10,  permissions: ['run_test'] },
-    Technician: { level: 30,  permissions: ['run_test', 'debug_mode'] },
-    Engineer:   { level: 60,  permissions: ['run_test', 'debug_mode', 'edit_recipe', 'config_hardware'] },
-    Developer:  { level: 80,  permissions: ['run_test', 'debug_mode', 'edit_recipe', 'config_hardware', 'manage_branding', 'edit_layout', 'show_ui_ids', 'test_elements'] },
-    Admin:      { level: 100, permissions: ['run_test', 'debug_mode', 'edit_recipe', 'config_hardware', 'manage_users', 'manage_branding', 'edit_layout', 'show_ui_ids', 'test_elements'] }
+    Operator:   { level: 10,  permissions: ['run_test', 'view_reports'] },
+    Technician: { level: 30,  permissions: ['run_test', 'view_reports', 'debug_mode', 'view_traceability'] },
+    Engineer:   { level: 60,  permissions: ['run_test', 'view_reports', 'debug_mode', 'edit_recipe', 'config_hardware', 'view_traceability', 'view_kpi', 'manage_data'] },
+    Developer:  { level: 80,  permissions: ['run_test', 'view_reports', 'debug_mode', 'edit_recipe', 'config_hardware', 'manage_branding', 'edit_layout', 'show_ui_ids', 'test_elements', 'view_traceability', 'view_kpi'] },
+    Admin:      { level: 100, permissions: ['run_test', 'view_reports', 'debug_mode', 'edit_recipe', 'config_hardware', 'manage_users', 'manage_branding', 'edit_layout', 'show_ui_ids', 'test_elements', 'view_traceability', 'view_kpi', 'manage_data', 'sign_quality', 'approve_reports'] },
+    Qualità:    { level: 60,  permissions: ['view_reports', 'sign_quality', 'approve_reports'] }
   };
 
   private users: StoredUser[] = [];
-  private currentRole: Role = 'Operator';
-  private currentOperator: string = 'Operatore';
+  private currentUsername: string | null = null;
+  private currentRole: Role | null = null;
+  private currentOperator: string = '';
 
-  constructor() { this.loadDb(); }
+  constructor() {
+    const userData = app?.getPath ? app.getPath('userData') : process.cwd();
+    this.dbPath = path.join(userData, 'auth', 'users.json');
+    this.loadDb();
+  }
+
+  private normalizePermissionName(permission: string): string {
+    const p = String(permission || '').trim();
+    if (p === 'manage_archive') return 'manage_data';
+    return p;
+  }
+
+  private normalizePermissions(input: string[] = []): string[] {
+    return Array.from(new Set((input || []).map(p => this.normalizePermissionName(String(p))).filter(Boolean)));
+  }
 
   private normalizeRoles(input: Record<string, string[] | RoleRecord> | undefined): Record<string, RoleRecord> {
-    const out = { ...this.roles };
+    const defaults: Record<string, RoleRecord> = JSON.parse(JSON.stringify(this.roles));
+    const out: Record<string, RoleRecord> = JSON.parse(JSON.stringify(defaults));
     for (const [name, value] of Object.entries(input || {})) {
-      if (Array.isArray(value)) out[name] = { permissions: value, level: this.defaultLevelForRole(name) };
-      else out[name] = { permissions: value.permissions || [], level: Number(value.level || this.defaultLevelForRole(name)) };
+      const roleName = String(name || '').trim();
+      if (!roleName) continue;
+      const inputPerms = Array.isArray(value) ? value : (value.permissions || []);
+      const inputLevel = Array.isArray(value) ? this.defaultLevelForRole(roleName) : Number(value.level || this.defaultLevelForRole(roleName));
+      const basePerms = defaults[roleName]?.permissions || [];
+      // I ruoli core mantengono i permessi minimi/canonici del progetto, poi aggiungono eventuali permessi legacy/custom.
+      const merged = defaults[roleName] ? [...basePerms, ...inputPerms] : inputPerms;
+      out[roleName] = { permissions: this.normalizePermissions(merged), level: inputLevel };
     }
+    // Admin deve restare sempre recuperabile e gestore, anche se un users.json legacy era incompleto.
+    out.Admin = { level: 100, permissions: this.normalizePermissions(defaults.Admin.permissions) };
     return out;
   }
 
   private defaultLevelForRole(role: string): number {
-    const r = role.toLowerCase();
+    const r = String(role || '').toLowerCase();
     if (r.includes('admin')) return 100;
     if (r.includes('develop') || r.includes('svilupp')) return 80;
     if (r.includes('engineer') || r.includes('ingegn')) return 60;
@@ -48,85 +91,197 @@ export class UserManager {
     return 10;
   }
 
+  private ensureDir(): void {
+    fs.mkdirSync(path.dirname(this.dbPath), { recursive: true });
+  }
+
   private ensureDefaultAdmin(): void {
-    const ensureUser = (username: string, displayName: string, role: Role, password: string) => {
-      if (this.users.some(u => u.username.toLowerCase() === username.toLowerCase())) return;
-      const salt = crypto.randomBytes(16).toString('hex');
-      this.users.push({ username, displayName, role, salt, passwordHash: this.hashPassword(password, salt), enabled: true });
+    const setPassword = (user: StoredUser, password: string) => {
+      user.salt = crypto.randomBytes(16).toString('hex');
+      user.passwordHash = this.hashPassword(password, user.salt);
     };
-    ensureUser('admin', 'Admin', 'Admin', 'admin');
+
+    const ensureUser = (username: string, displayName: string, role: Role, password: string, forceRepair = false) => {
+      let user = this.users.find(u => u.username.toLowerCase() === username.toLowerCase());
+      if (!user) {
+        const salt = crypto.randomBytes(16).toString('hex');
+        this.users.push({ username, displayName, role, salt, passwordHash: this.hashPassword(password, salt), enabled: true, operatorCode: username.toUpperCase() });
+        return;
+      }
+
+      // 4.13M recovery: admin deve sempre essere accessibile dopo migrazioni/corruzioni users.json.
+      // Se admin esiste ma è disabilitato, con ruolo errato o password non verificabile, lo ripariamo.
+      if (forceRepair) {
+        user.displayName = user.displayName || displayName;
+        user.role = role;
+        user.enabled = true;
+        if (!this.verifyPassword(user, password)) setPassword(user, password);
+      }
+    };
+
+    ensureUser('admin', 'Admin', 'Admin', 'admin', true);
     ensureUser('mirza', 'Mirza', 'Operator', 'mirza');
-    // AT-MEC HM 2.16: se il database esiste gia, mantieni password ma forza mirza come Operatore livello 10 richiesto.
-    const mirza = this.users.find(u => u.username.toLowerCase() === 'mirza');
-    if (mirza) { mirza.role = 'Operator'; mirza.displayName = 'Mirza'; mirza.enabled = true; }
+  }
+
+  private loadJson(file: string): UserDb | null {
+    try { return JSON.parse(fs.readFileSync(file, 'utf8')); } catch { return null; }
   }
 
   private loadDb(): void {
     try {
-      if (!fs.existsSync(path.dirname(this.dbPath))) fs.mkdirSync(path.dirname(this.dbPath), { recursive: true });
-      if (fs.existsSync(this.dbPath)) {
-        const db: UserDb = JSON.parse(fs.readFileSync(this.dbPath, 'utf8'));
+      this.ensureDir();
+      let db: UserDb | null = fs.existsSync(this.dbPath) ? this.loadJson(this.dbPath) : null;
+      if (!db && fs.existsSync(this.legacyDbPath)) db = this.loadJson(this.legacyDbPath);
+      if (db) {
         this.roles = this.normalizeRoles(db.roles || {});
-        this.users = db.users || [];
+        this.users = Array.isArray(db.users) ? db.users : [];
       }
       this.ensureDefaultAdmin();
       this.saveDb();
-    } catch (err) { console.error('[USER] Errore caricamento utenti:', err); }
+    } catch (err) {
+      console.error('[USER] Errore caricamento utenti:', err);
+      this.ensureDefaultAdmin();
+      this.saveDb();
+    }
   }
 
   private saveDb(): void {
-    if (!fs.existsSync(path.dirname(this.dbPath))) fs.mkdirSync(path.dirname(this.dbPath), { recursive: true });
-    fs.writeFileSync(this.dbPath, JSON.stringify({ roles: this.roles, users: this.users }, null, 2));
+    this.ensureDir();
+    const payload = JSON.stringify({ roles: this.roles, users: this.users }, null, 2);
+    const tmp = `${this.dbPath}.tmp`;
+    fs.writeFileSync(tmp, payload);
+    fs.renameSync(tmp, this.dbPath);
   }
 
-  private hashPassword(password: string, salt: string): string {
+  private legacyHash(password: string, salt: string): string {
     return crypto.createHash('sha256').update(`${salt}:${password}`).digest('hex');
   }
 
-  public login(usernameRaw: string, password?: string): { ok: boolean; error?: string; operator?: string; role?: Role; level?: number; permissions?: string[] } {
+  private scryptHash(password: string, saltHex: string): string {
+    const key = crypto.scryptSync(password, Buffer.from(saltHex, 'hex'), 64).toString('hex');
+    return `scrypt$${saltHex}$${key}`;
+  }
+
+  private hashPassword(password: string, salt?: string): string {
+    const saltHex = salt && /^[a-f0-9]{32,}$/i.test(salt) ? salt : crypto.randomBytes(16).toString('hex');
+    return this.scryptHash(password, saltHex);
+  }
+
+  private verifyPassword(user: StoredUser, password: string): boolean {
+    const stored = String(user.passwordHash || '');
+    if (stored.startsWith('scrypt$')) {
+      const parts = stored.split('$');
+      if (parts.length !== 3) return false;
+      const expected = this.scryptHash(password, parts[1]);
+      const a = Buffer.from(expected);
+      const b = Buffer.from(stored);
+      return a.length === b.length && crypto.timingSafeEqual(a, b);
+    }
+    // Legacy 4.13G SHA-256 path: accepted once, then upgraded.
+    if (this.legacyHash(password, user.salt) === stored) {
+      user.salt = crypto.randomBytes(16).toString('hex');
+      user.passwordHash = this.hashPassword(password, user.salt);
+      this.saveDb();
+      return true;
+    }
+    return false;
+  }
+
+  private auth(usernameRaw: string, password?: string, mutateSession = false): AuthResponse {
     const username = (usernameRaw || '').trim();
     if (!username) return { ok: false, error: 'Username mancante.' };
     if (!password) return { ok: false, error: 'Password obbligatoria.' };
     const user = this.users.find(u => u.username.toLowerCase() === username.toLowerCase() && u.enabled !== false);
     if (!user) return { ok: false, error: 'Utente non trovato o disabilitato.' };
-    if (this.hashPassword(password, user.salt) !== user.passwordHash) return { ok: false, error: 'Password non valida.' };
-    this.currentOperator = user.displayName || user.username;
-    this.currentRole = user.role;
-    const level = this.roles[user.role]?.level ?? 0;
-    console.log(`[USER] Login: ${this.currentOperator} come ${this.currentRole} livello ${level}`);
-    return { ok: true, operator: this.currentOperator, role: this.currentRole, level, permissions: this.roles[user.role]?.permissions || [] };
+    if (!this.verifyPassword(user, password)) return { ok: false, error: 'Password non valida.' };
+    const role = user.role;
+    const level = this.roles[role]?.level ?? 0;
+    const permissions = this.normalizePermissions(this.roles[role]?.permissions || []);
+    if (mutateSession) {
+      this.currentUsername = user.username;
+      this.currentOperator = user.displayName || user.username;
+      this.currentRole = role;
+      console.log(`[USER] Login: ${this.currentOperator} come ${this.currentRole} livello ${level}`);
+    }
+    return { ok: true, username: user.username, operator: user.displayName || user.username, role, level, permissions, operatorCode: user.operatorCode || user.username, photoDataUrl: user.photoDataUrl || '' };
+  }
+
+  public login(usernameRaw: string, password?: string): AuthResponse { return this.auth(usernameRaw, password, true); }
+  public verifyCredentials(usernameRaw: string, password?: string): AuthResponse { return this.auth(usernameRaw, password, false); }
+  public logout(): void { this.currentUsername = null; this.currentRole = null; this.currentOperator = ''; }
+
+  public getCurrentUser(): AuthResponse {
+    if (!this.currentUsername || !this.currentRole) return { ok: false, error: 'Login richiesto.' };
+    const role = this.currentRole;
+    const user = this.users.find(u => u.username.toLowerCase() === String(this.currentUsername).toLowerCase());
+    return { ok: true, username: this.currentUsername, operator: this.currentOperator, role, level: this.roles[role]?.level ?? 0, permissions: this.normalizePermissions(this.roles[role]?.permissions || []), operatorCode: user?.operatorCode || this.currentUsername, photoDataUrl: user?.photoDataUrl || '' };
+  }
+
+  private requireManageUsers(): { ok: boolean; error?: string } {
+    if (!this.canCurrentUser('manage_users')) return { ok: false, error: 'Permessi insufficienti: manage_users richiesto.' };
+    return { ok: true };
+  }
+
+  private activeManagersCount(): number {
+    return this.users.filter(u => u.enabled !== false && this.normalizePermissions(this.roles[u.role]?.permissions || []).includes('manage_users')).length;
   }
 
   public createRole(role: string, permissions: string[], level?: number): { ok: boolean; error?: string } {
+    const auth = this.requireManageUsers(); if (!auth.ok) return auth;
     const name = (role || '').trim();
     if (!name) return { ok: false, error: 'Nome ruolo mancante.' };
-    this.roles[name] = { permissions: Array.from(new Set(permissions || [])), level: Number(level || this.defaultLevelForRole(name)) };
+    const nextPerms = this.normalizePermissions(permissions || []);
+    const old = this.roles[name];
+    if (this.normalizePermissions(old?.permissions || []).includes('manage_users') && !nextPerms.includes('manage_users')) {
+      const affectedManagers = this.users.filter(u => u.enabled !== false && u.role === name).length;
+      if (this.activeManagersCount() - affectedManagers < 1) return { ok: false, error: 'Impossibile rimuovere ultimo ruolo con manage_users attivo.' };
+    }
+    this.roles[name] = { permissions: nextPerms, level: Number(level || this.defaultLevelForRole(name)) };
     this.saveDb();
     return { ok: true };
   }
 
-  public createUser(username: string, displayName: string, role: Role, password: string): { ok: boolean; error?: string } {
-    if (!username.trim()) return { ok: false, error: 'Username mancante.' };
-    if (!password || password.length < 4) return { ok: false, error: 'Password troppo corta: minimo 4 caratteri.' };
+  public createUser(username: string, displayName: string, role: Role, password: string, operatorCode?: string, photoDataUrl?: string): { ok: boolean; error?: string } {
+    const auth = this.requireManageUsers(); if (!auth.ok) return auth;
+    const clean = (username || '').trim();
+    if (!clean) return { ok: false, error: 'Username mancante.' };
     if (!this.roles[role]) return { ok: false, error: 'Ruolo non esistente.' };
+    const idx = this.users.findIndex(u => u.username.toLowerCase() === clean.toLowerCase());
+    if (idx >= 0) {
+      const old = this.users[idx];
+      const removingLastManager = this.normalizePermissions(this.roles[old.role]?.permissions || []).includes('manage_users') && !this.normalizePermissions(this.roles[role]?.permissions || []).includes('manage_users') && this.activeManagersCount() <= 1;
+      if (removingLastManager) return { ok: false, error: 'Impossibile togliere i permessi all’ultimo utente gestore.' };
+      old.displayName = (displayName || '').trim() || clean;
+      old.role = role;
+      old.operatorCode = (operatorCode || '').trim() || old.operatorCode || clean;
+      if (typeof photoDataUrl === 'string' && photoDataUrl.trim()) old.photoDataUrl = photoDataUrl.trim();
+      if (password && password.length >= 4) {
+        old.salt = crypto.randomBytes(16).toString('hex');
+        old.passwordHash = this.hashPassword(password, old.salt);
+      } else if (password) return { ok: false, error: 'Password troppo corta: minimo 4 caratteri.' };
+      if (this.currentUsername && old.username.toLowerCase() === this.currentUsername.toLowerCase()) {
+        this.currentRole = role;
+        this.currentOperator = old.displayName || old.username;
+      }
+      this.saveDb();
+      return { ok: true };
+    }
+    if (!password || password.length < 4) return { ok: false, error: 'Password troppo corta: minimo 4 caratteri.' };
     const salt = crypto.randomBytes(16).toString('hex');
-    const rec: StoredUser = { username: username.trim(), displayName: displayName.trim() || username.trim(), role, salt, passwordHash: this.hashPassword(password, salt), enabled: true };
-    const idx = this.users.findIndex(u => u.username.toLowerCase() === rec.username.toLowerCase());
-    if (idx >= 0) this.users[idx] = rec; else this.users.push(rec);
+    this.users.push({ username: clean, displayName: (displayName || '').trim() || clean, role, salt, passwordHash: this.hashPassword(password, salt), enabled: true, operatorCode: (operatorCode || '').trim() || clean, photoDataUrl: (photoDataUrl || '').trim() });
     this.saveDb();
     return { ok: true };
   }
-
-
 
   public deleteUser(usernameRaw: string): { ok: boolean; error?: string } {
+    const auth = this.requireManageUsers(); if (!auth.ok) return auth;
     const username = (usernameRaw || '').trim();
     if (!username) return { ok: false, error: 'Username mancante.' };
     const idx = this.users.findIndex(u => u.username.toLowerCase() === username.toLowerCase());
     if (idx < 0) return { ok: false, error: 'Utente non trovato.' };
     const target = this.users[idx];
-    if (target.role === 'Admin' && this.users.filter(u => u.role === 'Admin' && u.enabled !== false).length <= 1) {
-      return { ok: false, error: 'Impossibile eliminare ultimo Admin attivo.' };
+    if (this.normalizePermissions(this.roles[target.role]?.permissions || []).includes('manage_users') && this.activeManagersCount() <= 1) {
+      return { ok: false, error: 'Impossibile eliminare ultimo utente con manage_users.' };
     }
     this.users.splice(idx, 1);
     this.saveDb();
@@ -134,11 +289,12 @@ export class UserManager {
   }
 
   public setUserEnabled(usernameRaw: string, enabled: boolean): { ok: boolean; error?: string } {
+    const auth = this.requireManageUsers(); if (!auth.ok) return auth;
     const username = (usernameRaw || '').trim();
     const user = this.users.find(u => u.username.toLowerCase() === username.toLowerCase());
     if (!user) return { ok: false, error: 'Utente non trovato.' };
-    if (user.role === 'Admin' && enabled === false && this.users.filter(u => u.role === 'Admin' && u.enabled !== false).length <= 1) {
-      return { ok: false, error: 'Impossibile disabilitare ultimo Admin attivo.' };
+    if (enabled === false && this.normalizePermissions(this.roles[user.role]?.permissions || []).includes('manage_users') && this.activeManagersCount() <= 1) {
+      return { ok: false, error: 'Impossibile disabilitare ultimo utente con manage_users.' };
     }
     user.enabled = enabled;
     this.saveDb();
@@ -146,21 +302,20 @@ export class UserManager {
   }
 
   public listRoles(): Array<{ role: string; permissions: string[]; level: number }> {
-    return Object.keys(this.roles).map(role => ({ role, permissions: this.roles[role].permissions, level: this.roles[role].level }));
+    return Object.keys(this.roles).map(role => ({ role, permissions: this.normalizePermissions(this.roles[role].permissions), level: this.roles[role].level }));
   }
 
-  public listUsers(): Array<{ username: string; displayName: string; role: Role; enabled: boolean; level: number; permissions: string[] }> {
-    return this.users.map(({ username, displayName, role, enabled }) => ({ username, displayName, role, enabled, level: this.roles[role]?.level ?? 0, permissions: this.roles[role]?.permissions || [] }));
+  public listUsers(): Array<{ username: string; displayName: string; role: Role; enabled: boolean; level: number; permissions: string[] }> | { ok: false; error: string } {
+    if (!this.canCurrentUser('manage_users')) return { ok: false, error: 'Permessi insufficienti: manage_users richiesto.' };
+    return this.users.map(({ username, displayName, role, enabled, operatorCode, photoDataUrl }) => ({ username, displayName, role, enabled, operatorCode: operatorCode || username, photoDataUrl: photoDataUrl || '', level: this.roles[role]?.level ?? 0, permissions: this.normalizePermissions(this.roles[role]?.permissions || []) }));
   }
 
-  public hasPermission(role: Role, action: string): boolean {
-    return this.roles[role]?.permissions.includes(action) || false;
+  public hasPermission(role: Role | null, action: string): boolean {
+    if (!role || !action) return false;
+    return this.normalizePermissions(this.roles[role]?.permissions || []).includes(this.normalizePermissionName(action)) || false;
   }
 
-  public getCurrentRole(): Role { return this.currentRole; }
-  public getCurrentOperator(): string { return this.currentOperator; }
-
-  public canCurrentUser(action: string): boolean {
-    return this.hasPermission(this.currentRole, action);
-  }
+  public getCurrentRole(): Role | null { return this.currentRole; }
+  public getCurrentOperator(): string { return this.currentOperator || '—'; }
+  public canCurrentUser(action: string): boolean { return this.hasPermission(this.currentRole, action); }
 }

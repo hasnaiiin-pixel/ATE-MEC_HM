@@ -1,0 +1,52 @@
+<div id="unit-card-tab" class="tab-content">
+      <div class="recipe-big-card">
+        <h3>🧬 Scheda Unità / Genealogia prodotto</h3>
+        <div class="hint">Modulo separato collegato allo storico seriale. Mostra vita completa della scheda senza modificare Test Mode, Ricette, Layout Editor o hardware.</div>
+        <div class="recipe-page-toolbar">
+          <div class="col"><label>Seriale scheda</label><input id="unit-serial-input" placeholder="Scansiona o inserisci SN"></div>
+          <div class="col"><label>Commessa / Lotto</label><input id="unit-lot-input" placeholder="opzionale"></div>
+          <div class="col"><label>Revisione scheda</label><input id="unit-board-rev-input" placeholder="es. R03 / AX"></div>
+          <div class="col"><label>Firmware</label><input id="unit-fw-input" placeholder="versione FW se nota"></div>
+        </div>
+        <div class="recipe-page-toolbar">
+          <div class="col"><label>Note qualità</label><input id="unit-quality-note-input" placeholder="nota opzionale per questa consultazione"></div>
+          <div class="col"><label>Operatore</label><input id="unit-operator-input" placeholder="opzionale"></div>
+        </div>
+        <div class="row" style="margin:8px 0;">
+          <button class="btn btn-primary btn-sm" onclick="loadUnitGenealogy410E()">🔎 Carica scheda unità</button>
+          <button class="btn btn-ghost btn-sm" onclick="clearUnitCard410E()">🧹 Pulisci</button>
+          <button class="btn btn-ghost btn-sm" onclick="printUnitGenealogy410E()">🧾 Stampa / PDF</button>
+          <button class="btn btn-ghost btn-sm" onclick="generateUnitDossier413A()">📚 Dossier completo</button>
+        </div>
+      </div>
+      <div class="unit-card-stats-grid">
+        <div class="unit-card-stat"><div class="unit-card-stat-val" id="unit-last-result" style="color:var(--accent)">N/D</div><div class="unit-card-stat-lbl">ULTIMO ESITO</div></div>
+        <div class="unit-card-stat"><div class="unit-card-stat-val" id="unit-test-count">0</div><div class="unit-card-stat-lbl">TEST TOTALI</div></div>
+        <div class="unit-card-stat"><div class="unit-card-stat-val" id="unit-retest-count">0</div><div class="unit-card-stat-lbl">RETEST</div></div>
+        <div class="unit-card-stat"><div class="unit-card-stat-val" id="unit-repair-count">0</div><div class="unit-card-stat-lbl">RIPARAZIONI</div></div>
+      </div>
+      <div class="recipe-big-card unit-enterprise-card" style="margin-top:12px;">
+        <h3>🏷 Tracciabilità unità</h3>
+        <div id="unit-enterprise-box" class="trace-enterprise-grid"><div class="hint">Carica una scheda unità per vedere cliente, postazione, firmware, operatori e report associati.</div></div>
+      </div>
+      <div class="db-panel-grid" style="margin-top:12px;">
+        <div class="recipe-big-card">
+          <h3>📌 Identità unità</h3>
+          <div id="unit-identity-box" class="serial-history-card"><div class="hint">Inserisci un seriale e carica la scheda unità.</div></div>
+        </div>
+        <div class="recipe-big-card">
+          <h3>🧾 Stato qualità</h3>
+          <div id="unit-quality-box" class="serial-history-card"><div class="hint">Nessuna scheda caricata.</div></div>
+        </div>
+      </div>
+      <div class="db-panel-grid" style="margin-top:12px;">
+        <div class="recipe-big-card">
+          <h3>🕒 Timeline test e retest</h3>
+          <div id="unit-timeline-box" class="log-list" style="min-height:180px;"><div class="hint">La timeline appare dopo la ricerca.</div></div>
+        </div>
+        <div class="recipe-big-card">
+          <h3>🛠 Riparazioni collegate</h3>
+          <div id="unit-repairs-box" class="log-list" style="min-height:180px;"><div class="hint">Nessuna ricerca eseguita.</div></div>
+        </div>
+      </div>
+    </div>

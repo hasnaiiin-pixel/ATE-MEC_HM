@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "createdAt": "2026-06-03T11:36:37.771Z",
-  "updatedAt": "2026-06-03T15:06:50.277Z",
+  "updatedAt": "2026-06-16T06:49:11.903Z",
   "recipes": [
     {
       "id": "recipe_1780499051207_4a5df09b",
@@ -200,6 +200,153 @@
           "result": "FAIL"
         }
       ]
+    },
+    {
+      "timestamp": "2026-06-16T06:49:11.899Z",
+      "operator": "Admin",
+      "recipe_name": "TEST",
+      "recipe_version": 1,
+      "serial_dut": "510615",
+      "lot_number": "1025.3564",
+      "work_order": "1025.3564",
+      "repair_note": "",
+      "final_result": "FAIL",
+      "execution_time_ms": 5863,
+      "steps_log": [
+        {
+          "step_id": 1,
+          "type": "PowerSupplySet",
+          "measured": {
+            "channel": 1,
+            "voltage": 24,
+            "current": 1,
+            "outputOn": true
+          },
+          "result": "DONE"
+        },
+        {
+          "step_id": 2,
+          "type": "ManualMeasurement",
+          "measured": 900,
+          "measurement_source": "MANUALE",
+          "measurement_device": "operatore/manuale",
+          "min": 700,
+          "max": 999,
+          "unit": "",
+          "timestamp": "2026-06-16T06:49:09.098Z",
+          "result": "PASS"
+        },
+        {
+          "step_id": 3,
+          "type": "DigitalOutputSet",
+          "measured": {
+            "channel": 2,
+            "state": true,
+            "mode": "set",
+            "expected": true,
+            "writeCount": 1,
+            "verifyFeedback": false
+          },
+          "result": "DONE"
+        },
+        {
+          "step_id": 4,
+          "type": "Delay",
+          "measured": 1000,
+          "result": "DONE"
+        },
+        {
+          "step_id": 5,
+          "type": "VoltageMeasurement",
+          "measured": 0.000232081402,
+          "measurement_source": "AUTOMATICA",
+          "measurement_device": "Keysight_34461A",
+          "target": 12,
+          "tolerance": 0.5,
+          "min": 11.5,
+          "max": 12.5,
+          "unit": "V",
+          "timestamp": "2026-06-16T06:49:10.949Z",
+          "result": "FAIL"
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-06-16T06:49:11.899Z",
+      "operator": "Admin",
+      "recipe_name": "TEST",
+      "recipe_version": 1,
+      "serial_dut": "510615",
+      "lot_number": "1025.3564",
+      "work_order": "1025.3564",
+      "repair_note": "",
+      "final_result": "FAIL",
+      "execution_time_ms": 5863,
+      "steps_log": [
+        {
+          "step_id": 1,
+          "type": "PowerSupplySet",
+          "measured": {
+            "channel": 1,
+            "voltage": 24,
+            "current": 1,
+            "outputOn": true
+          },
+          "result": "DONE"
+        },
+        {
+          "step_id": 2,
+          "type": "ManualMeasurement",
+          "measured": 900,
+          "measurement_source": "MANUALE",
+          "measurement_device": "operatore/manuale",
+          "min": 700,
+          "max": 999,
+          "unit": "",
+          "timestamp": "2026-06-16T06:49:09.098Z",
+          "result": "PASS"
+        },
+        {
+          "step_id": 3,
+          "type": "DigitalOutputSet",
+          "measured": {
+            "channel": 2,
+            "state": true,
+            "mode": "set",
+            "expected": true,
+            "writeCount": 1,
+            "verifyFeedback": false
+          },
+          "result": "DONE"
+        },
+        {
+          "step_id": 4,
+          "type": "Delay",
+          "measured": 1000,
+          "result": "DONE"
+        },
+        {
+          "step_id": 5,
+          "type": "VoltageMeasurement",
+          "measured": 0.000232081402,
+          "measurement_source": "AUTOMATICA",
+          "measurement_device": "Keysight_34461A",
+          "target": 12,
+          "tolerance": 0.5,
+          "min": 11.5,
+          "max": 12.5,
+          "unit": "V",
+          "timestamp": "2026-06-16T06:49:10.949Z",
+          "result": "FAIL"
+        }
+      ],
+      "station_id": "BANCHETT111",
+      "station_name": "ATE0150",
+      "station_department": "COLLAUDO",
+      "station_site": "LAB01220",
+      "customer_name": "MEC",
+      "customer_logo": "",
+      "product_name": "1212"
     }
   ],
   "repairs": []

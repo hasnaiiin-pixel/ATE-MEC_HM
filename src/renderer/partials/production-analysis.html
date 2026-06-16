@@ -1,0 +1,53 @@
+<div id="production-analysis-tab" class="tab-content">
+      <div class="pa412a-page">
+        <div class="recipe-big-card pa412a-hero">
+          <div>
+            <div style="font-size:11px;color:var(--text2);letter-spacing:1px;">AT-MEC_HM_4.17B</div>
+            <h3>📈 Analisi Produzione</h3>
+            <div class="hint">Modulo separato per KPI industriali. Non modifica Dashboard, Storico Seriali, Scheda Unità, Test Mode o Layout Editor.</div>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="loadProductionAnalysisDashboard412A()">🔄 Aggiorna</button>
+        </div>
+        <div class="recipe-big-card">
+          <h3>🔎 Filtri analisi</h3>
+          <div class="pa412a-filter-grid">
+            <div class="col"><label>Commessa/Lotto</label><input id="pa412a-lot" placeholder="tutti"></div>
+            <div class="col"><label>Seriale</label><input id="pa412a-serial" placeholder="tutti"></div>
+            <div class="col"><label>Operatore</label><input id="pa412a-operator" placeholder="tutti"></div>
+            <div class="col"><label>Ricetta</label><input id="pa412a-recipe" placeholder="tutte"></div>
+            <div class="col"><label>Esito</label><select id="pa412a-result"><option value="ALL">Tutti</option><option value="PASS">PASS</option><option value="FAIL">FAIL</option></select></div>
+            <div class="col"><label>Dal</label><input id="pa412a-date-from" type="date"></div>
+            <div class="col"><label>Al</label><input id="pa412a-date-to" type="date"></div>
+          </div>
+          <div class="row" style="margin-top:10px;">
+            <button class="btn btn-primary btn-sm" onclick="loadProductionAnalysisDashboard412A()">📊 Calcola KPI</button>
+            <button class="btn btn-ghost btn-sm" onclick="clearProductionAnalysisFilters412A()">🧹 Pulisci</button>
+          </div>
+          <div id="pa412a-status" class="hint" style="margin-top:8px;">Premi Calcola KPI.</div>
+        </div>
+        <div class="pa412a-kpi-grid">
+          <div class="pa412a-kpi-card"><span>FPY</span><b id="pa412a-fpy">0%</b><small>PASS al primo colpo / seriali</small></div>
+          <div class="pa412a-kpi-card"><span>Yield</span><b id="pa412a-yield">0%</b><small>PASS / test totali</small></div>
+          <div class="pa412a-kpi-card"><span>Retest Rate</span><b id="pa412a-retest">0%</b><small>seriali con più test</small></div>
+          <div class="pa412a-kpi-card"><span>Tempo medio</span><b id="pa412a-avg-time">0s</b><small>media test filtrati</small></div>
+          <div class="pa412a-kpi-card"><span>PASS oggi</span><b id="pa412a-pass-today">0</b><small>giornata corrente</small></div>
+          <div class="pa412a-kpi-card"><span>FAIL oggi</span><b id="pa412a-fail-today">0</b><small>giornata corrente</small></div>
+          <div class="pa412a-kpi-card"><span>Seriali</span><b id="pa412a-serials">0</b><small>seriali unici</small></div>
+          <div class="pa412a-kpi-card"><span>Test totali</span><b id="pa412a-total">0</b><small>record filtrati</small></div>
+        </div>
+        <div class="pa412a-panel-grid">
+          <div class="recipe-big-card">
+            <h3>📉 Trend ultimi giorni</h3>
+            <div id="pa412a-trend" class="pa412a-list"><div class="hint">Nessun dato caricato.</div></div>
+          </div>
+          <div class="recipe-big-card">
+            <h3>🧯 Top Failure</h3>
+            <div id="pa412a-top-failures" class="pa412a-list"><div class="hint">Nessun dato caricato.</div></div>
+          </div>
+          <div class="recipe-big-card">
+            <h3>🧾 Ultimo report</h3>
+            <div id="pa412a-latest" class="pa412a-list"><div class="hint">Nessun dato caricato.</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
