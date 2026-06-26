@@ -1,0 +1,5 @@
+@echo off
+title AT-MEC HM 6.7B FIX1
+echo Avvio AT-MEC HM 6.7B FIX1 WO MASTERDATA CONSOLIDATION...
+npm start
+pause

@@ -52,7 +52,7 @@ async function deleteSelectedRecipe() {
   if (!confirm(`Eliminare la ricetta "${name}"? L'operazione non rimuove eventuali report storici.`)) return;
   try { localStorage.removeItem('recipe_' + name); } catch {}
   try { if (api?.deleteRecipe) await api.deleteRecipe(name); } catch(e) { addLog(document.getElementById('sys-log'), `⚠️ Delete DB/file: ${escapeHtml(normalizeError(e))}`, 'warn'); }
-  if (recipe?.recipe_name === name) { recipe = { recipe_name:'Nuova Ricetta', version:1, enabled:true, power_metadata:'PL303_PROGRAMMABLE', steps:[] }; stepIdCounter = 1; }
+  if (recipe?.recipe_name === name) { recipe = { recipe_name:'Nuova Ricetta', version:1, enabled:true, power_metadata:'MANUAL_POWER', steps:[] }; stepIdCounter = 1; }
   await refreshRecipeList();
   await refreshProductionRecipes();
   await refreshDashboardRecipes?.();
@@ -136,7 +136,7 @@ async function loadSavedRecipe() {
     recipe = loaded;
     stepIdCounter = Math.max(...recipe.steps.map(s => s.step_id), 0) + 1;
     document.getElementById('recipe-name-inp').value = recipe.recipe_name;
-    setPowerSourceValue(recipe.power_metadata || 'PL303_PROGRAMMABLE');
+    setPowerSourceValue(recipe.power_metadata || 'MANUAL_POWER');
     document.getElementById('recipe-enabled').checked = recipe.enabled !== false;
     const namePage = document.getElementById('recipe-name-page'); if (namePage) namePage.value = recipe.recipe_name;
     const enabledPage = document.getElementById('recipe-enabled-page'); if (enabledPage) enabledPage.checked = recipe.enabled !== false;
@@ -180,12 +180,30 @@ async function doLogin() {
     catch(_e){ return String(v ?? ''); }
   }
 
+  function normalizeRecipeInstrumentName(name){
+    const n = String(name || '').trim().toLowerCase();
+    if(!n) return '';
+    if(n.includes('modbus_serial') || n.includes('esp32') || n === 'esp32_serial') return 'modbus_serial';
+    if(n.includes('aimtti_pl303') || n.includes('pl303') || n.includes('tti')) return 'AimTTi_PL303';
+    if(n.includes('keysight') || n.includes('34461') || n.includes('34465') || n.includes('multimeter') || n.includes('multimetro') || n.includes('dmm')) return 'Keysight_34461A';
+    if(n.includes('scanner') || n.includes('qr')) return 'QR_Scanner';
+    if(['manual','manuale','operator','system','none'].includes(n)) return n;
+    return String(name || '').trim();
+  }
+
+  window.normalizeRecipeInstrumentName = normalizeRecipeInstrumentName;
+  window.isRecipeInstrumentExcluded = function(name){
+    const excluded = Array.isArray(window.excludedInstruments) ? window.excludedInstruments : (Array.isArray(excludedInstruments) ? excludedInstruments : []);
+    const wanted = normalizeRecipeInstrumentName(name);
+    return excluded.some(item => normalizeRecipeInstrumentName(item) === wanted);
+  };
+
   function mapInstrumentToGateKey(name){
-    const n = String(name || '').toLowerCase();
-    if(n.includes('modbus_serial') || n.includes('esp32')) return 'esp32';
-    if(n.includes('aimtti_pl303') || n.includes('pl303') || n.includes('tti')) return 'pl303';
-    if(n.includes('keysight_34461a') || n.includes('keysight') || n.includes('34461') || n.includes('multimet')) return 'multimeter';
-    if(n.includes('qr') || n.includes('scanner')) return 'scanner';
+    const normalized = normalizeRecipeInstrumentName(name);
+    if(normalized === 'modbus_serial') return 'esp32';
+    if(normalized === 'AimTTi_PL303') return 'pl303';
+    if(normalized === 'Keysight_34461A') return 'multimeter';
+    if(normalized === 'QR_Scanner') return 'scanner';
     return '';
   }
 
@@ -194,9 +212,8 @@ async function doLogin() {
     // Il pannello Device Manager può avere una configurazione visiva, ma non deve rendere ESP32/PL303/DMM obbligatori per tutte le ricette.
     try{
       if(typeof getRequiredInstrumentsForRecipe === 'function') {
-        const excluded = Array.isArray(window.excludedInstruments) ? window.excludedInstruments : (Array.isArray(excludedInstruments) ? excludedInstruments : []);
         const req = (getRequiredInstrumentsForRecipe() || [])
-          .filter(x => !excluded.includes(x))
+          .filter(x => !window.isRecipeInstrumentExcluded(x))
           .map(mapInstrumentToGateKey)
           .filter(Boolean);
         const unique = Array.from(new Set(req));
@@ -322,7 +339,9 @@ async function startTest() {
       const dmGate = await window.dm413rjPreStartGateSafe();
       if (!dmGate || dmGate.ok === false) { forceRunIdleUi(); return; }
     }
-    const sampleOk = await runPreTestSampleWizard();
+    const sampleOk = (typeof window.runPreTestSampleWizard === 'function')
+      ? await window.runPreTestSampleWizard()
+      : (localStorage.getItem('atmec_sample_test_required') === '1' && typeof runPreTestSampleWizard === 'function' ? await runPreTestSampleWizard() : true);
     if (!sampleOk) { addLog(document.getElementById('run-log'), '⏹ Test annullato nel wizard scheda campione.', 'warn'); forceRunIdleUi(); return; }
     const hwCheck = await guardedUi('Validazione hardware', () => validateRecipeHardwareBeforeStart(), { timeoutMs: 5000, logTo: document.getElementById('run-log'), fallback: { ok:false, missing:['timeout validazione'] } });
     if (!hwCheck.ok) {
@@ -335,7 +354,7 @@ async function startTest() {
     const lotNumber = getLotNumber();
     if (isSerialRequired() && !serial) { alert('Serial Number obbligatorio: inserisci SN manuale o da QR. Se questa scheda non ha seriale, disattiva il flag SN obbligatorio.'); forceRunIdleUi(); return; }
     if (!lotNumber) { alert('Inserisci Numero Lotto / Commessa prima di avviare la produzione.'); forceRunIdleUi(); return; }
-    recipe.power_metadata = getPowerSourceValue();
+    recipe.power_metadata = recipe.power_metadata || getPowerSourceValue();
     document.getElementById('result-banner')?.classList.remove('show');
     document.getElementById('fault-panel')?.classList.remove('show');
     stepStatusMap = {};
@@ -471,7 +490,7 @@ function getRequiredInstrumentsForRecipe() {
   // Calcola gli strumenti realmente richiesti dalla ricetta attiva.
   // Evita di mostrare o validare PL303/Keysight/Scanner se la ricetta non li usa.
   const required = new Set();
-  const power = getPowerSourceValue() || recipe.power_metadata || 'MANUAL_POWER';
+  const power = recipe.power_metadata || getPowerSourceValue() || 'MANUAL_POWER';
   if (power === 'ESP32_RELAY_POWER') required.add('modbus_serial');
   if (power === 'PL303_PROGRAMMABLE') required.add('AimTTi_PL303');
   for (const step of (recipe.steps || []).filter(s => s.enabled !== false)) {
@@ -494,7 +513,7 @@ function getRequiredInstrumentsForRecipe() {
   required.delete('operator');
   required.delete('system');
   required.delete('none');
-  return Array.from(required).filter(Boolean);
+  return Array.from(required).map(name => window.normalizeRecipeInstrumentName ? window.normalizeRecipeInstrumentName(name) : name).filter(Boolean);
 }
 
 function getInstrumentDisplayName(name) {
@@ -512,45 +531,65 @@ function renderRecipePrecheckOperations() {
 
 
 async function validateRecipeHardwareBeforeStart() {
-  const required = new Set(getRequiredInstrumentsForRecipe().filter(name => !excludedInstruments.includes(name)));
+  const required = new Set(getRequiredInstrumentsForRecipe().filter(name => !(window.isRecipeInstrumentExcluded ? window.isRecipeInstrumentExcluded(name) : excludedInstruments.includes(name))));
+  if (!required.size) return { ok: true, missing: [] };
 
-  try { latestHardwareStatuses = await withTimeout(api.getHardwareStatuses(), 1800, 'stato hardware'); } catch {}
+  function readJsonSafe(k, fallback) { try { const v = JSON.parse(localStorage.getItem(k) || 'null'); return v == null ? fallback : v; } catch { return fallback; } }
+  function normalizeRows(raw) {
+    if (Array.isArray(raw)) return raw;
+    if (raw && Array.isArray(raw.rows)) return raw.rows;
+    if (raw && Array.isArray(raw.statuses)) return raw.statuses;
+    if (raw && typeof raw === 'object') return Object.entries(raw).map(([k, v]) => Object.assign({ name:k }, (v && typeof v === 'object') ? v : { status:v }));
+    return [];
+  }
+  function txt(x) { return String((x && (x.name || x.device || x.label || x.type || x.group || x.driver || x._logical || x._title)) || '').toLowerCase(); }
+  function aliasesFor(name) {
+    const n = String(name || '').toLowerCase();
+    if (n === 'modbus_serial' || n.includes('esp32')) return ['modbus_serial','esp32','esp32-s3','controller'];
+    if (n === 'aimtti_pl303' || n.includes('pl303') || n.includes('alimentatore') || n.includes('tti')) return ['aimtti_pl303','pl303','tti','alimentatore','power'];
+    if (n === 'keysight_34461a' || n.includes('keysight') || n.includes('34461') || n.includes('multimet')) return ['keysight_34461a','keysight','34461','multimetro','dmm'];
+    if (n.includes('scanner') || n.includes('qr')) return ['qr_scanner','scanner','barcode'];
+    return [n];
+  }
+  function isLive(st) {
+    if (!st) return false;
+    if (st.manualSimulation || st.mock === true || String(st.status || st.state || '').toUpperCase().includes('SIM')) return false;
+    if (st.live === true || st.connected === true || st.ok === true || st.online === true) return true;
+    const s = String(st.status || st.state || '').toUpperCase();
+    return ['ONLINE','LIVE','CONNECTED','OK'].includes(s);
+  }
+  function findStatus(name, rows) {
+    const aliases = aliasesFor(name);
+    return rows.find(x => aliases.some(a => txt(x).includes(a))) || null;
+  }
+  function sharedStatusRows() {
+    const shared = readJsonSafe('atmec67c_device_status_shared', {});
+    const rows = [];
+    if (shared && typeof shared === 'object') {
+      Object.entries(shared).forEach(([key, value]) => {
+        if (value && typeof value === 'object') rows.push(Object.assign({ name:key }, value));
+      });
+    }
+    return rows;
+  }
 
-  // Fix 2.18: se serve ESP32, verifica prima il backend JSON già vivo e poi tenta SOLO ESP32.
-  // Non usare esp32ConnectOnPort qui: quella funzione collega anche altri strumenti e può causare
-  // timeout validazione pur avendo ESP32 correttamente collegata.
+  let rows = [];
+  try { rows = normalizeRows(await withTimeout(api.getHardwareStatuses(), 1800, 'stato hardware')); } catch { rows = []; }
+  const sharedRows = sharedStatusRows();
+  latestHardwareStatuses = rows.concat(sharedRows);
+
+  // ESP32 può essere verificato anche dal backend JSON, ma solo se realmente richiesto.
   if (required.has('modbus_serial')) {
-    let espStatus = getHardwareStatusByName('modbus_serial');
-    if (!isHardwareLiveStatus(espStatus)) {
+    let espStatus = findStatus('modbus_serial', latestHardwareStatuses);
+    if (!isLive(espStatus)) {
       try {
         const info = await withTimeout(api.getEsp32Info?.(), 1800, 'info ESP32');
-        if (info?.live === true) {
-          latestHardwareStatuses = latestHardwareStatuses || [];
-          const existing = getHardwareStatusByName('modbus_serial');
-          if (existing) { existing.mock = false; existing.connected = true; }
-          else latestHardwareStatuses.push({ name:'modbus_serial', mock:false, connected:true, connectionString: info.connectionString || 'ESP32 JSON' });
-        }
+        if (info?.live === true) latestHardwareStatuses.push({ name:'modbus_serial', mock:false, connected:true, live:true, connectionString: info.connectionString || 'ESP32 JSON' });
       } catch {}
-    }
-
-    espStatus = getHardwareStatusByName('modbus_serial');
-    if (!isHardwareLiveStatus(espStatus)) {
-      const cfg = api.getAppSettings ? await withTimeout(api.getAppSettings(), 1200, 'settings ESP32').catch(() => ({})) : {};
-      const selected = document.getElementById('esp32-control-com')?.value || document.getElementById('cfg-esp-com')?.value || cfg.esp32Port || '';
-      const port = selected && selected !== 'mock' ? selected : (cfg.esp32Port || '');
-      const baud = Number(document.getElementById('cfg-esp-baud')?.value || cfg.esp32Baud || 115200);
-      if (port && port !== 'mock') {
-        addLog(document.getElementById('run-log'), `ℹ️ ESP32 richiesta: collegamento rapido su ${escapeHtml(port)}...`, 'info');
-        let quick = null;
-        if (api.connectEsp32Only) quick = await withTimeout(api.connectEsp32Only({ port, baud }), 4200, 'connessione rapida ESP32').catch(e => ({ ok:false, error: normalizeError(e) }));
-        else quick = await guardedUi('Connessione rapida ESP32', () => api.reconnectHardware([{ name:'modbus_serial', conn:port, baud }]), { timeoutMs: 4300, logTo: document.getElementById('run-log'), fallback: [] });
-        if (quick?.statuses) latestHardwareStatuses = quick.statuses;
-        else { try { latestHardwareStatuses = await withTimeout(api.getHardwareStatuses(), 1200, 'stato hardware post ESP32'); } catch {} }
-      }
     }
   }
 
-  const missing = [...required].filter(name => !excludedInstruments.includes(name) && !isHardwareLiveStatus(getHardwareStatusByName(name)));
+  const missing = [...required].filter(name => !(window.isRecipeInstrumentExcluded ? window.isRecipeInstrumentExcluded(name) : excludedInstruments.includes(name)) && !isLive(findStatus(name, latestHardwareStatuses)));
   return { ok: missing.length === 0, missing };
 }
 

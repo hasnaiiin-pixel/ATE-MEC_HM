@@ -1,0 +1,513 @@
+{
+  "release": "AT-MEC_HM_6.6B_CORE_DATA_MIGRATION",
+  "createdAt": "2026-06-17T14:17:03.637Z",
+  "mode": "NON_DESTRUCTIVE_SQLITE_READY",
+  "counts": {
+    "users": 2,
+    "roles": 0,
+    "recipes": 1,
+    "test_runs": 5,
+    "repair_tickets": 0,
+    "work_orders": 0,
+    "repository_items": 13,
+    "settings": 2
+  },
+  "data": {
+    "users": [
+      {
+        "id": "USR_8C6976E5B541",
+        "username": "admin",
+        "role": "Admin",
+        "enabled": true,
+        "raw": {
+          "username": "admin",
+          "displayName": "Admin",
+          "role": "Admin",
+          "salt": "bd161c457887e4e35e3f01a6bcb12f52",
+          "passwordHash": "e5e65fd88c58385482f1886aac8d9dd148a3ac07c2dac7323850019193f98bb9",
+          "enabled": true
+        }
+      },
+      {
+        "id": "USR_419573D71487",
+        "username": "mirza",
+        "role": "Operator",
+        "enabled": true,
+        "raw": {
+          "username": "mirza",
+          "displayName": "Mirza",
+          "role": "Operator",
+          "salt": "1a0972d41057b989dea001df46a1a24b",
+          "passwordHash": "431bd2ee25963454e8d349a484bdfc4ee80160f58b8bc5447ee931f59abd63ea",
+          "enabled": true
+        }
+      }
+    ],
+    "roles": [],
+    "recipes": [
+      {
+        "id": "REC_DB72FF91C7E0",
+        "name": "Nuova Ricetta",
+        "version": 4,
+        "status": "ACTIVE",
+        "source": "recipes/Nuova Ricetta.json",
+        "steps": [
+          {
+            "step_id": 1,
+            "type": "ResistanceTest",
+            "enabled": true,
+            "label": "Misura resistenza",
+            "description": "",
+            "io_type": "SCPI",
+            "device_mapping": "Keysight_34461A",
+            "timeout": 2000,
+            "min": 450,
+            "max": 510,
+            "unit": "Ω",
+            "command": "MEAS:RES?"
+          }
+        ],
+        "raw": {
+          "recipe_name": "Nuova Ricetta",
+          "version": 4,
+          "enabled": true,
+          "power_metadata": "PL303_PROGRAMMABLE",
+          "steps": [
+            {
+              "step_id": 1,
+              "type": "ResistanceTest",
+              "enabled": true,
+              "label": "Misura resistenza",
+              "description": "",
+              "io_type": "SCPI",
+              "device_mapping": "Keysight_34461A",
+              "timeout": 2000,
+              "min": 450,
+              "max": 510,
+              "unit": "Ω",
+              "command": "MEAS:RES?"
+            }
+          ]
+        }
+      }
+    ],
+    "test_runs": [
+      {
+        "id": "TR_3B381169D3F5",
+        "timestamp": "2026-06-03T15:04:50.051Z",
+        "serial": "",
+        "work_order": "10000",
+        "lot": "10000",
+        "recipe": "Nuova Ricetta",
+        "operator": "Admin",
+        "station": "",
+        "result": "PASS",
+        "duration_ms": 18740,
+        "raw": {
+          "timestamp": "2026-06-03T15:04:50.051Z",
+          "operator": "Admin",
+          "recipe_name": "Nuova Ricetta",
+          "recipe_version": 2,
+          "serial_dut": "",
+          "lot_number": "10000",
+          "work_order": "10000",
+          "repair_note": "",
+          "final_result": "PASS",
+          "execution_time_ms": 18740,
+          "steps_log": [
+            {
+              "step_id": 1,
+              "type": "ManualMeasurement",
+              "measured": 3.1,
+              "result": "PASS"
+            }
+          ]
+        }
+      },
+      {
+        "id": "TR_4763422A405A",
+        "timestamp": "2026-06-03T15:05:06.691Z",
+        "serial": "",
+        "work_order": "10000",
+        "lot": "10000",
+        "recipe": "Nuova Ricetta",
+        "operator": "Admin",
+        "station": "",
+        "result": "FAIL",
+        "duration_ms": 11987,
+        "raw": {
+          "timestamp": "2026-06-03T15:05:06.691Z",
+          "operator": "Admin",
+          "recipe_name": "Nuova Ricetta",
+          "recipe_version": 2,
+          "serial_dut": "",
+          "lot_number": "10000",
+          "work_order": "10000",
+          "repair_note": "",
+          "final_result": "FAIL",
+          "execution_time_ms": 11987,
+          "steps_log": [
+            {
+              "step_id": 1,
+              "type": "ManualMeasurement",
+              "measured": "FAIL manuale",
+              "result": "FAIL"
+            }
+          ]
+        }
+      },
+      {
+        "id": "TR_A2C4D5898E82",
+        "timestamp": "2026-06-03T15:05:49.612Z",
+        "serial": "",
+        "work_order": "10000",
+        "lot": "10000",
+        "recipe": "Nuova Ricetta",
+        "operator": "Admin",
+        "station": "",
+        "result": "PASS",
+        "duration_ms": 5043,
+        "raw": {
+          "timestamp": "2026-06-03T15:05:49.612Z",
+          "operator": "Admin",
+          "recipe_name": "Nuova Ricetta",
+          "recipe_version": 3,
+          "serial_dut": "",
+          "lot_number": "10000",
+          "work_order": "10000",
+          "repair_note": "",
+          "final_result": "PASS",
+          "execution_time_ms": 5043,
+          "steps_log": [
+            {
+              "step_id": 1,
+              "type": "ManualMeasurement",
+              "measured": "CONFERMATO",
+              "result": "PASS"
+            }
+          ]
+        }
+      },
+      {
+        "id": "TR_CE7491584F9A",
+        "timestamp": "2026-06-03T15:06:00.162Z",
+        "serial": "",
+        "work_order": "10000",
+        "lot": "10000",
+        "recipe": "Nuova Ricetta",
+        "operator": "Admin",
+        "station": "",
+        "result": "FAIL",
+        "duration_ms": 5918,
+        "raw": {
+          "timestamp": "2026-06-03T15:06:00.162Z",
+          "operator": "Admin",
+          "recipe_name": "Nuova Ricetta",
+          "recipe_version": 3,
+          "serial_dut": "",
+          "lot_number": "10000",
+          "work_order": "10000",
+          "repair_note": "",
+          "final_result": "FAIL",
+          "execution_time_ms": 5918,
+          "steps_log": [
+            {
+              "step_id": 1,
+              "type": "ManualMeasurement",
+              "measured": null,
+              "result": "FAIL"
+            }
+          ]
+        }
+      },
+      {
+        "id": "TR_A45D7926136E",
+        "timestamp": "2026-06-03T15:06:50.276Z",
+        "serial": "",
+        "work_order": "10000",
+        "lot": "10000",
+        "recipe": "Nuova Ricetta",
+        "operator": "Admin",
+        "station": "",
+        "result": "FAIL",
+        "duration_ms": 4987,
+        "raw": {
+          "timestamp": "2026-06-03T15:06:50.276Z",
+          "operator": "Admin",
+          "recipe_name": "Nuova Ricetta",
+          "recipe_version": 4,
+          "serial_dut": "",
+          "lot_number": "10000",
+          "work_order": "10000",
+          "repair_note": "",
+          "final_result": "FAIL",
+          "execution_time_ms": 4987,
+          "steps_log": [
+            {
+              "step_id": 1,
+              "type": "ResistanceTest",
+              "measured": 9.9e+37,
+              "result": "FAIL"
+            }
+          ]
+        }
+      }
+    ],
+    "repair_tickets": [],
+    "work_orders": [],
+    "repository_items": [
+      {
+        "id": "REPO_EF5ED2A83E78",
+        "kind": "recipes",
+        "name": "Nuova Ricetta",
+        "version": "REV_A",
+        "status": "Draft",
+        "raw": {
+          "name": "Nuova Ricetta",
+          "revision": "REV_A",
+          "status": "Draft",
+          "path": "recipes/Nuova Ricetta.json",
+          "notes": "Ricetta rilevata automaticamente dalla cartella recipes/"
+        }
+      },
+      {
+        "id": "REPO_6CEE1347660E",
+        "kind": "firmware",
+        "name": "esp32s3_ate_node",
+        "version": "REV_A",
+        "status": "Draft",
+        "raw": {
+          "name": "esp32s3_ate_node",
+          "revision": "REV_A",
+          "status": "Draft",
+          "path": "firmware/esp32s3_ate_node/esp32s3_ate_node.ino",
+          "notes": "Firmware rilevato automaticamente dalla cartella firmware/"
+        }
+      },
+      {
+        "id": "REPO_271C14D89EFF",
+        "kind": "labels",
+        "name": "label-manager",
+        "version": "REV_A",
+        "status": "Draft",
+        "raw": {
+          "name": "label-manager",
+          "revision": "REV_A",
+          "status": "Draft",
+          "path": "src/renderer/partials/label-manager.html",
+          "notes": "Risorsa Label rilevata automaticamente"
+        }
+      },
+      {
+        "id": "REPO_950E2A47982F",
+        "kind": "labels",
+        "name": "label-manager-420a1",
+        "version": "REV_A",
+        "status": "Draft",
+        "raw": {
+          "name": "label-manager-420a1",
+          "revision": "REV_A",
+          "status": "Draft",
+          "path": "src/renderer/js/modules/labels/label-manager-420a1.js",
+          "notes": "Risorsa Label rilevata automaticamente"
+        }
+      },
+      {
+        "id": "REPO_8D2A2542DFAB",
+        "kind": "audio",
+        "name": "error",
+        "version": "REV_A",
+        "status": "Draft",
+        "raw": {
+          "name": "error",
+          "revision": "REV_A",
+          "status": "Draft",
+          "path": "assets/audio/error",
+          "notes": "Categoria audio disponibile"
+        }
+      },
+      {
+        "id": "REPO_518489614E1C",
+        "kind": "audio",
+        "name": "fail",
+        "version": "REV_A",
+        "status": "Draft",
+        "raw": {
+          "name": "fail",
+          "revision": "REV_A",
+          "status": "Draft",
+          "path": "assets/audio/fail",
+          "notes": "Categoria audio disponibile"
+        }
+      },
+      {
+        "id": "REPO_064AC5E686A9",
+        "kind": "audio",
+        "name": "pass",
+        "version": "REV_A",
+        "status": "Draft",
+        "raw": {
+          "name": "pass",
+          "revision": "REV_A",
+          "status": "Draft",
+          "path": "assets/audio/pass",
+          "notes": "Categoria audio disponibile"
+        }
+      },
+      {
+        "id": "REPO_86095C6AFED8",
+        "kind": "audio",
+        "name": "production",
+        "version": "REV_A",
+        "status": "Draft",
+        "raw": {
+          "name": "production",
+          "revision": "REV_A",
+          "status": "Draft",
+          "path": "assets/audio/production",
+          "notes": "Categoria audio disponibile"
+        }
+      },
+      {
+        "id": "REPO_9A318C3F714E",
+        "kind": "audio",
+        "name": "recipes",
+        "version": "REV_A",
+        "status": "Draft",
+        "raw": {
+          "name": "recipes",
+          "revision": "REV_A",
+          "status": "Draft",
+          "path": "assets/audio/recipes",
+          "notes": "Categoria audio disponibile"
+        }
+      },
+      {
+        "id": "REPO_5D13CEC2EB88",
+        "kind": "audio",
+        "name": "system",
+        "version": "REV_A",
+        "status": "Draft",
+        "raw": {
+          "name": "system",
+          "revision": "REV_A",
+          "status": "Draft",
+          "path": "assets/audio/system",
+          "notes": "Categoria audio disponibile"
+        }
+      },
+      {
+        "id": "REPO_41EB8048A0D4",
+        "kind": "layouts",
+        "name": "layout-editor",
+        "version": "REV_A",
+        "status": "Draft",
+        "raw": {
+          "name": "layout-editor",
+          "revision": "REV_A",
+          "status": "Draft",
+          "path": "src/renderer/js/layout-editor.js",
+          "notes": "Risorsa Layout rilevata automaticamente"
+        }
+      },
+      {
+        "id": "REPO_81DB28D0AAB2",
+        "kind": "layouts",
+        "name": "layout-editor-managers",
+        "version": "REV_A",
+        "status": "Draft",
+        "raw": {
+          "name": "layout-editor-managers",
+          "revision": "REV_A",
+          "status": "Draft",
+          "path": "src/renderer/js/layout-editor-managers.js",
+          "notes": "Risorsa Layout rilevata automaticamente"
+        }
+      },
+      {
+        "id": "REPO_457DA6FB6B7A",
+        "kind": "layouts",
+        "name": "layout-editor",
+        "version": "REV_A",
+        "status": "Draft",
+        "raw": {
+          "name": "layout-editor",
+          "revision": "REV_A",
+          "status": "Draft",
+          "path": "src/renderer/css/layout-editor.css",
+          "notes": "Risorsa Layout rilevata automaticamente"
+        }
+      }
+    ],
+    "settings": [
+      {
+        "key": "app_settings",
+        "value": {
+          "pl303Mode": "USB",
+          "pl303Host": "mock",
+          "pl303Port": 9221,
+          "pl303Com": "COM4",
+          "pl303Baud": 9600,
+          "ttiPort": "COM4",
+          "ttiBaud": 9600,
+          "logoBackgroundMode": "transparent",
+          "logoBgModes": {
+            "loginLarge": "transparent",
+            "loginSmall": "transparent",
+            "hmiLarge": "transparent",
+            "developerSmall": "transparent",
+            "reportLarge": "transparent",
+            "reportSmall": "transparent"
+          },
+          "developerSmallLogoPath": "assets/default_logos/MIRZA.png",
+          "reportSmallLogoPath": "assets/default_logos/MIRZA.png",
+          "loginSmallLogoPath": "assets/default_logos/MEC.PNG",
+          "loginLargeLogoPath": "assets/default_logos/MIRZA.png",
+          "hmiLargeLogoPath": "assets/default_logos/MEC.PNG",
+          "appLargeLogoPath": "assets/default_logos/MEC.PNG",
+          "reportLargeLogoPath": "assets/default_logos/MEC.PNG",
+          "esp32Port": "COM5",
+          "esp32Baud": 115200,
+          "companyLogoPath": "assets/default_logos/MEC.PNG",
+          "builderLogoPath": "assets/default_logos/MIRZA.png"
+        }
+      },
+      {
+        "key": "data_provider",
+        "value": {
+          "mode": "local_first",
+          "server": {
+            "enabled": false,
+            "url": "",
+            "timeoutMs": 5000
+          },
+          "sync": {
+            "enabled": true,
+            "queuePath": "C:\\Users\\spea4060_tmv331ef\\Documents\\PROGETTI\\AT-MEC_HM_4.13G\\database\\sync_queue.json",
+            "localFirst": true
+          },
+          "station": {
+            "id": "DESKTOP-54QO6OI",
+            "name": "Postazione locale",
+            "department": "COLLAUDO",
+            "site": "OSPITALETTO",
+            "autoSyncEnabled": false,
+            "autoSyncIntervalSec": 60
+          },
+          "database": {
+            "mode": "enterprise_json",
+            "sqlitePath": "database/ate_mec_enterprise.db",
+            "jsonMirrorPath": "database/ate_mec_enterprise_db.json",
+            "schema": "docs/sqlite_schema_enterprise.sql",
+            "version": "4.17B"
+          }
+        }
+      }
+    ]
+  },
+  "compatibility": {
+    "jsonPrimaryStillAvailable": true,
+    "sqlitePrimary": false,
+    "next": "6.6C will switch SQLite as primary after validation"
+  }
+}

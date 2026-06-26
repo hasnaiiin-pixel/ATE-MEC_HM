@@ -1,7 +1,7 @@
 {
   "schemaVersion": 41702,
   "createdAt": "2026-06-14T15:43:02.563Z",
-  "updatedAt": "2026-06-16T06:49:11.924Z",
+  "updatedAt": "2026-06-26T14:18:32.559Z",
   "backend": "json_enterprise",
   "sqliteReady": false,
   "tables": {
@@ -654,23 +654,23 @@
         "createdAt": "2026-06-14T15:43:02.618Z"
       },
       {
-        "timestamp": "2026-06-16T06:49:11.899Z",
+        "timestamp": "2026-06-26T07:31:46.790Z",
         "operator": "Admin",
-        "recipe_name": "TEST",
-        "recipe_version": 1,
-        "serial_dut": "510615",
-        "lot_number": "1025.3564",
-        "work_order": "1025.3564",
+        "recipe_name": "TEST_rix_COBO",
+        "recipe_version": 2,
+        "serial_dut": "4444",
+        "lot_number": "1000700",
+        "work_order": "1000700",
         "repair_note": "",
         "final_result": "FAIL",
-        "execution_time_ms": 5863,
+        "execution_time_ms": 20045,
         "steps_log": [
           {
             "step_id": 1,
             "type": "PowerSupplySet",
             "measured": {
               "channel": 1,
-              "voltage": 24,
+              "voltage": 18.5,
               "current": 1,
               "outputOn": true
             },
@@ -679,59 +679,259 @@
           {
             "step_id": 2,
             "type": "ManualMeasurement",
-            "measured": 900,
+            "measured": 1.65,
             "measurement_source": "MANUALE",
             "measurement_device": "operatore/manuale",
-            "min": 700,
-            "max": 999,
-            "unit": "",
-            "timestamp": "2026-06-16T06:49:09.098Z",
+            "min": 0,
+            "max": 3.3,
+            "unit": "V",
+            "timestamp": "2026-06-26T07:31:34.916Z",
             "result": "PASS"
           },
           {
             "step_id": 3,
-            "type": "DigitalOutputSet",
+            "type": "ManualMeasurement",
+            "measured": 10,
+            "measurement_source": "MANUALE",
+            "measurement_device": "operatore/manuale",
+            "min": 500,
+            "max": 999,
+            "unit": "",
+            "timestamp": "2026-06-26T07:31:45.545Z",
+            "result": "FAIL"
+          },
+          {
+            "step_id": 4,
+            "type": "PowerSupplySet",
             "measured": {
-              "channel": 2,
-              "state": true,
-              "mode": "set",
-              "expected": true,
-              "writeCount": 1,
-              "verifyFeedback": false
+              "channel": 1,
+              "voltage": 0,
+              "current": 0,
+              "outputOn": false
+            },
+            "result": "DONE"
+          }
+        ],
+        "station_id": "BANC123",
+        "station_name": "ATE0151",
+        "station_department": "COLLAUDO",
+        "station_site": "LAB0000",
+        "customer_name": "COBO",
+        "customer_logo": "",
+        "product_name": "1212",
+        "id": "test_1782459106793_ab7aec21",
+        "updatedAt": "2026-06-26T07:31:46.794Z",
+        "createdAt": "2026-06-26T07:31:46.794Z"
+      },
+      {
+        "timestamp": "2026-06-26T07:32:19.019Z",
+        "operator": "Admin",
+        "recipe_name": "TEST_rix_COBO",
+        "recipe_version": 2,
+        "serial_dut": "4444",
+        "lot_number": "1000700",
+        "work_order": "1000700",
+        "repair_note": "grgg",
+        "final_result": "FAIL",
+        "execution_time_ms": 13704,
+        "steps_log": [
+          {
+            "step_id": 1,
+            "type": "PowerSupplySet",
+            "measured": {
+              "channel": 1,
+              "voltage": 18.5,
+              "current": 1,
+              "outputOn": true
             },
             "result": "DONE"
           },
           {
+            "step_id": 2,
+            "type": "ManualMeasurement",
+            "measured": 1.65,
+            "measurement_source": "MANUALE",
+            "measurement_device": "operatore/manuale",
+            "min": 0,
+            "max": 3.3,
+            "unit": "V",
+            "timestamp": "2026-06-26T07:32:11.780Z",
+            "result": "PASS"
+          },
+          {
+            "step_id": 3,
+            "type": "ManualMeasurement",
+            "measured": 10,
+            "measurement_source": "MANUALE",
+            "measurement_device": "operatore/manuale",
+            "min": 500,
+            "max": 999,
+            "unit": "",
+            "timestamp": "2026-06-26T07:32:17.769Z",
+            "result": "FAIL"
+          },
+          {
             "step_id": 4,
-            "type": "Delay",
-            "measured": 1000,
+            "type": "PowerSupplySet",
+            "measured": {
+              "channel": 1,
+              "voltage": 0,
+              "current": 0,
+              "outputOn": false
+            },
+            "result": "DONE"
+          }
+        ],
+        "station_id": "BANC123",
+        "station_name": "ATE0151",
+        "station_department": "COLLAUDO",
+        "station_site": "LAB0000",
+        "customer_name": "COBO",
+        "customer_logo": "",
+        "product_name": "1212",
+        "id": "test_1782459139024_7db5a8a7",
+        "updatedAt": "2026-06-26T07:32:19.025Z",
+        "createdAt": "2026-06-26T07:32:19.025Z"
+      },
+      {
+        "timestamp": "2026-06-26T07:35:23.549Z",
+        "operator": "Admin",
+        "recipe_name": "TEST_rix_COBO",
+        "recipe_version": 2,
+        "serial_dut": "4444",
+        "lot_number": "1000700",
+        "work_order": "1000700",
+        "repair_note": "tyhtrh",
+        "final_result": "PASS",
+        "execution_time_ms": 10381,
+        "steps_log": [
+          {
+            "step_id": 1,
+            "type": "PowerSupplySet",
+            "measured": {
+              "channel": 1,
+              "voltage": 18.5,
+              "current": 1,
+              "outputOn": true
+            },
             "result": "DONE"
           },
           {
-            "step_id": 5,
-            "type": "VoltageMeasurement",
-            "measured": 0.000232081402,
-            "measurement_source": "AUTOMATICA",
-            "measurement_device": "Keysight_34461A",
-            "target": 12,
-            "tolerance": 0.5,
-            "min": 11.5,
-            "max": 12.5,
+            "step_id": 2,
+            "type": "ManualMeasurement",
+            "measured": 1.5,
+            "measurement_source": "MANUALE",
+            "measurement_device": "operatore/manuale",
+            "min": 0,
+            "max": 3.3,
             "unit": "V",
-            "timestamp": "2026-06-16T06:49:10.949Z",
-            "result": "FAIL"
+            "timestamp": "2026-06-26T07:35:19.200Z",
+            "result": "PASS"
+          },
+          {
+            "step_id": 3,
+            "type": "ManualMeasurement",
+            "measured": 500,
+            "measurement_source": "MANUALE",
+            "measurement_device": "operatore/manuale",
+            "min": 500,
+            "max": 999,
+            "unit": "",
+            "timestamp": "2026-06-26T07:35:22.305Z",
+            "result": "PASS"
+          },
+          {
+            "step_id": 4,
+            "type": "PowerSupplySet",
+            "measured": {
+              "channel": 1,
+              "voltage": 0,
+              "current": 0,
+              "outputOn": false
+            },
+            "result": "DONE"
           }
         ],
-        "station_id": "BANCHETT111",
-        "station_name": "ATE0150",
+        "station_id": "BANC123",
+        "station_name": "ATE0151",
         "station_department": "COLLAUDO",
-        "station_site": "LAB01220",
-        "customer_name": "MEC",
+        "station_site": "LAB0000",
+        "customer_name": "COBO",
         "customer_logo": "",
         "product_name": "1212",
-        "id": "test_1781592551905_95d51312",
-        "updatedAt": "2026-06-16T06:49:11.905Z",
-        "createdAt": "2026-06-16T06:49:11.905Z"
+        "id": "test_1782459323552_b7c5af95",
+        "updatedAt": "2026-06-26T07:35:23.552Z",
+        "createdAt": "2026-06-26T07:35:23.552Z"
+      },
+      {
+        "timestamp": "2026-06-26T14:18:32.537Z",
+        "operator": "Admin",
+        "recipe_name": "TEST_rix_COBO",
+        "recipe_version": 2,
+        "serial_dut": "102325",
+        "lot_number": "1000700",
+        "work_order": "1000700",
+        "repair_note": "",
+        "final_result": "FAIL",
+        "execution_time_ms": 8599,
+        "steps_log": [
+          {
+            "step_id": 1,
+            "type": "PowerSupplySet",
+            "measured": {
+              "channel": 1,
+              "voltage": 18.5,
+              "current": 1,
+              "outputOn": true
+            },
+            "result": "DONE"
+          },
+          {
+            "step_id": 2,
+            "type": "ManualMeasurement",
+            "measured": 1.25,
+            "measurement_source": "MANUALE",
+            "measurement_device": "operatore/manuale",
+            "min": 0,
+            "max": 3.3,
+            "unit": "V",
+            "timestamp": "2026-06-26T14:18:29.994Z",
+            "result": "PASS"
+          },
+          {
+            "step_id": 3,
+            "type": "ManualMeasurement",
+            "measured": "",
+            "measurement_source": "MANUALE",
+            "measurement_device": "operatore/manuale",
+            "min": 500,
+            "max": 999,
+            "unit": "",
+            "timestamp": "2026-06-26T14:18:31.291Z",
+            "result": "FAIL"
+          },
+          {
+            "step_id": 4,
+            "type": "PowerSupplySet",
+            "measured": {
+              "channel": 1,
+              "voltage": 0,
+              "current": 0,
+              "outputOn": false
+            },
+            "result": "DONE"
+          }
+        ],
+        "station_id": "BANC123",
+        "station_name": "ATE0151",
+        "station_department": "COLLAUDO",
+        "station_site": "LAB0000",
+        "customer_name": "COBO",
+        "customer_logo": "",
+        "product_name": "1212",
+        "id": "test_1782483512540_806200f3",
+        "updatedAt": "2026-06-26T14:18:32.540Z",
+        "createdAt": "2026-06-26T14:18:32.540Z"
       }
     ],
     "test_steps": [
@@ -795,108 +995,291 @@
         "type": "PowerSupplySet",
         "measured": {
           "channel": 1,
-          "voltage": 24,
+          "voltage": 18.5,
           "current": 1,
           "outputOn": true
         },
         "result": "DONE",
-        "testResultId": "test_1781592551905_95d51312",
+        "testResultId": "test_1782459106793_ab7aec21",
         "index": 1,
-        "id": "test_1781592551905_95d51312_step_1",
-        "updatedAt": "2026-06-16T06:49:11.914Z",
-        "createdAt": "2026-06-16T06:49:11.914Z"
+        "id": "test_1782459106793_ab7aec21_step_1",
+        "updatedAt": "2026-06-26T07:31:46.805Z",
+        "createdAt": "2026-06-26T07:31:46.805Z"
       },
       {
         "step_id": 2,
         "type": "ManualMeasurement",
-        "measured": 900,
+        "measured": 1.65,
         "measurement_source": "MANUALE",
         "measurement_device": "operatore/manuale",
-        "min": 700,
-        "max": 999,
-        "unit": "",
-        "timestamp": "2026-06-16T06:49:09.098Z",
+        "min": 0,
+        "max": 3.3,
+        "unit": "V",
+        "timestamp": "2026-06-26T07:31:34.916Z",
         "result": "PASS",
-        "testResultId": "test_1781592551905_95d51312",
+        "testResultId": "test_1782459106793_ab7aec21",
         "index": 2,
-        "id": "test_1781592551905_95d51312_step_2",
-        "updatedAt": "2026-06-16T06:49:11.917Z",
-        "createdAt": "2026-06-16T06:49:11.917Z"
+        "id": "test_1782459106793_ab7aec21_step_2",
+        "updatedAt": "2026-06-26T07:31:46.807Z",
+        "createdAt": "2026-06-26T07:31:46.807Z"
       },
       {
         "step_id": 3,
-        "type": "DigitalOutputSet",
-        "measured": {
-          "channel": 2,
-          "state": true,
-          "mode": "set",
-          "expected": true,
-          "writeCount": 1,
-          "verifyFeedback": false
-        },
-        "result": "DONE",
-        "testResultId": "test_1781592551905_95d51312",
+        "type": "ManualMeasurement",
+        "measured": 10,
+        "measurement_source": "MANUALE",
+        "measurement_device": "operatore/manuale",
+        "min": 500,
+        "max": 999,
+        "unit": "",
+        "timestamp": "2026-06-26T07:31:45.545Z",
+        "result": "FAIL",
+        "testResultId": "test_1782459106793_ab7aec21",
         "index": 3,
-        "id": "test_1781592551905_95d51312_step_3",
-        "updatedAt": "2026-06-16T06:49:11.919Z",
-        "createdAt": "2026-06-16T06:49:11.919Z"
+        "id": "test_1782459106793_ab7aec21_step_3",
+        "updatedAt": "2026-06-26T07:31:46.811Z",
+        "createdAt": "2026-06-26T07:31:46.811Z"
       },
       {
         "step_id": 4,
-        "type": "Delay",
-        "measured": 1000,
+        "type": "PowerSupplySet",
+        "measured": {
+          "channel": 1,
+          "voltage": 0,
+          "current": 0,
+          "outputOn": false
+        },
         "result": "DONE",
-        "testResultId": "test_1781592551905_95d51312",
+        "testResultId": "test_1782459106793_ab7aec21",
         "index": 4,
-        "id": "test_1781592551905_95d51312_step_4",
-        "updatedAt": "2026-06-16T06:49:11.922Z",
-        "createdAt": "2026-06-16T06:49:11.922Z"
+        "id": "test_1782459106793_ab7aec21_step_4",
+        "updatedAt": "2026-06-26T07:31:46.813Z",
+        "createdAt": "2026-06-26T07:31:46.813Z"
       },
       {
-        "step_id": 5,
-        "type": "VoltageMeasurement",
-        "measured": 0.000232081402,
-        "measurement_source": "AUTOMATICA",
-        "measurement_device": "Keysight_34461A",
-        "target": 12,
-        "tolerance": 0.5,
-        "min": 11.5,
-        "max": 12.5,
+        "step_id": 1,
+        "type": "PowerSupplySet",
+        "measured": {
+          "channel": 1,
+          "voltage": 18.5,
+          "current": 1,
+          "outputOn": true
+        },
+        "result": "DONE",
+        "testResultId": "test_1782459139024_7db5a8a7",
+        "index": 1,
+        "id": "test_1782459139024_7db5a8a7_step_1",
+        "updatedAt": "2026-06-26T07:32:19.030Z",
+        "createdAt": "2026-06-26T07:32:19.030Z"
+      },
+      {
+        "step_id": 2,
+        "type": "ManualMeasurement",
+        "measured": 1.65,
+        "measurement_source": "MANUALE",
+        "measurement_device": "operatore/manuale",
+        "min": 0,
+        "max": 3.3,
         "unit": "V",
-        "timestamp": "2026-06-16T06:49:10.949Z",
+        "timestamp": "2026-06-26T07:32:11.780Z",
+        "result": "PASS",
+        "testResultId": "test_1782459139024_7db5a8a7",
+        "index": 2,
+        "id": "test_1782459139024_7db5a8a7_step_2",
+        "updatedAt": "2026-06-26T07:32:19.033Z",
+        "createdAt": "2026-06-26T07:32:19.033Z"
+      },
+      {
+        "step_id": 3,
+        "type": "ManualMeasurement",
+        "measured": 10,
+        "measurement_source": "MANUALE",
+        "measurement_device": "operatore/manuale",
+        "min": 500,
+        "max": 999,
+        "unit": "",
+        "timestamp": "2026-06-26T07:32:17.769Z",
         "result": "FAIL",
-        "testResultId": "test_1781592551905_95d51312",
-        "index": 5,
-        "id": "test_1781592551905_95d51312_step_5",
-        "updatedAt": "2026-06-16T06:49:11.924Z",
-        "createdAt": "2026-06-16T06:49:11.924Z"
+        "testResultId": "test_1782459139024_7db5a8a7",
+        "index": 3,
+        "id": "test_1782459139024_7db5a8a7_step_3",
+        "updatedAt": "2026-06-26T07:32:19.036Z",
+        "createdAt": "2026-06-26T07:32:19.036Z"
+      },
+      {
+        "step_id": 4,
+        "type": "PowerSupplySet",
+        "measured": {
+          "channel": 1,
+          "voltage": 0,
+          "current": 0,
+          "outputOn": false
+        },
+        "result": "DONE",
+        "testResultId": "test_1782459139024_7db5a8a7",
+        "index": 4,
+        "id": "test_1782459139024_7db5a8a7_step_4",
+        "updatedAt": "2026-06-26T07:32:19.039Z",
+        "createdAt": "2026-06-26T07:32:19.039Z"
+      },
+      {
+        "step_id": 1,
+        "type": "PowerSupplySet",
+        "measured": {
+          "channel": 1,
+          "voltage": 18.5,
+          "current": 1,
+          "outputOn": true
+        },
+        "result": "DONE",
+        "testResultId": "test_1782459323552_b7c5af95",
+        "index": 1,
+        "id": "test_1782459323552_b7c5af95_step_1",
+        "updatedAt": "2026-06-26T07:35:23.563Z",
+        "createdAt": "2026-06-26T07:35:23.563Z"
+      },
+      {
+        "step_id": 2,
+        "type": "ManualMeasurement",
+        "measured": 1.5,
+        "measurement_source": "MANUALE",
+        "measurement_device": "operatore/manuale",
+        "min": 0,
+        "max": 3.3,
+        "unit": "V",
+        "timestamp": "2026-06-26T07:35:19.200Z",
+        "result": "PASS",
+        "testResultId": "test_1782459323552_b7c5af95",
+        "index": 2,
+        "id": "test_1782459323552_b7c5af95_step_2",
+        "updatedAt": "2026-06-26T07:35:23.566Z",
+        "createdAt": "2026-06-26T07:35:23.566Z"
+      },
+      {
+        "step_id": 3,
+        "type": "ManualMeasurement",
+        "measured": 500,
+        "measurement_source": "MANUALE",
+        "measurement_device": "operatore/manuale",
+        "min": 500,
+        "max": 999,
+        "unit": "",
+        "timestamp": "2026-06-26T07:35:22.305Z",
+        "result": "PASS",
+        "testResultId": "test_1782459323552_b7c5af95",
+        "index": 3,
+        "id": "test_1782459323552_b7c5af95_step_3",
+        "updatedAt": "2026-06-26T07:35:23.570Z",
+        "createdAt": "2026-06-26T07:35:23.570Z"
+      },
+      {
+        "step_id": 4,
+        "type": "PowerSupplySet",
+        "measured": {
+          "channel": 1,
+          "voltage": 0,
+          "current": 0,
+          "outputOn": false
+        },
+        "result": "DONE",
+        "testResultId": "test_1782459323552_b7c5af95",
+        "index": 4,
+        "id": "test_1782459323552_b7c5af95_step_4",
+        "updatedAt": "2026-06-26T07:35:23.572Z",
+        "createdAt": "2026-06-26T07:35:23.572Z"
+      },
+      {
+        "step_id": 1,
+        "type": "PowerSupplySet",
+        "measured": {
+          "channel": 1,
+          "voltage": 18.5,
+          "current": 1,
+          "outputOn": true
+        },
+        "result": "DONE",
+        "testResultId": "test_1782483512540_806200f3",
+        "index": 1,
+        "id": "test_1782483512540_806200f3_step_1",
+        "updatedAt": "2026-06-26T14:18:32.548Z",
+        "createdAt": "2026-06-26T14:18:32.548Z"
+      },
+      {
+        "step_id": 2,
+        "type": "ManualMeasurement",
+        "measured": 1.25,
+        "measurement_source": "MANUALE",
+        "measurement_device": "operatore/manuale",
+        "min": 0,
+        "max": 3.3,
+        "unit": "V",
+        "timestamp": "2026-06-26T14:18:29.994Z",
+        "result": "PASS",
+        "testResultId": "test_1782483512540_806200f3",
+        "index": 2,
+        "id": "test_1782483512540_806200f3_step_2",
+        "updatedAt": "2026-06-26T14:18:32.550Z",
+        "createdAt": "2026-06-26T14:18:32.550Z"
+      },
+      {
+        "step_id": 3,
+        "type": "ManualMeasurement",
+        "measured": "",
+        "measurement_source": "MANUALE",
+        "measurement_device": "operatore/manuale",
+        "min": 500,
+        "max": 999,
+        "unit": "",
+        "timestamp": "2026-06-26T14:18:31.291Z",
+        "result": "FAIL",
+        "testResultId": "test_1782483512540_806200f3",
+        "index": 3,
+        "id": "test_1782483512540_806200f3_step_3",
+        "updatedAt": "2026-06-26T14:18:32.554Z",
+        "createdAt": "2026-06-26T14:18:32.554Z"
+      },
+      {
+        "step_id": 4,
+        "type": "PowerSupplySet",
+        "measured": {
+          "channel": 1,
+          "voltage": 0,
+          "current": 0,
+          "outputOn": false
+        },
+        "result": "DONE",
+        "testResultId": "test_1782483512540_806200f3",
+        "index": 4,
+        "id": "test_1782483512540_806200f3_step_4",
+        "updatedAt": "2026-06-26T14:18:32.559Z",
+        "createdAt": "2026-06-26T14:18:32.559Z"
       }
     ],
     "serial_history": [
       {
-        "id": "510615_test_1781592551905_95d51312",
-        "serial": "510615",
+        "id": "4444_test_1782459106793_ab7aec21",
+        "serial": "4444",
         "eventType": "TEST",
         "result": "FAIL",
-        "timestamp": "2026-06-16T06:49:11.899Z",
+        "timestamp": "2026-06-26T07:31:46.790Z",
         "report": {
-          "timestamp": "2026-06-16T06:49:11.899Z",
+          "timestamp": "2026-06-26T07:31:46.790Z",
           "operator": "Admin",
-          "recipe_name": "TEST",
-          "recipe_version": 1,
-          "serial_dut": "510615",
-          "lot_number": "1025.3564",
-          "work_order": "1025.3564",
+          "recipe_name": "TEST_rix_COBO",
+          "recipe_version": 2,
+          "serial_dut": "4444",
+          "lot_number": "1000700",
+          "work_order": "1000700",
           "repair_note": "",
           "final_result": "FAIL",
-          "execution_time_ms": 5863,
+          "execution_time_ms": 20045,
           "steps_log": [
             {
               "step_id": 1,
               "type": "PowerSupplySet",
               "measured": {
                 "channel": 1,
-                "voltage": 24,
+                "voltage": 18.5,
                 "current": 1,
                 "outputOn": true
               },
@@ -905,59 +1288,277 @@
             {
               "step_id": 2,
               "type": "ManualMeasurement",
-              "measured": 900,
+              "measured": 1.65,
               "measurement_source": "MANUALE",
               "measurement_device": "operatore/manuale",
-              "min": 700,
-              "max": 999,
-              "unit": "",
-              "timestamp": "2026-06-16T06:49:09.098Z",
+              "min": 0,
+              "max": 3.3,
+              "unit": "V",
+              "timestamp": "2026-06-26T07:31:34.916Z",
               "result": "PASS"
             },
             {
               "step_id": 3,
-              "type": "DigitalOutputSet",
+              "type": "ManualMeasurement",
+              "measured": 10,
+              "measurement_source": "MANUALE",
+              "measurement_device": "operatore/manuale",
+              "min": 500,
+              "max": 999,
+              "unit": "",
+              "timestamp": "2026-06-26T07:31:45.545Z",
+              "result": "FAIL"
+            },
+            {
+              "step_id": 4,
+              "type": "PowerSupplySet",
               "measured": {
-                "channel": 2,
-                "state": true,
-                "mode": "set",
-                "expected": true,
-                "writeCount": 1,
-                "verifyFeedback": false
+                "channel": 1,
+                "voltage": 0,
+                "current": 0,
+                "outputOn": false
+              },
+              "result": "DONE"
+            }
+          ],
+          "station_id": "BANC123",
+          "station_name": "ATE0151",
+          "station_department": "COLLAUDO",
+          "station_site": "LAB0000",
+          "customer_name": "COBO",
+          "customer_logo": "",
+          "product_name": "1212"
+        },
+        "updatedAt": "2026-06-26T07:31:46.802Z",
+        "createdAt": "2026-06-26T07:31:46.802Z"
+      },
+      {
+        "id": "4444_test_1782459139024_7db5a8a7",
+        "serial": "4444",
+        "eventType": "TEST",
+        "result": "FAIL",
+        "timestamp": "2026-06-26T07:32:19.019Z",
+        "report": {
+          "timestamp": "2026-06-26T07:32:19.019Z",
+          "operator": "Admin",
+          "recipe_name": "TEST_rix_COBO",
+          "recipe_version": 2,
+          "serial_dut": "4444",
+          "lot_number": "1000700",
+          "work_order": "1000700",
+          "repair_note": "grgg",
+          "final_result": "FAIL",
+          "execution_time_ms": 13704,
+          "steps_log": [
+            {
+              "step_id": 1,
+              "type": "PowerSupplySet",
+              "measured": {
+                "channel": 1,
+                "voltage": 18.5,
+                "current": 1,
+                "outputOn": true
               },
               "result": "DONE"
             },
             {
-              "step_id": 4,
-              "type": "Delay",
-              "measured": 1000,
-              "result": "DONE"
+              "step_id": 2,
+              "type": "ManualMeasurement",
+              "measured": 1.65,
+              "measurement_source": "MANUALE",
+              "measurement_device": "operatore/manuale",
+              "min": 0,
+              "max": 3.3,
+              "unit": "V",
+              "timestamp": "2026-06-26T07:32:11.780Z",
+              "result": "PASS"
             },
             {
-              "step_id": 5,
-              "type": "VoltageMeasurement",
-              "measured": 0.000232081402,
-              "measurement_source": "AUTOMATICA",
-              "measurement_device": "Keysight_34461A",
-              "target": 12,
-              "tolerance": 0.5,
-              "min": 11.5,
-              "max": 12.5,
-              "unit": "V",
-              "timestamp": "2026-06-16T06:49:10.949Z",
+              "step_id": 3,
+              "type": "ManualMeasurement",
+              "measured": 10,
+              "measurement_source": "MANUALE",
+              "measurement_device": "operatore/manuale",
+              "min": 500,
+              "max": 999,
+              "unit": "",
+              "timestamp": "2026-06-26T07:32:17.769Z",
               "result": "FAIL"
+            },
+            {
+              "step_id": 4,
+              "type": "PowerSupplySet",
+              "measured": {
+                "channel": 1,
+                "voltage": 0,
+                "current": 0,
+                "outputOn": false
+              },
+              "result": "DONE"
             }
           ],
-          "station_id": "BANCHETT111",
-          "station_name": "ATE0150",
+          "station_id": "BANC123",
+          "station_name": "ATE0151",
           "station_department": "COLLAUDO",
-          "station_site": "LAB01220",
-          "customer_name": "MEC",
+          "station_site": "LAB0000",
+          "customer_name": "COBO",
           "customer_logo": "",
           "product_name": "1212"
         },
-        "updatedAt": "2026-06-16T06:49:11.908Z",
-        "createdAt": "2026-06-16T06:49:11.908Z"
+        "updatedAt": "2026-06-26T07:32:19.027Z",
+        "createdAt": "2026-06-26T07:32:19.027Z"
+      },
+      {
+        "id": "4444_test_1782459323552_b7c5af95",
+        "serial": "4444",
+        "eventType": "TEST",
+        "result": "PASS",
+        "timestamp": "2026-06-26T07:35:23.549Z",
+        "report": {
+          "timestamp": "2026-06-26T07:35:23.549Z",
+          "operator": "Admin",
+          "recipe_name": "TEST_rix_COBO",
+          "recipe_version": 2,
+          "serial_dut": "4444",
+          "lot_number": "1000700",
+          "work_order": "1000700",
+          "repair_note": "tyhtrh",
+          "final_result": "PASS",
+          "execution_time_ms": 10381,
+          "steps_log": [
+            {
+              "step_id": 1,
+              "type": "PowerSupplySet",
+              "measured": {
+                "channel": 1,
+                "voltage": 18.5,
+                "current": 1,
+                "outputOn": true
+              },
+              "result": "DONE"
+            },
+            {
+              "step_id": 2,
+              "type": "ManualMeasurement",
+              "measured": 1.5,
+              "measurement_source": "MANUALE",
+              "measurement_device": "operatore/manuale",
+              "min": 0,
+              "max": 3.3,
+              "unit": "V",
+              "timestamp": "2026-06-26T07:35:19.200Z",
+              "result": "PASS"
+            },
+            {
+              "step_id": 3,
+              "type": "ManualMeasurement",
+              "measured": 500,
+              "measurement_source": "MANUALE",
+              "measurement_device": "operatore/manuale",
+              "min": 500,
+              "max": 999,
+              "unit": "",
+              "timestamp": "2026-06-26T07:35:22.305Z",
+              "result": "PASS"
+            },
+            {
+              "step_id": 4,
+              "type": "PowerSupplySet",
+              "measured": {
+                "channel": 1,
+                "voltage": 0,
+                "current": 0,
+                "outputOn": false
+              },
+              "result": "DONE"
+            }
+          ],
+          "station_id": "BANC123",
+          "station_name": "ATE0151",
+          "station_department": "COLLAUDO",
+          "station_site": "LAB0000",
+          "customer_name": "COBO",
+          "customer_logo": "",
+          "product_name": "1212"
+        },
+        "updatedAt": "2026-06-26T07:35:23.560Z",
+        "createdAt": "2026-06-26T07:35:23.560Z"
+      },
+      {
+        "id": "102325_test_1782483512540_806200f3",
+        "serial": "102325",
+        "eventType": "TEST",
+        "result": "FAIL",
+        "timestamp": "2026-06-26T14:18:32.537Z",
+        "report": {
+          "timestamp": "2026-06-26T14:18:32.537Z",
+          "operator": "Admin",
+          "recipe_name": "TEST_rix_COBO",
+          "recipe_version": 2,
+          "serial_dut": "102325",
+          "lot_number": "1000700",
+          "work_order": "1000700",
+          "repair_note": "",
+          "final_result": "FAIL",
+          "execution_time_ms": 8599,
+          "steps_log": [
+            {
+              "step_id": 1,
+              "type": "PowerSupplySet",
+              "measured": {
+                "channel": 1,
+                "voltage": 18.5,
+                "current": 1,
+                "outputOn": true
+              },
+              "result": "DONE"
+            },
+            {
+              "step_id": 2,
+              "type": "ManualMeasurement",
+              "measured": 1.25,
+              "measurement_source": "MANUALE",
+              "measurement_device": "operatore/manuale",
+              "min": 0,
+              "max": 3.3,
+              "unit": "V",
+              "timestamp": "2026-06-26T14:18:29.994Z",
+              "result": "PASS"
+            },
+            {
+              "step_id": 3,
+              "type": "ManualMeasurement",
+              "measured": "",
+              "measurement_source": "MANUALE",
+              "measurement_device": "operatore/manuale",
+              "min": 500,
+              "max": 999,
+              "unit": "",
+              "timestamp": "2026-06-26T14:18:31.291Z",
+              "result": "FAIL"
+            },
+            {
+              "step_id": 4,
+              "type": "PowerSupplySet",
+              "measured": {
+                "channel": 1,
+                "voltage": 0,
+                "current": 0,
+                "outputOn": false
+              },
+              "result": "DONE"
+            }
+          ],
+          "station_id": "BANC123",
+          "station_name": "ATE0151",
+          "station_department": "COLLAUDO",
+          "station_site": "LAB0000",
+          "customer_name": "COBO",
+          "customer_logo": "",
+          "product_name": "1212"
+        },
+        "updatedAt": "2026-06-26T14:18:32.544Z",
+        "createdAt": "2026-06-26T14:18:32.544Z"
       }
     ],
     "firmware_history": [],

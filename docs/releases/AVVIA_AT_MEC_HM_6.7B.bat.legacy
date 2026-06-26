@@ -1,0 +1,5 @@
+@echo off
+title AT-MEC HM 6.7B
+echo Avvio AT-MEC HM 6.7B MES READY ENTERPRISE...
+npm start
+pause

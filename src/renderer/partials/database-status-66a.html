@@ -1,0 +1,44 @@
+<div id="database-status-66a-tab" class="tab-content db66a-page">
+  <div class="db66a-hero">
+    <div>
+      <div class="db66a-eyebrow">AT-MEC_HM_6.6C_SQLITE_ENTERPRISE_STABLE</div>
+      <h2>🗄️ Database Status Enterprise</h2>
+      <p>Controllo integrità, audit trail, backup SQLite, diagnostica performance e stato migrazione enterprise. JSON/localStorage restano disponibili come backup/export.</p>
+    </div>
+    <div class="db66a-score" id="db66a-score">6.6C</div>
+  </div>
+
+  <div class="db66a-actions">
+    <button class="btn btn-primary" onclick="refreshDatabaseStatus66A()">🔄 Aggiorna stato</button>
+    <button class="btn btn-success" onclick="exportDatabaseAudit66A()">⬇ Esporta stato JSON</button>
+    <button class="btn btn-warning" onclick="runIntegrityCheck66C()">🧪 Integrity Check</button>
+    <button class="btn btn-ghost" onclick="showAuditTrail66C()">📜 Audit Trail</button>
+    <button class="btn btn-ghost" onclick="showPerformance66C()">⚡ Performance</button>
+    <button class="btn btn-ghost" onclick="createPreMigrationBackup66A()">💾 Backup SQLite</button>
+    <button class="btn btn-ghost" onclick="showSqliteSchema66A()">📐 Script DB 6.6C</button>
+  </div>
+
+  <div class="db66a-grid">
+    <section class="db66a-card">
+      <h3>📦 Sorgenti dati</h3>
+      <div id="db66a-source-list" class="db66a-list"></div>
+    </section>
+    <section class="db66a-card">
+      <h3>📊 Stato runtime</h3>
+      <div id="db66a-local-db" class="db66a-list"></div>
+    </section>
+    <section class="db66a-card">
+      <h3>🛡️ Controlli Enterprise</h3>
+      <div id="db66a-module-map" class="db66a-list"></div>
+    </section>
+    <section class="db66a-card">
+      <h3>🧬 Mappa migrazione</h3>
+      <div id="db66a-plan" class="db66a-list"></div>
+    </section>
+  </div>
+
+  <section class="db66a-card db66a-wide">
+    <h3>📋 Output diagnostica</h3>
+    <div id="db66a-audit-output" class="db66a-output">Premi “Aggiorna stato” oppure “Integrity Check”.</div>
+  </section>
+</div>

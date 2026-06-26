@@ -1,0 +1,126 @@
+{
+  "release": "6.6C",
+  "createdAt": "2026-06-17T14:38:51.758Z",
+  "files": [
+    {
+      "file": "config/app_settings.json",
+      "size": 969,
+      "sha256": "926a7c73fddb46830008f6c31ae107f71e60dd9ff80d4f66a8556b4626dc6991"
+    },
+    {
+      "file": "config/data_provider.json",
+      "size": 719,
+      "sha256": "97134fde20875f5f19914b451be83978a520d15bcc5ce3f04b885467be3579d7"
+    },
+    {
+      "file": "config/logos/developerSmall_logo.png",
+      "size": 1276539,
+      "sha256": "61696d959405f0404d58981dae78fc65c58ae7033fd9336dc79c6490d7552c9e"
+    },
+    {
+      "file": "config/logos/developer_animation_default.gif",
+      "size": 101258,
+      "sha256": "8a5f399cb99d151849ebac6d62b38850c3fdfa74976ba9e6cf6d1e40eff3ec44"
+    },
+    {
+      "file": "config/logos/developer_small_default.png",
+      "size": 1276539,
+      "sha256": "61696d959405f0404d58981dae78fc65c58ae7033fd9336dc79c6490d7552c9e"
+    },
+    {
+      "file": "config/logos/hmi_large_default.png",
+      "size": 18490,
+      "sha256": "830bee836b3dd939a052b8de3ce3eb4c88a746a58e703dcef3a8d1a099e62405"
+    },
+    {
+      "file": "config/logos/loginSmall_logo.gif",
+      "size": 101258,
+      "sha256": "8a5f399cb99d151849ebac6d62b38850c3fdfa74976ba9e6cf6d1e40eff3ec44"
+    },
+    {
+      "file": "config/logos/loginSmall_logo.png",
+      "size": 1238412,
+      "sha256": "29d093ef85342406ba248304be7c63aa741a3a86c8380a0f8d390e61c630b47f"
+    },
+    {
+      "file": "config/logos/login_large_default.png",
+      "size": 18490,
+      "sha256": "830bee836b3dd939a052b8de3ce3eb4c88a746a58e703dcef3a8d1a099e62405"
+    },
+    {
+      "file": "config/logos/login_small_default.png",
+      "size": 1276539,
+      "sha256": "61696d959405f0404d58981dae78fc65c58ae7033fd9336dc79c6490d7552c9e"
+    },
+    {
+      "file": "config/logos/report_large_default.png",
+      "size": 18490,
+      "sha256": "830bee836b3dd939a052b8de3ce3eb4c88a746a58e703dcef3a8d1a099e62405"
+    },
+    {
+      "file": "config/logos/report_small_default.png",
+      "size": 1276539,
+      "sha256": "61696d959405f0404d58981dae78fc65c58ae7033fd9336dc79c6490d7552c9e"
+    },
+    {
+      "file": "config/repository_manifest_424b.json",
+      "size": 2810,
+      "sha256": "456bda778cb7c57fada6ea38cadcfafe8e91a19553ae2d90a569e4d67029de9a"
+    },
+    {
+      "file": "config/users.json",
+      "size": 1992,
+      "sha256": "74da37e61d04e7b056d7de8c073af2c5e34e4da51f0c1357a85e578abd96d579"
+    },
+    {
+      "file": "database/ate_mec_enterprise_db.json",
+      "size": 21823,
+      "sha256": "3124adab937ede0496cf64743f71a0b3ed0ba5e4a543481bdba069c40aa67411"
+    },
+    {
+      "file": "database/ate_mec_local_db.json",
+      "size": 5625,
+      "sha256": "845f330062033f771c12207edeeb7eafb0a924f3508b65e7dee35571bc6e8a33"
+    },
+    {
+      "file": "database/sqlite/enterprise_schema_66a.sql",
+      "size": 2788,
+      "sha256": "789f46073ed0b5fc3aeb99c47d8312bd99b345345778c720d5ad53d235d79613"
+    },
+    {
+      "file": "database/sqlite/enterprise_schema_66b.sql",
+      "size": 2466,
+      "sha256": "ff74881f0aa06f6af374093f25822baf26fc48a2acb2c3c77c5f98d7c3f0899e"
+    },
+    {
+      "file": "database/sqlite_enterprise_66b_migration.json",
+      "size": 14666,
+      "sha256": "4e727ad7ff4d84cfba11428c2fa16e2159bc860c3a594997c9ce55914f725c89"
+    },
+    {
+      "file": "database/sqlite_enterprise_66c_status.json",
+      "size": 472,
+      "sha256": "78a9fc7b67ef8d38bf13b4e050bac4758ed6f625c863b6849f75cd87d03b53bf"
+    },
+    {
+      "file": "database/sqlite_migration_66b.sql",
+      "size": 10647,
+      "sha256": "85ac4c11aa3b69cc8dfdd71cb2085c9258597e354e304ba25608aa178dcf1b9b"
+    },
+    {
+      "file": "database/sync_queue.json",
+      "size": 82,
+      "sha256": "3d18063b29c1ea7aca5ed960e22d4c6adaddde3baa601fbee64b173888a0b6b9"
+    },
+    {
+      "file": "recipes/Nuova Ricetta.json",
+      "size": 455,
+      "sha256": "44b3c5161f2f5a2b62afa71ac6e06649445860bfde526fa927d15c4b640ecb23"
+    },
+    {
+      "file": "src/renderer/config/repository_manifest_424b.json",
+      "size": 2810,
+      "sha256": "456bda778cb7c57fada6ea38cadcfafe8e91a19553ae2d90a569e4d67029de9a"
+    }
+  ]
+}

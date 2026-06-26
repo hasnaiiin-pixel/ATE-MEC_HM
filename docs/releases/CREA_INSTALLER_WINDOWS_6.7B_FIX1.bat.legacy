@@ -1,0 +1,5 @@
+@echo off
+title CREA INSTALLER AT-MEC HM 6.7B FIX1
+echo Creo installer Windows AT-MEC HM 6.7B FIX1...
+npm run dist
+pause

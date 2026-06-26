@@ -1,0 +1,100 @@
+<div id="production-execution-63a-tab" class="tab-content production63a-page">
+  <div class="prod63a-hero">
+    <div>
+      <h2>🏭 Production Execution</h2>
+      <p class="hint">AT-MEC_HM 6.3D — Supervisor Dashboard su dati reali produzione.</p>
+    </div>
+    <div class="prod63a-actions">
+      <button class="btn btn-primary" onclick="refreshProductionExecution63A()">🔄 Aggiorna dati reali</button>
+      <button class="btn btn-success" onclick="syncWorkOrderRuntime63B()">🔁 Sincronizza avanzamento WO</button>
+      <button class="btn btn-ghost" onclick="exportProductionExecution63A()">⬇ Export JSON</button>
+    </div>
+  </div>
+  <div class="prod63a-subnav panel">
+    <button class="btn btn-primary btn-sm" onclick="showProductionExecution63A()">🏭 Production Execution</button>
+    <button class="btn btn-ghost btn-sm" onclick="showWorkOrderRuntime63B()">📋 Work Order Runtime</button>
+    <button class="btn btn-ghost btn-sm" onclick="showMultiStationMonitor63C()">🖥️ Multi Station Monitor</button>
+    <button class="btn btn-ghost btn-sm" onclick="showSupervisorDashboard63D()">📡 Supervisor Dashboard</button>
+    <button class="btn btn-ghost btn-sm" onclick="goDashboard63C()">🏠 Dashboard</button>
+  </div>
+
+
+  <div class="prod63a-toolbar panel" data-prod63-section="dashboard">
+    <div class="field"><label>Commessa / WO</label><select id="prod63a-workorder-filter" onchange="renderProductionExecution63A()"><option value="ALL">Tutte</option></select></div>
+    <div class="field"><label>Ricetta</label><select id="prod63a-recipe-filter" onchange="renderProductionExecution63A()"><option value="ALL">Tutte</option></select></div>
+    <div class="field"><label>Periodo</label><select id="prod63a-period-filter" onchange="renderProductionExecution63A()"><option value="ALL">Tutto</option><option value="TODAY">Oggi</option><option value="7D">Ultimi 7 giorni</option><option value="30D">Ultimi 30 giorni</option></select></div>
+    <div class="field"><label>Origine dati</label><div id="prod63a-source" class="prod63a-source">in attesa</div></div>
+  </div>
+
+  <div id="prod63a-runtime-panel" class="prod63b-runtime-panel" data-prod63-section="runtime"></div>
+  <div id="prod63a-selected-wo" class="prod63a-workorder-box" data-prod63-section="runtime dashboard"></div>
+
+  <div class="panel prod63a-card prod63d-supervisor-panel" data-prod63-section="supervisor">
+    <div class="prod63c-head">
+      <div>
+        <h3>📡 Supervisor Dashboard</h3>
+        <div class="hint">Vista responsabile produzione: stato globale postazioni, commesse attive, KPI live e allarmi.</div>
+      </div>
+      <div>
+        <button class="btn btn-primary btn-sm" onclick="refreshProductionExecution63A()">🔄 Aggiorna supervisione</button>
+        <button class="btn btn-ghost btn-sm" onclick="exportProductionExecution63A()">⬇ Export JSON</button>
+      </div>
+    </div>
+    <div id="prod63d-supervisor-kpis" class="prod63d-supervisor-kpis"><div class="hint">Premi Aggiorna dati reali.</div></div>
+    <div class="prod63d-supervisor-grid">
+      <div class="prod63d-supervisor-box"><h4>🏭 Stato postazioni</h4><div id="prod63d-station-summary" class="prod63a-table-wrap"></div></div>
+      <div class="prod63d-supervisor-box"><h4>📋 Commesse attive</h4><div id="prod63d-workorder-summary" class="prod63a-table-wrap"></div></div>
+      <div class="prod63d-supervisor-box"><h4>🚨 Allarmi / Attenzioni</h4><div id="prod63d-alert-summary" class="prod63a-table-wrap"></div></div>
+    </div>
+  </div>
+
+  <div class="panel prod63a-card prod63c-station-panel" data-prod63-section="stations">
+    <div class="prod63c-head">
+      <div>
+        <h3>🖥️ Multi Station Monitor</h3>
+        <div class="hint">Stato postazioni, ultima attività, commessa, ricetta, operatore e KPI per stazione.</div>
+      </div>
+      <div>
+        <button class="btn btn-ghost btn-sm" onclick="addProductionStation63C()">➕ Aggiungi postazione</button>
+        <button class="btn btn-primary btn-sm" onclick="refreshProductionExecution63A()">🔄 Aggiorna stazioni</button>
+      </div>
+    </div>
+    <div id="prod63c-station-table" class="prod63a-table-wrap"><div class="hint">Premi Aggiorna dati reali.</div></div>
+  </div>
+
+
+  <div class="prod63a-kpi-grid" data-prod63-section="dashboard">
+    <div class="prod63a-kpi"><span>Test totali</span><b id="prod63a-kpi-total">0</b></div>
+    <div class="prod63a-kpi pass"><span>PASS</span><b id="prod63a-kpi-pass">0</b></div>
+    <div class="prod63a-kpi fail"><span>FAIL</span><b id="prod63a-kpi-fail">0</b></div>
+    <div class="prod63a-kpi error"><span>ERROR / STOP</span><b id="prod63a-kpi-error">0</b></div>
+    <div class="prod63a-kpi"><span>Yield</span><b id="prod63a-kpi-yield">0%</b></div>
+    <div class="prod63a-kpi"><span>Throughput oggi</span><b id="prod63a-kpi-throughput">0</b></div>
+  </div>
+
+  <div class="prod63a-grid" data-prod63-section="dashboard runtime">
+    <div class="panel prod63a-card">
+      <h3>📋 Avanzamento per commessa</h3>
+      <div id="prod63a-workorders-table" class="prod63a-table-wrap"><div class="hint">Premi Aggiorna dati reali.</div></div>
+    </div>
+    <div class="panel prod63a-card">
+      <h3>🧾 KPI per ricetta</h3>
+      <div id="prod63a-recipes-table" class="prod63a-table-wrap"><div class="hint">Nessun dato caricato.</div></div>
+    </div>
+  </div>
+
+  <div class="panel prod63a-card" data-prod63-section="dashboard">
+    <h3>🕒 Ultimi test produzione</h3>
+    <div id="prod63a-recent-table" class="prod63a-table-wrap"><div class="hint">Nessun test da visualizzare.</div></div>
+  </div>
+
+  <div class="panel prod63a-card" data-prod63-section="runtime stations">
+    <h3>📜 Runtime Work Order Audit</h3>
+    <div id="prod63b-runtime-audit" class="prod63a-table-wrap"><div class="hint">Nessun evento runtime.</div></div>
+  </div>
+
+  <div class="panel prod63a-card" data-prod63-section="dashboard runtime stations supervisor">
+    <h3>ℹ️ Note 6.3D</h3>
+    <div class="hint">La 6.3D aggiunge la Supervisor Dashboard sopra i dati reali già usati da Production Execution, Work Order Runtime e Multi Station Monitor. Il Test Mode non viene modificato.</div>
+  </div>
+</div>

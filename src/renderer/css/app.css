@@ -18,3 +18,15 @@
 
 @import url("modules/13-label-manager.css");
 @import url("modules/14-print-engine.css");
+
+
+/* AT-MEC_HM_6.7B_FIX2D_WO_LOAD_AND_ACTION_INPUT_FIX */
+.atmec67b-fix2c-compact-selector{border:1px solid rgba(96,165,250,.22);background:rgba(15,23,42,.54);border-radius:14px;padding:8px;margin:8px 0;}
+.atmec67b-wo-compact-row{display:grid;grid-template-columns:auto minmax(260px,1fr) minmax(150px,220px) auto;gap:8px;align-items:end;}
+.atmec67b-mode{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:900;color:#bfdbfe;white-space:nowrap;padding-bottom:7px;}
+.atmec67b-wo-select-block label{display:block;font-size:10px;letter-spacing:.08em;font-weight:900;color:#93c5fd;margin-bottom:2px;}
+.atmec67b-wo-select-block select,.atmec67b-wo-filter{height:34px!important;min-height:34px!important;padding:5px 9px!important;font-size:12px!important;}
+.atmec67b-wo-current{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-top:6px;border-top:1px solid rgba(148,163,184,.14);padding-top:6px;}
+.atmec67b-wo-current b{color:#f8fafc;font-size:13px}.atmec67b-wo-current small{display:block;color:#94a3b8;font-size:11px;margin-top:2px}.atmec67b-wo-kpis-compact{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}.atmec67b-wo-kpis-compact span{font-size:10px;color:#94a3b8;border:1px solid rgba(148,163,184,.15);background:rgba(2,6,23,.38);border-radius:999px;padding:4px 7px}.atmec67b-wo-kpis-compact b{color:#e5e7eb;font-size:11px}.atmec67b-wo-empty,.atmec67b-wo-selected-line{font-size:12px;color:#cbd5e1}.atmec67b-wo-selected-line.warn{color:#fbbf24}
+#manual-step-value,.manual-measure-input{pointer-events:auto!important;user-select:text!important;-webkit-user-select:text!important;}
+@media(max-width:1200px){.atmec67b-wo-compact-row{grid-template-columns:1fr;}.atmec67b-wo-current{align-items:flex-start;flex-direction:column}.atmec67b-wo-kpis-compact{justify-content:flex-start}}

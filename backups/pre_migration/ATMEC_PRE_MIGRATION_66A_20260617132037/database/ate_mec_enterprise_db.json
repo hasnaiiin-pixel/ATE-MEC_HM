@@ -1,0 +1,723 @@
+{
+  "schemaVersion": 41702,
+  "createdAt": "2026-06-14T15:43:02.563Z",
+  "updatedAt": "2026-06-14T15:43:02.618Z",
+  "backend": "json_enterprise",
+  "sqliteReady": false,
+  "tables": {
+    "users": [
+      {
+        "username": "admin",
+        "displayName": "Admin",
+        "role": "Admin",
+        "salt": "bd161c457887e4e35e3f01a6bcb12f52",
+        "passwordHash": "e5e65fd88c58385482f1886aac8d9dd148a3ac07c2dac7323850019193f98bb9",
+        "enabled": true,
+        "id": "admin",
+        "updatedAt": "2026-06-14T15:43:02.569Z",
+        "createdAt": "2026-06-14T15:43:02.569Z"
+      },
+      {
+        "username": "mirza",
+        "displayName": "Mirza",
+        "role": "Operator",
+        "salt": "1a0972d41057b989dea001df46a1a24b",
+        "passwordHash": "431bd2ee25963454e8d349a484bdfc4ee80160f58b8bc5447ee931f59abd63ea",
+        "enabled": true,
+        "id": "mirza",
+        "updatedAt": "2026-06-14T15:43:02.570Z",
+        "createdAt": "2026-06-14T15:43:02.570Z"
+      }
+    ],
+    "roles": [
+      {
+        "role": "Operator",
+        "permissions": [
+          "run_test",
+          "view_reports"
+        ],
+        "level": 10,
+        "id": "operator",
+        "updatedAt": "2026-06-14T15:43:02.571Z",
+        "createdAt": "2026-06-14T15:43:02.571Z"
+      },
+      {
+        "role": "Technician",
+        "permissions": [
+          "run_test",
+          "view_reports",
+          "debug_mode",
+          "view_traceability"
+        ],
+        "level": 30,
+        "id": "technician",
+        "updatedAt": "2026-06-14T15:43:02.571Z",
+        "createdAt": "2026-06-14T15:43:02.571Z"
+      },
+      {
+        "role": "Engineer",
+        "permissions": [
+          "run_test",
+          "view_reports",
+          "debug_mode",
+          "edit_recipe",
+          "config_hardware",
+          "view_traceability",
+          "view_kpi",
+          "manage_data"
+        ],
+        "level": 60,
+        "id": "engineer",
+        "updatedAt": "2026-06-14T15:43:02.572Z",
+        "createdAt": "2026-06-14T15:43:02.572Z"
+      },
+      {
+        "role": "Developer",
+        "permissions": [
+          "run_test",
+          "view_reports",
+          "debug_mode",
+          "edit_recipe",
+          "config_hardware",
+          "manage_branding",
+          "edit_layout",
+          "show_ui_ids",
+          "test_elements",
+          "view_traceability",
+          "view_kpi",
+          "manage_data"
+        ],
+        "level": 80,
+        "id": "developer",
+        "updatedAt": "2026-06-14T15:43:02.573Z",
+        "createdAt": "2026-06-14T15:43:02.573Z"
+      },
+      {
+        "role": "Admin",
+        "permissions": [
+          "run_test",
+          "view_reports",
+          "debug_mode",
+          "edit_recipe",
+          "config_hardware",
+          "manage_users",
+          "manage_branding",
+          "edit_layout",
+          "show_ui_ids",
+          "test_elements",
+          "view_traceability",
+          "view_kpi",
+          "manage_data"
+        ],
+        "level": 100,
+        "id": "admin",
+        "updatedAt": "2026-06-14T15:43:02.573Z",
+        "createdAt": "2026-06-14T15:43:02.573Z"
+      },
+      {
+        "role": "Qualità",
+        "permissions": [
+          "view_reports",
+          "sign_quality",
+          "approve_reports"
+        ],
+        "level": 60,
+        "id": "qualità",
+        "updatedAt": "2026-06-14T15:43:02.574Z",
+        "createdAt": "2026-06-14T15:43:02.574Z"
+      }
+    ],
+    "permissions": [
+      {
+        "role": "Operator",
+        "permission": "run_test",
+        "id": "operator_run_test",
+        "updatedAt": "2026-06-14T15:43:02.575Z",
+        "createdAt": "2026-06-14T15:43:02.575Z"
+      },
+      {
+        "role": "Operator",
+        "permission": "view_reports",
+        "id": "operator_view_reports",
+        "updatedAt": "2026-06-14T15:43:02.575Z",
+        "createdAt": "2026-06-14T15:43:02.575Z"
+      },
+      {
+        "role": "Technician",
+        "permission": "run_test",
+        "id": "technician_run_test",
+        "updatedAt": "2026-06-14T15:43:02.575Z",
+        "createdAt": "2026-06-14T15:43:02.575Z"
+      },
+      {
+        "role": "Technician",
+        "permission": "view_reports",
+        "id": "technician_view_reports",
+        "updatedAt": "2026-06-14T15:43:02.576Z",
+        "createdAt": "2026-06-14T15:43:02.576Z"
+      },
+      {
+        "role": "Technician",
+        "permission": "debug_mode",
+        "id": "technician_debug_mode",
+        "updatedAt": "2026-06-14T15:43:02.576Z",
+        "createdAt": "2026-06-14T15:43:02.576Z"
+      },
+      {
+        "role": "Technician",
+        "permission": "view_traceability",
+        "id": "technician_view_traceability",
+        "updatedAt": "2026-06-14T15:43:02.577Z",
+        "createdAt": "2026-06-14T15:43:02.577Z"
+      },
+      {
+        "role": "Engineer",
+        "permission": "run_test",
+        "id": "engineer_run_test",
+        "updatedAt": "2026-06-14T15:43:02.577Z",
+        "createdAt": "2026-06-14T15:43:02.577Z"
+      },
+      {
+        "role": "Engineer",
+        "permission": "view_reports",
+        "id": "engineer_view_reports",
+        "updatedAt": "2026-06-14T15:43:02.578Z",
+        "createdAt": "2026-06-14T15:43:02.578Z"
+      },
+      {
+        "role": "Engineer",
+        "permission": "debug_mode",
+        "id": "engineer_debug_mode",
+        "updatedAt": "2026-06-14T15:43:02.578Z",
+        "createdAt": "2026-06-14T15:43:02.578Z"
+      },
+      {
+        "role": "Engineer",
+        "permission": "edit_recipe",
+        "id": "engineer_edit_recipe",
+        "updatedAt": "2026-06-14T15:43:02.579Z",
+        "createdAt": "2026-06-14T15:43:02.579Z"
+      },
+      {
+        "role": "Engineer",
+        "permission": "config_hardware",
+        "id": "engineer_config_hardware",
+        "updatedAt": "2026-06-14T15:43:02.579Z",
+        "createdAt": "2026-06-14T15:43:02.579Z"
+      },
+      {
+        "role": "Engineer",
+        "permission": "view_traceability",
+        "id": "engineer_view_traceability",
+        "updatedAt": "2026-06-14T15:43:02.579Z",
+        "createdAt": "2026-06-14T15:43:02.579Z"
+      },
+      {
+        "role": "Engineer",
+        "permission": "view_kpi",
+        "id": "engineer_view_kpi",
+        "updatedAt": "2026-06-14T15:43:02.580Z",
+        "createdAt": "2026-06-14T15:43:02.580Z"
+      },
+      {
+        "role": "Engineer",
+        "permission": "manage_data",
+        "id": "engineer_manage_data",
+        "updatedAt": "2026-06-14T15:43:02.580Z",
+        "createdAt": "2026-06-14T15:43:02.580Z"
+      },
+      {
+        "role": "Developer",
+        "permission": "run_test",
+        "id": "developer_run_test",
+        "updatedAt": "2026-06-14T15:43:02.580Z",
+        "createdAt": "2026-06-14T15:43:02.580Z"
+      },
+      {
+        "role": "Developer",
+        "permission": "view_reports",
+        "id": "developer_view_reports",
+        "updatedAt": "2026-06-14T15:43:02.581Z",
+        "createdAt": "2026-06-14T15:43:02.581Z"
+      },
+      {
+        "role": "Developer",
+        "permission": "debug_mode",
+        "id": "developer_debug_mode",
+        "updatedAt": "2026-06-14T15:43:02.581Z",
+        "createdAt": "2026-06-14T15:43:02.581Z"
+      },
+      {
+        "role": "Developer",
+        "permission": "edit_recipe",
+        "id": "developer_edit_recipe",
+        "updatedAt": "2026-06-14T15:43:02.582Z",
+        "createdAt": "2026-06-14T15:43:02.582Z"
+      },
+      {
+        "role": "Developer",
+        "permission": "config_hardware",
+        "id": "developer_config_hardware",
+        "updatedAt": "2026-06-14T15:43:02.583Z",
+        "createdAt": "2026-06-14T15:43:02.583Z"
+      },
+      {
+        "role": "Developer",
+        "permission": "manage_branding",
+        "id": "developer_manage_branding",
+        "updatedAt": "2026-06-14T15:43:02.584Z",
+        "createdAt": "2026-06-14T15:43:02.584Z"
+      },
+      {
+        "role": "Developer",
+        "permission": "edit_layout",
+        "id": "developer_edit_layout",
+        "updatedAt": "2026-06-14T15:43:02.585Z",
+        "createdAt": "2026-06-14T15:43:02.585Z"
+      },
+      {
+        "role": "Developer",
+        "permission": "show_ui_ids",
+        "id": "developer_show_ui_ids",
+        "updatedAt": "2026-06-14T15:43:02.585Z",
+        "createdAt": "2026-06-14T15:43:02.585Z"
+      },
+      {
+        "role": "Developer",
+        "permission": "test_elements",
+        "id": "developer_test_elements",
+        "updatedAt": "2026-06-14T15:43:02.586Z",
+        "createdAt": "2026-06-14T15:43:02.586Z"
+      },
+      {
+        "role": "Developer",
+        "permission": "view_traceability",
+        "id": "developer_view_traceability",
+        "updatedAt": "2026-06-14T15:43:02.588Z",
+        "createdAt": "2026-06-14T15:43:02.588Z"
+      },
+      {
+        "role": "Developer",
+        "permission": "view_kpi",
+        "id": "developer_view_kpi",
+        "updatedAt": "2026-06-14T15:43:02.589Z",
+        "createdAt": "2026-06-14T15:43:02.589Z"
+      },
+      {
+        "role": "Developer",
+        "permission": "manage_data",
+        "id": "developer_manage_data",
+        "updatedAt": "2026-06-14T15:43:02.589Z",
+        "createdAt": "2026-06-14T15:43:02.589Z"
+      },
+      {
+        "role": "Admin",
+        "permission": "run_test",
+        "id": "admin_run_test",
+        "updatedAt": "2026-06-14T15:43:02.590Z",
+        "createdAt": "2026-06-14T15:43:02.590Z"
+      },
+      {
+        "role": "Admin",
+        "permission": "view_reports",
+        "id": "admin_view_reports",
+        "updatedAt": "2026-06-14T15:43:02.592Z",
+        "createdAt": "2026-06-14T15:43:02.592Z"
+      },
+      {
+        "role": "Admin",
+        "permission": "debug_mode",
+        "id": "admin_debug_mode",
+        "updatedAt": "2026-06-14T15:43:02.592Z",
+        "createdAt": "2026-06-14T15:43:02.592Z"
+      },
+      {
+        "role": "Admin",
+        "permission": "edit_recipe",
+        "id": "admin_edit_recipe",
+        "updatedAt": "2026-06-14T15:43:02.593Z",
+        "createdAt": "2026-06-14T15:43:02.593Z"
+      },
+      {
+        "role": "Admin",
+        "permission": "config_hardware",
+        "id": "admin_config_hardware",
+        "updatedAt": "2026-06-14T15:43:02.594Z",
+        "createdAt": "2026-06-14T15:43:02.594Z"
+      },
+      {
+        "role": "Admin",
+        "permission": "manage_users",
+        "id": "admin_manage_users",
+        "updatedAt": "2026-06-14T15:43:02.595Z",
+        "createdAt": "2026-06-14T15:43:02.595Z"
+      },
+      {
+        "role": "Admin",
+        "permission": "manage_branding",
+        "id": "admin_manage_branding",
+        "updatedAt": "2026-06-14T15:43:02.595Z",
+        "createdAt": "2026-06-14T15:43:02.595Z"
+      },
+      {
+        "role": "Admin",
+        "permission": "edit_layout",
+        "id": "admin_edit_layout",
+        "updatedAt": "2026-06-14T15:43:02.596Z",
+        "createdAt": "2026-06-14T15:43:02.596Z"
+      },
+      {
+        "role": "Admin",
+        "permission": "show_ui_ids",
+        "id": "admin_show_ui_ids",
+        "updatedAt": "2026-06-14T15:43:02.597Z",
+        "createdAt": "2026-06-14T15:43:02.597Z"
+      },
+      {
+        "role": "Admin",
+        "permission": "test_elements",
+        "id": "admin_test_elements",
+        "updatedAt": "2026-06-14T15:43:02.597Z",
+        "createdAt": "2026-06-14T15:43:02.597Z"
+      },
+      {
+        "role": "Admin",
+        "permission": "view_traceability",
+        "id": "admin_view_traceability",
+        "updatedAt": "2026-06-14T15:43:02.598Z",
+        "createdAt": "2026-06-14T15:43:02.598Z"
+      },
+      {
+        "role": "Admin",
+        "permission": "view_kpi",
+        "id": "admin_view_kpi",
+        "updatedAt": "2026-06-14T15:43:02.599Z",
+        "createdAt": "2026-06-14T15:43:02.599Z"
+      },
+      {
+        "role": "Admin",
+        "permission": "manage_data",
+        "id": "admin_manage_data",
+        "updatedAt": "2026-06-14T15:43:02.600Z",
+        "createdAt": "2026-06-14T15:43:02.600Z"
+      },
+      {
+        "role": "Qualità",
+        "permission": "view_reports",
+        "id": "qualità_view_reports",
+        "updatedAt": "2026-06-14T15:43:02.601Z",
+        "createdAt": "2026-06-14T15:43:02.601Z"
+      },
+      {
+        "role": "Qualità",
+        "permission": "sign_quality",
+        "id": "qualità_sign_quality",
+        "updatedAt": "2026-06-14T15:43:02.602Z",
+        "createdAt": "2026-06-14T15:43:02.602Z"
+      },
+      {
+        "role": "Qualità",
+        "permission": "approve_reports",
+        "id": "qualità_approve_reports",
+        "updatedAt": "2026-06-14T15:43:02.602Z",
+        "createdAt": "2026-06-14T15:43:02.602Z"
+      }
+    ],
+    "recipes": [
+      {
+        "id": "nuova ricetta",
+        "recipe_name": "Nuova Ricetta",
+        "latestVersion": 4,
+        "updatedAt": "2026-06-14T15:43:02.608Z",
+        "latestRevisionId": "recipe_1780499188959_736a7ee1",
+        "createdAt": "2026-06-14T15:43:02.604Z"
+      }
+    ],
+    "recipe_versions": [
+      {
+        "id": "recipe_1780499051207_4a5df09b",
+        "recipe_name": "Nuova Ricetta",
+        "version": 2,
+        "created_at": "2026-06-03T15:04:11.207Z",
+        "author": "Admin",
+        "note": "Salvataggio da HMI",
+        "recipe": {
+          "recipe_name": "Nuova Ricetta",
+          "version": 2,
+          "enabled": true,
+          "power_metadata": "PL303_PROGRAMMABLE",
+          "steps": [
+            {
+              "step_id": 1,
+              "type": "ManualMeasurement",
+              "enabled": true,
+              "label": "Step manuale guidato",
+              "description": "Posizionare le sonde sui punti indicati. Quando il contatto è stabile premere Conferma: il sistema acquisisce la misura automaticamente.",
+              "io_type": "SYSTEM",
+              "device_mapping": "system",
+              "timeout": 2500,
+              "min": 0,
+              "max": 3.3,
+              "unit": "V",
+              "command": "MEAS:VOLT:DC?",
+              "manual_measure_type": "CONFIRM",
+              "manual_input_enabled": true,
+              "stable_time_ms": 1000
+            }
+          ]
+        },
+        "updatedAt": "2026-06-14T15:43:02.603Z",
+        "createdAt": "2026-06-14T15:43:02.604Z"
+      },
+      {
+        "id": "recipe_1780499133870_0e14c23b",
+        "recipe_name": "Nuova Ricetta",
+        "version": 3,
+        "created_at": "2026-06-03T15:05:33.870Z",
+        "author": "Admin",
+        "note": "Salvataggio da HMI",
+        "recipe": {
+          "recipe_name": "Nuova Ricetta",
+          "version": 3,
+          "enabled": true,
+          "power_metadata": "PL303_PROGRAMMABLE",
+          "steps": [
+            {
+              "step_id": 1,
+              "type": "ManualMeasurement",
+              "enabled": true,
+              "label": "Step manuale guidato",
+              "description": "Posizionare le sonde sui punti indicati. Quando il contatto è stabile premere Conferma: il sistema acquisisce la misura automaticamente.",
+              "io_type": "SYSTEM",
+              "device_mapping": "system",
+              "timeout": 2500,
+              "min": 0,
+              "max": 3.3,
+              "unit": "V",
+              "command": "MEAS:VOLT:DC?",
+              "manual_measure_type": "CONFIRM",
+              "manual_input_enabled": false,
+              "stable_time_ms": 1000
+            }
+          ]
+        },
+        "updatedAt": "2026-06-14T15:43:02.606Z",
+        "createdAt": "2026-06-14T15:43:02.606Z"
+      },
+      {
+        "id": "recipe_1780499188959_736a7ee1",
+        "recipe_name": "Nuova Ricetta",
+        "version": 4,
+        "created_at": "2026-06-03T15:06:28.959Z",
+        "author": "Admin",
+        "note": "Salvataggio da HMI",
+        "recipe": {
+          "recipe_name": "Nuova Ricetta",
+          "version": 4,
+          "enabled": true,
+          "power_metadata": "PL303_PROGRAMMABLE",
+          "steps": [
+            {
+              "step_id": 1,
+              "type": "ResistanceTest",
+              "enabled": true,
+              "label": "Misura resistenza",
+              "description": "",
+              "io_type": "SCPI",
+              "device_mapping": "Keysight_34461A",
+              "timeout": 2000,
+              "min": 450,
+              "max": 510,
+              "unit": "Ω",
+              "command": "MEAS:RES?"
+            }
+          ]
+        },
+        "updatedAt": "2026-06-14T15:43:02.607Z",
+        "createdAt": "2026-06-14T15:43:02.607Z"
+      }
+    ],
+    "test_results": [
+      {
+        "timestamp": "2026-06-03T15:04:50.051Z",
+        "operator": "Admin",
+        "recipe_name": "Nuova Ricetta",
+        "recipe_version": 2,
+        "serial_dut": "",
+        "lot_number": "10000",
+        "work_order": "10000",
+        "repair_note": "",
+        "final_result": "PASS",
+        "execution_time_ms": 18740,
+        "steps_log": [
+          {
+            "step_id": 1,
+            "type": "ManualMeasurement",
+            "measured": 3.1,
+            "result": "PASS"
+          }
+        ],
+        "id": "test_1781451782609_df55ce43",
+        "updatedAt": "2026-06-14T15:43:02.609Z",
+        "createdAt": "2026-06-14T15:43:02.609Z"
+      },
+      {
+        "timestamp": "2026-06-03T15:05:06.691Z",
+        "operator": "Admin",
+        "recipe_name": "Nuova Ricetta",
+        "recipe_version": 2,
+        "serial_dut": "",
+        "lot_number": "10000",
+        "work_order": "10000",
+        "repair_note": "",
+        "final_result": "FAIL",
+        "execution_time_ms": 11987,
+        "steps_log": [
+          {
+            "step_id": 1,
+            "type": "ManualMeasurement",
+            "measured": "FAIL manuale",
+            "result": "FAIL"
+          }
+        ],
+        "id": "test_1781451782611_7f2e7af1",
+        "updatedAt": "2026-06-14T15:43:02.611Z",
+        "createdAt": "2026-06-14T15:43:02.611Z"
+      },
+      {
+        "timestamp": "2026-06-03T15:05:49.612Z",
+        "operator": "Admin",
+        "recipe_name": "Nuova Ricetta",
+        "recipe_version": 3,
+        "serial_dut": "",
+        "lot_number": "10000",
+        "work_order": "10000",
+        "repair_note": "",
+        "final_result": "PASS",
+        "execution_time_ms": 5043,
+        "steps_log": [
+          {
+            "step_id": 1,
+            "type": "ManualMeasurement",
+            "measured": "CONFERMATO",
+            "result": "PASS"
+          }
+        ],
+        "id": "test_1781451782613_d39264e7",
+        "updatedAt": "2026-06-14T15:43:02.613Z",
+        "createdAt": "2026-06-14T15:43:02.613Z"
+      },
+      {
+        "timestamp": "2026-06-03T15:06:00.162Z",
+        "operator": "Admin",
+        "recipe_name": "Nuova Ricetta",
+        "recipe_version": 3,
+        "serial_dut": "",
+        "lot_number": "10000",
+        "work_order": "10000",
+        "repair_note": "",
+        "final_result": "FAIL",
+        "execution_time_ms": 5918,
+        "steps_log": [
+          {
+            "step_id": 1,
+            "type": "ManualMeasurement",
+            "measured": null,
+            "result": "FAIL"
+          }
+        ],
+        "id": "test_1781451782614_512c21fb",
+        "updatedAt": "2026-06-14T15:43:02.615Z",
+        "createdAt": "2026-06-14T15:43:02.615Z"
+      },
+      {
+        "timestamp": "2026-06-03T15:06:50.276Z",
+        "operator": "Admin",
+        "recipe_name": "Nuova Ricetta",
+        "recipe_version": 4,
+        "serial_dut": "",
+        "lot_number": "10000",
+        "work_order": "10000",
+        "repair_note": "",
+        "final_result": "FAIL",
+        "execution_time_ms": 4987,
+        "steps_log": [
+          {
+            "step_id": 1,
+            "type": "ResistanceTest",
+            "measured": 9.9e+37,
+            "result": "FAIL"
+          }
+        ],
+        "id": "test_1781451782617_b9c27c76",
+        "updatedAt": "2026-06-14T15:43:02.617Z",
+        "createdAt": "2026-06-14T15:43:02.618Z"
+      }
+    ],
+    "test_steps": [
+      {
+        "step_id": 1,
+        "type": "ManualMeasurement",
+        "measured": 3.1,
+        "result": "PASS",
+        "testResultId": "test_1781451782609_df55ce43",
+        "index": 1,
+        "id": "test_1781451782609_df55ce43_step_1",
+        "updatedAt": "2026-06-14T15:43:02.610Z",
+        "createdAt": "2026-06-14T15:43:02.610Z"
+      },
+      {
+        "step_id": 1,
+        "type": "ManualMeasurement",
+        "measured": "FAIL manuale",
+        "result": "FAIL",
+        "testResultId": "test_1781451782611_7f2e7af1",
+        "index": 1,
+        "id": "test_1781451782611_7f2e7af1_step_1",
+        "updatedAt": "2026-06-14T15:43:02.612Z",
+        "createdAt": "2026-06-14T15:43:02.612Z"
+      },
+      {
+        "step_id": 1,
+        "type": "ManualMeasurement",
+        "measured": "CONFERMATO",
+        "result": "PASS",
+        "testResultId": "test_1781451782613_d39264e7",
+        "index": 1,
+        "id": "test_1781451782613_d39264e7_step_1",
+        "updatedAt": "2026-06-14T15:43:02.614Z",
+        "createdAt": "2026-06-14T15:43:02.614Z"
+      },
+      {
+        "step_id": 1,
+        "type": "ManualMeasurement",
+        "measured": null,
+        "result": "FAIL",
+        "testResultId": "test_1781451782614_512c21fb",
+        "index": 1,
+        "id": "test_1781451782614_512c21fb_step_1",
+        "updatedAt": "2026-06-14T15:43:02.616Z",
+        "createdAt": "2026-06-14T15:43:02.616Z"
+      },
+      {
+        "step_id": 1,
+        "type": "ResistanceTest",
+        "measured": 9.9e+37,
+        "result": "FAIL",
+        "testResultId": "test_1781451782617_b9c27c76",
+        "index": 1,
+        "id": "test_1781451782617_b9c27c76_step_1",
+        "updatedAt": "2026-06-14T15:43:02.618Z",
+        "createdAt": "2026-06-14T15:43:02.618Z"
+      }
+    ],
+    "serial_history": [],
+    "firmware_history": [],
+    "repairs": [],
+    "devices": [],
+    "device_events": [],
+    "device_configs": [],
+    "production_stats": [],
+    "quality_stats": []
+  }
+}

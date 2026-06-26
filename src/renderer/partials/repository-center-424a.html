@@ -1,0 +1,61 @@
+
+<div id="repository-center-424a-tab" class="tab-content">
+  <div class="card repository-424a-page">
+    <div class="row" style="justify-content:space-between;align-items:flex-start;gap:12px;">
+      <div>
+        <h2>📚 Repository & Distribution Center</h2>
+        <p class="hint">AT-MEC_HM 4.24B_FIX6 — Ricette allineate a Test Mode: selettori runtime, api.listRecipes(), localStorage e recipes/.</p>
+      </div>
+      <div class="row" style="gap:8px;flex-wrap:wrap;">
+        <button class="btn btn-primary" onclick="repo424BAutoDiscover()">🔄 Aggiorna Repository / Test Mode</button>
+        <button class="btn btn-ghost" onclick="repo424ASeedDemo()">+ Demo dati</button>
+        <button class="btn btn-ghost" onclick="repo424AToggleManualEditor()">✏️ Inserimento manuale</button>
+        <button class="btn btn-ghost" onclick="repo424AExportJson()">Esporta JSON</button>
+        <button class="btn btn-ghost" onclick="repo424AReset()">Reset Repository</button>
+      </div>
+    </div>
+
+    <div class="repo424a-kpis">
+      <div class="repo424a-kpi"><b id="repo424a-kpi-total">0</b><span>Elementi</span></div>
+      <div class="repo424a-kpi"><b id="repo424a-kpi-published">0</b><span>Published</span></div>
+      <div class="repo424a-kpi"><b id="repo424a-kpi-draft">0</b><span>Draft</span></div>
+      <div class="repo424a-kpi"><b id="repo424a-kpi-archived">0</b><span>Archived</span></div>
+    </div>
+
+    <div class="repo424a-tabs row" style="gap:8px;flex-wrap:wrap;margin:14px 0;">
+      <button class="btn btn-primary btn-sm" data-repo-kind="recipes" onclick="repo424ASelectKind('recipes')">🧾 Ricette</button>
+      <button class="btn btn-ghost btn-sm" data-repo-kind="firmware" onclick="repo424ASelectKind('firmware')">🔧 Firmware</button>
+      <button class="btn btn-ghost btn-sm" data-repo-kind="labels" onclick="repo424ASelectKind('labels')">🏷️ Label</button>
+      <button class="btn btn-ghost btn-sm" data-repo-kind="audio" onclick="repo424ASelectKind('audio')">🔊 Audio</button>
+      <button class="btn btn-ghost btn-sm" data-repo-kind="layouts" onclick="repo424ASelectKind('layouts')">🎨 Layout</button>
+      <button class="btn btn-ghost btn-sm" data-repo-kind="audit" onclick="repo424ASelectKind('audit')">📋 Audit</button>
+    </div>
+
+    <div class="repo424a-discovery-note" id="repo424a-discovery-note">Le risorse disponibili devono comparire qui sotto in tabella. Usa “Aggiorna Repository / Test Mode” per ricaricare ricette, firmware, label, audio e layout.</div>
+
+    <div id="repo424a-editor" class="repo424a-editor" style="display:none;">
+      <h3 id="repo424a-editor-title">Inserimento manuale / modifica elemento repository</h3>
+      <div class="grid-4">
+        <label>Nome<input id="repo424a-name" placeholder="es. TEST_MLX_001"></label>
+        <label>Revisione<input id="repo424a-revision" placeholder="REV_A / 1.0.0"></label>
+        <label>Autore<input id="repo424a-author" placeholder="Admin"></label>
+        <label>Stato<select id="repo424a-status"><option>Draft</option><option>Published</option><option>Archived</option></select></label>
+      </div>
+      <label>Note / Changelog<textarea id="repo424a-notes" rows="3" placeholder="Descrizione modifica, motivo pubblicazione, note qualità..."></textarea></label>
+      <div class="row" style="gap:8px;flex-wrap:wrap;margin-top:10px;">
+        <button class="btn btn-primary" onclick="repo424ASaveItem()">Salva / Aggiorna</button>
+        <button class="btn btn-ghost" onclick="repo424APublishSelected()">Pubblica</button>
+        <button class="btn btn-ghost" onclick="repo424AArchiveSelected()">Archivia</button>
+        <button class="btn btn-ghost" onclick="repo424AClearForm()">Pulisci campi</button>
+      </div>
+    </div>
+
+    <div class="repo424a-table-wrap">
+      <div class="row" style="justify-content:space-between;gap:8px;flex-wrap:wrap;"><h3 id="repo424a-table-title">Repository Ricette</h3><div class="row" style="gap:8px;flex-wrap:wrap;"><button class="btn btn-ghost btn-sm" onclick="repo424BAddStation()">+ Aggiungi Postazione</button><button class="btn btn-primary btn-sm" onclick="repo424BSyncAll()">Sincronizza Tutte</button></div></div>
+      <table class="repo424a-table">
+        <thead><tr><th>Nome</th><th>Revisione</th><th>Stato</th><th>Autore</th><th>Data</th><th>Azioni</th></tr></thead>
+        <tbody id="repo424a-table-body"></tbody>
+      </table>
+    </div>
+  </div>
+</div>

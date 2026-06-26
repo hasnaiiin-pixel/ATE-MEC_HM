@@ -1,0 +1,206 @@
+{
+  "schemaVersion": 1,
+  "createdAt": "2026-06-03T11:36:37.771Z",
+  "updatedAt": "2026-06-03T15:06:50.277Z",
+  "recipes": [
+    {
+      "id": "recipe_1780499051207_4a5df09b",
+      "recipe_name": "Nuova Ricetta",
+      "version": 2,
+      "created_at": "2026-06-03T15:04:11.207Z",
+      "author": "Admin",
+      "note": "Salvataggio da HMI",
+      "recipe": {
+        "recipe_name": "Nuova Ricetta",
+        "version": 2,
+        "enabled": true,
+        "power_metadata": "PL303_PROGRAMMABLE",
+        "steps": [
+          {
+            "step_id": 1,
+            "type": "ManualMeasurement",
+            "enabled": true,
+            "label": "Step manuale guidato",
+            "description": "Posizionare le sonde sui punti indicati. Quando il contatto è stabile premere Conferma: il sistema acquisisce la misura automaticamente.",
+            "io_type": "SYSTEM",
+            "device_mapping": "system",
+            "timeout": 2500,
+            "min": 0,
+            "max": 3.3,
+            "unit": "V",
+            "command": "MEAS:VOLT:DC?",
+            "manual_measure_type": "CONFIRM",
+            "manual_input_enabled": true,
+            "stable_time_ms": 1000
+          }
+        ]
+      }
+    },
+    {
+      "id": "recipe_1780499133870_0e14c23b",
+      "recipe_name": "Nuova Ricetta",
+      "version": 3,
+      "created_at": "2026-06-03T15:05:33.870Z",
+      "author": "Admin",
+      "note": "Salvataggio da HMI",
+      "recipe": {
+        "recipe_name": "Nuova Ricetta",
+        "version": 3,
+        "enabled": true,
+        "power_metadata": "PL303_PROGRAMMABLE",
+        "steps": [
+          {
+            "step_id": 1,
+            "type": "ManualMeasurement",
+            "enabled": true,
+            "label": "Step manuale guidato",
+            "description": "Posizionare le sonde sui punti indicati. Quando il contatto è stabile premere Conferma: il sistema acquisisce la misura automaticamente.",
+            "io_type": "SYSTEM",
+            "device_mapping": "system",
+            "timeout": 2500,
+            "min": 0,
+            "max": 3.3,
+            "unit": "V",
+            "command": "MEAS:VOLT:DC?",
+            "manual_measure_type": "CONFIRM",
+            "manual_input_enabled": false,
+            "stable_time_ms": 1000
+          }
+        ]
+      }
+    },
+    {
+      "id": "recipe_1780499188959_736a7ee1",
+      "recipe_name": "Nuova Ricetta",
+      "version": 4,
+      "created_at": "2026-06-03T15:06:28.959Z",
+      "author": "Admin",
+      "note": "Salvataggio da HMI",
+      "recipe": {
+        "recipe_name": "Nuova Ricetta",
+        "version": 4,
+        "enabled": true,
+        "power_metadata": "PL303_PROGRAMMABLE",
+        "steps": [
+          {
+            "step_id": 1,
+            "type": "ResistanceTest",
+            "enabled": true,
+            "label": "Misura resistenza",
+            "description": "",
+            "io_type": "SCPI",
+            "device_mapping": "Keysight_34461A",
+            "timeout": 2000,
+            "min": 450,
+            "max": 510,
+            "unit": "Ω",
+            "command": "MEAS:RES?"
+          }
+        ]
+      }
+    }
+  ],
+  "testReports": [
+    {
+      "timestamp": "2026-06-03T15:04:50.051Z",
+      "operator": "Admin",
+      "recipe_name": "Nuova Ricetta",
+      "recipe_version": 2,
+      "serial_dut": "",
+      "lot_number": "10000",
+      "work_order": "10000",
+      "repair_note": "",
+      "final_result": "PASS",
+      "execution_time_ms": 18740,
+      "steps_log": [
+        {
+          "step_id": 1,
+          "type": "ManualMeasurement",
+          "measured": 3.1,
+          "result": "PASS"
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-06-03T15:05:06.691Z",
+      "operator": "Admin",
+      "recipe_name": "Nuova Ricetta",
+      "recipe_version": 2,
+      "serial_dut": "",
+      "lot_number": "10000",
+      "work_order": "10000",
+      "repair_note": "",
+      "final_result": "FAIL",
+      "execution_time_ms": 11987,
+      "steps_log": [
+        {
+          "step_id": 1,
+          "type": "ManualMeasurement",
+          "measured": "FAIL manuale",
+          "result": "FAIL"
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-06-03T15:05:49.612Z",
+      "operator": "Admin",
+      "recipe_name": "Nuova Ricetta",
+      "recipe_version": 3,
+      "serial_dut": "",
+      "lot_number": "10000",
+      "work_order": "10000",
+      "repair_note": "",
+      "final_result": "PASS",
+      "execution_time_ms": 5043,
+      "steps_log": [
+        {
+          "step_id": 1,
+          "type": "ManualMeasurement",
+          "measured": "CONFERMATO",
+          "result": "PASS"
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-06-03T15:06:00.162Z",
+      "operator": "Admin",
+      "recipe_name": "Nuova Ricetta",
+      "recipe_version": 3,
+      "serial_dut": "",
+      "lot_number": "10000",
+      "work_order": "10000",
+      "repair_note": "",
+      "final_result": "FAIL",
+      "execution_time_ms": 5918,
+      "steps_log": [
+        {
+          "step_id": 1,
+          "type": "ManualMeasurement",
+          "measured": null,
+          "result": "FAIL"
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-06-03T15:06:50.276Z",
+      "operator": "Admin",
+      "recipe_name": "Nuova Ricetta",
+      "recipe_version": 4,
+      "serial_dut": "",
+      "lot_number": "10000",
+      "work_order": "10000",
+      "repair_note": "",
+      "final_result": "FAIL",
+      "execution_time_ms": 4987,
+      "steps_log": [
+        {
+          "step_id": 1,
+          "type": "ResistanceTest",
+          "measured": 9.9e+37,
+          "result": "FAIL"
+        }
+      ]
+    }
+  ],
+  "repairs": []
+}

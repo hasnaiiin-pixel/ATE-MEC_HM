@@ -1,0 +1,178 @@
+/* AT-MEC_HM 6.6D - Test Mode UX Preview
+   Non-invasive UX layer for manual measurement, multimeter retry and retest banner. */
+
+#manual-step-modal.show {
+  background: rgba(2, 6, 23, 0.20) !important;
+  backdrop-filter: blur(2px) !important;
+  align-items: stretch !important;
+  justify-content: flex-end !important;
+  padding: 18px !important;
+}
+
+#manual-step-modal.show .modal {
+  width: min(460px, calc(100vw - 28px)) !important;
+  max-height: calc(100vh - 36px) !important;
+  margin: 0 !important;
+  border-radius: 22px !important;
+  overflow: hidden !important;
+  border: 1px solid rgba(96, 165, 250, 0.35) !important;
+  background:
+    radial-gradient(circle at top right, rgba(59,130,246,.22), transparent 38%),
+    linear-gradient(180deg, rgba(15,23,42,.98), rgba(2,6,23,.98)) !important;
+  box-shadow: 0 24px 80px rgba(0,0,0,.58), inset 0 1px 0 rgba(255,255,255,.08) !important;
+  color: #e5edf7 !important;
+  animation: atmec66dSlideIn .18s ease-out !important;
+}
+
+@keyframes atmec66dSlideIn {
+  from { transform: translateX(28px); opacity: .72; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+#manual-step-modal .modal-head {
+  padding: 18px 20px !important;
+  background: rgba(15,23,42,.72) !important;
+  border-bottom: 1px solid rgba(148,163,184,.22) !important;
+}
+
+#manual-step-modal .modal-head strong {
+  font-size: 18px !important;
+  letter-spacing: .2px !important;
+}
+
+#manual-step-modal .modal-body {
+  padding: 18px 20px !important;
+  overflow: auto !important;
+}
+
+#manual-step-modal .manual-instructions {
+  border: 1px solid rgba(148,163,184,.22) !important;
+  background: rgba(15,23,42,.62) !important;
+  border-radius: 16px !important;
+  padding: 14px !important;
+  color: #dbeafe !important;
+  line-height: 1.45 !important;
+}
+
+#manual-step-modal #manual-step-measure-info,
+#manual-step-modal #manual-step-limits {
+  color: #cbd5e1 !important;
+  background: rgba(30,41,59,.68) !important;
+  border: 1px solid rgba(148,163,184,.18) !important;
+  border-radius: 12px !important;
+  padding: 10px 12px !important;
+}
+
+#manual-step-modal #manual-step-alert {
+  border-radius: 16px !important;
+  border: 1px solid rgba(245,158,11,.34) !important;
+  background: rgba(245,158,11,.12) !important;
+  color: #fde68a !important;
+  font-weight: 700 !important;
+  padding: 12px 14px !important;
+  margin: 12px 0 !important;
+}
+
+#manual-step-modal .manual-input-panel {
+  border-radius: 18px !important;
+  border: 1px solid rgba(34,211,238,.38) !important;
+  background: rgba(8,47,73,.42) !important;
+  padding: 14px !important;
+}
+
+#manual-step-modal .manual-input-panel label {
+  color: #bae6fd !important;
+  font-weight: 800 !important;
+  letter-spacing: .2px !important;
+}
+
+#manual-step-modal .manual-measure-input {
+  width: 100% !important;
+  margin-top: 8px !important;
+  border-radius: 14px !important;
+  border: 1px solid rgba(125,211,252,.45) !important;
+  background: rgba(2,6,23,.82) !important;
+  color: #f8fafc !important;
+  font-size: 26px !important;
+  font-weight: 800 !important;
+  text-align: center !important;
+  padding: 12px 14px !important;
+  outline: none !important;
+}
+
+#manual-step-modal .manual-measure-input:focus {
+  border-color: rgba(34,211,238,.95) !important;
+  box-shadow: 0 0 0 4px rgba(34,211,238,.16) !important;
+}
+
+.atmec66d-tolerance-card {
+  margin-top: 12px;
+  border-radius: 16px;
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border: 1px solid rgba(148,163,184,.20);
+  background: rgba(15,23,42,.70);
+}
+.atmec66d-tolerance-card strong { font-size: 14px; }
+.atmec66d-tolerance-card span { color:#94a3b8; font-size:12px; }
+.atmec66d-tolerance-card.pass { border-color: rgba(34,197,94,.42); background: rgba(20,83,45,.32); color:#bbf7d0; }
+.atmec66d-tolerance-card.fail { border-color: rgba(239,68,68,.44); background: rgba(127,29,29,.32); color:#fecaca; }
+.atmec66d-tolerance-card.wait { border-color: rgba(245,158,11,.34); background: rgba(120,53,15,.26); color:#fde68a; }
+
+#manual-step-modal .modal-foot {
+  padding: 16px 20px 18px !important;
+  background: rgba(2,6,23,.52) !important;
+  border-top: 1px solid rgba(148,163,184,.18) !important;
+}
+
+#manual-step-modal .manual-action-grid {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 10px !important;
+}
+#manual-step-modal .manual-action-grid .btn {
+  min-height: 42px !important;
+  border-radius: 12px !important;
+  font-weight: 800 !important;
+}
+
+.atmec66d-action-strip {
+  position: fixed;
+  right: 22px;
+  top: 86px;
+  z-index: 2147482500;
+  width: min(420px, calc(100vw - 44px));
+  pointer-events: none;
+}
+.atmec66d-action-strip-card {
+  pointer-events: auto;
+  border-radius: 18px;
+  padding: 14px 16px;
+  color: #e5edf7;
+  background: linear-gradient(135deg, rgba(15,23,42,.97), rgba(30,41,59,.94));
+  border: 1px solid rgba(96,165,250,.32);
+  box-shadow: 0 18px 48px rgba(0,0,0,.42);
+}
+.atmec66d-action-strip-card h4 { margin:0 0 6px; font-size:15px; }
+.atmec66d-action-strip-card p { margin:0; color:#cbd5e1; font-size:12px; line-height:1.4; }
+
+.repair65c7-testmode-badge,
+#repair65c7-testmode-ticket-badge {
+  right: 20px !important;
+  bottom: 22px !important;
+  max-width: min(520px, calc(100vw - 40px)) !important;
+  border-radius: 18px !important;
+  background: linear-gradient(135deg, rgba(15,23,42,.98), rgba(30,41,59,.96)) !important;
+  border: 1px solid rgba(245,158,11,.40) !important;
+  color: #f8fafc !important;
+  box-shadow: 0 18px 48px rgba(0,0,0,.46) !important;
+}
+
+.atmec66d-no-layout-shift-note {
+  color:#94a3b8;
+  font-size:11px;
+  margin-top:7px;
+}

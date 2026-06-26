@@ -1,0 +1,1088 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Test Mode Compatto - Demo conservativa</title>
+  <style>
+    :root {
+      --bg0: #0d0d14;
+      --bg1: #12121e;
+      --bg2: #1a1a2e;
+      --bg3: #1e1e3a;
+      --accent: #00d4ff;
+      --accent2: #7c3aed;
+      --pass: #2ecc71;
+      --fail: #ff4136;
+      --warn: #f39c12;
+      --text: #e8e8f0;
+      --text2: #9090b0;
+      --border: #2a2a4a;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      overflow: hidden;
+      background: var(--bg0);
+      color: var(--text);
+      font-family: "Segoe UI", monospace;
+      letter-spacing: 0;
+    }
+
+    button, input, select {
+      font: inherit;
+      letter-spacing: 0;
+    }
+
+    input, select {
+      width: 100%;
+      min-height: 36px;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 6px;
+      padding: 7px 10px;
+      font-size: 12px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--text2);
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .btn {
+      min-height: 40px;
+      border: 0;
+      border-radius: 6px;
+      padding: 8px 12px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 850;
+      color: var(--text);
+      background: transparent;
+      border: 1px solid var(--border);
+    }
+
+    .btn-primary { background: var(--accent2); color: white; border-color: transparent; }
+    .btn-success { background: var(--pass); color: #06130b; border-color: transparent; }
+    .btn-warn { background: var(--warn); color: #120b00; border-color: transparent; }
+    .btn-danger { background: var(--fail); color: white; border-color: transparent; }
+    .btn-ghost { background: rgba(255,255,255,.02); }
+    .btn-sm { min-height: 31px; padding: 5px 9px; font-size: 11px; }
+
+    .btn-3d {
+      border-radius: 14px;
+      min-height: 46px;
+      font-weight: 900;
+      letter-spacing: 1px;
+      transform: translateY(0);
+      box-shadow: 0 7px 0 rgba(0,0,0,.35), 0 12px 24px rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,.25);
+      border: 1px solid rgba(255,255,255,.12);
+    }
+
+    .btn-3d:hover:not(:disabled) {
+      transform: translateY(-1px);
+      filter: brightness(1.08);
+    }
+
+    .btn-3d:active:not(:disabled) {
+      transform: translateY(3px);
+      box-shadow: 0 3px 0 rgba(0,0,0,.35), 0 7px 14px rgba(0,0,0,.25);
+    }
+
+    .action-ico {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px;
+      font-size: 16px;
+    }
+
+    .page {
+      height: 100vh;
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr) auto;
+      gap: 8px;
+      padding: 10px;
+    }
+
+    .prod-test-header {
+      display: grid;
+      grid-template-columns: 160px minmax(0, 1fr) 220px;
+      gap: 12px;
+      align-items: center;
+      min-height: 62px;
+      padding: 8px 12px;
+      background: linear-gradient(135deg, rgba(26,26,46,.96), rgba(18,18,30,.96));
+      border: 1px solid var(--border);
+      border-radius: 16px;
+    }
+
+    .logo-box {
+      display: grid;
+      place-items: center;
+      height: 42px;
+      border: 1px solid rgba(0,212,255,.22);
+      border-radius: 10px;
+      color: var(--accent);
+      font-weight: 1000;
+      letter-spacing: 2px;
+    }
+
+    .prod-test-title {
+      min-width: 0;
+      text-align: center;
+    }
+
+    .prod-test-title h1 {
+      margin: 0;
+      color: var(--accent);
+      font-size: 23px;
+      letter-spacing: 2px;
+      text-shadow: 0 0 16px rgba(0,212,255,.26);
+    }
+
+    .prod-test-title .subtitle {
+      color: var(--text2);
+      font-size: 11px;
+      margin-top: 3px;
+    }
+
+    .prod-top-emergency {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 6px;
+    }
+
+    .btn-emergency {
+      min-height: 46px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,65,54,.55);
+      background: rgba(255,65,54,.16);
+      color: #ffb7b2;
+      font-weight: 950;
+    }
+
+    .prod-test-body {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 390px;
+      gap: 10px;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .prod-panel {
+      min-width: 0;
+      min-height: 0;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: linear-gradient(145deg, rgba(255,255,255,.055), rgba(255,255,255,.018));
+      box-shadow: 0 14px 34px rgba(0,0,0,.24);
+      padding: 10px;
+    }
+
+    .main-panel {
+      display: grid;
+      grid-template-rows: auto auto auto minmax(0, 1fr) auto auto;
+      gap: 8px;
+    }
+
+    .prod-selector-row {
+      display: grid;
+      grid-template-columns: minmax(130px, .8fr) minmax(210px, 1.2fr) 84px 102px;
+      gap: 8px;
+      align-items: end;
+    }
+
+    .prod-meta-row {
+      display: grid;
+      grid-template-columns: minmax(230px, .9fr) minmax(260px, 1fr) minmax(290px, 1.15fr);
+      gap: 8px;
+      align-items: stretch;
+    }
+
+    .prod-check-card {
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 12px;
+      background: rgba(255,255,255,.025);
+      padding: 8px;
+    }
+
+    .prod-data-card {
+      position: relative;
+      min-height: 84px;
+      border: 1px solid rgba(255,255,255,.09);
+      border-radius: 14px;
+      background: linear-gradient(180deg, rgba(255,255,255,.045), rgba(255,255,255,.02));
+      padding: 9px;
+      display: grid;
+      align-content: space-between;
+      gap: 7px;
+    }
+
+    .prod-data-card.wo-active {
+      border-color: rgba(0,212,255,.32);
+      box-shadow: inset 0 0 0 1px rgba(0,212,255,.06);
+    }
+
+    .data-kicker {
+      color: var(--text2);
+      font-size: 10px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: .6px;
+    }
+
+    .data-value {
+      color: white;
+      font-size: 18px;
+      font-weight: 1000;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .wo-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      color: var(--text2);
+      font-size: 11px;
+    }
+
+    .wo-meta b { color: var(--accent); }
+
+    .serial-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 44px;
+      gap: 6px;
+    }
+
+    .serial-row input {
+      min-height: 44px;
+      font-size: 17px;
+      font-weight: 900;
+      color: white;
+    }
+
+    .inline-check {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      color: var(--text2);
+      font-size: 11px;
+      font-weight: 750;
+    }
+
+    .inline-check input { width: auto; min-height: auto; }
+
+    .switch-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: center;
+      min-height: 34px;
+      color: var(--text2);
+      font-size: 11px;
+      font-weight: 850;
+    }
+
+    .switch-ui {
+      position: relative;
+      display: inline-flex;
+      width: 48px;
+      height: 26px;
+      cursor: pointer;
+    }
+
+    .switch-ui input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .switch-ui span {
+      position: absolute;
+      inset: 0;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: rgba(255,255,255,.07);
+      box-shadow: inset 0 2px 6px rgba(0,0,0,.35);
+      transition: .18s;
+    }
+
+    .switch-ui span::after {
+      content: "";
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      left: 2px;
+      top: 2px;
+      border-radius: 50%;
+      background: var(--text2);
+      box-shadow: 0 2px 8px rgba(0,0,0,.45);
+      transition: .18s;
+    }
+
+    .switch-ui input:checked + span {
+      border-color: rgba(0,212,255,.5);
+      background: rgba(0,212,255,.20);
+    }
+
+    .switch-ui input:checked + span::after {
+      left: 24px;
+      background: var(--accent);
+      box-shadow: 0 0 12px rgba(0,212,255,.65);
+    }
+
+    .prod-recipe-name {
+      min-height: 34px;
+      display: flex;
+      align-items: center;
+      color: var(--text);
+      font-size: 18px;
+      font-weight: 950;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    .prod-status-line {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 7px 10px;
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 12px;
+      background: rgba(255,255,255,.025);
+      color: var(--text2);
+      font-size: 12px;
+    }
+
+    .running-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 5px 10px;
+      border-radius: 999px;
+      background: rgba(0,212,255,.12);
+      color: var(--accent);
+      font-weight: 900;
+      border: 1px solid rgba(0,212,255,.22);
+    }
+
+    .split {
+      display: grid;
+      grid-template-columns: minmax(260px, .9fr) minmax(360px, 1.25fr);
+      gap: 8px;
+      min-height: 0;
+      height: min(33vh, 290px);
+    }
+
+    .prod-current-step {
+      min-width: 0;
+      min-height: 0;
+      border: 1px solid rgba(34,211,238,.26);
+      border-radius: 14px;
+      background: radial-gradient(circle at top right, rgba(34,211,238,.12), transparent 36%), linear-gradient(180deg, rgba(15,23,42,.80), rgba(2,6,23,.70));
+      padding: 10px;
+      display: grid;
+      grid-template-rows: auto auto minmax(0, 1fr);
+      gap: 8px;
+    }
+
+    .step-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      color: #bae6fd;
+      font-size: 11px;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .step-value {
+      font-size: 21px;
+      font-weight: 950;
+      line-height: 1.1;
+    }
+
+    .live-measure-panel {
+      min-height: 0;
+      border: 1px solid rgba(148,163,184,.18);
+      border-radius: 12px;
+      background: rgba(2,6,23,.38);
+      padding: 8px;
+      display: grid;
+      gap: 6px;
+    }
+
+    .live-title {
+      color: var(--text2);
+      font-size: 10px;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .live-value {
+      color: #67e8f9;
+      font-size: 26px;
+      font-weight: 1000;
+      line-height: 1;
+    }
+
+    .measure-bar {
+      display: grid;
+      gap: 5px;
+    }
+
+    .measure-scale {
+      position: relative;
+      height: 18px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--fail) 0%, #d97706 12%, var(--pass) 22%, var(--pass) 78%, #d97706 88%, var(--fail) 100%);
+      border: 1px solid rgba(255,255,255,.13);
+      box-shadow: inset 0 1px 3px rgba(0,0,0,.55);
+    }
+
+    .measure-scale::before {
+      content: "";
+      position: absolute;
+      left: 22%;
+      right: 22%;
+      top: 3px;
+      bottom: 3px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.35);
+      background: rgba(255,255,255,.08);
+      box-shadow: 0 0 16px rgba(46,204,113,.25);
+    }
+
+    .measure-scale::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: -5px;
+      width: 2px;
+      height: 28px;
+      border-radius: 2px;
+      background: rgba(255,255,255,.92);
+      box-shadow: 0 0 12px rgba(255,255,255,.45);
+    }
+
+    .measure-pointer {
+      position: absolute;
+      left: 56%;
+      top: -9px;
+      width: 0;
+      height: 0;
+      transform: translateX(-50%);
+      border-left: 8px solid transparent;
+      border-right: 8px solid transparent;
+      border-bottom: 13px solid #facc15;
+      z-index: 2;
+      filter: drop-shadow(0 2px 7px rgba(0,0,0,.65));
+    }
+
+    .measure-caption {
+      display: flex;
+      justify-content: space-between;
+      color: var(--text2);
+      font-size: 10px;
+    }
+
+    .measure-result {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      font-size: 11px;
+      padding: 5px 7px;
+      border-radius: 9px;
+      background: rgba(46,204,113,.10);
+      border: 1px solid rgba(46,204,113,.25);
+    }
+
+    .measure-result b { color: #bbf7d0; }
+
+    .prod-sequence-log {
+      min-height: 0;
+      overflow: auto;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: rgba(0,0,0,.18);
+      padding: 8px;
+    }
+
+    .prod-seq-row {
+      display: grid;
+      grid-template-columns: 64px 1fr 82px;
+      gap: 8px;
+      align-items: center;
+      padding: 6px 8px;
+      border-radius: 10px;
+      margin-bottom: 5px;
+      background: rgba(15,23,42,.48);
+      border: 1px solid rgba(148,163,184,.12);
+      font-size: 11px;
+    }
+
+    .prod-seq-row.pass { border-left: 5px solid var(--pass); }
+    .prod-seq-row.running { border-left: 5px solid var(--accent); }
+    .prod-seq-row.todo { border-left: 5px solid rgba(255,255,255,.18); opacity: .78; }
+
+    .prod-status-banner {
+      min-height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: rgba(255,255,255,.05);
+      color: var(--text2);
+      font-size: 31px;
+      font-weight: 1000;
+      letter-spacing: 3px;
+    }
+
+    .prod-status-banner.operator-wait {
+      color: #fff7ed;
+      background: linear-gradient(90deg, rgba(180,83,9,.96), rgba(239,68,68,.86), rgba(180,83,9,.96));
+      border: 2px solid rgba(251,191,36,.95);
+      box-shadow: 0 0 28px rgba(251,146,60,.55), inset 0 0 18px rgba(251,191,36,.16);
+    }
+
+    .primary-actions {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .primary-actions .btn {
+      min-height: 50px;
+      font-size: 15px;
+    }
+
+    .prod-progress-wrap {
+      margin: 0;
+      background: rgba(13,13,20,.96);
+      padding: 8px 10px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      box-shadow: 0 -8px 24px rgba(0,0,0,.22);
+    }
+
+    .prod-progress-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 12px;
+      color: var(--text2);
+      font-size: 11px;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .prod-progress-head b {
+      color: var(--accent);
+      font-size: 32px;
+      line-height: 1;
+    }
+
+    .prod-progress-bar {
+      height: 24px;
+      border-radius: 999px;
+      overflow: hidden;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.08);
+      margin-top: 6px;
+    }
+
+    .prod-progress-fill {
+      width: 42%;
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent2), var(--accent));
+      box-shadow: 0 0 22px rgba(0,212,255,.35);
+    }
+
+    .right-panel {
+      display: grid;
+      grid-template-rows: auto auto minmax(0, 1fr);
+      gap: 8px;
+      overflow: hidden;
+    }
+
+    .compact-card {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: rgba(255,255,255,.035);
+      padding: 9px;
+    }
+
+    .card-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 7px;
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 950;
+    }
+
+    .instrument-bar {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 6px;
+    }
+
+    .instrument {
+      display: grid;
+      grid-template-columns: 12px 1fr auto;
+      align-items: center;
+      gap: 7px;
+      min-height: 30px;
+      border: 1px solid rgba(148,163,184,.18);
+      border-radius: 10px;
+      background: rgba(15,23,42,.58);
+      padding: 5px 8px;
+      font-size: 11px;
+    }
+
+    .dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 99px;
+      background: var(--pass);
+      box-shadow: 0 0 10px var(--pass);
+    }
+
+    .instrument small {
+      color: #86efac;
+      font-weight: 900;
+      font-size: 9px;
+    }
+
+    .instrument.skip small { color: #bae6fd; }
+    .instrument.skip .dot { background: var(--accent); box-shadow: 0 0 10px var(--accent); }
+
+    .action-panel {
+      display: grid;
+      grid-template-rows: auto auto minmax(0, 1fr) auto auto;
+      gap: 8px;
+      border: 1px solid rgba(251,191,36,.45);
+      border-radius: 16px;
+      background:
+        radial-gradient(circle at top right, rgba(251,191,36,.15), transparent 34%),
+        linear-gradient(180deg, rgba(120,53,15,.23), rgba(15,23,42,.78));
+      box-shadow: 0 14px 38px rgba(0,0,0,.24);
+      padding: 10px;
+      overflow: hidden;
+    }
+
+    .action-head {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: start;
+      gap: 8px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+
+    .action-chip {
+      justify-self: start;
+      border: 1px solid rgba(251,191,36,.45);
+      background: rgba(245,158,11,.16);
+      color: #fde68a;
+      border-radius: 999px;
+      padding: 5px 9px;
+      font-size: 10px;
+      font-weight: 950;
+      text-transform: uppercase;
+    }
+
+    .action-step {
+      color: var(--text2);
+      font-size: 10px;
+      font-weight: 950;
+      text-transform: uppercase;
+      text-align: right;
+    }
+
+    .action-title {
+      margin: 0;
+      color: #fff7ed;
+      font-size: 21px;
+      line-height: 1.12;
+    }
+
+    .action-copy {
+      margin: 0;
+      color: #cbd5e1;
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .action-instruction {
+      display: grid;
+      gap: 6px;
+    }
+
+    .manual-input-panel {
+      border: 1px solid rgba(148,163,184,.18);
+      border-radius: 14px;
+      background:
+        linear-gradient(180deg, rgba(2,6,23,.60), rgba(15,23,42,.48));
+      padding: 10px;
+      display: grid;
+      gap: 8px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+    }
+
+    .manual-input-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 58px;
+      gap: 7px;
+    }
+
+    .manual-input-row input {
+      min-height: 48px;
+      font-size: 24px;
+      font-weight: 1000;
+      color: white;
+    }
+
+    .unit-box {
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--accent);
+      font-weight: 950;
+      background: rgba(255,255,255,.04);
+    }
+
+    .action-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 7px;
+    }
+
+    .action-buttons .btn {
+      min-height: 44px;
+    }
+
+    .details-technical {
+      min-height: 0;
+      overflow: auto;
+      color: var(--text2);
+      font-size: 11px;
+      line-height: 1.4;
+    }
+
+    details {
+      border: 1px solid rgba(148,163,184,.16);
+      border-radius: 12px;
+      background: rgba(2,6,23,.32);
+      padding: 0;
+    }
+
+    summary {
+      cursor: pointer;
+      padding: 8px 10px;
+      color: var(--accent);
+      font-weight: 900;
+    }
+
+    .technical-lines {
+      display: grid;
+      gap: 4px;
+      padding: 0 10px 10px;
+      font-family: Consolas, monospace;
+      font-size: 10px;
+    }
+
+    .footer {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      color: var(--text2);
+      font-size: 10px;
+      padding: 0 4px;
+    }
+
+    .demo-switch {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .demo-switch .btn { min-height: 28px; font-size: 10px; padding: 4px 7px; }
+
+    @media (max-width: 1200px) {
+      body { overflow: auto; }
+      .page { height: auto; min-height: 100vh; }
+      .prod-test-body { grid-template-columns: 1fr; overflow: visible; }
+      .right-panel { grid-template-rows: auto; }
+      .split { height: auto; grid-template-columns: 1fr; }
+      .prod-test-header, .prod-selector-row, .prod-meta-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="prod-test-header">
+      <div class="logo-box">MEC</div>
+      <div class="prod-test-title">
+        <h1>MODALITA TEST</h1>
+        <div class="subtitle">Layout conservativo compatto - stessa logica, meno rumore</div>
+      </div>
+      <div class="prod-top-emergency">
+        <button class="btn-emergency">EMERGENZA STOP</button>
+      </div>
+    </header>
+
+    <section class="prod-test-body">
+      <section class="prod-panel main-panel">
+        <div class="prod-selector-row">
+          <div>
+            <label>Cliente</label>
+            <input value="COBO">
+          </div>
+          <div>
+            <label>Ricetta</label>
+            <select><option>TEST_rix_COBO</option></select>
+          </div>
+          <div>
+            <label>Rev.</label>
+            <select><option>ultima</option></select>
+          </div>
+          <button class="btn btn-primary btn-sm">Ricette</button>
+        </div>
+
+        <div class="prod-meta-row">
+          <div class="prod-data-card wo-active">
+            <div class="data-kicker">Work Order attivo</div>
+            <div class="data-value">WO-2026-001</div>
+            <div class="wo-meta"><span>Lotto <b>LOT-260617-A</b></span><button class="btn btn-primary btn-sm btn-3d">Cambio WO</button></div>
+          </div>
+          <div class="prod-data-card">
+            <div class="data-kicker">Seriale scheda</div>
+            <div class="serial-row">
+              <input value="COBO-000184">
+              <button class="btn btn-ghost btn-3d"><span class="action-ico">▦</span></button>
+            </div>
+          </div>
+          <div class="prod-data-card">
+            <div class="switch-row"><span>SN obbligatorio</span><label class="switch-ui"><input type="checkbox" checked><span></span></label></div>
+            <div class="switch-row"><span>Wizard avvio produzione</span><label class="switch-ui"><input id="wizardFlag" type="checkbox"><span></span></label></div>
+            <div class="wo-meta"><span>Si apre solo se interruttore attivo</span></div>
+          </div>
+        </div>
+
+        <div class="prod-recipe-name">TEST_rix_COBO</div>
+        <div class="prod-status-line">
+          <span>Commessa: WO-2026-001 | SN: COBO-000184</span>
+          <span id="prodState">Stato: IN TEST</span>
+          <span class="running-indicator">TEST IN ESECUZIONE</span>
+        </div>
+
+        <div class="split">
+          <div class="prod-current-step">
+            <div class="step-head"><span>Step corrente</span><b>04 / 12</b></div>
+            <div class="step-value" id="stepValue">Misura tensione TP12</div>
+            <div class="live-measure-panel">
+              <div class="live-title">Misura step live</div>
+              <div class="live-value" id="liveValue">5.01 V</div>
+              <div class="measure-bar">
+                <div class="measure-caption"><span>Min 4.80</span><b>Target 5.00</b><span>Max 5.20</span></div>
+                <div class="measure-scale"><i class="measure-pointer" id="measurePointer"></i></div>
+                <div class="measure-result" id="measureResult"><span>Dentro parametro</span><b>PASS</b></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="prod-sequence-log">
+            <div class="prod-seq-row pass"><span>01</span><span>Controllo alimentazione</span><b>PASS</b></div>
+            <div class="prod-seq-row pass"><span>02</span><span>Setup multimetro</span><b>PASS</b></div>
+            <div class="prod-seq-row pass"><span>03</span><span>Misura resistenza</span><b>PASS</b></div>
+            <div class="prod-seq-row running"><span>04</span><span>Misura tensione TP12</span><b>RUN</b></div>
+            <div class="prod-seq-row todo"><span>05</span><span>Conferma visiva operatore</span><b>TODO</b></div>
+            <div class="prod-seq-row todo"><span>06</span><span>Report finale</span><b>TODO</b></div>
+          </div>
+        </div>
+
+        <div class="prod-status-banner operator-wait" id="statusBanner">ATTESA OPERATORE</div>
+
+        <div class="primary-actions">
+          <button class="btn btn-success">START</button>
+          <button class="btn btn-warn">PAUSA</button>
+          <button class="btn btn-danger">STOP</button>
+        </div>
+
+        <div class="prod-progress-wrap">
+          <div class="prod-progress-head"><span>Avanzamento test</span><b id="progressPct">42%</b></div>
+          <div class="prod-progress-bar"><div class="prod-progress-fill" id="progressFill"></div></div>
+        </div>
+      </section>
+
+      <aside class="right-panel">
+        <section class="compact-card">
+          <div class="card-head"><span>Strumenti richiesti</span><button class="btn btn-ghost btn-sm">Dettagli</button></div>
+          <div class="instrument-bar">
+            <div class="instrument"><i class="dot"></i><b>Keysight</b><small>LIVE</small></div>
+            <div class="instrument"><i class="dot"></i><b>PL303</b><small>LIVE</small></div>
+            <div class="instrument skip"><i class="dot"></i><b>ESP32</b><small>NON RICHIESTO</small></div>
+          </div>
+        </section>
+
+        <section class="action-panel" id="actionPanel">
+          <div class="action-chip" id="actionChip">Azione richiesta</div>
+          <h2 class="action-title" id="actionTitle">Inserisci misura manuale</h2>
+          <p class="action-copy" id="actionCopy">La lettura automatica e disponibile. Se vuoi confermare manualmente, inserisci il valore letto dallo strumento.</p>
+
+          <div class="manual-input-panel">
+            <label id="manualLabel">Misura manuale operatore</label>
+            <div class="manual-input-row">
+              <input id="manualValue" value="5.01">
+              <div class="unit-box" id="manualUnit">V</div>
+            </div>
+            <div class="measure-bar">
+              <div class="measure-caption"><span>4.80</span><b>OK: 4.80 - 5.20</b><span>5.20</span></div>
+              <div class="measure-scale"><i class="measure-pointer" id="manualPointer"></i></div>
+              <div class="measure-result" id="manualResult"><span>Valore dentro parametro</span><b>PASS</b></div>
+            </div>
+          </div>
+
+          <div class="action-buttons">
+            <button class="btn btn-success" id="confirmBtn">USA MISURA</button>
+            <button class="btn btn-primary" id="retryBtn">RIPROVA</button>
+          </div>
+
+          <div class="details-technical">
+            <details>
+              <summary>Dettagli tecnici</summary>
+              <div class="technical-lines">
+                <div>Keysight USB VISA - MY57216945</div>
+                <div>Range: min 4.80 / max 5.20 V</div>
+                <div>Step: VoltageMeasurement</div>
+              </div>
+            </details>
+          </div>
+        </section>
+      </aside>
+    </section>
+
+    <footer class="footer">
+      <span>Uscita consentita solo con credenziali abilitate.</span>
+      <div class="demo-switch">
+        <button class="btn btn-ghost btn-sm" onclick="scenario('measure')">Misura</button>
+        <button class="btn btn-ghost btn-sm" onclick="scenario('serial')">S/N</button>
+        <button class="btn btn-ghost btn-sm" onclick="scenario('wizard')">Wizard</button>
+        <button class="btn btn-ghost btn-sm" onclick="scenario('fail')">FAIL</button>
+        <button class="btn btn-ghost btn-sm" onclick="scenario('ready')">Pronto</button>
+      </div>
+      <span>10:42:18</span>
+    </footer>
+  </main>
+
+  <script>
+    function setText(id, value) {
+      const el = document.getElementById(id);
+      if (el) el.textContent = value;
+    }
+
+    function scenario(mode) {
+      const banner = document.getElementById('statusBanner');
+      const action = document.getElementById('actionPanel');
+      const manual = document.getElementById('manualValue');
+      const unit = document.getElementById('manualUnit');
+      const fill = document.getElementById('progressFill');
+      const pointer = document.getElementById('manualPointer');
+
+      action.style.display = 'grid';
+      banner.className = 'prod-status-banner operator-wait';
+      fill.style.width = '42%';
+      pointer.style.left = '56%';
+
+      if (mode === 'ready') {
+        setText('prodState', 'Stato: READY');
+        setText('statusBanner', 'DA FARE');
+        setText('actionChip', 'Nessuna azione');
+        setText('actionTitle', 'Pronto per nuova scheda');
+        setText('actionCopy', 'Inserisci S/N e premi START. Il pannello azione resta chiuso quando non serve.');
+        setText('confirmBtn', 'START');
+        setText('retryBtn', 'RESET');
+        setText('progressPct', '0%');
+        fill.style.width = '0%';
+        banner.className = 'prod-status-banner';
+      }
+
+      if (mode === 'serial') {
+        setText('prodState', 'Stato: READY');
+        setText('statusBanner', 'INSERIRE S/N');
+        setText('actionChip', 'Input operatore');
+        setText('actionTitle', 'Scansiona Serial Number');
+        setText('actionCopy', 'Inserisci il seriale scheda. La commessa rimane visibile nella fascia dati produzione.');
+        setText('manualLabel', 'Serial Number');
+        manual.value = 'COBO-000184';
+        unit.textContent = 'SN';
+        setText('confirmBtn', 'CONFERMA');
+        setText('retryBtn', 'QR');
+      }
+
+      if (mode === 'measure') {
+        setText('prodState', 'Stato: IN TEST');
+        setText('statusBanner', 'ATTESA OPERATORE');
+        setText('actionChip', 'Misura manuale');
+        setText('actionTitle', 'Inserisci misura manuale');
+        setText('actionCopy', 'Manteniamo il pannello a destra: l operatore vede solo valore, range e conferma.');
+        setText('manualLabel', 'Misura manuale operatore');
+        manual.value = '5.01';
+        unit.textContent = 'V';
+        setText('confirmBtn', 'USA MISURA');
+        setText('retryBtn', 'RIPROVA');
+      }
+
+      if (mode === 'wizard') {
+        document.getElementById('wizardFlag').checked = true;
+        setText('prodState', 'Stato: SETUP');
+        setText('statusBanner', 'WIZARD ATTIVO');
+        setText('actionChip', 'Wizard configurazione');
+        setText('actionTitle', 'Conferma strumenti richiesti');
+        setText('actionCopy', 'Il wizard appare solo se il flag e attivo. A fine wizard il flag si disattiva e non ricompare.');
+        setText('manualLabel', 'Esito configurazione');
+        manual.value = 'Strumenti OK';
+        unit.textContent = 'OK';
+        setText('confirmBtn', 'FINE WIZARD');
+        setText('retryBtn', 'RIVEDI');
+      }
+
+      if (mode === 'fail') {
+        setText('prodState', 'Stato: FAIL');
+        setText('statusBanner', 'FAIL');
+        setText('actionChip', 'Decisione richiesta');
+        setText('actionTitle', 'Registra nota FAIL');
+        setText('actionCopy', 'Il pannello resta a destra e chiede solo la decisione operativa, con dettagli tecnici nascosti.');
+        setText('manualLabel', 'Nota riparazione');
+        manual.value = 'Verificare TP12';
+        unit.textContent = 'NOTE';
+        setText('confirmBtn', 'SALVA');
+        setText('retryBtn', 'STOP');
+        setText('progressPct', '100%');
+        fill.style.width = '100%';
+      }
+    }
+  </script>
+</body>
+</html>

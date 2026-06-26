@@ -1,0 +1,25 @@
+{
+  "release": "AT-MEC_HM_6.6C_SQLITE_ENTERPRISE_STABLE",
+  "timestamp": "2026-06-17T14:38:51.620Z",
+  "status": "OK",
+  "counts": {
+    "tests": 5,
+    "repairs": 0,
+    "recipes": 2,
+    "users": 4,
+    "workOrders": 0,
+    "repositoryItems": 13
+  },
+  "checks": {
+    "missingFiles": [],
+    "duplicateTests": [],
+    "duplicateRepairs": [],
+    "orphanRepairs": []
+  },
+  "sizes": {
+    "database": 58569,
+    "config": 6609044,
+    "recipes": 455,
+    "data": 0
+  }
+}

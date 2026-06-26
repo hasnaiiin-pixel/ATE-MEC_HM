@@ -1,0 +1,11 @@
+{
+  "version": "AT-MEC_HM_6.7B_MES_READY_ENTERPRISE",
+  "status": "MES_READY",
+  "connectors": [
+    "CSV",
+    "SQL Server",
+    "Access MDB",
+    "REST API"
+  ],
+  "createdAt": "2026-06-19"
+}

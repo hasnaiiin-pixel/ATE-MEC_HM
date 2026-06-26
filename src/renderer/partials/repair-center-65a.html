@@ -1,0 +1,64 @@
+<div id="repair-center-65a-tab" class="tab-content repair65a-page" style="display:none;">
+  <div class="repair65a-hero">
+    <div>
+      <h2>🛠 Repair Center Enterprise</h2>
+      <p class="hint">AT-MEC_HM 6.5C_FIX1 — Dossier tecnico completo, timeline, allegati, retest moderno e deduplica test.</p>
+    </div>
+    <div class="repair65a-actions">
+      <button class="btn btn-primary" onclick="refreshRepairCenter65A()">🔄 Aggiorna</button>
+      
+      <button class="btn btn-ghost" onclick="exportRepairTickets65A()">⬇ Export JSON</button>
+    </div>
+  </div>
+  <div class="repair65a-kpi-grid">
+    <div class="repair65a-kpi"><span>Ticket totali</span><b id="repair65a-kpi-total">0</b></div>
+    <div class="repair65a-kpi warn"><span>OPEN</span><b id="repair65a-kpi-open">0</b></div>
+    <div class="repair65a-kpi"><span>IN REPAIR</span><b id="repair65a-kpi-inrepair">0</b></div>
+    <div class="repair65a-kpi"><span>RETEST</span><b id="repair65a-kpi-retest">0</b></div>
+    <div class="repair65a-kpi pass"><span>CLOSED</span><b id="repair65a-kpi-closed">0</b></div>
+  </div>
+
+  <section class="panel repair65a-panel repair65a-fail-panel">
+    <div class="repair65a-head"><h3>🚨 FAIL Queue - seriali da riparare</h3><div class="hint">Mostra i seriali con ultimo esito FAIL e senza ticket aperto. Il test non viene interrotto da popup.</div></div>
+    <div id="repair65a-fail-queue" class="repair65a-table-wrap"><div class="hint">Premi Aggiorna per caricare i FAIL reali.</div></div>
+  </section>
+  <div class="repair65a-layout">
+    <section class="panel repair65a-panel">
+      <div class="repair65a-head"><h3>📋 Ticket Aperti / Storico Ticket</h3><div class="hint">Apri i ticket dalla FAIL Queue. Doppio click su seriale/ticket per aprire la Scheda Seriale.</div></div>
+      <div class="repair65a-toolbar">
+        <div class="field"><label>Stato</label><select id="repair65a-filter-status" onchange="refreshRepairCenter65A()"><option value="ALL">Tutti</option><option>OPEN</option><option>IN_REPAIR</option><option>RETEST</option><option>CLOSED</option></select></div>
+        <div class="field"><label>Seriale</label><input id="repair65a-filter-serial" placeholder="SN..." oninput="refreshRepairCenter65A()"></div>
+        <div class="field"><label>Ricerca</label><input id="repair65a-filter-text" placeholder="difetto, causa, componente..." oninput="refreshRepairCenter65A()"></div>
+      </div>
+      <div id="repair65a-ticket-table" class="repair65a-table-wrap"><div class="hint">Premi Aggiorna.</div></div>
+    </section>
+    <section class="panel repair65a-panel">
+      <div class="repair65a-head"><h3>🧾 Dettaglio Ticket</h3><div id="repair65a-selected-id" class="repair65a-chip">Nessun ticket selezionato</div></div>
+      <div id="repair65a-ticket-detail" class="repair65a-detail"><div class="hint">Seleziona un ticket dalla tabella.</div></div>
+    </section>
+  </div>
+
+  <section class="panel repair65a-panel repair65b-intelligence-panel">
+    <div class="repair65a-head">
+      <h3>📊 Repair Intelligence / Dossier</h3>
+      <div class="hint">KPI riparazioni calcolati dai ticket reali: MTTR, top difetti, cause, componenti, ricette e tecnici.</div>
+    </div>
+    <div class="repair65a-kpi-grid repair65b-kpi-grid">
+      <div class="repair65a-kpi"><span>Ticket aperti</span><b id="repair65b-kpi-open-total">0</b></div>
+      <div class="repair65a-kpi pass"><span>Ticket chiusi</span><b id="repair65b-kpi-closed-total">0</b></div>
+      <div class="repair65a-kpi"><span>MTTR medio</span><b id="repair65b-kpi-mttr">—</b></div>
+      <div class="repair65a-kpi warn"><span>Fail in coda</span><b id="repair65b-kpi-failqueue">0</b></div>
+    </div>
+    <div class="repair65a-layout repair65b-layout">
+      <div class="repair65a-table-wrap" id="repair65b-top-defects"><div class="hint">Aggiorna per calcolare Top Difetti.</div></div>
+      <div class="repair65a-table-wrap" id="repair65b-top-causes"><div class="hint">Aggiorna per calcolare Top Cause.</div></div>
+      <div class="repair65a-table-wrap" id="repair65b-top-components"><div class="hint">Aggiorna per calcolare Top Componenti.</div></div>
+      <div class="repair65a-table-wrap" id="repair65b-top-recipes"><div class="hint">Aggiorna per calcolare Top Ricette.</div></div>
+    </div>
+  </section>
+
+  <section class="panel repair65a-panel">
+    <div class="repair65a-head"><h3>📋 Scheda Seriale / Unit Card rapida</h3><div class="hint">Apertura da doppio click su seriale oppure da ticket.</div></div>
+    <div id="repair65a-unit-card" class="repair65a-unit-card"><div class="hint">Nessun seriale selezionato.</div></div>
+  </section>
+</div>

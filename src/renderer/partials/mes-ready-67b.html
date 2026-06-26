@@ -1,0 +1,95 @@
+<div id="mes-ready-67b-tab" class="tab-content">
+  <div class="mes67-page">
+    <div class="mes67-hero">
+      <div>
+        <div class="mes67-kicker">AT-MEC_HM_6.7B_FIX1 · MES Ready Enterprise</div>
+        <h2>🧾 Work Orders / MES Ready</h2>
+        <p>Gestione Work Order collegata ai Master Data e preparazione connettori MES. Per ora lavora localmente: CSV, SQL Server, Access e REST sono predisposti per integrazione futura.</p>
+      </div>
+      <div class="mes67-actions">
+        <button class="btn btn-primary" onclick="mes67SaveWorkOrder()">💾 Salva WO</button>
+        <button class="btn btn-ghost" onclick="mes67SeedDemo()">✨ Demo</button>
+        <button class="btn btn-ghost" onclick="mes67ImportCsvPrompt()">⬆ Import CSV</button>
+        <button class="btn btn-ghost" onclick="mes67Export()">⬇ Export JSON</button>
+        <button class="btn btn-ghost" onclick="mes67Render()">🔄 Aggiorna</button>
+      </div>
+    </div>
+
+    <div class="mes67-kpis">
+      <div class="mes67-kpi"><span>WO Totali</span><b id="mes67-kpi-total">0</b></div>
+      <div class="mes67-kpi"><span>Attivi</span><b id="mes67-kpi-active">0</b></div>
+      <div class="mes67-kpi"><span>Completati</span><b id="mes67-kpi-completed">0</b></div>
+      <div class="mes67-kpi"><span>Previsti</span><b id="mes67-kpi-target">0</b></div>
+      <div class="mes67-kpi"><span>Prodotti</span><b id="mes67-kpi-done">0</b></div>
+      <div class="mes67-kpi"><span>Residuo</span><b id="mes67-kpi-left">0</b></div>
+    </div>
+
+
+    <section class="panel mes67-panel mes67-active-panel">
+      <div class="mes67-title-row"><div class="mes67-title">⭐ Work Order attiva</div><button class="btn btn-ghost btn-sm" onclick="mes67ClearActiveWorkOrder()">Rimuovi attiva</button></div>
+      <div id="mes67-active-work-order" class="mes67-active-work-order">Nessuna WO attiva. Apri o crea una Work Order e premi <b>IMPOSTA ATTIVA</b>.</div>
+    </section>
+
+    <div class="mes67-tabs">
+      <button class="btn btn-primary btn-sm" onclick="mes67Select('orders')">🧾 Work Orders</button>
+      <button class="btn btn-ghost btn-sm" onclick="mes67Select('production')">🏭 Produzione Collegata</button>
+      <button class="btn btn-ghost btn-sm" onclick="mes67Select('connector')">🔌 MES Connector</button>
+      <button class="btn btn-ghost btn-sm" onclick="mes67Select('audit')">📜 Audit</button>
+    </div>
+
+    <div id="mes67-orders-view" class="mes67-view">
+      <div class="mes67-layout">
+        <section class="panel mes67-panel mes67-editor">
+          <div class="mes67-title">🧾 Work Order</div>
+          <div id="mes67-form" class="mes67-form"></div>
+          <div class="mes67-row">
+            <button class="btn btn-primary" onclick="mes67SaveWorkOrder()">💾 Salva WO</button>
+            <button class="btn btn-ghost" onclick="mes67ClearForm()">Nuovo</button>
+            <button class="btn btn-ghost" onclick="mes67DuplicateWorkOrder()">Duplica</button>
+            <button class="btn btn-primary" onclick="mes67SetActiveFromForm()">⭐ Imposta attiva</button>
+            <button class="btn btn-danger" onclick="mes67CloseWorkOrder()">Chiudi</button>
+          </div>
+        </section>
+        <section class="panel mes67-panel mes67-table-panel">
+          <div class="mes67-title-row"><div class="mes67-title">Lista Work Orders</div><input id="mes67-search" placeholder="Cerca WO, cliente, prodotto..." oninput="mes67Render()"></div>
+          <div id="mes67-list" class="mes67-table"></div>
+        </section>
+      </div>
+    </div>
+
+    <div id="mes67-production-view" class="mes67-view" style="display:none">
+      <section class="panel mes67-panel">
+        <div class="mes67-title">🏭 Produzione collegata a Work Order</div>
+        <div id="mes67-production-cards" class="mes67-production-cards"></div>
+      </section>
+    </div>
+
+    <div id="mes67-connector-view" class="mes67-view" style="display:none">
+      <section class="panel mes67-panel">
+        <div class="mes67-title">🔌 MES Connector Ready</div>
+        <div class="mes67-connector-grid">
+          <div class="mes67-connector"><b>CSV</b><span>Import locale Work Order già disponibile.</span></div>
+          <div class="mes67-connector"><b>SQL Server</b><span>Server, database, utente/password predisposti. Connessione reale futura.</span></div>
+          <div class="mes67-connector"><b>Access / MDB</b><span>Provider predisposto per database legacy e Melexis.</span></div>
+          <div class="mes67-connector"><b>REST API</b><span>Endpoint, token e mapping pronti per ERP/MES.</span></div>
+        </div>
+        <div class="mes67-form mes67-connector-form">
+          <select id="mes67-provider"><option>CSV</option><option>SQL Server</option><option>Access MDB</option><option>REST API</option></select>
+          <input id="mes67-server" placeholder="Server / path / endpoint">
+          <input id="mes67-database" placeholder="Database / file / tenant">
+          <input id="mes67-user" placeholder="Utente">
+          <input id="mes67-password" placeholder="Password / token" type="password">
+          <textarea id="mes67-mapping" placeholder="Mapping campi MES → AT-MEC"></textarea>
+        </div>
+        <button class="btn btn-primary" onclick="mes67SaveConnector()">💾 Salva configurazione MES</button>
+      </section>
+    </div>
+
+    <div id="mes67-audit-view" class="mes67-view" style="display:none">
+      <section class="panel mes67-panel">
+        <div class="mes67-title">📜 Audit Work Orders / MES Ready</div>
+        <div id="mes67-audit" class="mes67-table"></div>
+      </section>
+    </div>
+  </div>
+</div>

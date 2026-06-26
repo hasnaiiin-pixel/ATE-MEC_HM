@@ -1,0 +1,57 @@
+<div id="master-data-67a-tab" class="tab-content">
+  <div class="md67-page">
+    <div class="md67-hero">
+      <div>
+        <div class="md67-kicker">AT-MEC_HM_6.7A · Master Data Enterprise</div>
+        <h2>🏷️ Master Data Enterprise</h2>
+        <p>Gestione anagrafiche industriali: Cliente → Prodotto → Scheda → Revisione → Firmware → Ricetta. Questa struttura prepara AT-MEC_HM a Work Orders evoluti, MES e tracciabilità enterprise.</p>
+      </div>
+      <div class="md67-actions">
+        <button class="btn btn-primary" onclick="md67SaveAll()">💾 Salva</button>
+        <button class="btn btn-ghost" onclick="md67SeedDemo()">✨ Demo</button>
+        <button class="btn btn-ghost" onclick="md67Export()">⬇ Export JSON</button>
+        <button class="btn btn-ghost" onclick="md67Refresh()">🔄 Aggiorna</button>
+      </div>
+    </div>
+
+    <div class="md67-kpis">
+      <div class="md67-kpi"><span>Clienti</span><b id="md67-kpi-customers">0</b></div>
+      <div class="md67-kpi"><span>Prodotti</span><b id="md67-kpi-products">0</b></div>
+      <div class="md67-kpi"><span>Schede</span><b id="md67-kpi-boards">0</b></div>
+      <div class="md67-kpi"><span>Revisioni</span><b id="md67-kpi-revisions">0</b></div>
+      <div class="md67-kpi"><span>Firmware</span><b id="md67-kpi-firmware">0</b></div>
+      <div class="md67-kpi"><span>Binding</span><b id="md67-kpi-bindings">0</b></div>
+    </div>
+
+    <div class="md67-tabs">
+      <button class="btn btn-primary btn-sm" onclick="md67Select('customers')">👥 Clienti</button>
+      <button class="btn btn-ghost btn-sm" onclick="md67Select('products')">📦 Prodotti</button>
+      <button class="btn btn-ghost btn-sm" onclick="md67Select('boards')">🧩 Schede</button>
+      <button class="btn btn-ghost btn-sm" onclick="md67Select('revisions')">🔖 Revisioni</button>
+      <button class="btn btn-ghost btn-sm" onclick="md67Select('firmware')">💾 Firmware</button>
+      <button class="btn btn-ghost btn-sm" onclick="md67Select('bindings')">🔗 Collegamenti</button>
+      <button class="btn btn-ghost btn-sm" onclick="md67Select('audit')">📜 Audit</button>
+    </div>
+
+    <div class="md67-layout">
+      <section class="panel md67-panel md67-editor">
+        <div id="md67-editor-title" class="md67-title">👥 Cliente</div>
+        <div id="md67-form" class="md67-form"></div>
+        <div class="md67-row">
+          <button class="btn btn-primary" onclick="md67SaveCurrent()">💾 Salva elemento</button>
+          <button class="btn btn-ghost" onclick="md67ClearForm()">Pulisci</button>
+          <button class="btn btn-danger" onclick="md67DeleteCurrent()">Elimina</button>
+        </div>
+      </section>
+      <section class="panel md67-panel md67-table-panel">
+        <div class="md67-title-row"><div id="md67-list-title" class="md67-title">Lista</div><input id="md67-search" placeholder="Cerca..." oninput="md67Render()"></div>
+        <div id="md67-list" class="md67-table"></div>
+      </section>
+    </div>
+
+    <section class="panel md67-panel md67-chain">
+      <div class="md67-title">🧬 Catena Master Data</div>
+      <div id="md67-chain-view" class="md67-chain-view">Seleziona un collegamento per vedere Cliente → Prodotto → Scheda → Revisione → Firmware → Ricetta.</div>
+    </section>
+  </div>
+</div>

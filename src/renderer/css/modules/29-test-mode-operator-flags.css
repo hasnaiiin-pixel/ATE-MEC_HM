@@ -1,0 +1,601 @@
+/* AT-MEC_HM 6.7O - definitive Test Mode operator switch row.
+   Loaded last to override legacy global checkbox and topbar rules. */
+body.atmec66e-modern-testmode #production-test-mode .prod-operator-bar{
+  display:grid!important;
+  grid-template-columns:minmax(360px,1fr) 130px 350px 250px!important;
+  grid-template-areas:"wo commessa sn sample"!important;
+  gap:8px!important;
+  align-items:stretch!important;
+  margin:4px 0 8px!important;
+  overflow:visible!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-op-cell{
+  min-height:58px!important;
+  height:58px!important;
+  padding:6px 8px!important;
+  overflow:visible!important;
+  box-sizing:border-box!important;
+  align-content:center!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-op-wo{
+  grid-area:wo!important;
+  display:grid!important;
+  grid-template-columns:132px 116px minmax(92px,110px)!important;
+  gap:7px!important;
+  justify-content:start!important;
+  align-items:center!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-op-commessa{
+  grid-area:commessa!important;
+  width:130px!important;
+  max-width:130px!important;
+  justify-items:center!important;
+  text-align:center!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-op-sn{
+  grid-area:sn!important;
+  width:350px!important;
+  max-width:350px!important;
+  justify-items:center!important;
+  text-align:center!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-op-sample{
+  grid-area:sample!important;
+  width:250px!important;
+  max-width:250px!important;
+  justify-items:center!important;
+  text-align:center!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-op-commessa>label,
+body.atmec66e-modern-testmode #production-test-mode .prod-op-sn>label,
+body.atmec66e-modern-testmode #production-test-mode .prod-op-sample>label{
+  display:block!important;
+  width:100%!important;
+  margin:0 0 5px!important;
+  text-align:center!important;
+  white-space:nowrap!important;
+  line-height:1!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-op-wo #atmec67b-selected-wo-chip{
+  width:100%!important;
+  min-width:0!important;
+  max-width:110px!important;
+  height:28px!important;
+  padding:5px 7px!important;
+  justify-self:start!important;
+  text-align:center!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+  white-space:nowrap!important;
+  box-sizing:border-box!important;
+}
+body.atmec66e-modern-testmode #production-test-mode #atmec67b-wo-open-btn{
+  width:116px!important;
+  min-width:116px!important;
+  max-width:116px!important;
+  height:30px!important;
+  min-height:30px!important;
+}
+body.atmec66e-modern-testmode #production-test-mode #prod-lot-number{
+  width:10ch!important;
+  max-width:10ch!important;
+  height:30px!important;
+  min-height:30px!important;
+  justify-self:center!important;
+  text-align:center!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-op-inline-sn{
+  display:grid!important;
+  grid-template-columns:145px 32px 150px!important;
+  width:339px!important;
+  min-width:339px!important;
+  max-width:339px!important;
+  gap:6px!important;
+  justify-content:center!important;
+  align-items:center!important;
+  height:30px!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-op-inline-sample{
+  display:grid!important;
+  grid-template-columns:120px 116px!important;
+  width:242px!important;
+  min-width:242px!important;
+  max-width:242px!important;
+  gap:6px!important;
+  justify-content:center!important;
+  align-items:center!important;
+  height:30px!important;
+}
+body.atmec66e-modern-testmode #production-test-mode #prod-serial-input{
+  width:145px!important;
+  min-width:145px!important;
+  max-width:145px!important;
+  height:30px!important;
+  min-height:30px!important;
+  text-align:center!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-op-inline-sn>.btn{
+  width:32px!important;
+  min-width:32px!important;
+  max-width:32px!important;
+  height:30px!important;
+  min-height:30px!important;
+  padding:0!important;
+}
+body.atmec66e-modern-testmode #production-test-mode #sample-startup-wizard-btn{
+  width:120px!important;
+  min-width:120px!important;
+  max-width:120px!important;
+  height:30px!important;
+  min-height:30px!important;
+  justify-self:center!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-switch-control{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) 42px!important;
+  gap:6px!important;
+  align-items:center!important;
+  justify-items:stretch!important;
+  height:30px!important;
+  min-height:30px!important;
+  max-height:30px!important;
+  padding:3px 7px!important;
+  margin:0!important;
+  border:1px solid rgba(148,163,184,.24)!important;
+  border-radius:8px!important;
+  background:rgba(15,23,42,.62)!important;
+  color:#bfdbfe!important;
+  font-size:8px!important;
+  line-height:1!important;
+  font-weight:1000!important;
+  letter-spacing:.02em!important;
+  text-transform:uppercase!important;
+  white-space:nowrap!important;
+  box-sizing:border-box!important;
+  overflow:hidden!important;
+  cursor:pointer!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-switch-control span{
+  display:block!important;
+  min-width:0!important;
+  overflow:hidden!important;
+  text-overflow:clip!important;
+  white-space:nowrap!important;
+  text-align:left!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-switch-wo{
+  grid-template-columns:1fr 42px!important;
+  width:132px!important;
+  min-width:132px!important;
+  max-width:132px!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-switch-serial{
+  width:150px!important;
+  min-width:150px!important;
+  max-width:150px!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-switch-sample{
+  width:116px!important;
+  min-width:116px!important;
+  max-width:116px!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-switch-control input[type="checkbox"],
+body.atmec66e-modern-testmode #production-test-mode #atmec67b-use-wo-prod,
+body.atmec66e-modern-testmode #production-test-mode #serial-required-prod,
+body.atmec66e-modern-testmode #production-test-mode #sample-test-required-prod{
+  appearance:none!important;
+  -webkit-appearance:none!important;
+  position:relative!important;
+  display:inline-block!important;
+  justify-self:end!important;
+  width:42px!important;
+  min-width:42px!important;
+  max-width:42px!important;
+  height:22px!important;
+  min-height:22px!important;
+  max-height:22px!important;
+  padding:0!important;
+  margin:0!important;
+  border-radius:999px!important;
+  border:1px solid rgba(255,255,255,.22)!important;
+  background:rgba(255,255,255,.14)!important;
+  box-shadow:none!important;
+  transform:none!important;
+  vertical-align:middle!important;
+  cursor:pointer!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-switch-control input[type="checkbox"]::before,
+body.atmec66e-modern-testmode #production-test-mode #atmec67b-use-wo-prod::before,
+body.atmec66e-modern-testmode #production-test-mode #serial-required-prod::before,
+body.atmec66e-modern-testmode #production-test-mode #sample-test-required-prod::before{
+  content:""!important;
+  position:absolute!important;
+  width:16px!important;
+  height:16px!important;
+  left:3px!important;
+  top:2px!important;
+  border-radius:50%!important;
+  background:#fff!important;
+  box-shadow:0 1px 6px rgba(0,0,0,.35)!important;
+  transition:.16s ease!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-switch-control input[type="checkbox"]::after,
+body.atmec66e-modern-testmode #production-test-mode #atmec67b-use-wo-prod::after,
+body.atmec66e-modern-testmode #production-test-mode #serial-required-prod::after,
+body.atmec66e-modern-testmode #production-test-mode #sample-test-required-prod::after{
+  content:"OFF"!important;
+  position:absolute!important;
+  right:5px!important;
+  top:4px!important;
+  left:auto!important;
+  width:auto!important;
+  height:auto!important;
+  border:0!important;
+  transform:none!important;
+  font-size:8px!important;
+  font-weight:900!important;
+  line-height:1!important;
+  color:rgba(255,255,255,.78)!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-switch-control input[type="checkbox"]:checked,
+body.atmec66e-modern-testmode #production-test-mode #atmec67b-use-wo-prod:checked,
+body.atmec66e-modern-testmode #production-test-mode #serial-required-prod:checked,
+body.atmec66e-modern-testmode #production-test-mode #sample-test-required-prod:checked{
+  background:linear-gradient(90deg,var(--accent),#22c55e)!important;
+  border-color:rgba(34,197,94,.8)!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-switch-control input[type="checkbox"]:checked::before,
+body.atmec66e-modern-testmode #production-test-mode #atmec67b-use-wo-prod:checked::before,
+body.atmec66e-modern-testmode #production-test-mode #serial-required-prod:checked::before,
+body.atmec66e-modern-testmode #production-test-mode #sample-test-required-prod:checked::before{
+  left:21px!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-switch-control input[type="checkbox"]:checked::after,
+body.atmec66e-modern-testmode #production-test-mode #atmec67b-use-wo-prod:checked::after,
+body.atmec66e-modern-testmode #production-test-mode #serial-required-prod:checked::after,
+body.atmec66e-modern-testmode #production-test-mode #sample-test-required-prod:checked::after{
+  content:"ON"!important;
+  left:5px!important;
+  right:auto!important;
+  color:#031417!important;
+}
+@media(max-width:1180px){
+  body.atmec66e-modern-testmode #production-test-mode .prod-operator-bar{
+    grid-template-columns:minmax(360px,1fr) 130px 350px!important;
+    grid-template-areas:"wo wo wo" "commessa sn sample"!important;
+  }
+}
+
+/* 6.7O - taller switch row: text centered above switch, no clipping */
+body.atmec66e-modern-testmode #production-test-mode .prod-operator-bar{
+  grid-template-columns:minmax(330px,1fr) 130px 380px 290px!important;
+  gap:8px!important;
+  align-items:stretch!important;
+  overflow:visible!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-op-cell{
+  min-height:82px!important;
+  height:82px!important;
+  padding:8px 9px!important;
+  overflow:visible!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-op-wo{
+  grid-template-columns:136px 120px minmax(92px,112px)!important;
+  align-items:center!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-op-sn{
+  width:380px!important;
+  max-width:380px!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-op-sample{
+  width:290px!important;
+  max-width:290px!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-op-commessa>label,
+body.atmec66e-modern-testmode #production-test-mode .prod-op-sn>label,
+body.atmec66e-modern-testmode #production-test-mode .prod-op-sample>label{
+  display:block!important;
+  text-align:center!important;
+  margin:0 0 7px!important;
+  line-height:12px!important;
+  min-height:12px!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-op-inline-sn{
+  grid-template-columns:150px 36px 170px!important;
+  width:368px!important;
+  min-width:368px!important;
+  max-width:368px!important;
+  height:46px!important;
+  min-height:46px!important;
+  align-items:center!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-op-inline-sample{
+  grid-template-columns:132px 132px!important;
+  width:270px!important;
+  min-width:270px!important;
+  max-width:270px!important;
+  height:46px!important;
+  min-height:46px!important;
+  align-items:center!important;
+}
+body.atmec66e-modern-testmode #production-test-mode #prod-serial-input{
+  width:150px!important;
+  min-width:150px!important;
+  max-width:150px!important;
+  height:34px!important;
+  min-height:34px!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-op-inline-sn>.btn{
+  width:36px!important;
+  min-width:36px!important;
+  max-width:36px!important;
+  height:34px!important;
+  min-height:34px!important;
+}
+body.atmec66e-modern-testmode #production-test-mode #sample-startup-wizard-btn,
+body.atmec66e-modern-testmode #production-test-mode #atmec67b-wo-open-btn,
+body.atmec66e-modern-testmode #production-test-mode #prod-lot-number,
+body.atmec66e-modern-testmode #production-test-mode .prod-op-wo #atmec67b-selected-wo-chip{
+  height:34px!important;
+  min-height:34px!important;
+}
+body.atmec66e-modern-testmode #production-test-mode #sample-startup-wizard-btn{
+  width:132px!important;
+  min-width:132px!important;
+  max-width:132px!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-op-cell label.prod-switch-control{
+  display:grid!important;
+  grid-template-columns:1fr!important;
+  grid-template-rows:12px 22px!important;
+  row-gap:5px!important;
+  align-items:center!important;
+  justify-items:center!important;
+  justify-content:center!important;
+  height:46px!important;
+  min-height:46px!important;
+  max-height:46px!important;
+  padding:4px 8px!important;
+  margin:0!important;
+  overflow:visible!important;
+  line-height:1!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-op-cell label.prod-switch-control span{
+  width:100%!important;
+  display:block!important;
+  text-align:center!important;
+  line-height:12px!important;
+  min-height:12px!important;
+  overflow:hidden!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-op-cell label.prod-switch-control input[type="checkbox"]{
+  justify-self:center!important;
+  align-self:center!important;
+  width:42px!important;
+  min-width:42px!important;
+  max-width:42px!important;
+  height:22px!important;
+  min-height:22px!important;
+  max-height:22px!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-switch-wo{
+  width:136px!important;
+  min-width:136px!important;
+  max-width:136px!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-switch-serial{
+  width:170px!important;
+  min-width:170px!important;
+  max-width:170px!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-switch-sample{
+  width:132px!important;
+  min-width:132px!important;
+  max-width:132px!important;
+}
+@media(max-width:1180px){
+  body.atmec66e-modern-testmode #production-test-mode .prod-operator-bar{
+    grid-template-columns:minmax(330px,1fr) 130px 380px!important;
+    grid-template-areas:"wo wo wo" "commessa sn sample"!important;
+  }
+}
+
+/* 6.7O - centered switch track, wider WO space, clearer labels/status */
+body.atmec66e-modern-testmode #production-test-mode .prod-operator-bar{
+  grid-template-columns:minmax(390px,1fr) 130px 360px 250px!important;
+  grid-template-areas:"wo commessa sn sample"!important;
+  gap:8px!important;
+  overflow:visible!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-op-cell{
+  min-height:82px!important;
+  height:82px!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-op-wo{
+  grid-template-columns:132px 116px 88px!important;
+  gap:7px!important;
+  justify-content:start!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-op-sn{
+  width:360px!important;
+  max-width:360px!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-op-sample{
+  width:250px!important;
+  max-width:250px!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-op-wo #atmec67b-selected-wo-chip{
+  width:88px!important;
+  min-width:88px!important;
+  max-width:88px!important;
+  padding-left:5px!important;
+  padding-right:5px!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-op-inline-sn{
+  grid-template-columns:148px 36px 158px!important;
+  width:354px!important;
+  min-width:354px!important;
+  max-width:354px!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-op-inline-sample{
+  grid-template-columns:118px 112px!important;
+  width:236px!important;
+  min-width:236px!important;
+  max-width:236px!important;
+}
+body.atmec66e-modern-testmode #production-test-mode #prod-serial-input{
+  width:148px!important;
+  min-width:148px!important;
+  max-width:148px!important;
+}
+body.atmec66e-modern-testmode #production-test-mode #sample-startup-wizard-btn{
+  width:118px!important;
+  min-width:118px!important;
+  max-width:118px!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-switch-wo{
+  width:132px!important;
+  min-width:132px!important;
+  max-width:132px!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-switch-serial{
+  width:158px!important;
+  min-width:158px!important;
+  max-width:158px!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-switch-sample{
+  width:112px!important;
+  min-width:112px!important;
+  max-width:112px!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-op-cell>label,
+body.atmec66e-modern-testmode #production-test-mode .prod-op-cell label.prod-switch-control>span:first-child{
+  font-size:10.5px!important;
+  font-weight:1000!important;
+  letter-spacing:.08em!important;
+  color:#67e8f9!important;
+  text-shadow:0 0 10px rgba(34,211,238,.32)!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-op-commessa>label{
+  color:#fde68a!important;
+  text-shadow:0 0 10px rgba(250,204,21,.22)!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-op-cell label.prod-switch-control{
+  grid-template-columns:1fr!important;
+  grid-template-rows:14px 24px!important;
+  row-gap:4px!important;
+  height:48px!important;
+  min-height:48px!important;
+  max-height:48px!important;
+  align-items:center!important;
+  justify-items:center!important;
+  overflow:visible!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-op-cell label.prod-switch-control>span:first-child{
+  width:100%!important;
+  line-height:14px!important;
+  min-height:14px!important;
+  text-align:center!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-switch-control input[type="checkbox"],
+body.atmec66e-modern-testmode #production-test-mode #atmec67b-use-wo-prod,
+body.atmec66e-modern-testmode #production-test-mode #serial-required-prod,
+body.atmec66e-modern-testmode #production-test-mode #sample-test-required-prod{
+  position:absolute!important;
+  width:1px!important;
+  min-width:1px!important;
+  max-width:1px!important;
+  height:1px!important;
+  min-height:1px!important;
+  max-height:1px!important;
+  opacity:0!important;
+  pointer-events:none!important;
+  margin:0!important;
+  padding:0!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-switch-control input[type="checkbox"]::before,
+body.atmec66e-modern-testmode #production-test-mode .prod-switch-control input[type="checkbox"]::after,
+body.atmec66e-modern-testmode #production-test-mode #atmec67b-use-wo-prod::before,
+body.atmec66e-modern-testmode #production-test-mode #atmec67b-use-wo-prod::after,
+body.atmec66e-modern-testmode #production-test-mode #serial-required-prod::before,
+body.atmec66e-modern-testmode #production-test-mode #serial-required-prod::after,
+body.atmec66e-modern-testmode #production-test-mode #sample-test-required-prod::before,
+body.atmec66e-modern-testmode #production-test-mode #sample-test-required-prod::after{
+  content:none!important;
+  display:none!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-switch-track{
+  position:relative!important;
+  display:block!important;
+  width:42px!important;
+  height:22px!important;
+  min-width:42px!important;
+  min-height:22px!important;
+  border-radius:999px!important;
+  border:1px solid rgba(255,255,255,.22)!important;
+  background:rgba(255,255,255,.14)!important;
+  box-sizing:border-box!important;
+  justify-self:center!important;
+  align-self:center!important;
+  overflow:hidden!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-switch-track::before{
+  content:""!important;
+  position:absolute!important;
+  width:16px!important;
+  height:16px!important;
+  left:3px!important;
+  top:2px!important;
+  border-radius:50%!important;
+  background:#fff!important;
+  box-shadow:0 1px 6px rgba(0,0,0,.35)!important;
+  transition:.16s ease!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-switch-track::after{
+  content:"OFF"!important;
+  position:absolute!important;
+  right:5px!important;
+  top:6px!important;
+  font-size:8px!important;
+  font-weight:900!important;
+  line-height:1!important;
+  color:rgba(255,255,255,.78)!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-switch-control input[type="checkbox"]:checked + .prod-switch-track{
+  background:linear-gradient(90deg,var(--accent),#22c55e)!important;
+  border-color:rgba(34,197,94,.8)!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-switch-control input[type="checkbox"]:checked + .prod-switch-track::before{
+  left:21px!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-switch-control input[type="checkbox"]:checked + .prod-switch-track::after{
+  content:"ON"!important;
+  left:5px!important;
+  right:auto!important;
+  top:6px!important;
+  color:#031417!important;
+  transform:none!important;
+}
+body.atmec66e-modern-testmode #production-test-mode #prod-status-banner{
+  background:linear-gradient(90deg,rgba(8,47,73,.88),rgba(14,116,144,.62),rgba(8,47,73,.88))!important;
+  color:#e0f2fe!important;
+  border:2px solid rgba(103,232,249,.55)!important;
+  box-shadow:0 0 22px rgba(34,211,238,.22), inset 0 0 18px rgba(14,165,233,.10)!important;
+  text-shadow:0 1px 8px rgba(0,0,0,.55)!important;
+}
+body.atmec66e-modern-testmode #production-test-mode #prod-status-banner.pass{
+  background:linear-gradient(90deg,rgba(20,83,45,.90),rgba(34,197,94,.42),rgba(20,83,45,.90))!important;
+  color:#dcfce7!important;
+  border-color:rgba(134,239,172,.62)!important;
+}
+body.atmec66e-modern-testmode #production-test-mode #prod-status-banner.fail{
+  background:linear-gradient(90deg,rgba(127,29,29,.90),rgba(239,68,68,.46),rgba(127,29,29,.90))!important;
+  color:#fee2e2!important;
+  border-color:rgba(252,165,165,.70)!important;
+}
+@media(max-width:1120px){
+  body.atmec66e-modern-testmode #production-test-mode .prod-operator-bar{
+    grid-template-columns:minmax(390px,1fr) 130px 360px!important;
+    grid-template-areas:"wo wo wo" "commessa sn sample"!important;
+  }
+}

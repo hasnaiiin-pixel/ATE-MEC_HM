@@ -123,13 +123,65 @@ function classifySettingsPermissions(settings: any): string[] {
   const keys = Object.keys(settings || {});
   const required = new Set<string>();
   const brandingRe = /(logo|Logo|brand|Brand|signature|Signature|report.*Logo|customerLogo|developerSmall|companyLogo|builderLogo|loginLarge|hmiLarge|logoBackground|logoBg)/;
-  const hardwareRe = /(keysight|pl303|esp32|serial|baud|visa|port|hardware|device|station)/i;
+  const hardwareRe = /(keysight|pl303|esp32|serial|baud|visa|port|hardware|device|station|instrument|exclude|scanner)/i;
   for (const k of keys) {
     if (brandingRe.test(k)) required.add('manage_branding');
     if (hardwareRe.test(k)) required.add('config_hardware');
   }
   return Array.from(required);
 }
+
+function isTcpConnectionText(conn: string): boolean {
+  const clean = String(conn || '').trim().replace(/^tcp:\/\//i, '');
+  return /^\d+\.\d+\.\d+\.\d+(:\d+)?$/.test(clean) || /^[a-zA-Z0-9_.-]+:\d+$/.test(clean);
+}
+
+function settingsFromReconnectConfig(c: { name: string; conn: string; baud: number }): any {
+  const name = String(c?.name || '').trim();
+  const conn = String(c?.conn || '').trim();
+  const baud = Number(c?.baud || 0);
+  if (!name || !conn || conn === 'mock') return {};
+  if (name === 'modbus_serial' || name === 'esp32_serial') {
+    return { esp32Port: conn, esp32Baud: baud || 115200 };
+  }
+  if (name === 'AimTTi_PL303') {
+    if (isTcpConnectionText(conn)) {
+      const clean = conn.replace(/^tcp:\/\//i, '');
+      const [host, portText] = clean.includes(':') ? clean.split(':') : [clean, String(baud || 9221)];
+      return { pl303Mode: 'ETHERNET', pl303Host: host, pl303Port: Number(portText || 9221), ttiHost: host, ttiPort: host, ttiBaud: Number(portText || 9221) };
+    }
+    return { pl303Mode: 'USB', pl303Com: conn, pl303Baud: baud || 9600, ttiPort: conn, ttiBaud: baud || 9600 };
+  }
+  if (name === 'Keysight_34461A' || name === 'Keysight_34465A') {
+    const raw = conn.replace(/^visa:\/\//i, '').replace(/^usb:\/\//i, '');
+    const isVisa = /^visa:\/\//i.test(conn) || /^(USB|TCPIP|GPIB).*::INSTR$/i.test(raw);
+    const isUsbCom = /^usb:\/\//i.test(conn) || /^COM\d+$/i.test(raw) || raw.startsWith('/dev/');
+    return { keysightMode: isVisa ? 'USB_VISA' : (isUsbCom ? 'USB_COM' : 'ETH'), keysightIp: raw, keysightPort: baud || (isVisa || isUsbCom ? 9600 : 5025) };
+  }
+  return {};
+}
+
+function persistReconnectSettings(configs: Array<{ name: string; conn: string; baud: number }>): void {
+  const merged = (configs || []).reduce((acc, c) => ({ ...acc, ...settingsFromReconnectConfig(c) }), {} as any);
+  if (Object.keys(merged).length) writeAppSettings(merged);
+}
+
+function normalizeInstrumentName(name: string): string {
+  const n = String(name || '').trim().toLowerCase();
+  if (!n) return '';
+  if (n.includes('modbus_serial') || n.includes('esp32') || n === 'esp32_serial') return 'modbus_serial';
+  if (n.includes('aimtti_pl303') || n.includes('pl303') || n.includes('tti')) return 'AimTTi_PL303';
+  if (n.includes('keysight') || n.includes('34461') || n.includes('34465') || n.includes('multimeter') || n.includes('multimetro') || n.includes('dmm')) return 'Keysight_34461A';
+  if (n.includes('scanner') || n.includes('qr')) return 'QR_Scanner';
+  if (['manual', 'manuale', 'operator', 'system', 'none'].includes(n)) return n;
+  return String(name || '').trim();
+}
+
+function isInstrumentExcluded(name: string, excluded: Set<string>): boolean {
+  const normalized = normalizeInstrumentName(name);
+  return Array.from(excluded).some(item => normalizeInstrumentName(item) === normalized);
+}
+
 
 function createWindow(): void {
   mainWindow = new BrowserWindow({
@@ -138,7 +190,7 @@ function createWindow(): void {
     minWidth: 1280,
     minHeight: 800,
     backgroundColor: '#0d0d14',
-    title: 'AT-MEC HM 6.0 WORK ORDER PRODUCT MANAGEMENT',
+    title: 'AT-MEC HM 6.3A_FIX2 PRODUCTION PAGE RENDER FIX',
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
@@ -342,6 +394,7 @@ safeIpcHandle('connect-esp32-only', async (_e, cfg: { port?: string; baud?: numb
   const statuses = hal.getAllStatuses();
   mainWindow?.webContents.send('hardware-statuses', statuses);
   const st = statuses.find(s => s.name === 'modbus_serial');
+  if (st && !st.mock) writeAppSettings(settingsFromReconnectConfig({ name: 'modbus_serial', conn: port, baud }));
   return { ok: !!st && !st.mock, status: st, statuses };
 });
 
@@ -354,7 +407,10 @@ safeIpcHandle('reconnect-hardware', async (_e, configs: Array<{ name: string; co
       console.error(`[MAIN] Timeout connessione ${c.name}:`, err);
     }
   }
-  return hal.getAllStatuses();
+  persistReconnectSettings(configs || []);
+  const statuses = hal.getAllStatuses();
+  mainWindow?.webContents.send('hardware-statuses', statuses);
+  return statuses;
 });
 
 safeIpcHandle('start-test', async (_e, payload: { recipe: Recipe; serialDut: string; lotNumber?: string; workOrder?: string; overrideDuplicate?: boolean; repairNote?: string }) => {
@@ -400,8 +456,8 @@ safeIpcHandle('start-test', async (_e, payload: { recipe: Recipe; serialDut: str
   const hwCheck = hal.validateRecipeHardware(recipe);
   const cfg = readAppSettings();
   const excluded = new Set<string>(Array.isArray(cfg.excludedInstruments) ? cfg.excludedInstruments : []);
-  const nonHardwareNames = new Set(['manual', 'manuale', 'operator', 'system', 'none']);
-  const missingAfterExclusions = (hwCheck.missing || []).filter(name => !excluded.has(name) && !nonHardwareNames.has(String(name || '').toLowerCase()));
+  const nonHardwareNames = new Set(['manual', 'manuale', 'operator', 'system', 'none', 'qr_scanner', 'scanner', 'barcode']);
+  const missingAfterExclusions = (hwCheck.missing || []).filter(name => !isInstrumentExcluded(name, excluded) && !nonHardwareNames.has(String(name || '').toLowerCase()));
   if (missingAfterExclusions.length > 0) {
     return {
       ok: false,
@@ -524,6 +580,7 @@ safeIpcHandle('recover-fault', () => {
 });
 
 safeIpcHandle('flash-firmware', async (_e, { tool, operation, filePath }) => {
+  const denied = requirePermission('config_hardware'); if (denied) return denied;
   const { FlashManager } = await import('./hal/FlashManager');
   const result = await FlashManager.executeFlashOperation(tool, operation, filePath, 30000);
   eventBus.emit('cli-log-received', { tool, operation, output: result.output, success: result.success });
@@ -544,6 +601,7 @@ safeIpcHandle('query-multimeter', async (_e, { device, cmd }) => {
 
 
 safeIpcHandle('connect-pl303', async (_e, cfg: { mode?: string; host?: string; port?: number; com?: string; baud?: number }) => {
+  const denied = requirePermission('config_hardware'); if (denied) return denied;
   const mode = String(cfg?.mode || 'USB').toUpperCase();
   const conn = mode === 'ETHERNET' ? String(cfg?.host || 'mock') : String(cfg?.com || 'mock');
   const speed = mode === 'ETHERNET' ? Number(cfg?.port || 9221) : Number(cfg?.baud || 9600);
@@ -558,6 +616,7 @@ safeIpcHandle('connect-pl303', async (_e, cfg: { mode?: string; host?: string; p
 });
 
 safeIpcHandle('set-pl303-output', async (_e, cfg: { voltage?: number; current?: number; outputOn?: boolean; channel?: number }) => {
+  const denied = requirePermission('config_hardware'); if (denied) return denied;
   const res = await timeoutPromise(hal.setPl303Output(Number(cfg?.voltage || 0), Number(cfg?.current || 0), Boolean(cfg?.outputOn), Number(cfg?.channel || 1)), 3500, 'set PL303');
   return res;
 });
@@ -620,6 +679,7 @@ safeIpcHandle('get-esp32-info', async () => {
 });
 
 safeIpcHandle('set-esp32-pin-map', async (_e, entries) => {
+  const denied = requirePermission('config_hardware'); if (denied) return denied;
   hal.setEsp32PinMap(entries || []);
   return { ok: true };
 });
@@ -627,6 +687,7 @@ safeIpcHandle('set-esp32-pin-map', async (_e, entries) => {
 
 // AT-MEC_HM_3.30 - Communication Hub: seriale, Telnet/TCP, log RX/TX e base parser renderer.
 safeIpcHandle('comm-open-serial', async (_e, cfg: { port?: string; baud?: number }) => {
+  const denied = requirePermission('config_hardware'); if (denied) return denied;
   closeCommunicationHub();
   const port = String(cfg?.port || '').trim();
   const baudRate = Number(cfg?.baud || 115200);
@@ -643,6 +704,7 @@ safeIpcHandle('comm-open-serial', async (_e, cfg: { port?: string; baud?: number
 });
 
 safeIpcHandle('comm-open-tcp', async (_e, cfg: { host?: string; port?: number; mode?: string }) => {
+  const denied = requirePermission('config_hardware'); if (denied) return denied;
   closeCommunicationHub();
   const host = String(cfg?.host || '').trim();
   const port = Number(cfg?.port || 23);
@@ -664,6 +726,7 @@ safeIpcHandle('comm-open-tcp', async (_e, cfg: { host?: string; port?: number; m
 });
 
 safeIpcHandle('comm-send', async (_e, payload: { data?: string; appendNewline?: boolean }) => {
+  const denied = requirePermission('config_hardware'); if (denied) return denied;
   const raw = String(payload?.data ?? '');
   const data = raw + (payload?.appendNewline === false ? '' : '\n');
   if (commSerial?.isOpen) {

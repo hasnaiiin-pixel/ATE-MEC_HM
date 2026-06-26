@@ -824,7 +824,8 @@ function moveStep(i, delta) { const j = i + delta; if (j < 0 || j >= recipe.step
 function updateRecipeHealth() {
   const el = document.getElementById('recipe-health'); if (!el) return;
   const active = recipe.steps.filter(s => s.enabled !== false);
-  const needsEsp = active.some(s => ['DI','DO','AI','AO'].includes(s.io_type)) || (getPowerSourceValue() === 'ESP32_RELAY_POWER');
+  const power = recipe.power_metadata || getPowerSourceValue();
+  const needsEsp = active.some(s => ['DI','DO'].includes(s.io_type) || s.type === 'DigitalInputCheck' || s.type === 'DigitalOutputSet') || (power === 'ESP32_RELAY_POWER');
   const esp = latestHardwareStatuses.find(x => x.name === 'modbus_serial');
   const espTxt = needsEsp ? (esp && !esp.mock ? '✅ ESP32/modbus_serial LIVE' : '❌ ESP32/modbus_serial non LIVE') : 'ℹ️ ESP32 non richiesto';
   const errors = [];

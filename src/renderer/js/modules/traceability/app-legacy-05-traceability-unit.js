@@ -84,7 +84,7 @@ Vuoi inserire manualmente il valore letto sullo strumento esterno? Il sistema co
     const limits = `Limiti: ${data.min ?? '-∞'} ÷ ${data.max ?? '+∞'} ${data.unit || ''}`;
     document.getElementById('manual-step-measure-info').textContent = `Misura: ${data.manual_measure_type || 'CONFIRM'}${data.channel !== undefined ? ' su GPIO '+data.channel : ''}. Stabilizzazione: ${data.stable_time_ms || 0} ms. ${limits}.`;
     const limEl = document.getElementById('manual-step-limits'); if (limEl) limEl.textContent = limits + ' — PASS/FAIL automatico.';
-    const alertEl = document.getElementById('manual-step-alert'); if (alertEl) alertEl.textContent = fallback ? 'MISURA FALLITA DAL MULTIMETRO: inserisci il valore manuale e premi “Usa misura manuale”.' : 'Posiziona le sonde, poi prova acquisizione. Se lo strumento non risponde puoi inserire misura manuale.';
+    const alertEl = document.getElementById('manual-step-alert'); if (alertEl) alertEl.textContent = fallback ? 'MISURA FALLITA DAL MULTIMETRO: inserisci il valore manuale e premi “Misura manuale”.' : 'Posiziona le sonde, poi prova acquisizione. Se lo strumento non risponde puoi inserire misura manuale.';
     const acqBtn = document.getElementById('manual-step-acquire-btn'); if (acqBtn) acqBtn.style.display = fallback ? 'none' : '';
     document.getElementById('manual-step-value').value = '';
     document.getElementById('manual-step-modal').classList.add('show');
@@ -606,6 +606,20 @@ recipeMatchesClientFilter = function(recipeObj, filter){
 };
 function setLiveMeasurePanel319(data){
   const set=(id,v)=>{const el=document.getElementById(id); if(el) el.textContent = (v===undefined||v===null||v==='') ? '--' : String(v);};
+  const clean=(v,unit='')=>{
+    if(v===undefined||v===null||v==='') return '--';
+    if(typeof v==='object'){
+      const pairs=[];
+      if(v.voltage!==undefined) pairs.push(`${Number(v.voltage).toString()==='NaN'?v.voltage:Number(v.voltage).toFixed(3).replace(/\.000$/,'')} V`);
+      if(v.current!==undefined) pairs.push(`${Number(v.current).toString()==='NaN'?v.current:Number(v.current).toFixed(3).replace(/\.000$/,'')} A`);
+      if(v.value!==undefined) pairs.push(clean(v.value,unit));
+      if(!pairs.length) return JSON.stringify(v);
+      return pairs.join(' / ');
+    }
+    const n=Number(v);
+    const value=Number.isFinite(n) ? n.toFixed(3).replace(/\.000$/,'') : String(v);
+    return `${value}${unit ? ' '+unit : ''}`.trim();
+  };
   if(!data){ set('prod-live-measure-value','--'); set('prod-live-expected','--'); set('prod-live-tolerance','--'); set('prod-live-device','--'); set('prod-live-unit','--'); set('prod-live-ts','--'); set('prod-live-result','--'); return; }
   const val = data.value ?? data.measured ?? data.measurement ?? data.current ?? data.voltage ?? data.resultValue;
   const min = data.min ?? data.expected_min;
@@ -613,7 +627,7 @@ function setLiveMeasurePanel319(data){
   const exp = data.expected ?? data.nominal ?? (min!==undefined || max!==undefined ? `${min ?? '-∞'} ÷ ${max ?? '+∞'}` : '--');
   const unit = data.unit || '';
   let passfail = data.pass === true ? 'PASS' : data.pass === false ? 'FAIL' : (data.result || data.status || '--');
-  set('prod-live-measure-value', val!==undefined ? `${Number(val).toString()==='NaN'?val:Number(val).toFixed ? Number(val).toFixed(3).replace(/\.000$/,'') : val} ${unit}` : '--');
+  set('prod-live-measure-value', val!==undefined ? clean(val, unit) : '--');
   set('prod-live-expected', exp);
   set('prod-live-tolerance', data.tolerance ?? (min!==undefined || max!==undefined ? `${min ?? '-∞'} / ${max ?? '+∞'}` : '--'));
   set('prod-live-device', data.device || data.device_mapping || '--');

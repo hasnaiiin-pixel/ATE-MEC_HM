@@ -1,0 +1,5 @@
+@echo off
+title INSTALLA AT-MEC HM 6.7B
+echo Installazione dipendenze AT-MEC HM 6.7B...
+npm install
+pause

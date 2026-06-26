@@ -1,0 +1,30 @@
+
+/* AT-MEC_HM 4.24B - Repository Distribution Sync */
+.repository-424a-page .repo424a-table .btn-xs{padding:4px 8px;font-size:12px}
+.repository-424a-status.Archived,.repo424a-status.Mismatch{background:rgba(220,53,69,.18);color:#ffb3b3;border:1px solid rgba(220,53,69,.35)}
+.repository-424a-status.Published{background:rgba(25,135,84,.18);color:#a6f4c5;border:1px solid rgba(25,135,84,.35)}
+.repository-424a-status.Draft{background:rgba(255,193,7,.16);color:#ffe8a3;border:1px solid rgba(255,193,7,.35)}
+
+
+/* AT-MEC_HM 4.24B_FIX5 - Recipe list visibility */
+.repo424a-discovery-note{
+  margin:10px 0 14px;
+  padding:10px 12px;
+  border:1px solid rgba(100,160,255,.25);
+  border-radius:10px;
+  background:rgba(40,90,160,.10);
+  color:var(--text-muted,#aeb8c8);
+}
+.repo424a-table-wrap{
+  display:block !important;
+  visibility:visible !important;
+}
+.repo424a-table tbody tr td{
+  vertical-align:top;
+}
+.repo424a-empty-state{
+  padding:14px;
+  border:1px dashed rgba(255,255,255,.18);
+  border-radius:10px;
+  color:var(--text-muted,#aeb8c8);
+}

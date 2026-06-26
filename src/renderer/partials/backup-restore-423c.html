@@ -1,0 +1,73 @@
+<div id="backup-restore-423c-tab" class="tab-content">
+  <div class="br423-shell">
+    <div class="br423-hero">
+      <div>
+        <div class="br423-eyebrow">AT-MEC_HM_4.23C_FIX1_BACKUP_RESTORE_PAGE_FIX</div>
+        <h2>💾 Backup & Restore Enterprise</h2>
+        <p>Scheduler, verifica integrità e protezione ripristino per database, ricette, configurazioni, label, audio e manufacturing.</p>
+      </div>
+      <div class="br423-status" id="br423-status-pill">READY</div>
+    </div>
+
+    <div class="br423-grid">
+      <section class="br423-card">
+        <h3>Backup rapido HMI</h3>
+        <p>Esporta stato browser e configurazioni locali per debug rapido.</p>
+        <button class="btn btn-primary" onclick="createBrowserBackup423C()">💾 Esporta backup HMI</button>
+        <button class="btn btn-ghost" onclick="renderBackupRestore423C()">🔄 Aggiorna stato</button>
+      </section>
+      <section class="br423-card">
+        <h3>Backup completo filesystem</h3>
+        <p>Crea ZIP completo con manifest, checksum e contenuti critici.</p>
+        <div class="br423-command">npm run backup:full</div>
+        <div class="br423-command">node scripts/backup_restore_423c.js backup</div>
+      </section>
+      <section class="br423-card">
+        <h3>Restore protetto</h3>
+        <p>Prima del restore viene generato sempre un backup PRE_RESTORE.</p>
+        <div class="br423-command">node scripts/backup_restore_423c.js restore backups\NOME_BACKUP.zip</div>
+      </section>
+      <section class="br423-card">
+        <h3>Integrità</h3>
+        <p>Controlla presenza risorse, scheduler e ultimo controllo.</p>
+        <button class="btn btn-success" onclick="runBackupIntegrity423C()">✅ Verifica integrità</button>
+      </section>
+    
+      <section class="br423-card">
+        <h3>Clone Station</h3>
+        <p>Prepara o importa un pacchetto per clonare rapidamente una postazione ATE.</p>
+        <button class="btn btn-primary" onclick="exportCloneStation423C()">📦 Esporta profilo clone</button>
+        <button class="btn btn-ghost" onclick="showCloneStationGuide423C()">📋 Guida clone</button>
+        <div class="br423-command">npm run clone:export</div>
+        <div class="br423-command">npm run clone:import backups\CLONE_ZIP.zip</div>
+      </section>
+</div>
+
+    <div class="br423-card br423-wide">
+      <div class="br423-head-row">
+        <h3>Scheduler backup</h3>
+        <button class="btn btn-primary btn-sm" onclick="saveBackupSchedule423C()">💾 Salva schedulazione</button>
+      </div>
+      <div class="br423-scheduler-grid">
+        <label>Abilita scheduler<br><select id="br423-scheduler-enabled"><option value="true">ON</option><option value="false">OFF</option></select></label>
+        <label>Frequenza<br><select id="br423-scheduler-frequency"><option value="daily">Giornaliero</option><option value="weekly">Settimanale</option><option value="monthly">Mensile</option></select></label>
+        <label>Orario<br><input id="br423-scheduler-time" type="time" value="02:00"></label>
+        <label>Retention<br><input id="br423-scheduler-retention" type="number" min="1" max="100" value="20"></label>
+      </div>
+      <div id="br423-scheduler-status" class="br423-scheduler-status"></div>
+    </div>
+
+    <div class="br423-card br423-wide">
+      <div class="br423-head-row">
+        <h3>Contenuto backup 4.23C_FIX1</h3>
+        <button class="btn btn-ghost btn-sm" onclick="exportBackupChecklist423C()">📤 Esporta checklist</button>
+      </div>
+      <div id="br423-checklist" class="br423-checklist"></div>
+    </div>
+
+    <div class="br423-card br423-wide">
+      <h3>Log Backup & Restore</h3>
+      <div id="br423-log" class="br423-log"></div>
+    </div>
+  </div>
+</div>

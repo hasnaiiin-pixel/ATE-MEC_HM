@@ -3,8 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: file:; media-src 'self' blob: file:;">
-<title>ATE-MEC HM 4.22A UI NAVIGATION CLEANUP</title>
+<title>ATE-MEC HM 6.7O TEST MODE SWITCH ALIGNMENT FIX</title>
 <link rel="stylesheet" href="css/app.css">
+<link rel="stylesheet" href="css/modules/17-repository-center.css">
 </head>
 <body class="locked">
 <!--
@@ -18,9 +19,9 @@
   <div class="login-card">
     <img id="login-large-logo" class="login-hero-logo" title="Logo aziendale">
     <div class="login-brand">
-      <div><div class="login-title">ATE-MEC HM 4.22A UI NAVIGATION CLEANUP</div><div class="login-sub">Production Test & Traceability Suite</div></div>
+      <div><div class="login-title">ATE-MEC HM 6.7O TEST MODE SWITCH ALIGNMENT FIX</div><div class="login-sub">Production Test & Traceability Suite</div></div>
     </div>
-    <div class="col"><label>Utente / Badge</label><input id="op-name" type="text" value="Operatore" placeholder="Inserisci utente"></div>
+    <div class="col"><label>Utente disponibile</label><select id="op-name" class="login-user-select"><option value="Operatore">Operatore</option></select></div>
     <div class="col"><label>Password</label><input id="op-password" type="password" placeholder="Password"></div>
     <div class="hint">Il ruolo e il livello accesso vengono decisi automaticamente da username e password.</div>
     <button class="btn btn-primary btn-3d" onclick="doLogin()">🔐 ACCEDI</button>
@@ -32,9 +33,10 @@
 
 <div id="topbar">
   <img id="app-large-logo" class="app-logo-large"><div class="app-brand-pro"><span class="logo" id="app-title-logo">ATE-MEC HM</span><span class="app-subtitle-pro">Production Test & Traceability Suite</span></div>
-  <span class="ver">4.22A</span>
+  <span class="ver">6.7O_SWITCH_ALIGNMENT_FIX</span>
   <div id="hw-badges" style="display:flex;gap:6px;"></div>
   <span class="spacer"></span>
+  <button class="btn btn-success btn-xs chrome-toggle" onclick="goDashboard63C()" title="Torna alla Dashboard">🏠 Dashboard</button>
   <button class="btn btn-ghost btn-xs chrome-toggle" onclick="toggleLeftRail()" title="Mostra/nascondi menu sinistro">☰ Menu</button>
   <button class="btn btn-ghost btn-xs chrome-toggle" onclick="toggleRightRail()" title="Mostra/nascondi pannello destro">◫ Step</button>
   <span id="state-pill" class="state-pill" style="color:var(--text2)">IDLE</span>
@@ -58,18 +60,31 @@
   </div>
   <div class="prod-test-body">
     <div class="prod-panel">
-      <div class="prod-selector-row-221 prod-selector-row-318">
+      <div class="prod-operator-bar" id="prod-operator-bar">
+        <div class="prod-op-cell prod-op-wo">
+          <label class="prod-switch-control prod-switch-wo"><span>WO/COMMESSA</span><input id="atmec67b-use-wo-prod" type="checkbox" checked onchange="setUseWorkOrderMode67B(this.checked)"><span class="prod-switch-track" aria-hidden="true"></span></label>
+          <button class="btn btn-primary btn-sm" id="atmec67b-wo-open-btn" onclick="openWorkOrderSelector67B()">WO (Commessa)</button>
+          <span id="atmec67b-selected-wo-chip" class="prod-op-chip">Nessuna WO</span>
+        </div>
+        <div class="prod-op-cell prod-op-commessa">
+          <label>Commessa</label>
+          <input id="prod-lot-number" placeholder="Commessa produzione" oninput="syncLotNumberInputs('prod')">
+        </div>
+        <div class="prod-op-cell prod-op-sn">
+          <label>SERIAL NUMBER</label>
+          <div class="prod-op-inline prod-op-inline-sn"><input id="prod-serial-input" placeholder="QR o manuale" oninput="syncSerialInputs('prod')"><button class="btn btn-ghost btn-sm" onclick="startQr()">+</button><label class="prod-switch-control prod-switch-serial"><span>OBBLIGATORIO</span><input id="serial-required-prod" type="checkbox" checked onchange="setSerialRequired(this.checked)"><span class="prod-switch-track" aria-hidden="true"></span></label></div>
+        </div>
+        <div class="prod-op-cell prod-op-sample">
+          <label>Test campione</label>
+          <div class="prod-op-inline prod-op-inline-sample"><button class="btn btn-warn btn-sm" id="sample-startup-wizard-btn" onclick="openStartupWizard(true)" disabled>Wizard</button><label class="prod-switch-control prod-switch-sample"><span>ABILITA</span><input id="sample-test-required-prod" type="checkbox" onchange="setSampleTestRequired(this.checked)"><span class="prod-switch-track" aria-hidden="true"></span></label></div>
+        </div>
+      </div>
+      <div class="prod-selector-row-221 prod-selector-row-318 prod-recipe-compact-row">
         <div class="prod-select-cell"><label>Cliente</label><input id="prod-client-filter" placeholder="cliente" oninput="refreshProductionRecipes()"></div>
         <div class="prod-select-cell"><label>Ricetta</label><select id="prod-recipe-select" onchange="loadProductionRecipeSelection()"></select></div>
         <div class="prod-select-cell revision"><label>Rev.</label><select id="prod-recipe-version-select" onchange="loadProductionRecipeRevisionSelection()"><option value="">ultima</option></select></div>
-        <button class="btn btn-primary btn-sm" onclick="refreshProductionRecipes()">🔄 Ricette</button>
-        <button class="btn btn-ghost btn-sm" onclick="loadProductionRecipeSelection()">📂 Seleziona</button>
-        <button class="btn btn-warn btn-sm" onclick="openStartupWizard(true)">🧭 Wizard strumenti</button>
-      </div>
-      <div class="prod-meta-row-225 prod-meta-row-318">
-        <div class="prod-info-cell"><label>Commessa / Lotto</label><input id="prod-lot-number" placeholder="Commessa produzione" oninput="syncLotNumberInputs('prod')"></div>
-        <div class="prod-info-cell prod-check-card"><label>Seriale scheda</label><div class="prod-inline-control"><span>SN obbligatorio</span><input id="serial-required-prod" type="checkbox" checked onchange="setSerialRequired(this.checked)"></div><div class="row prod-input-row"><input id="prod-serial-input" placeholder="QR o manuale" oninput="syncSerialInputs('prod')"><button class="btn btn-ghost btn-sm" onclick="startQr()">📷</button></div></div>
-        <div class="prod-info-cell prod-check-card sample-cell"><label>Test scheda campione</label><div class="prod-inline-control"><span>Abilita all'inizio produzione</span><input id="sample-test-required-prod" type="checkbox" onchange="setSampleTestRequired(this.checked)"></div><div class="hint prod-boxed-hint">Richiede conferma scheda campione solo all'avvio test.</div></div>
+        <button class="btn btn-primary btn-sm" onclick="refreshProductionRecipes()">Ricette</button>
+        <button class="btn btn-ghost btn-sm" onclick="loadProductionRecipeSelection()">Seleziona</button>
       </div>
       <div class="prod-recipe-name" id="prod-recipe-name">Nessuna ricetta selezionata</div>
       <div class="prod-status-line">
@@ -82,20 +97,23 @@
         <div class="prod-time-cell"><label>Tempo stimato ricetta</label><b id="prod-estimated-time">00:00</b></div>
         <div class="prod-time-cell running"><label>Tempo reale test</label><b id="prod-real-time">00:00</b></div>
       </div>
-      <div class="prod-main-split-221">
-        <div>
-          <div class="prod-current-step">
-            <div class="label">STEP ATTUALE</div>
-            <div id="prod-current-step" class="value">Da fare</div><div id="prod-live-measure-panel" class="step-live-measure-panel"><div class="live-title">Misura step live</div><div class="live-value" id="prod-live-measure-value">--</div><div class="live-grid"><div class="live-cell">Atteso<b id="prod-live-expected">--</b></div><div class="live-cell">Tolleranza<b id="prod-live-tolerance">--</b></div><div class="live-cell">Device<b id="prod-live-device">--</b></div><div class="live-cell">Unità<b id="prod-live-unit">--</b></div><div class="live-cell">Timestamp<b id="prod-live-ts">--</b></div><div class="live-cell">Esito<b id="prod-live-result">--</b></div></div></div>
-          </div>
-          <div id="prod-status-banner" data-ui-id="testmode.status.banner" class="prod-status-banner todo">DA FARE</div>
+      <div class="prod-main-split-221 atmec66e-fix1c-main-split">
+        <div class="prod-current-step atmec66e-fix1c-step-col">
+          <div class="label">STEP ATTUALE</div>
+          <div id="prod-current-step" class="value">Da fare</div><div id="prod-live-measure-panel" class="step-live-measure-panel"><div class="live-title">Misura step live</div><div class="live-value" id="prod-live-measure-value">--</div><div class="live-grid"><div class="live-cell">Atteso<b id="prod-live-expected">--</b></div><div class="live-cell">Tolleranza<b id="prod-live-tolerance">--</b></div><div class="live-cell">Device<b id="prod-live-device">--</b></div><div class="live-cell">Unità<b id="prod-live-unit">--</b></div><div class="live-cell">Timestamp<b id="prod-live-ts">--</b></div><div class="live-cell">Esito<b id="prod-live-result">--</b></div></div></div>
         </div>
-        <div class="prod-sequence-log" id="prod-sequence-log"></div>
+        <div class="prod-sequence-log atmec66e-fix1c-log-col" id="prod-sequence-log"></div>
       </div>
+      <div id="prod-status-banner" data-ui-id="testmode.status.banner" class="prod-status-banner todo atmec66e-fix1c-status-full">DA FARE</div>
       <div class="prod-primary-actions-inline" aria-label="Comandi principali Test Mode">
-        <button class="btn btn-success btn-3d prod-main-action" onclick="startTest()"><span class="action-ico">▶️</span><span>START</span></button>
+        <button class="btn btn-success btn-3d prod-main-action" onclick="startTest()"><span class="action-ico">▶️</span><span>START (F1)</span></button>
         <button class="btn btn-warn btn-3d prod-main-action" onclick="pauseTest()"><span class="action-ico">⏸️</span><span>PAUSA</span></button>
         <button class="btn btn-danger btn-3d prod-main-action" onclick="stopTestAndReset()"><span class="action-ico">⏹️</span><span>STOP</span></button>
+      </div>
+
+      <div class="prod-progress-wrap">
+        <div class="prod-progress-head"><span>Avanzamento test</span><b id="prod-progress-percent" data-ui-id="testmode.progress.percent">0%</b></div>
+        <div class="prod-progress-bar"><div id="prod-progress-fill" class="prod-progress-fill"></div></div>
       </div>
       <div class="tm-label-panel420 prod-label-panel420" id="tm-label-panel420">
         <div class="tm-label-head420">
@@ -123,10 +141,6 @@
         </div>
       </div>
 
-      <div class="prod-progress-wrap">
-        <div class="prod-progress-head"><span>Avanzamento test</span><b id="prod-progress-percent" data-ui-id="testmode.progress.percent">0%</b></div>
-        <div class="prod-progress-bar"><div id="prod-progress-fill" class="prod-progress-fill"></div></div>
-      </div>
     </div>
     <div class="prod-panel">
       <div class="prod-kpis">
@@ -193,7 +207,7 @@
   <div id="sidebar">
     <div class="section-title">🏭 Banco prova</div>
     <div class="side-card">
-      <div style="font-size:17px;font-weight:900;color:var(--accent);letter-spacing:1px;">ATE-MEC HM 4.22A UI NAVIGATION CLEANUP</div>
+      <div style="font-size:17px;font-weight:900;color:var(--accent);letter-spacing:1px;">ATE-MEC HM 6.7O TEST MODE SWITCH ALIGNMENT FIX</div>
       <div id="logged-user-box" class="hint">Accesso non effettuato</div>
       <button class="btn btn-ghost btn-sm side-nav-btn" onclick="showTab('operator-profile-tab', null); refreshOperatorProfile413O()">👤 Profilo collaboratore</button>
       <button class="btn btn-ghost btn-sm side-nav-btn" onclick="logoutAndLock()">🔒 Logout / cambia utente</button>
@@ -203,17 +217,29 @@
       <details class="nav-group" open><summary>▶ Produzione <span>▾</span></summary>
         <button class="btn btn-ghost btn-sm side-nav-btn submenu-btn" onclick="showTab('run-tab', document.querySelector('[data-tab=run]'))">▶ Esecuzione ricette</button>
         <button class="btn btn-primary btn-sm side-nav-btn submenu-btn" onclick="enterProductionTestMode()">🖥️ Modalità Test</button>
+        <button class="btn btn-ghost btn-sm side-nav-btn submenu-btn" onclick="showProductionExecution63A()">🏭 Production Execution</button>
+        <button class="btn btn-ghost btn-sm side-nav-btn submenu-btn" onclick="showWorkOrderRuntime63B()">📋 Work Order Runtime</button>
+        <button class="btn btn-ghost btn-sm side-nav-btn submenu-btn" onclick="showMultiStationMonitor63C()">🖥️ Multi Station Monitor</button>
+        <button class="btn btn-ghost btn-sm side-nav-btn submenu-btn" onclick="showSupervisorDashboard63D()">📡 Supervisor Dashboard</button>
         <button class="btn btn-ghost btn-sm side-nav-btn submenu-btn" onclick="showTab('factory-core-tab', null); loadFactoryEnterprise418B()">🏭 Factory Enterprise</button>
-        <button class="btn btn-ghost btn-sm side-nav-btn submenu-btn" onclick="showWorkOrderProduct60()">📋 Work Orders / Product Master</button>
-        <button class="btn btn-ghost btn-sm side-nav-btn submenu-btn manufacturing-module-61" onclick="showRevisionFirmware61()">🔧 Firmware / Revisioni</button>
+        <!-- 6.7B_FIX1: moduli legacy Work Orders/Product Master e Firmware/Revisioni nascosti dal menu per evitare doppioni.
+             Sorgenti uniche: Master Data Enterprise + Work Orders / MES Ready. -->
       </details>
       <details class="nav-group" open><summary>🧾 Ricette <span>▾</span></summary>
         <button class="btn btn-ghost btn-sm side-nav-btn submenu-btn" onclick="showTab('recipe-tab', document.querySelector('[data-tab=recipe]')); renderRecipePage()">🧾 Ricette & Step</button>
         <button class="btn btn-ghost btn-sm side-nav-btn submenu-btn" onclick="showTab('customers-logos-tab', null); renderCustomersLogos413B()">🏢 Clienti & Loghi</button>
       </details>
+      <details class="nav-group" open><summary>📚 Repository & Distribution <span>▾</span></summary>
+        <button class="btn btn-ghost btn-sm side-nav-btn submenu-btn" onclick="showRepositoryCenter424A()">📚 Repository Center / Sync</button>
+      </details>
+      <details class="nav-group" open><summary>🏷️ Master Data / Work Orders <span>▾</span></summary>
+        <button class="btn btn-ghost btn-sm side-nav-btn submenu-btn" onclick="showMasterData67A()">🏷️ Master Data Enterprise</button>
+        <button class="btn btn-ghost btn-sm side-nav-btn submenu-btn" onclick="showMesReady67B()">🧾 Work Orders / MES Ready</button>
+      </details>
       <details class="nav-group" open><summary>📊 Report & QC / KPI <span>▾</span></summary>
         <button class="btn btn-ghost btn-sm side-nav-btn submenu-btn" onclick="showTab('audit-tab', document.querySelector('[data-tab=audit]')); loadAudit()">📁 Test Report</button>
         <button class="btn btn-ghost btn-sm side-nav-btn submenu-btn" onclick="showTab('traceability-tab', null); initTraceabilitySerialPage()">🔎 Storico Seriali</button>
+        <button class="btn btn-ghost btn-sm side-nav-btn submenu-btn" onclick="showRepairCenter65A()">🛠 Repair Center</button>
         <button class="btn btn-ghost btn-sm side-nav-btn submenu-btn" onclick="showTab('unit-card-tab', null); initUnitCardPage410E()">🧬 Scheda Unità</button>
         <button class="btn btn-ghost btn-sm side-nav-btn submenu-btn" onclick="showTab('database-tab', null); loadDatabaseDashboard()">📊 Database / KPI</button>
         <button class="btn btn-ghost btn-sm side-nav-btn submenu-btn" onclick="showTab('production-analysis-tab', null); loadProductionAnalysisDashboard412A()">📈 Analisi Produzione</button>
@@ -236,7 +262,9 @@
         <button class="btn btn-ghost btn-sm side-nav-btn submenu-btn" onclick="showTab('users-tab', document.querySelector('[data-tab=users]')); refreshRolesUsers()">🔐 Utenti & Ruoli</button>
         <button class="btn btn-ghost btn-sm side-nav-btn submenu-btn" onclick="showTab('operator-profile-tab', null); refreshOperatorProfile413O()">👤 Profilo collaboratore</button>
         <button class="btn btn-ghost btn-sm side-nav-btn submenu-btn" onclick="showTab('sync-settings-tab', null); initSyncSettings413B()">🔄 Data Provider & Sync</button>
+        <button class="btn btn-ghost btn-sm side-nav-btn submenu-btn" onclick="showDatabaseStatus66A()">🗄️ Database Status</button>
         <button class="btn btn-ghost btn-sm side-nav-btn submenu-btn" onclick="showTab('data-archive-tab', null); loadDataArchiveDashboard412B()">🗄️ Archivio Dati</button>
+        <button class="btn btn-ghost btn-sm side-nav-btn submenu-btn" onclick="showBackupRestore423C()">💾 Backup & Restore</button>
         <button class="btn btn-ghost btn-sm side-nav-btn submenu-btn" onclick="showAudioVoice421()">🔊🎤 Audio & Voice</button>
         <button class="btn btn-ghost btn-sm side-nav-btn submenu-btn" onclick="showEnterpriseStable422()">🛡️ Enterprise Stable</button>
         <button class="btn btn-ghost btn-sm side-nav-btn submenu-btn" onclick="showTab('settings-tab', document.querySelector('[data-tab=settings]'))">⚙️ Configurazione</button>
@@ -285,6 +313,7 @@
     <div data-partial-mount="traceability-tab" data-partial-src="partials/traceability.html"></div>
 
     <div data-partial-mount="unit-card-tab" data-partial-src="partials/unit-card.html"></div>
+    <div data-partial-mount="repair-center-65a-tab" data-partial-src="partials/repair-center-65a.html"></div>
 
     <div data-partial-mount="database-tab" data-partial-src="partials/database.html"></div>
 
@@ -300,8 +329,14 @@
     <div data-partial-mount="print-engine-tab" data-partial-src="partials/print-engine.html"></div>
     <div data-partial-mount="work-order-product-tab" data-partial-src="partials/work-order-product-60.html"></div>
     <div data-partial-mount="revision-firmware-tab" data-partial-src="partials/revision-firmware-61.html"></div>
+    <div data-partial-mount="master-data-67a-tab" data-partial-src="partials/master-data-67a.html"></div>
+    <div data-partial-mount="mes-ready-67b-tab" data-partial-src="partials/mes-ready-67b.html"></div>
     <div data-partial-mount="audio-voice-tab" data-partial-src="partials/audio-voice-421ab.html"></div>
     <div data-partial-mount="enterprise-stable-tab" data-partial-src="partials/enterprise-stable-422.html"></div>
+
+    <div data-partial-mount="repository-center-424a-tab" data-partial-src="partials/repository-center-424a.html"></div>
+    <div data-partial-mount="production-execution-63a-tab" data-partial-src="partials/production-execution-63a.html"></div>
+    <div data-partial-mount="database-status-66a-tab" data-partial-src="partials/database-status-66a.html"></div>
 
     <!-- TAB: FACTORY ENTERPRISE 4.18B -->
     <div data-partial-mount="factory-core-tab" data-partial-src="partials/factory-core.html"></div>
@@ -309,6 +344,7 @@
 
     <!-- TAB: ARCHIVIO DATI 4.12D - Modulo separato, non modifica Test Mode/Ricette/Hardware/Layout Editor -->
     <div data-partial-mount="data-archive-tab" data-partial-src="partials/data-archive.html"></div>
+    <div data-partial-mount="backup-restore-423c-tab" data-partial-src="partials/backup-restore-423c.html"></div>
 
     <!-- TAB: RICETTE & STEP -->
     <div data-partial-mount="recipe-tab" data-partial-src="partials/recipe-editor.html"></div>
@@ -629,8 +665,8 @@
     <div class="modal-foot">
       <div class="manual-action-grid">
         <button class="btn btn-danger" onclick="respondManualStep(false)">🛑 Misura non disponibile</button>
-        <button class="btn btn-primary" id="manual-step-acquire-btn" onclick="respondManualStep(true)">📡 Riprova multimetro</button>
-        <button class="btn btn-success" id="manual-step-value-btn" onclick="respondManualValueOnly()">✍️ Usa misura manuale</button>
+        <button class="btn btn-primary" id="manual-step-acquire-btn" onclick="respondManualStep(true)">Riprova</button>
+        <button class="btn btn-success" id="manual-step-value-btn" onclick="respondManualValueOnly()">Misura manuale</button>
       </div>
     </div>
   </div>
@@ -701,13 +737,36 @@
 <script src="js/modules/printers/print-engine-420a5.js"></script>
 <script src="js/modules/factory/work-order-product-60.js"></script>
 <script src="js/modules/factory/revision-firmware-61.js"></script>
+<script src="js/modules/factory/master-data-67a.js"></script>
+<script src="js/modules/factory/mes-ready-67b.js"></script>
 <script src="js/modules/audio/audio-voice-421ab.js"></script>
 <script src="js/modules/core/enterprise-stable-422.js"></script>
+<script src="js/modules/core/backup-restore-423c.js"></script>
+<script src="js/modules/repository/repository-center-424a.js"></script>
+<script src="js/modules/factory/production-execution-63a.js"></script>
+<script src="js/modules/repair/repair-center-65a.js"></script>
+<script src="js/modules/database/database-status-66a.js"></script>
+<script src="js/modules/ui/test-mode-ux-66d.js"></script>
+<script src="js/modules/ui/test-mode-modern-66e.js"></script>
+<script src="js/modules/ui/test-mode-start-workflow-66e-fix1e.js"></script>
+<script src="js/modules/factory/wo-start-integration-67b-fix2a.js"></script>
+<script src="js/modules/device-manager/device-manager-safe-67c.js"></script>
 <link rel="stylesheet" href="css/modules/15-work-order-product.css">
 <link rel="stylesheet" href="css/modules/16-revision-firmware.css">
 <link rel="stylesheet" href="css/modules/17-audio-voice.css">
 <link rel="stylesheet" href="css/modules/18-enterprise-stable.css">
+<link rel="stylesheet" href="css/modules/19-backup-restore.css">
+<link rel="stylesheet" href="css/modules/20-repository-distribution.css">
+<link rel="stylesheet" href="css/modules/21-production-execution.css">
+<link rel="stylesheet" href="css/modules/22-repair-center.css">
+<link rel="stylesheet" href="css/modules/23-database-status.css">
+<link rel="stylesheet" href="css/modules/24-test-mode-ux.css">
+<link rel="stylesheet" href="css/modules/25-test-mode-modern.css">
+<link rel="stylesheet" href="css/modules/26-master-data.css">
+<link rel="stylesheet" href="css/modules/27-mes-ready.css">
+<link rel="stylesheet" href="css/modules/28-device-manager-safe.css">
 <link rel="stylesheet" href="css/layout-editor.css" data-source="atmec-layout-editor-398-style">
+<link rel="stylesheet" href="css/modules/29-test-mode-operator-flags.css">
 <script src="js/layout-editor.js" data-source="atmec-layout-editor-398-script"></script>
 <script src="js/layout-editor-managers.js" data-source="atmec-layout-editor-managers-398"></script>
 <script src="js/version.js" data-source="atmec-version-script"></script>

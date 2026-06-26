@@ -41,7 +41,7 @@ var IS_ELECTRON = (api !== null);
  * Ogni variabile controlla una parte del renderer: ricette, polling, utenti, produzione e loghi.
  * I flag busy impediscono doppio click o polling sovrapposti che in passato causavano blocchi.
  */
-let recipe = { recipe_name: 'Nuova Ricetta', version: 1, enabled: true, power_metadata: 'PL303_PROGRAMMABLE', steps: [] };
+let recipe = { recipe_name: 'Nuova Ricetta', version: 1, enabled: true, power_metadata: 'MANUAL_POWER', steps: [] };
 let stepIdCounter = 1;
 let autoPollInterval = null;
 let trendData = [];
@@ -208,9 +208,23 @@ async function showFrontChoiceModal(title, message, buttons = []) {
   });
 }
 function isSampleTestRequired() { return localStorage.getItem('atmec_sample_test_required') === '1'; }
+function updateSampleWizardUi() {
+  const required = isSampleTestRequired();
+  ['sample-test-required-prod','sample-test-required-dash'].forEach(id => { const el=document.getElementById(id); if(el) el.checked = !!required; });
+  const btn = document.getElementById('sample-startup-wizard-btn');
+  if (btn) {
+    btn.disabled = !required;
+    btn.title = required ? 'Apri wizard scheda campione' : 'Attiva Test campione per usare il wizard';
+  }
+  if (!required) document.getElementById('startup-wizard-modal')?.classList.remove('show');
+}
 function setSampleTestRequired(required) {
   localStorage.setItem('atmec_sample_test_required', required ? '1' : '0');
-  ['sample-test-required-prod','sample-test-required-dash'].forEach(id => { const el=document.getElementById(id); if(el) el.checked = !!required; });
+  if (!required) {
+    sessionStorage.setItem('atmec_startup_wizard_done','1');
+    sessionStorage.removeItem('atmec_sample_test_done');
+  }
+  updateSampleWizardUi();
 }
 async function runPreTestSampleWizard() {
   if (!isSampleTestRequired()) return true;
@@ -223,7 +237,8 @@ async function runPreTestSampleWizard() {
   if (choice === 'cancel') return false;
   if (choice === 'skip') return true;
   const required = getRequiredInstrumentsForRecipe();
-  const list = required.length ? required : ['ESP32'];
+  const list = required.length ? required : [];
+  if (!list.length && typeof addLog === 'function') addLog(document.getElementById('run-log'), 'Scheda campione: nessuno strumento automatico richiesto dalla ricetta.', 'info');
   for (const instrument of list) {
     const st = latestHardwareStatuses.find(x => String(x.name) === String(instrument));
     const msg = `Strumento richiesto: ${instrument}
@@ -251,6 +266,11 @@ Collega/verifica lo strumento, poi conferma.`;
 let startupWizardStep = 0;
 const startupWizardLabels = ['1. Ricetta e revisione', '2. Strumenti richiesti', '3. Test strumenti', '4. Scheda campione', '5. Pronto'];
 function openStartupWizard(force=false) {
+  updateSampleWizardUi();
+  if (!isSampleTestRequired()) {
+    if (force && typeof showToast === 'function') showToast('Wizard campione disattivato: abilita Test campione per aprirlo.', 'warn');
+    return;
+  }
   if (!force && sessionStorage.getItem('atmec_startup_wizard_done') === '1') return;
   const m = document.getElementById('startup-wizard-modal');
   if (!m) return;
@@ -266,6 +286,7 @@ function closeStartupWizard(skip=false) {
   sessionStorage.setItem('atmec_startup_wizard_done','1');
   document.getElementById('startup-wizard-modal')?.classList.remove('show');
   if (!skip && isSampleTestRequired()) sessionStorage.setItem('atmec_sample_test_done','1');
+  updateSampleWizardUi();
 }
 function startupWizardPrev(){ startupWizardStep=Math.max(0,startupWizardStep-1); renderStartupWizard(); }
 let startupWizardBusy = false;
@@ -417,10 +438,17 @@ updateClock();
 /** Navigazione principale tra pagine: non distrugge lo stato, mostra solo il tab richiesto. */
 function showTab(id, btn) {
   if (!requireLogin()) return;
-  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(t => {
+    t.classList.remove('active');
+    // 6.5A_FIX2: non lasciare display:none inline, altrimenti le pagine standard restano vuote
+    if (t.style && (t.style.display === 'none' || t.style.display === 'block' || t.style.display === 'flex')) t.style.display = '';
+  });
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
   const tab = document.getElementById(id);
-  if (tab) tab.classList.add('active');
+  if (tab) {
+    tab.classList.add('active');
+    if (tab.style) tab.style.display = '';
+  }
   if (btn) btn.classList.add('active');
 }
 
@@ -908,20 +936,30 @@ function isHardwareLiveStatus(st) {
   return st.mock === false;
 }
 
+function normalizeHardwareRowsForLookup(raw) {
+  if (Array.isArray(raw)) return raw;
+  if (raw && Array.isArray(raw.rows)) return raw.rows;
+  if (raw && Array.isArray(raw.statuses)) return raw.statuses;
+  if (raw && typeof raw === 'object') {
+    return Object.entries(raw).map(([k, v]) => Object.assign({ name: k }, (v && typeof v === 'object') ? v : { status: v }));
+  }
+  return [];
+}
+
 function getHardwareStatusByName(name) {
   const wanted = String(name || '').toLowerCase();
-  const rows = latestHardwareStatuses || [];
-  const exact = rows.find(x => x.name === name || x.device === name);
+  const rows = normalizeHardwareRowsForLookup(latestHardwareStatuses);
+  const exact = rows.find(x => x && (x.name === name || x.device === name));
   if (exact) return exact;
-  function txt(x){ return String((x && (x.name || x.device || x.label || x.type || x.group)) || '').toLowerCase(); }
+  function txt(x){ return String((x && (x.name || x.device || x.label || x.type || x.group || x.driver || x._logical || x._title)) || '').toLowerCase(); }
   if (wanted === 'modbus_serial' || wanted.includes('esp32')) {
     return rows.find(x => { const t = txt(x); return t.includes('modbus_serial') || t.includes('esp32') || t.includes('esp32-s3') || t.includes('esp32 controller'); });
   }
-  if (wanted === 'aimtti_pl303' || wanted.includes('pl303')) {
-    return rows.find(x => { const t = txt(x); return t.includes('aimtti_pl303') || t.includes('pl303') || t.includes('tti') || t.includes('alimentatore'); });
+  if (wanted === 'aimtti_pl303' || wanted.includes('pl303') || wanted.includes('alimentatore') || wanted.includes('tti')) {
+    return rows.find(x => { const t = txt(x); return t.includes('aimtti_pl303') || t.includes('pl303') || t.includes('tti') || t.includes('alimentatore') || t.includes('power'); });
   }
-  if (wanted === 'keysight_34461a' || wanted.includes('keysight') || wanted.includes('34461')) {
-    return rows.find(x => { const t = txt(x); return t.includes('keysight_34461a') || t.includes('keysight') || t.includes('34461') || t.includes('multimet'); });
+  if (wanted === 'keysight_34461a' || wanted.includes('keysight') || wanted.includes('34461') || wanted.includes('multimetro')) {
+    return rows.find(x => { const t = txt(x); return t.includes('keysight_34461a') || t.includes('keysight') || t.includes('34461') || t.includes('multimet') || t.includes('dmm'); });
   }
   return undefined;
 }
@@ -1004,3 +1042,15 @@ function toggleWizardLive() {
   else startWizardLive();
 }
 
+
+
+// AT-MEC 6.7D: export funzioni condivise per moduli UI legacy.
+try {
+  if (typeof runPreTestSampleWizard === 'function') window.runPreTestSampleWizard = runPreTestSampleWizard;
+  if (typeof getHardwareStatusByName === 'function') window.getHardwareStatusByName = getHardwareStatusByName;
+  if (typeof isHardwareLiveStatus === 'function') window.isHardwareLiveStatus = isHardwareLiveStatus;
+} catch (_e) {}
+try {
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', updateSampleWizardUi);
+  else updateSampleWizardUi();
+} catch (_e) {}

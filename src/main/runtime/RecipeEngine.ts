@@ -7,7 +7,7 @@
 import { StateMachine } from '../core/StateMachine';
 import { EventBus } from '../core/EventBus';
 import { DeviceManager } from '../hal/DeviceManager';
-import { AuditSystem, TestReport } from '../core/AuditSystem';
+import { TestReport } from '../core/AuditSystem';
 import { DiagnosticEngine } from '../core/DiagnosticEngine';
 import { FlashManager } from '../hal/FlashManager';
 
@@ -85,7 +85,6 @@ interface StepResult {
 }
 
 export class RecipeEngine {
-  private auditSystem = new AuditSystem();
   private debugMode = false;
   private debugResolver: (() => void) | null = null;
   private loopCounters: Record<number, number> = {};
@@ -321,7 +320,6 @@ export class RecipeEngine {
       steps_log: reportSteps
     };
 
-    this.auditSystem.logTest(report);
     this.eventBus.emit('run_completed', { success: recipeSuccess, report });
 
     // AT-MEC 2.23: sia PASS sia FAIL devono terminare lo stato RUNNING.

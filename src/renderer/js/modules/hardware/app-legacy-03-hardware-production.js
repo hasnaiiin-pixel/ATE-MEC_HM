@@ -413,10 +413,7 @@ async function esp32AutoConnectAndUseForRecipes() {
   document.getElementById('esp32-control-com').value = port;
   const ok = await esp32ConnectOnPort(port, true);
   if (ok) {
-    setPowerSourceValue('ESP32_RELAY_POWER');
-    const psPage = document.getElementById('power-source-page'); if (psPage) psPage.value = 'ESP32_RELAY_POWER';
-    recipe.power_metadata = 'ESP32_RELAY_POWER';
-    esp32Log('✅ ESP32 impostata come hardware ricetta. Ora puoi avviare test con I/O ESP32.', 'pass');
+    esp32Log('ESP32 collegata e salvata. La ricetta usera ESP32 solo se alimentazione o step I/O lo richiedono.', 'pass');
     addLog(document.getElementById('run-log'), '✅ ESP32 LIVE: modbus_serial pronto per ricette.', 'pass');
   }
 }
@@ -545,9 +542,12 @@ function renderProductionSequenceLog() {
   box.innerHTML = steps.map((st, idx) => {
     const status = stepStatusMap[st.step_id] || 'todo';
     const label = stepStatusLabel(status);
+    const type = String(st.type || st.io_type || '').trim();
+    const mode = st.manual_input_enabled || /Manual/i.test(type) ? 'Misura manuale' : (st.io_type || st.device_mapping || st.device || 'Automatico');
     return `<div class="prod-seq-row ${status}">
-      <div>#${idx + 1}</div>
-      <div><b>${escapeHtml(st.label || st.type || 'Step')}</b><div class="detail-line">${escapeHtml(st.type || '')}${st.enabled === false ? ' · DISABILITATO' : ''}</div></div>
+      <div class="prod-seq-num">#${idx + 1}</div>
+      <div class="prod-seq-step"><b>${escapeHtml(st.label || st.type || 'Step')}</b><small>${escapeHtml(st.enabled === false ? 'DISABILITATO' : 'Da fare')}</small></div>
+      <div class="prod-seq-mode">${escapeHtml(mode)}</div>
       <div class="prod-status-pill ${status}">${label}</div>
     </div>`;
   }).join('');
@@ -669,42 +669,60 @@ async function autoConnectProductionInstruments(showLog=false) {
     const cfg = await api.getAppSettings?.() || {};
     excludedInstruments = Array.isArray(cfg.excludedInstruments) ? cfg.excludedInstruments : [];
     const required = new Set(getRequiredInstrumentsForRecipe());
-
+    const isExcluded = name => window.isRecipeInstrumentExcluded ? window.isRecipeInstrumentExcluded(name) : excludedInstruments.includes(name);
     const configs = [];
-    if (required.has('modbus_serial') && !excludedInstruments.includes('modbus_serial')) {
-      let port = cfg.esp32Port || document.getElementById('esp32-control-com')?.value || document.getElementById('cfg-esp-com')?.value || '';
-      if (!port || port === 'mock') {
-        await esp32ControlScanPorts(false);
-        port = serialPortsCache.find(p => p.likelyEsp32)?.path || serialPortsCache[0]?.path || 'mock';
-      }
-      configs.push({ name: 'modbus_serial', conn: port, baud: Number(cfg.esp32Baud || 115200) });
+    const missingConfig = [];
+
+    if (required.has('modbus_serial') && !isExcluded('modbus_serial')) {
+      const port = String(cfg.esp32Port || '').trim();
+      if (!port || port === 'mock') missingConfig.push('ESP32: porta non salvata nel Device Manager');
+      else configs.push({ name: 'modbus_serial', conn: port, baud: Number(cfg.esp32Baud || 115200) });
     }
-    if (required.has('Keysight_34461A') && !excludedInstruments.includes('Keysight_34461A')) { const km = cfg.keysightMode || 'ETH'; const kr = cfg.keysightIp || '127.0.0.1'; configs.push({ name: 'Keysight_34461A', conn: km === 'USB_COM' ? 'usb://' + kr : km === 'USB_VISA' ? 'visa://' + kr : kr, baud: Number(cfg.keysightPort || (km === 'ETH' ? 5025 : 9600)) }); }
-    if (required.has('AimTTi_PL303') && !excludedInstruments.includes('AimTTi_PL303')) configs.push({ name: 'AimTTi_PL303', conn: ((cfg.pl303Mode === 'ETHERNET') ? (cfg.pl303Host || cfg.ttiHost || 'mock') : (cfg.pl303Com || cfg.ttiPort || 'mock')), baud: Number((cfg.pl303Mode === 'ETHERNET') ? (cfg.pl303Port || 9221) : (cfg.pl303Baud || cfg.ttiBaud || 9600)) });
+
+    if (required.has('Keysight_34461A') && !isExcluded('Keysight_34461A')) {
+      const km = cfg.keysightMode || 'ETH';
+      const kr = String(cfg.keysightIp || '').trim();
+      if (!kr || kr === 'mock') missingConfig.push('Keysight: risorsa non salvata nel Device Manager');
+      else configs.push({ name: 'Keysight_34461A', conn: km === 'USB_COM' ? 'usb://' + kr : km === 'USB_VISA' ? 'visa://' + kr : kr, baud: Number(cfg.keysightPort || (km === 'ETH' ? 5025 : 9600)) });
+    }
+
+    if (required.has('AimTTi_PL303') && !isExcluded('AimTTi_PL303')) {
+      const isEth = cfg.pl303Mode === 'ETHERNET';
+      const conn = String(isEth ? (cfg.pl303Host || cfg.ttiHost || '') : (cfg.pl303Com || cfg.ttiPort || '')).trim();
+      if (!conn || conn === 'mock') missingConfig.push('PL303: porta/host non salvato nel Device Manager');
+      else configs.push({ name: 'AimTTi_PL303', conn, baud: Number(isEth ? (cfg.pl303Port || 9221) : (cfg.pl303Baud || cfg.ttiBaud || 9600)) });
+    }
+
+    if (missingConfig.length) {
+      addLog(document.getElementById('run-log'), 'Configurazione strumenti incompleta: ' + missingConfig.map(escapeHtml).join(' - ') + '. Salva le porte dal Device Manager.', 'warn');
+    }
+
     if (configs.length) {
       const statuses = await guardedUi('Auto collegamento strumenti necessari', () => api.reconnectHardware(configs), { timeoutMs: Math.max(4500, configs.length * 3200), logTo: document.getElementById('run-log'), fallback: [] });
       latestHardwareStatuses = Array.isArray(statuses) ? statuses : latestHardwareStatuses;
     } else {
       try { latestHardwareStatuses = await api.getHardwareStatuses(); } catch {}
     }
+    try { if (typeof window.persistHardwareStatuses67C === 'function') window.persistHardwareStatuses67C(latestHardwareStatuses); } catch(_e) {}
     updateHwBadges(latestHardwareStatuses);
     renderProductionHardwareList();
-    if (showLog) addLog(document.getElementById('run-log'), '🔌 Auto collegamento strumenti necessari completato.', 'info');
-  } catch(e) { addLog(document.getElementById('run-log'), `❌ Auto collegamento strumenti: ${escapeHtml(normalizeError(e))}`, 'fail'); }
+    if (showLog) addLog(document.getElementById('run-log'), 'Verifica collegamento strumenti necessari completata.', 'info');
+  } catch(e) { addLog(document.getElementById('run-log'), 'Auto collegamento strumenti: ' + escapeHtml(normalizeError(e)), 'fail'); }
 }
 
 function renderProductionHardwareList() {
   const box = document.getElementById('prod-hardware-list');
   if (!box) return;
-  const expected = getRequiredInstrumentsForRecipe();
+  const expected = Array.from(new Set((getRequiredInstrumentsForRecipe() || []).map(name => window.normalizeRecipeInstrumentName ? window.normalizeRecipeInstrumentName(name) : name).filter(Boolean)));
+  const isExcluded = name => window.isRecipeInstrumentExcluded ? window.isRecipeInstrumentExcluded(name) : excludedInstruments.includes(name);
   const byName = new Map((latestHardwareStatuses || []).map(s => [s.name, s]));
   if (!expected.length) { box.innerHTML = '<div class="hint">Questa ricetta non richiede strumenti automatici. Verifica eventuali operazioni manuali prima di START.</div>'; return; }
   box.innerHTML = expected.map(name => {
     const st = byName.get(name) || { name, status:'NON RILEVATO', mock:true };
-    const excluded = excludedInstruments.includes(name);
+    const excluded = isExcluded(name);
     const live = isHardwareLiveStatus(st);
     const displayName = getInstrumentDisplayName(name);
-    const conn = st.conn || st.port || st.host || st.connection || '-';
+    const conn = st.connectionString || st.conn || st.port || st.host || st.connection || '-';
     return `<div class="prod-hw-row">
       <div><b>${escapeHtml(displayName)}</b><div class="detail-line">${excluded ? 'ESCLUSO' : (live ? 'LIVE' : 'NON LIVE')}</div></div>
       <div class="detail-line">${escapeHtml(String(conn))}</div>
@@ -714,11 +732,12 @@ function renderProductionHardwareList() {
   }).join('');
 }
 async function toggleInstrumentExcluded(name) {
-  const idx = excludedInstruments.indexOf(name);
-  if (idx >= 0) excludedInstruments.splice(idx, 1); else excludedInstruments.push(name);
+  const canonical = window.normalizeRecipeInstrumentName ? window.normalizeRecipeInstrumentName(name) : name;
+  const idx = excludedInstruments.findIndex(item => (window.normalizeRecipeInstrumentName ? window.normalizeRecipeInstrumentName(item) : item) === canonical);
+  if (idx >= 0) excludedInstruments.splice(idx, 1); else excludedInstruments.push(canonical);
   try { await api?.saveAppSettings?.({ excludedInstruments }); } catch {}
   renderProductionHardwareList();
-  addLog(document.getElementById('run-log'), `${idx >= 0 ? 'Incluso' : 'Escluso'} strumento: <b>${escapeHtml(name)}</b>`, 'info');
+  addLog(document.getElementById('run-log'), `${idx >= 0 ? 'Incluso' : 'Escluso'} strumento: <b>${escapeHtml(canonical)}</b>`, 'info');
 }
 
 
@@ -974,4 +993,3 @@ async function resetDefaultLogos() {
     if (res?.ok) { await loadAppSettings(); addLog(document.getElementById('sys-log'), 'Loghi default M/MEC/MIRZA ripristinati.', 'pass'); }
   } catch(e) { addLog(document.getElementById('sys-log'), `❌ Errore reset loghi: ${escapeHtml(normalizeError(e))}`, 'fail'); }
 }
-

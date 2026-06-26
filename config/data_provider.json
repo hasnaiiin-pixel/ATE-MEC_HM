@@ -11,10 +11,10 @@
     "localFirst": true
   },
   "station": {
-    "id": "BANCHETT111",
-    "name": "ATE0150",
+    "id": "BANC123",
+    "name": "ATE0151",
     "department": "COLLAUDO",
-    "site": "LAB01220",
+    "site": "LAB0000",
     "autoSyncEnabled": false,
     "autoSyncIntervalSec": 60
   },

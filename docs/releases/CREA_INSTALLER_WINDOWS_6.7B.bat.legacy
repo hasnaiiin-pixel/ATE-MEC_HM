@@ -1,0 +1,5 @@
+@echo off
+title CREA INSTALLER AT-MEC HM 6.7B
+echo Creo installer Windows AT-MEC HM 6.7B...
+npm run package:all
+pause

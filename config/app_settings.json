@@ -25,5 +25,11 @@
   "esp32Port": "COM5",
   "esp32Baud": 115200,
   "companyLogoPath": "assets/default_logos/MEC.PNG",
-  "builderLogoPath": "assets/default_logos/MIRZA.png"
+  "builderLogoPath": "assets/default_logos/MIRZA.png",
+  "excludedInstruments": [
+    "Keysight_34461A"
+  ],
+  "keysightMode": "USB_VISA",
+  "keysightIp": "USB0::0x2A8D::0x1301::MY57216945::0::INSTR",
+  "keysightPort": 9600
 }

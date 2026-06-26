@@ -1,0 +1,197 @@
+[
+  {
+    "type": "TEST",
+    "timestamp": "2026-06-03T15:04:50.051Z",
+    "serial": "",
+    "user": "Admin",
+    "result": "PASS",
+    "raw": {
+      "id": "TR_3B381169D3F5",
+      "timestamp": "2026-06-03T15:04:50.051Z",
+      "serial": "",
+      "work_order": "10000",
+      "lot": "10000",
+      "recipe": "Nuova Ricetta",
+      "operator": "Admin",
+      "station": "",
+      "result": "PASS",
+      "duration_ms": 18740,
+      "raw": {
+        "timestamp": "2026-06-03T15:04:50.051Z",
+        "operator": "Admin",
+        "recipe_name": "Nuova Ricetta",
+        "recipe_version": 2,
+        "serial_dut": "",
+        "lot_number": "10000",
+        "work_order": "10000",
+        "repair_note": "",
+        "final_result": "PASS",
+        "execution_time_ms": 18740,
+        "steps_log": [
+          {
+            "step_id": 1,
+            "type": "ManualMeasurement",
+            "measured": 3.1,
+            "result": "PASS"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "TEST",
+    "timestamp": "2026-06-03T15:05:06.691Z",
+    "serial": "",
+    "user": "Admin",
+    "result": "FAIL",
+    "raw": {
+      "id": "TR_4763422A405A",
+      "timestamp": "2026-06-03T15:05:06.691Z",
+      "serial": "",
+      "work_order": "10000",
+      "lot": "10000",
+      "recipe": "Nuova Ricetta",
+      "operator": "Admin",
+      "station": "",
+      "result": "FAIL",
+      "duration_ms": 11987,
+      "raw": {
+        "timestamp": "2026-06-03T15:05:06.691Z",
+        "operator": "Admin",
+        "recipe_name": "Nuova Ricetta",
+        "recipe_version": 2,
+        "serial_dut": "",
+        "lot_number": "10000",
+        "work_order": "10000",
+        "repair_note": "",
+        "final_result": "FAIL",
+        "execution_time_ms": 11987,
+        "steps_log": [
+          {
+            "step_id": 1,
+            "type": "ManualMeasurement",
+            "measured": "FAIL manuale",
+            "result": "FAIL"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "TEST",
+    "timestamp": "2026-06-03T15:05:49.612Z",
+    "serial": "",
+    "user": "Admin",
+    "result": "PASS",
+    "raw": {
+      "id": "TR_A2C4D5898E82",
+      "timestamp": "2026-06-03T15:05:49.612Z",
+      "serial": "",
+      "work_order": "10000",
+      "lot": "10000",
+      "recipe": "Nuova Ricetta",
+      "operator": "Admin",
+      "station": "",
+      "result": "PASS",
+      "duration_ms": 5043,
+      "raw": {
+        "timestamp": "2026-06-03T15:05:49.612Z",
+        "operator": "Admin",
+        "recipe_name": "Nuova Ricetta",
+        "recipe_version": 3,
+        "serial_dut": "",
+        "lot_number": "10000",
+        "work_order": "10000",
+        "repair_note": "",
+        "final_result": "PASS",
+        "execution_time_ms": 5043,
+        "steps_log": [
+          {
+            "step_id": 1,
+            "type": "ManualMeasurement",
+            "measured": "CONFERMATO",
+            "result": "PASS"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "TEST",
+    "timestamp": "2026-06-03T15:06:00.162Z",
+    "serial": "",
+    "user": "Admin",
+    "result": "FAIL",
+    "raw": {
+      "id": "TR_CE7491584F9A",
+      "timestamp": "2026-06-03T15:06:00.162Z",
+      "serial": "",
+      "work_order": "10000",
+      "lot": "10000",
+      "recipe": "Nuova Ricetta",
+      "operator": "Admin",
+      "station": "",
+      "result": "FAIL",
+      "duration_ms": 5918,
+      "raw": {
+        "timestamp": "2026-06-03T15:06:00.162Z",
+        "operator": "Admin",
+        "recipe_name": "Nuova Ricetta",
+        "recipe_version": 3,
+        "serial_dut": "",
+        "lot_number": "10000",
+        "work_order": "10000",
+        "repair_note": "",
+        "final_result": "FAIL",
+        "execution_time_ms": 5918,
+        "steps_log": [
+          {
+            "step_id": 1,
+            "type": "ManualMeasurement",
+            "measured": null,
+            "result": "FAIL"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "TEST",
+    "timestamp": "2026-06-03T15:06:50.276Z",
+    "serial": "",
+    "user": "Admin",
+    "result": "FAIL",
+    "raw": {
+      "id": "TR_A45D7926136E",
+      "timestamp": "2026-06-03T15:06:50.276Z",
+      "serial": "",
+      "work_order": "10000",
+      "lot": "10000",
+      "recipe": "Nuova Ricetta",
+      "operator": "Admin",
+      "station": "",
+      "result": "FAIL",
+      "duration_ms": 4987,
+      "raw": {
+        "timestamp": "2026-06-03T15:06:50.276Z",
+        "operator": "Admin",
+        "recipe_name": "Nuova Ricetta",
+        "recipe_version": 4,
+        "serial_dut": "",
+        "lot_number": "10000",
+        "work_order": "10000",
+        "repair_note": "",
+        "final_result": "FAIL",
+        "execution_time_ms": 4987,
+        "steps_log": [
+          {
+            "step_id": 1,
+            "type": "ResistanceTest",
+            "measured": 9.9e+37,
+            "result": "FAIL"
+          }
+        ]
+      }
+    }
+  }
+]

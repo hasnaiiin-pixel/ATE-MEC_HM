@@ -1,7 +1,7 @@
 {
-  "name": "at-mec-hm-4-22a-ui-navigation-cleanup",
-  "version": "4.22.1",
-  "description": "AT-MEC_HM_4.22A_UI_NAVIGATION_CLEANUP",
+  "name": "at-mec-hm-6-7o-test-mode-switch-alignment-fix",
+  "version": "6.7O_TEST_MODE_SWITCH_ALIGNMENT_FIX",
+  "description": "AT-MEC_HM_6.7O_TEST_MODE_SWITCH_ALIGNMENT_FIX",
   "main": "dist/main/main.js",
   "scripts": {
     "build": "tsc",
@@ -15,11 +15,31 @@
     "package:all": "npm run build && electron-builder --win portable nsis",
     "audit": "node scripts/project_audit.js",
     "audit:enterprise": "node scripts/enterprise_audit_422.js",
-    "backup": "node scripts/enterprise_backup_restore_422.js backup"
+    "backup": "node scripts/backup_restore_423c.js backup",
+    "backup:full": "node scripts/backup_restore_423c.js backup",
+    "restore": "node scripts/backup_restore_423c.js restore",
+    "backup:list": "node scripts/backup_restore_423c.js list",
+    "backup:check": "node scripts/backup_restore_423c.js check",
+    "backup:integrity": "node scripts/backup_restore_423c.js integrity",
+    "backup:schedule": "node scripts/backup_restore_423c.js schedule",
+    "backup:run-scheduled": "node scripts/backup_restore_423c.js run-scheduled",
+    "clone:export": "node scripts/backup_restore_423c.js clone-export",
+    "clone:import": "node scripts/backup_restore_423c.js clone-import",
+    "db:audit": "node scripts/sqlite_foundation_66a.js audit",
+    "db:backup-pre-migration": "node scripts/sqlite_migration_66b.js backup",
+    "db:status": "node scripts/sqlite_foundation_66a.js status",
+    "db:migrate": "node scripts/sqlite_migration_66b.js migrate",
+    "db:migration-report": "node scripts/sqlite_migration_66b.js report",
+    "db:integrity": "node scripts/sqlite_enterprise_66c.js integrity",
+    "db:audit-trail": "node scripts/sqlite_enterprise_66c.js audit",
+    "db:backup-sqlite": "node scripts/sqlite_enterprise_66c.js backup",
+    "db:performance": "node scripts/sqlite_enterprise_66c.js performance",
+    "db:cleanup-report": "node scripts/sqlite_enterprise_66c.js cleanup",
+    "db:enterprise-status": "node scripts/sqlite_enterprise_66c.js status"
   },
   "build": {
     "appId": "com.atemec.platform",
-    "productName": "AT-MEC HM 4.22A UI NAVIGATION CLEANUP",
+    "productName": "ATE-MEC HM 6.7O TEST MODE SWITCH ALIGNMENT FIX",
     "directories": {
       "output": "dist_installer"
     },
@@ -29,14 +49,14 @@
         "portable"
       ],
       "icon": "assets/icon.ico",
-      "shortcutName": "AT-MEC HM 4.22A UI NAVIGATION CLEANUP"
+      "shortcutName": "ATE-MEC HM 6.7O TEST MODE SWITCH ALIGNMENT FIX"
     },
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "AT-MEC HM 4.22A UI NAVIGATION CLEANUP"
+      "shortcutName": "ATE-MEC HM 6.7O TEST MODE SWITCH ALIGNMENT FIX"
     },
     "files": [
       "dist/**/*",
@@ -74,7 +94,7 @@
     "typescript": "^5.4.5",
     "wait-on": "^9.0.10"
   },
-  "productName": "AT-MEC HM 4.22A UI NAVIGATION CLEANUP",
+  "productName": "ATE-MEC HM 6.7O TEST MODE SWITCH ALIGNMENT FIX",
   "optionalDependencies": {
     "better-sqlite3": "^11.8.1"
   }

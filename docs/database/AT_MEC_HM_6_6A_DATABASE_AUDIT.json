@@ -1,0 +1,56 @@
+{
+  "release": "AT-MEC_HM_6.6A_SQLITE_FOUNDATION",
+  "generatedAt": "2026-06-17T13:20:37.631Z",
+  "files": {
+    "localDb": {
+      "exists": true,
+      "size": 5625,
+      "mtime": "2026-06-17T07:01:09.000Z"
+    },
+    "enterpriseDb": {
+      "exists": true,
+      "size": 21823,
+      "mtime": "2026-06-17T07:01:09.000Z"
+    },
+    "users": {
+      "exists": true,
+      "size": 1992,
+      "mtime": "2026-06-17T07:01:09.000Z"
+    },
+    "appSettings": {
+      "exists": true,
+      "size": 969,
+      "mtime": "2026-06-17T07:01:09.000Z"
+    },
+    "dataProvider": {
+      "exists": true,
+      "size": 719,
+      "mtime": "2026-06-17T07:01:09.000Z"
+    },
+    "sqliteSchema": {
+      "exists": true,
+      "size": 2788,
+      "mtime": "2026-06-17T13:20:37.305Z"
+    }
+  },
+  "counts": {
+    "recipesJson": 1,
+    "firmwareFiles": 1,
+    "audioFiles": 7,
+    "localReports": 0,
+    "localRepairs": 0,
+    "enterpriseKeys": 6,
+    "configUsers": 2,
+    "appSettingsKeys": 20
+  },
+  "checksums": {
+    "localDb": "845f330062033f771c12207edeeb7eafb0a924f3508b65e7dee35571bc6e8a33",
+    "enterpriseDb": "3124adab937ede0496cf64743f71a0b3ed0ba5e4a543481bdba069c40aa67411",
+    "users": "74da37e61d04e7b056d7de8c073af2c5e34e4da51f0c1357a85e578abd96d579",
+    "schema": "789f46073ed0b5fc3aeb99c47d8312bd99b345345778c720d5ad53d235d79613"
+  },
+  "nextMigration": {
+    "6.6B": "migrare utenti, ruoli, ricette, test_results, repair_tickets, work_orders, repository_items",
+    "6.6C": "rendere SQLite sorgente primaria, JSON solo export/backup, integrity check e restore DB"
+  }
+}

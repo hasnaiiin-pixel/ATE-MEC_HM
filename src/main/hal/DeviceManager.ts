@@ -41,6 +41,7 @@ export class DeviceManager {
     // AT-MEC_HM_3.1: nome strumento ufficiale Keysight 34461A.
     // Per retrocompatibilità accettiamo anche eventuali vecchie ricette/configurazioni 34465A.
     if (deviceName === 'Keysight_34465A') deviceName = 'Keysight_34461A';
+    const previousConnection = this.deviceRegistry[deviceName];
     this.deviceRegistry[deviceName] = connectionString;
     // AT-MEC 2.24: se uno strumento è già connesso sulla stessa porta non chiudere/riaprire.
     // Questo evita disconnessioni durante il Test Mode e riduce timeout falsi.
@@ -93,6 +94,9 @@ export class DeviceManager {
     }
 
     if (deviceName === 'AimTTi_PL303') {
+      if (previousConnection === connectionString && !this.getMockMode(deviceName) && (this.ttiSerialPort?.isOpen || (this.scpiSockets[deviceName] && !this.scpiSockets[deviceName].destroyed))) {
+        return true;
+      }
       // AT-MEC_HM_2.15: driver dedicato alimentatore Aim-TTi PL303QMD-P.
       // Supporta due modalità: USB/seriale (COMx) ed Ethernet/TCP SCPI.
       // Se la connessione fallisce non blocca la HMI: passa in MOCK e segnala lo stato.
@@ -132,6 +136,9 @@ export class DeviceManager {
     }
 
     if (deviceName === 'Keysight_34461A') {
+      if (previousConnection === connectionString && !this.getMockMode(deviceName) && (this.visaResources[deviceName] || this.scpiSerialPorts[deviceName]?.isOpen || (this.scpiSockets[deviceName] && !this.scpiSockets[deviceName].destroyed))) {
+        return true;
+      }
       // Driver Keysight 34461A. Modalità supportate:
       // - Ethernet/LAN SCPI: IP o tcp://IP:5025
       // - USB seriale/COM quando disponibile come porta virtuale
@@ -426,9 +433,22 @@ export class DeviceManager {
 
   public validateRecipeHardware(recipe: { power_metadata?: string; steps?: Array<{ device_mapping?: string; io_type?: string; type?: string; enabled?: boolean; manual_measure_type?: string; manual_input_enabled?: boolean }> }): { ok: boolean; missing: string[] } {
     const required = new Set<string>();
+    const normalizeRequired = (name: string): string => {
+      const n = String(name || '').trim().toLowerCase();
+      if (!n) return '';
+      if (n.includes('modbus_serial') || n.includes('esp32') || n === 'esp32_serial') return 'modbus_serial';
+      if (n.includes('aimtti_pl303') || n.includes('pl303') || n.includes('tti')) return 'AimTTi_PL303';
+      if (n.includes('keysight') || n.includes('34461') || n.includes('34465') || n.includes('multimeter') || n.includes('multimetro') || n.includes('dmm')) return 'Keysight_34461A';
+      if (n.includes('scanner') || n.includes('qr')) return 'QR_Scanner';
+      return String(name || '').trim();
+    };
+    const addRequired = (name: string) => {
+      const normalized = normalizeRequired(name);
+      if (normalized && normalized !== 'QR_Scanner') required.add(normalized);
+    };
 
-    if (recipe.power_metadata === 'PL303_PROGRAMMABLE') required.add('AimTTi_PL303');
-    if (recipe.power_metadata === 'ESP32_RELAY_POWER') required.add('modbus_serial');
+    if (recipe.power_metadata === 'PL303_PROGRAMMABLE') addRequired('AimTTi_PL303');
+    if (recipe.power_metadata === 'ESP32_RELAY_POWER') addRequired('modbus_serial');
 
     for (const step of recipe.steps || []) {
       if (step.enabled === false) continue;
@@ -441,16 +461,16 @@ export class DeviceManager {
       if (!device || deviceKey === 'manual' || deviceKey === 'manuale' || deviceKey === 'operator' || deviceKey === 'system' || deviceKey === 'none') {
         if (step.type === 'ManualMeasurement') continue;
       }
-      if (['DI', 'DO'].includes(step.io_type || '') || step.type === 'DigitalInputCheck' || step.type === 'DigitalOutputSet') { required.add('modbus_serial'); continue; }
-      if (['VoltageMeasurement','CurrentMeasurement','ResistanceTest','FrequencyTest','AnalogInputMeasurement'].includes(step.type || '')) { required.add(device || 'Keysight_34461A'); continue; }
+      if (['DI', 'DO'].includes(step.io_type || '') || step.type === 'DigitalInputCheck' || step.type === 'DigitalOutputSet') { addRequired('modbus_serial'); continue; }
+      if (['VoltageMeasurement','CurrentMeasurement','ResistanceTest','FrequencyTest','AnalogInputMeasurement'].includes(step.type || '')) { addRequired(device || 'Keysight_34461A'); continue; }
       if (step.type === 'ManualMeasurement') {
         const manualType = String(step.manual_measure_type || step.io_type || '').toUpperCase();
         const requiresScpiDevice = manualType === 'SCPI' || manualType.startsWith('SCPI_');
-        if (requiresScpiDevice && device && !['manual','manuale','operator','system','none'].includes(deviceKey)) required.add(device);
+        if (requiresScpiDevice && device && !['manual','manuale','operator','system','none'].includes(deviceKey)) addRequired(device);
         continue;
       }
       if (!device || deviceKey === 'system') continue;
-      required.add(device);
+      addRequired(device);
     }
 
     const missing = Array.from(required).filter(name => !this.isDeviceLive(name));

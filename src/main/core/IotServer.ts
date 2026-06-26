@@ -19,21 +19,26 @@ export interface KpiData {
 }
 
 export class IotServer {
-  private wss: WebSocketServer;
+  private wss: WebSocketServer | null = null;
   private clients: Set<WebSocket> = new Set();
   private lastKpiData: KpiData = { total: 0, passed: 0, failed: 0, yield: '0%' };
   private startTime = Date.now();
 
   constructor(port: number = 8080) {
-    this.wss = new WebSocketServer({ port });
-    this.wss.on('connection', (ws) => {
-      this.clients.add(ws);
-      ws.send(JSON.stringify({ type: 'KPI_UPDATE', data: this.lastKpiData }));
-      ws.send(JSON.stringify({ type: 'SERVER_INFO', data: { version: '1.0.0', port } }));
-      ws.on('close', () => this.clients.delete(ws));
-      ws.on('error', () => this.clients.delete(ws));
-    });
-    console.log(`[IOT SERVER] WebSocket IIoT avviato sulla porta ${port}`);
+    try {
+      this.wss = new WebSocketServer({ port });
+      this.wss.on('connection', (ws) => {
+        this.clients.add(ws);
+        ws.send(JSON.stringify({ type: 'KPI_UPDATE', data: this.lastKpiData }));
+        ws.send(JSON.stringify({ type: 'SERVER_INFO', data: { version: '1.0.0', port } }));
+        ws.on('close', () => this.clients.delete(ws));
+        ws.on('error', () => this.clients.delete(ws));
+      });
+      console.log(`[IOT SERVER] WebSocket IIoT avviato sulla porta ${port}`);
+    } catch (err: any) {
+      console.warn(`[IOT SERVER] Porta ${port} non disponibile. Server remoto disabilitato, HMI continua.`, err?.message || err);
+      this.wss = null;
+    }
   }
 
   /**
@@ -67,5 +72,5 @@ export class IotServer {
 
   public getClientCount(): number { return this.clients.size; }
 
-  public close(): void { this.wss.close(); }
+  public close(): void { try { this.wss?.close(); } catch(_e){} }
 }
