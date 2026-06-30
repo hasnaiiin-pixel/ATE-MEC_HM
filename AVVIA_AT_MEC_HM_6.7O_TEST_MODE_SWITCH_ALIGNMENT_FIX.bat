@@ -1,5 +1,0 @@
-@echo off
-title AT-MEC_HM_6.7O_TEST_MODE_SWITCH_ALIGNMENT_FIX
-echo Avvio AT-MEC_HM_6.7O_TEST_MODE_SWITCH_ALIGNMENT_FIX...
-npm start
-pause
