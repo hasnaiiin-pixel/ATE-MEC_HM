@@ -1,0 +1,53 @@
+{
+  "version": "AT-MEC_HM_7.6.2_FIX1_AI_COPILOT_UI_ACTIONS",
+  "createdAt": "2026-06-30T08:08:04.855Z",
+  "checks": [
+    {
+      "label": "package.json presente",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "dist/main/main.js presente",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "src/renderer/index.html presente",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "AI Copilot 7.6.2 script presente",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "AI Copilot 7.6.2 CSS presente",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "node_modules presente",
+      "ok": false,
+      "detail": "se manca, eseguire INSTALLA prima o lasciare che AVVIA installi"
+    },
+    {
+      "label": "Electron binario presente",
+      "ok": false,
+      "detail": "se manca, eseguire npm install senza --ignore-scripts"
+    },
+    {
+      "label": "Porta 8080 libera oppure gestita",
+      "ok": true,
+      "detail": "porta occupata: fallback/continua senza chiudere HMI"
+    },
+    {
+      "label": "IotServer startup-safe",
+      "ok": true,
+      "detail": "EADDRINUSE non deve chiudere app"
+    }
+  ],
+  "criticalMissing": false,
+  "electronMissing": true
+}

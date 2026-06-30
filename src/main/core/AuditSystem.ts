@@ -30,6 +30,11 @@ export interface TestReport {
   steps_log: Array<{
     step_id: number;
     type: string;
+    label?: string;
+    component?: string;
+    test_point?: string;
+    device?: string;
+    channel?: number;
     measured?: any;
     measurement_source?: 'AUTOMATICA' | 'MANUALE' | 'SISTEMA';
     measurement_device?: string;

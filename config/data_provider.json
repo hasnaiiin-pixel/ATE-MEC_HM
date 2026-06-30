@@ -7,7 +7,7 @@
   },
   "sync": {
     "enabled": true,
-    "queuePath": "C:\\Users\\spea4060_tmv331ef\\Documents\\PROGETTI\\AT-MEC_HM_4.13G\\database\\sync_queue.json",
+    "queuePath": "database/sync_queue.json",
     "localFirst": true
   },
   "station": {
@@ -23,6 +23,6 @@
     "sqlitePath": "database/ate_mec_enterprise.db",
     "jsonMirrorPath": "database/ate_mec_enterprise_db.json",
     "schema": "docs/sqlite_schema_enterprise.sql",
-    "version": "4.17B"
+    "version": "7.5.2_CLEAN_BASELINE_VALIDATED"
   }
 }

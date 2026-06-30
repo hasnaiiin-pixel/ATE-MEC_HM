@@ -2,19 +2,20 @@
   <div class="analytics419-page">
     <div class="analytics419-hero">
       <div>
-        <div class="analytics419-kicker">AT-MEC HM 4.19B2</div>
-        <h2>📊 Analytics Center</h2>
-        <div class="hint">Centro analitico per produzione, collaboratori, ricette, dispositivi, riparazioni e postazioni.</div>
+        <div class="analytics419-kicker">AT-MEC HM 7.5.1 CLEAN BASELINE FIX1</div>
+        <h2>📊 Quality Analytics Center</h2>
+        <div class="hint">Analisi professionale PASS/FAIL, componenti, test point, misure e timeline seriali.</div>
       </div>
       <div class="analytics419-actions">
         <button class="btn btn-primary btn-sm" onclick="loadAnalyticsCenter419B2()">🔄 Aggiorna Analytics</button>
-        <button class="btn btn-ghost btn-sm" onclick="showTab('production-analysis-tab', null); loadProductionAnalysisDashboard412A()">📈 Analisi Produzione</button>
         <button class="btn btn-ghost btn-sm" onclick="showTab('factory-core-tab', null); loadFactoryEnterprise418B()">🏭 Factory Enterprise</button>
       </div>
     </div>
 
     <div class="analytics419-filter-card">
       <div class="col"><label>Periodo</label><select id="an419-period"><option value="today">Oggi</option><option value="7d">Ultimi 7 giorni</option><option value="30d">Ultimi 30 giorni</option><option value="all">Tutto</option></select></div>
+      <div class="col"><label>Commessa / Lotto</label><input id="an419-lot" placeholder="tutte"></div>
+      <div class="col"><label>Seriale</label><input id="an419-serial" placeholder="tutti"></div>
       <div class="col"><label>Ricetta</label><input id="an419-recipe" placeholder="tutte"></div>
       <div class="col"><label>Collaboratore</label><input id="an419-operator" placeholder="tutti"></div>
       <div class="col"><label>Postazione</label><input id="an419-station" placeholder="tutte"></div>
@@ -26,9 +27,55 @@
       <div class="analytics419-kpi"><span>Test totali</span><b id="an419-total">0</b><small>Periodo selezionato</small></div>
       <div class="analytics419-kpi ok"><span>PASS</span><b id="an419-pass">0</b><small>Conformi</small></div>
       <div class="analytics419-kpi fail"><span>FAIL</span><b id="an419-fail">0</b><small>Non conformi</small></div>
+      <div class="analytics419-kpi orange"><span>STOP / ABORT</span><b id="an419-stopped">0</b><small>Interruzioni operative</small></div>
       <div class="analytics419-kpi cyan"><span>FPY / Yield</span><b id="an419-fpy">0%</b><small>Qualità primo passaggio</small></div>
       <div class="analytics419-kpi purple"><span>Tempo medio</span><b id="an419-avg">0s</b><small>Durata media test</small></div>
       <div class="analytics419-kpi orange"><span>Riparazioni</span><b id="an419-repairs">0</b><small>Interventi registrati</small></div>
+    </div>
+
+    <div class="analytics419-enterprise-panel analytics419-quality-panel">
+      <div class="analytics419-enterprise-head">
+        <div>
+          <div class="analytics419-kicker">Quality intelligence</div>
+          <h3>🧠 Analisi PASS / FAIL professionale</h3>
+          <div class="hint">Separazione tra performance positiva, cause di scarto, componenti critici e test point ricorrenti.</div>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="loadAnalyticsCenter419B2()">🔄 Ricalcola</button>
+      </div>
+      <div class="analytics419-grid analytics419-grid-2">
+        <div class="analytics419-card">
+          <h3>✅ Analisi PASS</h3>
+          <div id="an419-pass-analysis" class="analytics419-list"><div class="hint">Premi Aggiorna Analytics.</div></div>
+        </div>
+        <div class="analytics419-card">
+          <h3>❌ Analisi FAIL</h3>
+          <div id="an419-fail-analysis" class="analytics419-list"><div class="hint">Premi Aggiorna Analytics.</div></div>
+        </div>
+      </div>
+      <div class="analytics419-grid analytics419-grid-3">
+        <div class="analytics419-card">
+          <h3>🧩 Top componenti critici</h3>
+          <div id="an419-top-components" class="analytics419-list"><div class="hint">Nessun dato componente.</div></div>
+        </div>
+        <div class="analytics419-card">
+          <h3>📍 Top Test Point / Step</h3>
+          <div id="an419-top-testpoints" class="analytics419-list"><div class="hint">Nessun dato test point.</div></div>
+        </div>
+        <div class="analytics419-card">
+          <h3>📏 Distribuzione misure</h3>
+          <div id="an419-measurements" class="analytics419-list"><div class="hint">Nessuna misura numerica.</div></div>
+        </div>
+      </div>
+      <div class="analytics419-grid analytics419-grid-2">
+        <div class="analytics419-card">
+          <h3>🧬 Timeline seriali</h3>
+          <div id="an419-serial-timeline" class="analytics419-timeline"><div class="hint">Filtra per seriale o usa gli ultimi seriali testati.</div></div>
+        </div>
+        <div class="analytics419-card">
+          <h3>🔎 Dettaglio ultimi FAIL</h3>
+          <div id="an419-fail-details" class="analytics419-list"><div class="hint">Nessun FAIL nel periodo.</div></div>
+        </div>
+      </div>
     </div>
 
     <div class="analytics419-grid analytics419-grid-2">

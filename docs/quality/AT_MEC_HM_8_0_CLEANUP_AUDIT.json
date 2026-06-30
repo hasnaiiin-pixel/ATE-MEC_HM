@@ -1,0 +1,47 @@
+{
+  "version": "AT-MEC_HM_8.0_AI_READY_ENTERPRISE_STABLE",
+  "createdAt": "2026-06-30T10:18:32.221Z",
+  "score": 100,
+  "checks": [
+    {
+      "label": "Legacy Work Order 6.0 non caricato",
+      "ok": true,
+      "detail": "index.html non deve caricare moduli 6.0"
+    },
+    {
+      "label": "Legacy Revision/Firmware 6.1 non caricato",
+      "ok": true,
+      "detail": "index.html non deve caricare moduli 6.1"
+    },
+    {
+      "label": "Clean Baseline 7.5 caricato",
+      "ok": true,
+      "detail": "adapter canonico 7.5 presente"
+    },
+    {
+      "label": "CSS Clean Baseline 7.5 caricato",
+      "ok": true,
+      "detail": "stile pannello 7.5 presente"
+    },
+    {
+      "label": "Archivio decommission presente",
+      "ok": true,
+      "detail": "legacy spostato fuori runtime"
+    },
+    {
+      "label": "Sync queue path relativo",
+      "ok": true,
+      "detail": "config/data_provider.json portabile"
+    },
+    {
+      "label": "Menu KPI doppio nascosto",
+      "ok": true,
+      "detail": "menu Report/QC usa Analytics Center come accesso principale"
+    },
+    {
+      "label": "AI Copilot 8.0 senza duplicare moduli",
+      "ok": true,
+      "detail": "AI apre pagina dedicata e aggiunge solo readiness dentro pagina esistente"
+    }
+  ]
+}

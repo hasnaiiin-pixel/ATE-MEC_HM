@@ -1,0 +1,17 @@
+{
+  "version": "AT-MEC_HM_7.7.1_AI_APPROVAL_PERSISTENCE_UX",
+  "createdAt": "2026-06-30T08:42:28.328Z",
+  "primaryMenu": [
+    "AI Copilot Center",
+    "Analisi completa AI",
+    "Provider & Approvazioni AI"
+  ],
+  "hiddenDuplicates": [
+    "Nuova pagina AI duplicata",
+    "Nuovo Analytics AI",
+    "Nuovo Repair AI",
+    "Nuovo MES AI"
+  ],
+  "aiRule": "7.7 estende la pagina AI esistente: provider e approvazioni manuali, nessuna modifica automatica.",
+  "result": "OK"
+}

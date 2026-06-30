@@ -3,7 +3,7 @@
    Does not change Test Engine, Repair, SQLite, Repository or Hardware runtime. */
 (function(){
   'use strict';
-  const VERSION='6.7O_TEST_MODE_SWITCH_ALIGNMENT_FIX';
+  const VERSION='7.5.1_CLEAN_BASELINE_NO_DUPLICATES_FIX1_STARTUP';
   const $=(id)=>document.getElementById(id);
   const q=(sel,root=document)=>root.querySelector(sel);
   function safe(fn, fallback){ try{return fn();}catch(_e){return fallback;} }
@@ -200,7 +200,7 @@
     try{document.body.classList.add('atmec66e-modern-testmode');}catch(_e){}
     watchManualModal(); ensureInstrumentBar(); ensureSessionKpi(); modernizeStepCard(); watchLog(); enhanceLog(); populateActiveLoginUsers();
     setInterval(()=>{updateInstrumentBar(); refreshSessionKpi(); updateStepStatus(); enhanceLog();},1200);
-    console.log('[TEST UX 6.7O] Test Mode Switch Alignment Fix inizializzato');
+    console.log('[TEST UX 7.3] Test Mode Backbone Unified inizializzato');
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init); else init();
 })();

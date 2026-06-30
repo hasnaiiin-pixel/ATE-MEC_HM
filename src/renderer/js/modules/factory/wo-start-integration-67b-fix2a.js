@@ -3,7 +3,7 @@
    No giant WO cards in Test Mode. START/F1 uses selected WO or opens compact selector. */
 (function(){
   'use strict';
-  var VERSION='6.7O_TEST_MODE_SWITCH_ALIGNMENT_FIX';
+  var VERSION='7.5.1_CLEAN_BASELINE_NO_DUPLICATES_FIX1_STARTUP';
   var KEY='atmec67b_mes_ready';
   var ACTIVE_KEY='atmec_active_work_order';
   var CURRENT_KEY='atmec_current_work_order';
@@ -49,6 +49,23 @@
   }
   function woLot(w){return w?(w.wo||w.id||''):'';} // In Test Mode il campo Commessa deve essere il numero WO, non il lotto
   function woRecipe(w){return w?String(w.recipe||'').trim():'';}
+  function mdValue(k,id,fields){
+    var item=findMd(k,id);
+    for(var i=0;i<fields.length;i++){if(item&&item[fields[i]]) return item[fields[i]];}
+    return '';
+  }
+  function woCustomer(w){return w?(mdValue('customers',w.customerId,['name','code'])||w.customerText||w.customer||'Cliente n/d'):'';}
+  function woProduct(w){return w?(mdValue('products',w.productId,['code','name'])||w.productText||w.productCode||'Prodotto n/d'):'';}
+  function woBoard(w){return w?(mdValue('boards',w.boardId,['code','name'])||w.boardCode||w.boardText||w.board||'Scheda n/d'):'';}
+  function woFirmware(w){var f=w&&findMd('firmware',w.firmwareId)||{}; return w?((f.name||w.firmwareText||'FW')+' '+(f.version||w.firmwareVersion||'')).trim():'';}
+  function woSearchText(w){
+    if(!w) return '';
+    return [
+      w.id,w.wo,w.commessa,w.lot,w.lotto,w.status,
+      woCustomer(w),woProduct(w),woBoard(w),woFirmware(w),woRecipe(w),
+      w.customerCode,w.productCode,w.boardCode,w.boardText,w.productText,w.recipe
+    ].filter(Boolean).join(' ').toLowerCase();
+  }
   function counters(w){var qty=Number(w&&w.qty||0), done=Number(w&&w.done||0), fail=Number(w&&w.fail||0), error=Number(w&&w.error||0); return {qty:qty,done:done,fail:fail,error:error,left:Math.max(0,qty-done),yield:(done+fail)?Math.round(1000*done/(done+fail))/10:0};}
   function avgCycle(w){var v=w&&(w.avgCycleSec||w.averageCycleSec||w.cycleTimeSec||w.avg_time_sec); return Number(v||0)>0?Number(v):null;}
   function parseTime(v){var t=v?new Date(v).getTime():0; return Number.isFinite(t)?t:0;}
@@ -62,13 +79,11 @@
   }
   function woLabel(w){
     if(!w) return '';
-    var c=findMd('customers',w.customerId), p=findMd('products',w.productId), b=findMd('boards',w.boardId), f=findMd('firmware',w.firmwareId);
-    return [w.wo||w.id,c.name||w.customerText||'Cliente n/d',p.code||p.name||w.productText||'Prodotto n/d',b.code||'',(f.name||'FW')+' '+(f.version||''),w.recipe||'Ricetta n/d'].filter(Boolean).join(' · ');
+    return [w.wo||w.id,woCustomer(w),woProduct(w),woBoard(w),woFirmware(w),w.recipe||'Ricetta n/d'].filter(Boolean).join(' · ');
   }
   function selectedSummary(w){
     if(!w) return 'NESSUNA WO SELEZIONATA';
-    var c=findMd('customers',w.customerId), p=findMd('products',w.productId);
-    return (w.wo||w.id)+' | '+(c.name||w.customerText||'Cliente n/d')+' | '+(p.code||p.name||w.productText||'Prodotto n/d');
+    return (w.wo||w.id)+' | '+woCustomer(w)+' | '+woBoard(w);
   }
   function setValue(ids,v){ids.forEach(function(id){var el=$(id); if(!el) return; if('value' in el && el.value!==v){el.value=v; try{el.dispatchEvent(new Event('input',{bubbles:true}));}catch(_){}} else if(!('value' in el)){el.textContent=v;}});}
   function setRecipeSelectors(recipe){
@@ -123,7 +138,7 @@
     kpi.appendChild(box);
     return {chip:$('atmec67g-wo-kpi-chip'),btn:$('atmec67g-wo-stats-btn')};
   }
-  function renderMiniKpi(w){var k=counters(w); return '<div class="atmec67b-wo-kpis-compact"><span>PREVISTI <b>'+k.qty+'</b></span><span>PASS <b>'+k.done+'</b></span><span>FAIL <b>'+k.fail+'</b></span><span>RESIDUO <b>'+k.left+'</b></span><span>YIELD <b>'+k.yield+'%</b></span></div>';}
+  function renderMiniKpi(w){var k=counters(w); return '<div class="atmec67b-wo-kpis-compact atmec69a-wo-kpis"><span class="total">TOT <b>'+k.qty+'</b></span><span class="pass">PASS <b>'+k.done+'</b></span><span class="fail">FAIL <b>'+k.fail+'</b></span><span class="left">RES <b>'+k.left+'</b></span><span class="yield">YIELD <b>'+k.yield+'%</b></span></div>';}
   function renderOperatorBar(list,useWO,sel){
     var cb=$('atmec67b-use-wo-prod');
     var chip=$('atmec67b-selected-wo-chip');
@@ -132,6 +147,8 @@
     var statsBtn=woHost.btn;
     var kpiChip=woHost.chip;
     var lot=$('prod-lot-number');
+    var root=$('production-test-mode');
+    if(root) root.classList.toggle('atmec69a-wo-locked-mode',!!useWO);
     if(cb) cb.checked=!!useWO;
     if(openBtn) openBtn.disabled=!useWO;
     if(statsBtn) statsBtn.disabled=!useWO || !sel;
@@ -167,13 +184,14 @@
     lockRecipeControls(useWO);
   }
   function lockRecipeControls(locked){
-    ['prod-client-filter','prod-recipe-select','prod-recipe-version-select'].forEach(function(id){
+    ['prod-client-filter','prod-recipe-select','prod-recipe-version-select','prod-recipe-rev','prod-recipe-name'].forEach(function(id){
       var el=$(id); if(!el) return;
       el.disabled=!!locked;
+      if('readOnly' in el) el.readOnly=!!locked;
       el.classList.toggle('atmec67h-wo-recipe-locked',!!locked);
       el.title=locked?'Bloccato: dati ricetta presi dalla WO':'';
     });
-    document.querySelectorAll('.prod-recipe-compact-row .btn').forEach(function(btn){
+    document.querySelectorAll('.prod-recipe-compact-row .btn, #prod-select-recipe-btn, #prod-load-recipe-btn, #prod-recipe-refresh-btn').forEach(function(btn){
       btn.disabled=!!locked;
       btn.classList.toggle('atmec67h-wo-recipe-locked',!!locked);
       btn.title=locked?'Bloccato: disattiva Usa WO/Commessa per cambiare manualmente':'';
@@ -200,17 +218,29 @@
   function filterSelectOptions(q, list, sel){
     var select=$('atmec67b-wo-select'); if(!select) return;
     q=String(q||'').toLowerCase();
-    var shown=list.filter(function(w){return !q || woLabel(w).toLowerCase().indexOf(q)>-1 || String(w.wo||w.id).toLowerCase().indexOf(q)>-1;});
+    var shown=list.filter(function(w){return !q || woSearchText(w).indexOf(q)>-1;});
     select.innerHTML='<option value="">Seleziona WO attiva...</option>'+shown.map(function(w){return '<option value="'+esc(w.id)+'" '+(sel&&sel.id===w.id?'selected':'')+'>'+esc(selectedSummary(w))+'</option>';}).join('');
   }
   function chooseWO(list){
     return new Promise(function(resolve){
       var old=$('atmec67b-wo-selector'); if(old) old.remove();
       var div=document.createElement('div'); div.id='atmec67b-wo-selector'; div.className='atmec67b-wo-selector-backdrop';
-      div.innerHTML='<div class="atmec67b-wo-selector-card" role="dialog" aria-modal="true"><div class="atmec67b-wo-selector-head"><b>SELEZIONA WO / COMMESSA</b><button type="button" class="btn btn-ghost btn-sm" id="atmec67b-wo-cancel-x">✕</button></div><input id="atmec67b-wo-modal-search" class="atmec67b-wo-modal-search" placeholder="Cerca cliente, commessa, codice scheda, prodotto o ricetta..."><div class="atmec67b-wo-selector-list" id="atmec67b-wo-selector-list"></div><div class="atmec67b-wo-selector-actions"><button type="button" class="btn btn-ghost" id="atmec67b-wo-skip">ANNULLA</button></div></div>';
+      div.innerHTML='<div class="atmec67b-wo-selector-card atmec69a-wo-selector-card" role="dialog" aria-modal="true"><div class="atmec67b-wo-selector-head"><b>SELEZIONA WO / COMMESSA</b><button type="button" class="btn btn-ghost btn-sm" id="atmec67b-wo-cancel-x">✕</button></div><input id="atmec67b-wo-modal-search" class="atmec67b-wo-modal-search" placeholder="Cerca per commessa, cliente, codice scheda, prodotto o ricetta..."><div class="atmec67b-wo-selector-list" id="atmec67b-wo-selector-list"></div><div class="atmec67b-wo-selector-actions"><button type="button" class="btn btn-ghost" id="atmec67b-wo-skip">ANNULLA</button></div></div>';
       document.body.appendChild(div);
       var listBox=$('atmec67b-wo-selector-list');
-      function draw(q){q=String(q||'').toLowerCase(); var rows=list.filter(function(w){return !q || woLabel(w).toLowerCase().indexOf(q)>-1 || String(w.wo||w.id).toLowerCase().indexOf(q)>-1 || String(w.boardCode||w.boardText||w.productText||'').toLowerCase().indexOf(q)>-1;}); listBox.innerHTML=rows.map(function(w){var k=counters(w); return '<button type="button" class="atmec67b-wo-choice" data-id="'+esc(w.id)+'"><b>'+esc(w.wo||w.id)+'</b><small>'+esc(woLabel(w))+'</small><span>RESIDUO '+k.left+'</span></button>';}).join('')||'<div class="hint">Nessuna WO trovata.</div>'; listBox.querySelectorAll('.atmec67b-wo-choice').forEach(function(b){b.onclick=function(){var id=this.getAttribute('data-id'); close(list.find(function(x){return x.id===id;})||null);};});}
+      function draw(q){
+        q=String(q||'').toLowerCase();
+        var rows=list.filter(function(w){return !q || woSearchText(w).indexOf(q)>-1;});
+        listBox.innerHTML=rows.map(function(w){
+          var k=counters(w);
+          return '<button type="button" class="atmec67b-wo-choice atmec69a-wo-choice" data-id="'+esc(w.id)+'">'+
+            '<span class="atmec69a-wo-choice-main"><b>'+esc(w.wo||w.id)+'</b><em>'+esc(woCustomer(w))+'</em></span>'+
+            '<span class="atmec69a-wo-choice-meta"><strong>Scheda</strong> '+esc(woBoard(w))+' <strong>Ricetta</strong> '+esc(woRecipe(w)||'n/d')+'</span>'+
+            '<span class="atmec69a-wo-choice-kpi"><i class="total">TOT '+k.qty+'</i><i class="pass">PASS '+k.done+'</i><i class="fail">FAIL '+k.fail+'</i><i class="left">RES '+k.left+'</i></span>'+
+          '</button>';
+        }).join('')||'<div class="hint">Nessuna WO trovata.</div>';
+        listBox.querySelectorAll('.atmec67b-wo-choice').forEach(function(b){b.onclick=function(){var id=this.getAttribute('data-id'); close(list.find(function(x){return x.id===id;})||null);};});
+      }
       function close(w){try{div.remove();}catch(_){ } resolve(w||null);}
       draw(''); var search=$('atmec67b-wo-modal-search'); if(search){search.oninput=function(){draw(search.value);}; setTimeout(function(){try{search.focus();}catch(_){ }},50);}
       $('atmec67b-wo-cancel-x').onclick=function(){close(null);}; $('atmec67b-wo-skip').onclick=function(){close(null);};
@@ -277,6 +307,11 @@
     if(!sel){toast('Seleziona una WO prima di aprire le statistiche.','warn'); return;}
     var old=$('atmec67g-wo-stats-modal'); if(old) old.remove();
     var k=counters(sel), avg=avgCycle(sel), elapsed=elapsedSec(sel), estTotal=estimatedTotalSec(sel,k), fails=topFails(sel);
+    var produced=k.done+k.fail+k.error;
+    if(!avg && elapsed && produced) avg=Math.round(elapsed/produced);
+    if(estTotal==null && avg && k.qty) estTotal=Math.round(avg*k.qty);
+    var estLeft=(estTotal!=null&&elapsed!=null)?Math.max(0,estTotal-elapsed):null;
+    var progress=k.qty?Math.min(100,Math.round((produced/Math.max(1,k.qty))*100)):0;
     var total=Math.max(1,k.done+k.fail+k.error+k.left);
     var passDeg=Math.round((k.done/total)*360), failDeg=Math.round((k.fail/total)*360), errDeg=Math.round((k.error/total)*360);
     var top=fails.length?fails.map(function(f){return '<div class="atmec67g-topfail-row"><b>'+esc(f.label)+'</b><span>'+esc(f.count)+'</span></div>';}).join(''):'<div class="atmec67g-empty">Nessun top fail registrato su questa WO.</div>';
@@ -284,20 +319,31 @@
     modal.id='atmec67g-wo-stats-modal';
     modal.className='atmec67g-wo-stats-backdrop';
     modal.innerHTML='<div class="atmec67g-wo-stats-card" role="dialog" aria-modal="true">'+
-      '<div class="atmec67g-stats-head"><div><b>STATISTICHE WO</b><span>'+esc(sel.wo||sel.id)+' · '+esc(woLabel(sel))+'</span></div><button class="btn btn-ghost btn-sm" id="atmec67g-stats-close">Chiudi</button></div>'+
+      '<div class="atmec67g-stats-head atmec69b-stats-head"><div><b>STATISTICHE WO</b><span>'+esc(sel.wo||sel.id)+' · '+esc(woLabel(sel))+'</span></div><button class="btn btn-ghost btn-sm" id="atmec67g-stats-close">Chiudi</button></div>'+
+      '<div class="atmec69b-stats-meta">'+
+        '<div><label>Commessa</label><b>'+esc(sel.wo||sel.id)+'</b></div>'+
+        '<div><label>Cliente</label><b>'+esc(woCustomer(sel))+'</b></div>'+
+        '<div><label>Scheda</label><b>'+esc(woBoard(sel))+'</b></div>'+
+        '<div><label>Prodotto</label><b>'+esc(woProduct(sel))+'</b></div>'+
+        '<div><label>Ricetta</label><b>'+esc(woRecipe(sel)||'n/d')+'</b></div>'+
+        '<div><label>Stato</label><b>'+esc(sel.status||'Running')+'</b></div>'+
+      '</div>'+
       '<div class="atmec67g-stats-grid">'+
         '<div class="atmec67g-stat"><label>Previste</label><b>'+k.qty+'</b></div>'+
         '<div class="atmec67g-stat pass"><label>PASS</label><b>'+k.done+'</b></div>'+
         '<div class="atmec67g-stat fail"><label>FAIL</label><b>'+k.fail+'</b></div>'+
+        '<div class="atmec67g-stat warn"><label>Errori</label><b>'+k.error+'</b></div>'+
         '<div class="atmec67g-stat"><label>Residuo</label><b>'+k.left+'</b></div>'+
         '<div class="atmec67g-stat"><label>Yield</label><b>'+k.yield+'%</b></div>'+
-        '<div class="atmec67g-stat"><label>Tempo medio</label><b>'+(avg?Math.round(avg)+' s':'--')+'</b></div>'+
+        '<div class="atmec67g-stat"><label>Avanzamento</label><b>'+progress+'%</b></div>'+
+        '<div class="atmec67g-stat"><label>Tempo medio scheda</label><b>'+(avg?Math.round(avg)+' s':'--')+'</b></div>'+
         '<div class="atmec67g-stat"><label>Tempo impiegato</label><b>'+fmtDuration(elapsed)+'</b></div>'+
-        '<div class="atmec67g-stat"><label>Tempo totale stimato</label><b>'+fmtDuration(estTotal)+'</b></div>'+
+        '<div class="atmec67g-stat"><label>Tempo residuo stimato</label><b>'+fmtDuration(estLeft)+'</b></div>'+
+        '<div class="atmec67g-stat total-time"><label>Tempo totale commessa</label><b>'+fmtDuration(estTotal)+'</b></div>'+
       '</div>'+
       '<div class="atmec67g-chart-row">'+
-        '<div class="atmec67g-donut" style="--pass:'+passDeg+'deg;--fail:'+failDeg+'deg;--err:'+errDeg+'deg"><span>'+k.yield+'%</span></div>'+
-        '<div class="atmec67g-bars"><div><span>PASS</span><i style="width:'+Math.min(100,Math.round((k.done/Math.max(1,k.qty))*100))+'%"></i><b>'+k.done+'</b></div><div class="fail"><span>FAIL</span><i style="width:'+Math.min(100,Math.round((k.fail/Math.max(1,k.qty))*100))+'%"></i><b>'+k.fail+'</b></div><div class="left"><span>RESIDUO</span><i style="width:'+Math.min(100,Math.round((k.left/Math.max(1,k.qty))*100))+'%"></i><b>'+k.left+'</b></div></div>'+
+        '<div class="atmec67g-donut atmec69b-donut" style="--pass:'+passDeg+'deg;--fail:'+failDeg+'deg;--err:'+errDeg+'deg"><span>'+k.yield+'%</span><small>YIELD</small></div>'+
+        '<div class="atmec67g-bars atmec69b-bars"><div><span>PASS</span><i style="width:'+Math.min(100,Math.round((k.done/Math.max(1,k.qty))*100))+'%"></i><b>'+k.done+'</b></div><div class="fail"><span>FAIL</span><i style="width:'+Math.min(100,Math.round((k.fail/Math.max(1,k.qty))*100))+'%"></i><b>'+k.fail+'</b></div><div class="error"><span>ERRORI</span><i style="width:'+Math.min(100,Math.round((k.error/Math.max(1,k.qty))*100))+'%"></i><b>'+k.error+'</b></div><div class="left"><span>RESIDUO</span><i style="width:'+Math.min(100,Math.round((k.left/Math.max(1,k.qty))*100))+'%"></i><b>'+k.left+'</b></div><div class="progress"><span>AVANZAMENTO</span><i style="width:'+progress+'%"></i><b>'+progress+'%</b></div></div>'+
       '</div>'+
       '<div class="atmec67g-topfail"><h4>Top fail</h4>'+top+'</div>'+
     '</div>';

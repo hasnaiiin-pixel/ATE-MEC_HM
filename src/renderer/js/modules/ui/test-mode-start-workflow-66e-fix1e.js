@@ -3,7 +3,7 @@
    Does not change Test Engine, recipe execution, flags or existing Test Mode layout. */
 (function(){
   'use strict';
-  const VERSION='6.7F_START_POPUP_WO_LOCK';
+  const VERSION='7.3_START_POPUP_BACKBONE_UNIFIED';
   const $=(id)=>document.getElementById(id);
   const esc=(s)=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
   const val=(id)=>String($(id)?.value||'').trim();
@@ -16,6 +16,18 @@
   function activeWorkOrder(){try{return JSON.parse(localStorage.getItem('atmec_active_work_order')||'null')||null;}catch(_e){return null;}}
   function useWorkOrderMode(){try{return typeof window.getUseWorkOrderMode67B==='function'?!!window.getUseWorkOrderMode67B():localStorage.getItem('atmec67b_use_work_order_mode')!=='false';}catch(_e){return localStorage.getItem('atmec67b_use_work_order_mode')!=='false';}}
   function woLabel(w){if(!w)return ''; return [w.wo||w.id, w.customerText||'', w.productText||'', w.recipe||''].filter(Boolean).join(' · ');}
+  function woCounters(w){const qty=Number(w?.qty||0), pass=Number(w?.done||0), fail=Number(w?.fail||0), err=Number(w?.error||0); return {qty,pass,fail,err,left:Math.max(0,qty-pass)};}
+  function woStartSummary(w){
+    if(!w) return '<div class="atmec69a-start-wo-summary warn">WO/Commessa attivo: seleziona una WO prima di avviare il test.</div>';
+    const k=woCounters(w);
+    return `<div class="atmec69a-start-wo-summary">
+      <div><label>WO</label><b>${esc(w.wo||w.id)}</b></div>
+      <div><label>Cliente</label><b>${esc(w.customerText||'n/d')}</b></div>
+      <div><label>Scheda</label><b>${esc(w.boardCode||w.boardText||w.productText||'n/d')}</b></div>
+      <div><label>Ricetta</label><b>${esc(w.recipe||'n/d')}</b></div>
+      <div><label>Pass/Fail/Res</label><b>${k.pass}/${k.fail}/${k.left}</b></div>
+    </div>`;
+  }
   function showOperatorWait(text){
     try{
       // FIX1G: attenzione operatore solo nel punto di azione, non nel banner/dashboard generale.
@@ -52,15 +64,16 @@
       overlay.id='atmec66e-start-gate';
       overlay.className='atmec66e-start-gate-backdrop';
       overlay.innerHTML=`<div class="atmec66e-start-gate-card atmec66e-start-gate-safe" role="dialog" aria-modal="true">
-        <div class="atmec66e-start-gate-head"><div><b>▶ AVVIO TEST</b><span class="atmec66e-start-wait-pill">IN ATTESA OPERATORE</span><small>SN obbligatorio attivo: conferma dati produzione</small></div><button type="button" class="btn btn-ghost btn-sm" id="atmec66e-start-cancel-x">✕</button></div>
+        <div class="atmec66e-start-gate-head"><div><b>START TEST (F1)</b><span class="atmec66e-start-wait-pill">IN ATTESA OPERATORE</span><small>SN obbligatorio attivo: conferma dati produzione</small></div><button type="button" class="btn btn-ghost btn-sm" id="atmec66e-start-cancel-x">✕</button></div>
         <div class="atmec66e-start-wo">${woMode ? (awo ? 'WO ATTIVA: '+esc(woLabel(awo)) : 'WO/COMMESSA ATTIVO: seleziona una WO prima di avviare') : 'MODALITA COMMESSA MANUALE'}</div>
+        ${woMode ? woStartSummary(awo) : ''}
         <div class="atmec66e-start-grid atmec67h-start-grid">
           <label class="atmec67h-start-lot">COMMESSA<input id="atmec66e-start-lot" value="${esc(lot)}" placeholder="${woMode?'Bloccata da WO':'Commessa manuale'}" ${woMode?'readonly':''}></label>
           <label class="atmec67h-start-sn">S/N - INSERISCI O SCANSIONA<input id="atmec66e-start-sn" value="${esc(serial)}" placeholder="SERIAL NUMBER" autocomplete="off"></label>
           <label class="notes">NOTE OPERATORE<textarea id="atmec66e-start-note" placeholder="Note opzionali: campionatura, scheda riparata, verifica engineering...">${esc(lastNote)}</textarea></label>
         </div>
         <div id="atmec66e-start-error" class="atmec66e-start-error"></div>
-        <div class="atmec66e-start-actions"><button type="button" class="btn btn-ghost" id="atmec66e-start-cancel">ANNULLA</button><button type="button" class="btn btn-success btn-3d" id="atmec66e-start-ok">START TEST</button></div>
+        <div class="atmec66e-start-actions"><button type="button" class="btn btn-ghost" id="atmec66e-start-cancel">ANNULLA</button><button type="button" class="btn btn-success btn-3d" id="atmec66e-start-ok">START TEST (F1)</button></div>
         <div class="hint">Premi INVIO su seriale/note per avviare. ESC annulla.</div>
       </div>`;
       document.body.appendChild(overlay);

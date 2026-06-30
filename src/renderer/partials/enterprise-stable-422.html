@@ -1,12 +1,125 @@
 <div id="enterprise-stable-tab" class="tab-content enterprise422-page">
   <div class="enterprise422-hero">
     <div>
-      <div class="enterprise422-eyebrow">AT-MEC_HM_4.22_ENTERPRISE_STABLE</div>
-      <h2>🛡️ Enterprise Stability Center</h2>
-      <p>Centro di consolidamento per audit, backup, permessi, logging e consistenza versione. Questa release non cambia il flusso Test Mode: mette in sicurezza i moduli già sviluppati.</p>
+      <div class="enterprise422-eyebrow">AT-MEC_HM_7.7.1_AI_APPROVAL_PERSISTENCE_UX</div>
+      <h2>🛡️ Enterprise Clean Baseline Center</h2>
+      <p>Centro unico di pulizia e consolidamento: mantiene i moduli già presenti, rimuove doppioni dal runtime e usa Data Contract / Clean Baseline come sorgente canonica.</p>
     </div>
-    <div class="enterprise422-score" id="enterprise422-score">--%</div>
+    <div class="enterprise422-score" id="enterprise73-score">--%</div>
   </div>
+
+  <section class="enterprise422-card enterprise422-wide enterprise73-card">
+    <div class="enterprise73-head">
+      <div>
+        <h3>🧭 Backbone unificato 7.5</h3>
+        <p class="hint">Backbone 7.3/7.4 consolidato in Clean Baseline 7.5: audit dei moduli già presenti, contesto WO/produzione unificato e decommission dei doppioni runtime.</p>
+      </div>
+      <div class="row wrap">
+        <button class="btn btn-primary" onclick="renderEnterpriseBackbone73()">Aggiorna backbone</button>
+        <button class="btn btn-success" onclick="syncEnterpriseBackbone73()">Sincronizza contesto</button>
+        <button class="btn btn-ghost" onclick="exportEnterpriseBackbone73()">Esporta JSON</button>
+      </div>
+    </div>
+    <div id="enterprise73-active-wo" class="enterprise73-active"><b>Nessuna WO attiva</b><span>Premi Aggiorna backbone.</span></div>
+    <div id="enterprise73-kpis" class="enterprise73-kpis"></div>
+    <div class="enterprise73-grid">
+      <div>
+        <h4>Stato moduli esistenti</h4>
+        <div id="enterprise73-modules" class="enterprise73-list"><div class="hint">Premi Aggiorna backbone.</div></div>
+      </div>
+      <div>
+        <h4>Gap / rischi senza duplicare</h4>
+        <div id="enterprise73-issues" class="enterprise73-list"><div class="hint">Premi Aggiorna backbone.</div></div>
+      </div>
+    </div>
+    <h4>Work Orders normalizzati</h4>
+    <div id="enterprise73-wo-table" class="enterprise73-table-wrap"><div class="hint">Nessuna lettura eseguita.</div></div>
+    <div id="enterprise73-stamp" class="enterprise422-status">Backbone non ancora aggiornato.</div>
+  </section>
+
+
+  <section class="enterprise422-card enterprise422-wide enterprise74-card">
+    <div class="enterprise74-head">
+      <div>
+        <h3>🧬 Enterprise Data Contract 7.4 + Clean Baseline 7.5</h3>
+        <p>Modello dati unico per WO, Commessa, Serial Number, Cliente, Scheda, Ricetta, Revisione, Firmware, Operatore, Repair, Analytics e Factory. La normalizzazione resta sicura: crea backup, non cancella dati, e la 7.5 riduce i doppioni runtime.</p>
+        <div id="enterprise74-meta">Data Contract non ancora verificato.</div>
+      </div>
+      <div class="row wrap">
+        <button class="btn btn-primary" onclick="renderEnterpriseDataContract74()">Aggiorna Data Contract</button>
+        <button class="btn btn-ghost" onclick="runEnterpriseConsistency74()">Verifica coerenza</button>
+        <button class="btn btn-success" onclick="applyEnterpriseSafeMigration74()">Normalizza sicura</button>
+        <button class="btn btn-ghost" onclick="exportEnterpriseDataContract74()">Esporta contract</button>
+        <button class="btn btn-ghost" onclick="exportEnterpriseConsistency74()">Esporta report</button>
+      </div>
+    </div>
+    <div class="enterprise74-scoreline">
+      <div class="enterprise74-scorebox"><div><span>Data score</span><b id="enterprise74-score">--%</b></div></div>
+      <div id="enterprise74-current-context"><div class="hint">Premi Aggiorna Data Contract.</div></div>
+    </div>
+    <div class="enterprise74-grid">
+      <div>
+        <h4>Campi contrattuali</h4>
+        <div id="enterprise74-contract-fields" class="enterprise74-list"><div class="hint">Nessuna verifica eseguita.</div></div>
+      </div>
+      <div>
+        <h4>Coerenza / migrazione sicura</h4>
+        <div id="enterprise74-consistency-list" class="enterprise74-list"><div class="hint">Nessun report generato.</div></div>
+      </div>
+    </div>
+    <h4>Mappa chiavi legacy rilevate</h4>
+    <div id="enterprise74-key-map"><div class="hint">Nessuna scansione eseguita.</div></div>
+    <div id="enterprise74-stamp" class="enterprise422-status">Data Contract 7.4 non ancora aggiornato.</div>
+  </section>
+
+  <section class="enterprise422-card enterprise422-wide enterprise75-card">
+    <div class="enterprise75-head">
+      <div>
+        <h3>🧹 Clean Baseline 7.5 — No Duplicates</h3>
+        <p class="hint">Versione pulita per ripartire: decommission runtime dei moduli legacy 6.0/6.1, menu senza KPI doppi, contesto canonico WO/Commessa/S/N e mirror legacy solo per compatibilità.</p>
+        <div id="enterprise75-meta">Clean Baseline non ancora verificata.</div>
+      </div>
+      <div class="row wrap">
+        <button class="btn btn-primary" onclick="runEnterpriseCleanBaseline75()">Audit pulizia</button>
+        <button class="btn btn-success" onclick="applyEnterpriseCleanBaseline75()">Applica baseline pulita</button>
+        <button class="btn btn-ghost" onclick="exportEnterpriseCleanBaseline75()">Esporta report</button>
+      </div>
+    </div>
+    <div class="enterprise75-scoreline">
+      <div class="enterprise75-scorebox"><div><span>Clean score</span><b id="enterprise75-score">--%</b></div></div>
+      <div id="enterprise75-context"><div class="hint">Premi Audit pulizia.</div></div>
+    </div>
+    <div class="enterprise75-grid">
+      <div>
+        <h4>Controlli pulizia runtime</h4>
+        <div id="enterprise75-clean-list" class="enterprise422-list"><div class="hint">Nessun audit eseguito.</div></div>
+      </div>
+      <div>
+        <h4>Funzioni decommissionate / accorpate</h4>
+        <div id="enterprise75-deprecated-list" class="enterprise422-list"><div class="hint">Nessun report generato.</div></div>
+      </div>
+    </div>
+    <div class="enterprise752-validation">
+      <div class="enterprise752-head">
+        <div>
+          <h4>✅ Clean Baseline 7.6 — Runtime Validation</h4>
+          <p class="hint">Controllo finale anti-doppioni: script/CSS/partial caricati, handler principali, menu consolidato e legacy 6.0/6.1 solo come compatibilità.</p>
+          <div id="enterprise753-runtime-meta">Validazione non ancora eseguita.</div>
+        </div>
+        <div class="row wrap">
+          <button class="btn btn-primary" onclick="runEnterpriseRuntimeValidation753()">Valida runtime</button>
+          <button class="btn btn-ghost" onclick="exportEnterpriseRuntimeValidation753()">Esporta validazione</button>
+        </div>
+      </div>
+      <div class="enterprise75-scoreline enterprise752-scoreline">
+        <div class="enterprise75-scorebox"><div><span>Runtime score</span><b id="enterprise753-runtime-score">--%</b></div></div>
+        <div id="enterprise753-runtime-list" class="enterprise422-list"><div class="hint">Premi Valida runtime.</div></div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- 7.6.2 CLEAN: AI Copilot completo resta in menu/pagina dedicata per evitare sovrapposizioni con Enterprise Clean Baseline. -->
 
   <div class="enterprise422-grid">
     <section class="enterprise422-card">
@@ -21,7 +134,7 @@
 
     <section class="enterprise422-card">
       <h3>💾 Backup / Restore configurazioni</h3>
-      <p class="hint">Backup browser-side delle configurazioni salvate in localStorage: ricette, label, print, audio/voice, work orders, revisioni/firmware e impostazioni UI.</p>
+      <p class="hint">Backup browser-side delle configurazioni salvate in localStorage: ricette, label, print, audio/voice, work orders, Master Data/MES, Data Contract 7.4, Clean Baseline 7.5 e impostazioni UI.</p>
       <div class="row wrap">
         <button class="btn btn-success" onclick="exportEnterpriseBackup422()">Backup JSON</button>
         <label class="btn btn-ghost enterprise422-file">Import backup<input type="file" accept="application/json" onchange="importEnterpriseBackup422(event)"></label>
@@ -56,7 +169,7 @@
   </div>
 
   <div class="enterprise422-card enterprise422-wide">
-    <h3>✅ Checklist stabilità 4.22</h3>
+    <h3>✅ Checklist stabilità enterprise</h3>
     <div id="enterprise422-checklist" class="enterprise422-checklist"></div>
   </div>
 </div>

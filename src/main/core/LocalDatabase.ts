@@ -231,33 +231,152 @@ export class LocalDatabase {
 
   public getStats(filters: any = {}): any {
     const reports = this.filterReports(filters);
+    const db = this.read();
+    const serialFilter = norm(filters.serial);
+    const lotFilter = norm(filters.lot);
+    const dateFrom = filters.dateFrom ? new Date(filters.dateFrom + 'T00:00:00').getTime() : 0;
+    const dateTo = filters.dateTo ? new Date(filters.dateTo + 'T23:59:59').getTime() : Number.MAX_SAFE_INTEGER;
+    const resultOf = (r: any): string => String(r?.final_result || r?.result || '').toUpperCase();
+    const isPass = (r: any): boolean => resultOf(r) === 'PASS';
+    const isFail = (r: any): boolean => resultOf(r) === 'FAIL';
+    const num = (v: any): number => Number.isFinite(Number(v)) ? Number(v) : 0;
+    const stepLabel = (s: any): string => String(s?.label || s?.description || '').trim();
+    const stepKey = (s: any): string => {
+      const label = stepLabel(s);
+      return `${s?.step_id ?? 'N/D'} ${label || s?.type || 'Step'}`.trim();
+    };
+    const componentKey = (s: any, r?: any): string => {
+      const direct = String(s?.component || s?.component_name || s?.refdes || s?.part || s?.part_number || '').trim();
+      if (direct) return direct.toUpperCase();
+      const text = `${stepLabel(s)} ${s?.type || ''} ${r?.repair_note || ''}`;
+      const m = text.match(/\b(?:R|C|U|D|Q|L|J|TP|F|K|M)\d{1,5}\b/i);
+      if (m) return m[0].toUpperCase();
+      return s?.step_id ? `STEP ${s.step_id}` : 'NON CODIFICATO';
+    };
+    const testPointKey = (s: any): string => {
+      const direct = String(s?.test_point || s?.testPoint || s?.tp || '').trim();
+      if (direct) return direct.toUpperCase();
+      return s?.step_id ? `STEP ${s.step_id}` : 'N/D';
+    };
+    const inc = (map: Record<string, number>, key: string, by = 1): void => {
+      const clean = String(key || 'N/D').trim() || 'N/D';
+      map[clean] = (map[clean] || 0) + by;
+    };
+    const top = (map: Record<string, number>, limit = 10): Array<{ name: string; count: number }> =>
+      Object.keys(map).map(name => ({ name, count: map[name] })).sort((a,b) => b.count - a.count || a.name.localeCompare(b.name)).slice(0, limit);
+    const pct1 = (value: number, base: number): number => base ? Number(((value / base) * 100).toFixed(1)) : 0;
+    const repairRows = (db.repairs || []).filter((r: any) => {
+      const t = new Date(r.timestamp || 0).getTime();
+      if (serialFilter && !norm(r.serial_dut).includes(serialFilter)) return false;
+      if (lotFilter && !norm(r.lot_number || r.work_order).includes(lotFilter)) return false;
+      if (!Number.isNaN(t) && (t < dateFrom || t > dateTo)) return false;
+      return true;
+    });
     const total = reports.length;
-    const pass = reports.filter(r => r.final_result === 'PASS').length;
-    const fail = reports.filter(r => r.final_result === 'FAIL').length;
-    const repairCount = reports.filter(r => String((r as any).repair_note || '').trim()).length;
+    const pass = reports.filter(isPass).length;
+    const fail = reports.filter(isFail).length;
+    const stopped = reports.filter(r => !isPass(r) && !isFail(r)).length;
+    const repairCount = repairRows.length + reports.filter(r => String((r as any).repair_note || '').trim()).length;
     const yieldRate = total ? Number(((pass / total) * 100).toFixed(1)) : 0;
-    const byRecipe: Record<string, { total: number; pass: number; fail: number }> = {};
+    const byRecipe: Record<string, { total: number; pass: number; fail: number; stopped: number }> = {};
+    const byOperator: Record<string, { total: number; pass: number; fail: number; stopped: number }> = {};
+    const byStation: Record<string, { total: number; pass: number; fail: number; stopped: number }> = {};
     for (const r of reports) {
       const key = r.recipe_name || 'N/D';
-      if (!byRecipe[key]) byRecipe[key] = { total: 0, pass: 0, fail: 0 };
+      if (!byRecipe[key]) byRecipe[key] = { total: 0, pass: 0, fail: 0, stopped: 0 };
       byRecipe[key].total++;
-      if (r.final_result === 'PASS') byRecipe[key].pass++; else byRecipe[key].fail++;
+      if (isPass(r)) byRecipe[key].pass++; else if (isFail(r)) byRecipe[key].fail++; else byRecipe[key].stopped++;
+
+      const op = String(r.operator || 'N/D').trim() || 'N/D';
+      if (!byOperator[op]) byOperator[op] = { total: 0, pass: 0, fail: 0, stopped: 0 };
+      byOperator[op].total++;
+      if (isPass(r)) byOperator[op].pass++; else if (isFail(r)) byOperator[op].fail++; else byOperator[op].stopped++;
+
+      const station = String((r as any).station_name || (r as any).station_id || 'Locale').trim() || 'Locale';
+      if (!byStation[station]) byStation[station] = { total: 0, pass: 0, fail: 0, stopped: 0 };
+      byStation[station].total++;
+      if (isPass(r)) byStation[station].pass++; else if (isFail(r)) byStation[station].fail++; else byStation[station].stopped++;
     }
     const byDay: Record<string, { total: number; pass: number; fail: number }> = {};
     const topFailures: Record<string, number> = {};
+    const topPasses: Record<string, number> = {};
+    const topComponents: Record<string, number> = {};
+    const topTestPoints: Record<string, number> = {};
+    const failByStepType: Record<string, number> = {};
+    const failByDevice: Record<string, number> = {};
+    const passByStepType: Record<string, number> = {};
+    const measurementGroups: Record<string, { name: string; unit: string; count: number; pass: number; fail: number; min: number; max: number; sum: number; below: number; above: number }> = {};
+    const failureDetails: any[] = [];
     for (const r of reports) {
       const day = String(r.timestamp || '').slice(0, 10) || 'N/D';
       if (!byDay[day]) byDay[day] = { total: 0, pass: 0, fail: 0 };
       byDay[day].total++;
-      if (r.final_result === 'PASS') byDay[day].pass++; else byDay[day].fail++;
-      if (r.final_result !== 'PASS') {
-        const failed = (r.steps_log || []).find((x: any) => x.result === 'FAIL');
-        const key = failed ? `${failed.step_id} ${failed.type}` : (r.recipe_name || 'FAIL generico');
-        topFailures[key] = (topFailures[key] || 0) + 1;
+      if (isPass(r)) byDay[day].pass++; else byDay[day].fail++;
+      for (const step of ((r as any).steps_log || [])) {
+        const sResult = String(step?.result || '').toUpperCase();
+        const measured = Number(step?.measured);
+        if (Number.isFinite(measured)) {
+          const name = stepKey(step);
+          const unit = String(step?.unit || '').trim();
+          const key = `${name}|${unit}`;
+          if (!measurementGroups[key]) measurementGroups[key] = { name, unit, count: 0, pass: 0, fail: 0, min: measured, max: measured, sum: 0, below: 0, above: 0 };
+          const g = measurementGroups[key];
+          g.count++;
+          g.sum += measured;
+          g.min = Math.min(g.min, measured);
+          g.max = Math.max(g.max, measured);
+          if (sResult === 'FAIL') g.fail++; else g.pass++;
+          if (Number.isFinite(Number(step?.min)) && measured < Number(step.min)) g.below++;
+          if (Number.isFinite(Number(step?.max)) && measured > Number(step.max)) g.above++;
+        }
+        if (sResult === 'PASS' || sResult === 'DONE') {
+          inc(topPasses, stepKey(step));
+          inc(passByStepType, String(step?.type || 'Step'));
+        }
+      }
+      if (!isPass(r)) {
+        const failedSteps = ((r as any).steps_log || []).filter((x: any) => String(x?.result || '').toUpperCase() === 'FAIL');
+        const source = failedSteps.length ? failedSteps : [{ step_id: '', type: r.recipe_name || 'FAIL generico', label: r.recipe_name || 'FAIL generico' }];
+        for (const failed of source) {
+          const key = stepKey(failed);
+          inc(topFailures, key);
+          inc(topComponents, componentKey(failed, r));
+          inc(topTestPoints, testPointKey(failed));
+          inc(failByStepType, String(failed?.type || 'FAIL generico'));
+          inc(failByDevice, String(failed?.measurement_device || failed?.device || 'N/D'));
+        }
+        const first = source[0] || {};
+        failureDetails.push({
+          timestamp: (r as any).timestamp || '',
+          serial: (r as any).serial_dut || '',
+          lot: (r as any).lot_number || (r as any).work_order || '',
+          recipe: (r as any).recipe_name || '',
+          result: resultOf(r),
+          step: stepKey(first),
+          component: componentKey(first, r),
+          testPoint: testPointKey(first),
+          measured: first?.measured,
+          min: first?.min,
+          max: first?.max,
+          unit: first?.unit || '',
+          operator: (r as any).operator || ''
+        });
       }
     }
-    const dailyTrend = Object.keys(byDay).sort().slice(-14).map(day => ({ day, ...byDay[day], yieldRate: byDay[day].total ? Number(((byDay[day].pass / byDay[day].total) * 100).toFixed(1)) : 0 }));
-    const topFailureList = Object.keys(topFailures).map(name => ({ name, count: topFailures[name] })).sort((a,b) => b.count - a.count).slice(0, 10);
+    for (const repair of repairRows) {
+      const note = String((repair as any).repair_note || '').trim();
+      const m = note.match(/\b(?:R|C|U|D|Q|L|J|TP|F|K|M)\d{1,5}\b/i);
+      if (m) inc(topComponents, m[0].toUpperCase());
+    }
+    const dailyTrend = Object.keys(byDay).sort().slice(-30).map(day => ({ day, ...byDay[day], yieldRate: byDay[day].total ? Number(((byDay[day].pass / byDay[day].total) * 100).toFixed(1)) : 0, failRate: byDay[day].total ? Number(((byDay[day].fail / byDay[day].total) * 100).toFixed(1)) : 0 }));
+    const topFailureList = top(topFailures, 12);
+    const topPassList = top(topPasses, 12);
+    const topComponentList = top(topComponents, 12);
+    const topTestPointList = top(topTestPoints, 12);
+    const measurementDistribution = Object.keys(measurementGroups).map(key => {
+      const g = measurementGroups[key];
+      return { name: g.name, unit: g.unit, count: g.count, pass: g.pass, fail: g.fail, min: Number(g.min.toFixed(4)), max: Number(g.max.toFixed(4)), avg: Number((g.sum / Math.max(1, g.count)).toFixed(4)), below: g.below, above: g.above, failRate: pct1(g.fail, g.count) };
+    }).sort((a,b) => b.failRate - a.failRate || b.count - a.count).slice(0, 16);
 
     // AT-MEC_HM_4.10I - KPI industriali aggiuntivi, calcolati solo sui report filtrati.
     // Non modifica il motore test: serve solo per dashboard/qualità.
@@ -271,9 +390,28 @@ export class LocalDatabase {
     const serialKeys = Object.keys(bySerial);
     let firstPass = 0;
     let serialsWithRetest = 0;
+    const serialTimelines = serialKeys.map(sn => {
+      const tests = bySerial[sn].slice().sort((a: any,b: any) => new Date(a.timestamp || 0).getTime() - new Date(b.timestamp || 0).getTime());
+      const repairs = repairRows.filter((x: any) => norm(x.serial_dut) === norm(sn));
+      const events = [
+        ...tests.map((x: any) => ({ type: 'TEST', timestamp: x.timestamp || '', result: resultOf(x), recipe: x.recipe_name || '', lot: x.lot_number || x.work_order || '', operator: x.operator || '' })),
+        ...repairs.map((x: any) => ({ type: 'REPAIR', timestamp: x.timestamp || '', result: 'REPAIR', recipe: '', lot: x.lot_number || x.work_order || '', operator: x.operator || '', note: x.repair_note || '' }))
+      ].sort((a: any,b: any) => new Date(a.timestamp || 0).getTime() - new Date(b.timestamp || 0).getTime());
+      const latest = events[events.length - 1] || null;
+      return {
+        serial: sn,
+        totalTests: tests.length,
+        pass: tests.filter(isPass).length,
+        fail: tests.filter(isFail).length,
+        retest: tests.length > 1,
+        latestResult: latest?.result || '',
+        latestAt: latest?.timestamp || '',
+        events
+      };
+    }).sort((a: any,b: any) => new Date(b.latestAt || 0).getTime() - new Date(a.latestAt || 0).getTime()).slice(0, 20);
     for (const sn of serialKeys) {
       const list = bySerial[sn].slice().sort((a: any,b: any) => new Date(a.timestamp || 0).getTime() - new Date(b.timestamp || 0).getTime());
-      if (String(list[0]?.final_result || '').toUpperCase() === 'PASS') firstPass++;
+      if (isPass(list[0])) firstPass++;
       if (list.length > 1) serialsWithRetest++;
     }
     const fpyRate = serialKeys.length ? Number(((firstPass / serialKeys.length) * 100).toFixed(1)) : 0;
@@ -283,7 +421,27 @@ export class LocalDatabase {
     const latestReport = reports.slice().sort((a: any,b: any) => new Date(b.timestamp || 0).getTime() - new Date(a.timestamp || 0).getTime())[0] || null;
 
     const recentReports = reports.slice(-20).reverse();
-    return { dbPath: this.dbPath, total, pass, fail, repairCount, yieldRate, fpyRate, retestRate, avgTestTimeSec, uniqueSerials: serialKeys.length, latestReport, byRecipe, dailyTrend, topFailures: topFailureList, recentReports, repairRecords: this.read().repairs.slice(-20).reverse(), recipeCount: this.listRecipes().length, revisionCount: this.read().recipes.length };
+    const failAnalysis = {
+      totalFail: fail,
+      stopped,
+      failRate: pct1(fail, total),
+      affectedSerials: serialKeys.filter(sn => bySerial[sn].some(isFail)).length,
+      topFailures: topFailureList,
+      topComponents: topComponentList,
+      topTestPoints: topTestPointList,
+      byStepType: top(failByStepType, 10),
+      byDevice: top(failByDevice, 10),
+      details: failureDetails.sort((a: any,b: any) => new Date(b.timestamp || 0).getTime() - new Date(a.timestamp || 0).getTime()).slice(0, 30)
+    };
+    const passAnalysis = {
+      totalPass: pass,
+      passRate: pct1(pass, total),
+      firstPassSerials: firstPass,
+      topPassedChecks: topPassList,
+      byStepType: top(passByStepType, 10),
+      stableRecipes: Object.keys(byRecipe).map(name => ({ name, total: byRecipe[name].total, pass: byRecipe[name].pass, fail: byRecipe[name].fail, yieldRate: pct1(byRecipe[name].pass, byRecipe[name].total) })).sort((a,b) => b.yieldRate - a.yieldRate || b.total - a.total).slice(0, 10)
+    };
+    return { dbPath: this.dbPath, total, pass, fail, stopped, repairCount, yieldRate, fpyRate, retestRate, avgTestTimeSec, uniqueSerials: serialKeys.length, latestReport, byRecipe, byOperator, byStation, dailyTrend, topFailures: topFailureList, topPasses: topPassList, topComponents: topComponentList, topTestPoints: topTestPointList, failAnalysis, passAnalysis, measurementDistribution, serialTimelines, recentReports, repairRecords: repairRows.slice(-20).reverse(), recipeCount: this.listRecipes().length, revisionCount: db.recipes.length };
   }
 
 

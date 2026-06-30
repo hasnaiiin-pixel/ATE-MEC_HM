@@ -1,0 +1,180 @@
+<div id="ai-copilot-tab" class="tab-content enterprise422-page ai76-page">
+  <div class="enterprise422-hero ai76-hero">
+    <div>
+      <div class="enterprise422-eyebrow">AT-MEC_HM_8.0_AI_READY_ENTERPRISE_STABLE</div>
+      <h2>🤖 AI Copilot Center</h2>
+      <p>Menu dedicato AI: analisi locale/read-only sopra moduli esistenti. Non crea nuove Traceability, Repair, Analytics, MES, Factory o Work Orders.</p>
+    </div>
+    <div class="enterprise422-score" id="ai76-page-score">AI</div>
+  </div>
+
+  <section id="enterprise76-ai-card" class="enterprise422-card enterprise422-wide enterprise76-ai-card">
+    <div class="enterprise76-head">
+      <div>
+        <h3>🤖 AI Copilot 8.0 — AI Ready Enterprise Stable</h3>
+        <p class="hint">AI Copilot completo, provider sicuro, approvazioni manuali e readiness score finale. Nessuna azione automatica su ricette, WO, utenti, test o hardware.</p>
+        <div id="ai76-meta">AI Copilot non ancora analizzato.</div>
+        <div id="ai76-ui-status" class="ai76-ui-status">Pronto. Premi un pulsante AI.</div>
+      </div>
+      <div class="row wrap">
+        <button class="btn btn-primary" data-ai-main="complete" onclick="runAiCompleteAnalysis762()">Analisi completa</button>
+        <button class="btn btn-ghost" data-ai-main="context" onclick="runAiLocalAnalysis76()">Solo contesto</button>
+        <button class="btn btn-ghost" data-ai-main="prompt" onclick="createAiPrompt76()">Crea prompt AI</button>
+        <button class="btn btn-ghost" data-ai-main="prompt" onclick="copyAiPrompt76()">Copia prompt</button>
+        <button class="btn btn-ghost" onclick="exportAiContext76()">Esporta contesto</button>
+        <button class="btn btn-success" onclick="exportAiCompleteReport762()">Esporta report completo</button>
+      </div>
+    </div>
+    <div class="enterprise76-scoreline">
+      <div class="enterprise76-scorebox"><div><span>AI readiness</span><b id="ai76-score">--%</b></div></div>
+      <div id="ai76-context-grid" class="ai76-context-grid"><div class="hint">Premi Analizza contesto.</div></div>
+    </div>
+  </section>
+
+
+
+  <section id="ai80-status-center" class="enterprise422-card enterprise422-wide enterprise76-ai-card ai80-ready-card">
+    <div class="enterprise76-head">
+      <div>
+        <h3>🚀 AI Ready 8.0 — Status Center finale</h3>
+        <p class="hint">Consolidamento finale AI: readiness score, safe mode, provider, approvazioni, dati disponibili e report unico. Nessuna pagina business duplicata.</p>
+      </div>
+      <div class="row wrap">
+        <button class="btn btn-success" data-ai-main="ready" onclick="runAiReady80()">Aggiorna AI Ready 8.0</button>
+        <button class="btn btn-ghost" onclick="exportAiReadyReport80()">Esporta AI Ready report</button>
+      </div>
+    </div>
+    <div class="ai80-ready-top">
+      <div class="ai80-ready-score"><div><span>AI Ready</span><b id="ai80-readiness-score">--%</b></div></div>
+      <div id="ai80-status-grid" class="ai80-status-grid"><div class="hint">Premi Aggiorna AI Ready 8.0.</div></div>
+    </div>
+    <div class="ai80-ready-grid">
+      <div class="ai80-ready-panel">
+        <h4>✅ Controlli readiness</h4>
+        <div id="ai80-readiness-details" class="ai80-readiness-details"><div class="hint">Nessun controllo eseguito.</div></div>
+      </div>
+      <div class="ai80-ready-panel">
+        <h4>🛡️ Safe Mode + Report finale</h4>
+        <div id="ai80-safe-mode-summary" class="ai80-safe-mode-summary"><div class="hint">Safe mode in attesa di aggiornamento.</div></div>
+        <div id="ai80-final-report-preview" class="ai80-final-report-preview"><div class="hint">Report finale non ancora generato.</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="enterprise422-card enterprise422-wide enterprise76-ai-card ai762-complete-card">
+    <div class="enterprise76-head">
+      <div>
+        <h3>✅ AI Complete 8.0 — Matrice, anti-doppioni, provider e approvazioni</h3>
+        <p class="hint">Questa sezione non crea nuovi moduli. Controlla maturità dei moduli esistenti, possibili doppioni runtime/menu e qualità del contesto AI.</p>
+      </div>
+      <div class="row wrap">
+        <button class="btn btn-primary" data-ai-main="complete" onclick="runAiCompleteAnalysis762()">Aggiorna tutto</button>
+        <button class="btn btn-ghost" data-ai-main="prompt" onclick="copyAiPrompt76()">Copia prompt completo</button>
+      </div>
+    </div>
+    <div class="ai762-complete-grid">
+      <div class="ai762-panel">
+        <h4>📌 Matrice moduli AI</h4>
+        <div id="ai762-readiness-matrix" class="ai762-matrix"><div class="hint">Premi Analisi completa.</div></div>
+      </div>
+      <div class="ai762-panel">
+        <h4>🧹 Anti-doppioni runtime</h4>
+        <div id="ai762-duplication-guard" class="ai762-guard"><div class="hint">Premi Analisi completa.</div></div>
+      </div>
+    </div>
+    <div class="ai762-complete-grid ai762-complete-grid-bottom">
+      <div class="ai762-panel">
+        <h4>📊 Sintesi qualità dati</h4>
+        <div id="ai762-quality-summary" class="ai762-quality"><div class="hint">Premi Analisi completa.</div></div>
+      </div>
+      <div class="ai762-panel">
+        <h4>📄 Preview report AI</h4>
+        <div id="ai762-report-preview" class="ai762-report-preview"><div class="hint">Premi Analisi completa.</div></div>
+      </div>
+    </div>
+    <div class="ai771-roadmap-wrap">
+      <h4>🚦 Roadmap AI ridotta — stato verso 8.0</h4>
+      <div id="ai771-roadmap-readiness" class="ai771-roadmap-readiness"><div class="hint">Premi Analisi completa per vedere cosa manca prima di 8.0 AI Ready.</div></div>
+    </div>
+  </section>
+
+  <section class="enterprise422-card enterprise422-wide enterprise76-ai-card ai76-workbench-card">
+    <div class="enterprise76-head">
+      <div>
+        <h3>🧠 AI Workbench — Suggerimenti senza azioni automatiche</h3>
+        <p class="hint">Le analisi sotto leggono i dati disponibili e producono solo suggerimenti/prompt. Nessuna ricetta, WO, utente, test o hardware viene modificato.</p>
+      </div>
+      <div class="row wrap">
+        <button class="btn btn-primary" data-ai-action="production" onclick="runAiProductionAdvisor76()">Produzione / WO</button>
+        <button class="btn btn-ghost" data-ai-action="fail" onclick="runAiFailAdvisor76()">FAIL / Qualità</button>
+        <button class="btn btn-ghost" data-ai-action="recipe" onclick="runAiRecipeAdvisor76()">Review ricetta</button>
+        <button class="btn btn-success" data-ai-action="plan" onclick="createAiActionPlan76()">Crea piano azione</button>
+        <button class="btn btn-ghost" onclick="exportAiFullReport76()">Esporta report AI</button>
+      </div>
+    </div>
+    <div class="ai76-workbench-grid">
+      <div class="ai76-workbench-panel">
+        <h4>🏭 Produzione / WO</h4>
+        <div id="ai76-production-insights" class="ai76-mini-list"><div class="hint">Premi Produzione / WO.</div></div>
+      </div>
+      <div class="ai76-workbench-panel">
+        <h4>🧪 FAIL / Qualità</h4>
+        <div id="ai76-fail-insights" class="ai76-mini-list"><div class="hint">Premi FAIL / Qualità.</div></div>
+      </div>
+      <div class="ai76-workbench-panel">
+        <h4>🧾 Ricetta / Step</h4>
+        <div id="ai76-recipe-insights" class="ai76-mini-list"><div class="hint">Premi Review ricetta.</div></div>
+      </div>
+    </div>
+    <div class="ai76-action-plan-wrap">
+      <h4>📌 Piano azione AI locale</h4>
+      <div id="ai76-action-plan" class="ai76-action-plan"><div class="hint">Premi Crea piano azione.</div></div>
+    </div>
+  </section>
+
+  <section class="enterprise422-card enterprise422-wide enterprise76-ai-card">
+    <div class="enterprise76-grid">
+      <div>
+        <h4>Insight AI locali / anti-doppioni</h4>
+        <div id="ai76-insights" class="ai76-insights"><div class="hint">Nessuna analisi eseguita.</div></div>
+      </div>
+      <div>
+        <h4>Provider AI sicuro</h4>
+        <div id="ai76-provider-meta">Provider spento · local rules</div>
+        <div class="ai76-provider-grid">
+          <label class="ai76-provider-toggle"><input id="ai76-provider-enabled" type="checkbox"> Abilita provider esterno</label>
+          <label>Tipo provider<select id="ai76-provider-type"><option value="local_rules">Local rules / offline</option><option value="openai_compatible">OpenAI compatible</option><option value="custom_rest">Custom REST</option></select></label>
+          <label>Endpoint<input id="ai76-provider-endpoint" placeholder="https://... opzionale"></label>
+          <label>Modello<input id="ai76-provider-model" placeholder="es. gpt / local model"></label>
+          <label>API key sessione<input id="ai77-provider-api-key" type="password" autocomplete="off" placeholder="non esportata, solo sessione corrente"></label>
+          <label>Modalità<select id="ai76-action-mode"><option value="read_only">Solo lettura</option><option value="suggest_only">Suggerisci azioni</option><option value="confirm_each_action">Conferma ogni azione</option></select></label>
+          <button class="btn btn-success" data-ai-main="provider" onclick="saveAiProviderSettings77()">Salva impostazioni AI</button>
+          <button class="btn btn-ghost" data-ai-main="provider" onclick="testAiProvider77()">Test provider</button>
+          <button class="btn btn-primary" data-ai-main="provider" onclick="generateAiProviderAnswer77()">Genera risposta AI</button>
+          <button class="btn btn-warn" data-ai-main="approvals" onclick="buildAiApprovalQueue77()">Crea coda approvazioni</button>
+        </div>
+        <p class="ai76-note">Regola 8.0: AI può chiamare un provider solo su comando operatore. Le azioni restano in coda approvazione e non modificano automaticamente dati o ricette.</p>
+      </div>
+    </div>
+    <div id="ai77-provider-status" class="ai77-provider-status">Provider AI non testato. Modalità sicura attiva.</div>
+    <div class="ai77-provider-result-wrap">
+      <h4>🔐 Provider AI 8.0 — risposta controllata</h4>
+      <div id="ai77-provider-result" class="ai77-provider-result"><div class="hint">Usa Test provider oppure Genera risposta AI. L'invio dati avviene solo dopo conferma operatore.</div></div>
+    </div>
+    <div class="ai77-approval-wrap">
+      <div class="enterprise76-head ai77-approval-head">
+        <div>
+          <h4>✅ Coda approvazioni manuali</h4>
+          <p class="hint">I suggerimenti AI vengono trasformati in richieste approvazione. Approva/rifiuta registra solo la decisione; non modifica ricette, WO, utenti, test o hardware.</p>
+        </div>
+        <div class="row wrap">
+          <button class="btn btn-primary" data-ai-main="approvals" onclick="buildAiApprovalQueue77()">Aggiorna coda</button>
+          <button class="btn btn-ghost" onclick="exportAiApprovals77()">Esporta coda</button>
+        </div>
+      </div>
+      <div id="ai77-approval-queue" class="ai77-approval-queue"><div class="hint">Premi Crea coda approvazioni.</div></div>
+    </div>
+    <h4>Prompt AI controllato</h4>
+    <textarea id="ai76-prompt" class="ai76-prompt" readonly placeholder="Qui viene generato il prompt sicuro con contesto locale e regole anti-duplicazione."></textarea>
+  </section>
+</div>

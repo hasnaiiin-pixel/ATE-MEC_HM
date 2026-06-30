@@ -23,7 +23,14 @@ export interface TestStep {
   device_mapping: string;
   label?: string;
   description?: string;
+  component?: string;
+  component_name?: string;
+  refdes?: string;
+  test_point?: string;
+  testPoint?: string;
+  tp?: string;
   io_type?: 'DI' | 'DO' | 'AI' | 'AO' | 'SCPI' | 'SYSTEM' | 'FW';
+  device?: string;
   channel?: number;
   value?: any;
   min?: number;
@@ -245,6 +252,11 @@ export class RecipeEngine {
       reportSteps.push({
         step_id: step.step_id,
         type: step.type,
+        label: step.label || step.description || '',
+        component: step.component || step.component_name || step.refdes || '',
+        test_point: step.test_point || step.testPoint || step.tp || '',
+        device: step.device_mapping || step.device || step.io_type || stepResult.measurement_device || '',
+        channel: step.channel,
         measured: stepResult.measured,
         measurement_source: stepResult.measurement_source,
         measurement_device: stepResult.measurement_device,
@@ -806,4 +818,3 @@ export class RecipeEngine {
     return `${name}${step.type} su ${step.device_mapping}.`;
   }
 }
-

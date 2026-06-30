@@ -1,0 +1,206 @@
+/* AT-MEC_HM 6.8A - safe Test Mode visual polish.
+   Loaded after all Test Mode overrides; no hardware/test-engine logic here. */
+body.atmec66e-modern-testmode #production-test-mode{
+  --atmec68-line:rgba(103,232,249,.24);
+  --atmec68-panel:linear-gradient(180deg,rgba(8,15,31,.86),rgba(5,15,27,.68));
+  --atmec68-glow:0 0 22px rgba(34,211,238,.16);
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-panel{
+  border-color:rgba(103,232,249,.18)!important;
+  background:radial-gradient(circle at top left,rgba(34,211,238,.08),transparent 34%),var(--atmec68-panel)!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-operator-bar{
+  margin-bottom:8px!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-timing-strip{
+  display:grid!important;
+  grid-template-columns:1fr 1fr 1fr!important;
+  gap:8px!important;
+  margin:6px 0 8px!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-time-cell{
+  min-height:46px!important;
+  border-radius:10px!important;
+  border:1px solid rgba(103,232,249,.18)!important;
+  background:linear-gradient(180deg,rgba(15,23,42,.80),rgba(2,6,23,.50))!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.04)!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-time-cell label{
+  color:#93c5fd!important;
+  font-size:9.5px!important;
+  letter-spacing:.08em!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-time-cell b{
+  color:#f8fafc!important;
+  font-size:18px!important;
+}
+body.atmec66e-modern-testmode #production-test-mode #prod-status-banner{
+  min-height:64px!important;
+  margin:8px 0!important;
+  border-radius:14px!important;
+  font-size:clamp(22px,2.4vw,36px)!important;
+  letter-spacing:.08em!important;
+  background:linear-gradient(90deg,rgba(12,74,110,.74),rgba(8,145,178,.46),rgba(12,74,110,.74))!important;
+  border:2px solid rgba(125,211,252,.58)!important;
+  color:#e0f2fe!important;
+  text-shadow:0 2px 12px rgba(0,0,0,.62)!important;
+  box-shadow:0 0 26px rgba(34,211,238,.22),inset 0 0 20px rgba(14,165,233,.10)!important;
+}
+body.atmec66e-modern-testmode #production-test-mode #prod-status-banner.todo{
+  background:linear-gradient(90deg,rgba(30,41,59,.88),rgba(51,65,85,.64),rgba(30,41,59,.88))!important;
+  border-color:rgba(148,163,184,.44)!important;
+  color:#e2e8f0!important;
+}
+body.atmec66e-modern-testmode #production-test-mode #prod-status-banner.running{
+  background:linear-gradient(90deg,rgba(8,47,73,.92),rgba(14,165,233,.44),rgba(8,47,73,.92))!important;
+  border-color:rgba(125,211,252,.70)!important;
+  color:#f0f9ff!important;
+}
+body.atmec66e-modern-testmode #production-test-mode #prod-status-banner.pass{
+  background:linear-gradient(90deg,rgba(20,83,45,.92),rgba(34,197,94,.44),rgba(20,83,45,.92))!important;
+  border-color:rgba(134,239,172,.72)!important;
+  color:#dcfce7!important;
+}
+body.atmec66e-modern-testmode #production-test-mode #prod-status-banner.fail{
+  background:linear-gradient(90deg,rgba(127,29,29,.92),rgba(239,68,68,.48),rgba(127,29,29,.92))!important;
+  border-color:rgba(252,165,165,.78)!important;
+  color:#fee2e2!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-primary-actions-inline{
+  display:grid!important;
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  gap:10px!important;
+  margin:8px 0!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-main-action{
+  min-height:48px!important;
+  border-radius:12px!important;
+  font-size:14px!important;
+  letter-spacing:.02em!important;
+  box-shadow:0 12px 26px rgba(0,0,0,.20),inset 0 1px 0 rgba(255,255,255,.10)!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-main-action .action-ico{
+  font-size:18px!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-current-step.atmec66e-fix1c-step-col,
+body.atmec66e-modern-testmode #production-test-mode #prod-sequence-log.atmec66e-fix1c-log-col{
+  border-color:rgba(103,232,249,.18)!important;
+  box-shadow:var(--atmec68-glow)!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .atmec66e-step-card-head{
+  color:#67e8f9!important;
+}
+body.atmec66e-modern-testmode #production-test-mode #prod-current-step{
+  color:#f8fafc!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-progress-wrap{
+  border-color:rgba(103,232,249,.18)!important;
+  background:rgba(15,23,42,.52)!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-progress-fill{
+  background:linear-gradient(90deg,#06b6d4,#22c55e)!important;
+  box-shadow:0 0 16px rgba(34,211,238,.36)!important;
+}
+@media(max-width:980px){
+  body.atmec66e-modern-testmode #production-test-mode .prod-primary-actions-inline,
+  body.atmec66e-modern-testmode #production-test-mode .prod-timing-strip{
+    grid-template-columns:1fr!important;
+  }
+}
+
+/* AT-MEC_HM 6.8B - operator readability and panel order refinement. */
+body.atmec66e-modern-testmode #production-test-mode .prod-recipe-compact-row{
+  gap:7px!important;
+  margin:6px 0!important;
+  align-items:end!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-select-cell{
+  min-height:48px!important;
+  border-color:rgba(103,232,249,.16)!important;
+  background:rgba(15,23,42,.56)!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-select-cell label{
+  color:#93c5fd!important;
+  font-size:9.5px!important;
+  letter-spacing:.08em!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-select-cell input,
+body.atmec66e-modern-testmode #production-test-mode .prod-select-cell select{
+  min-height:30px!important;
+  height:30px!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-main-split-221.atmec66e-fix1c-main-split{
+  grid-template-columns:minmax(330px,.92fr) minmax(420px,1.08fr)!important;
+  gap:10px!important;
+  margin-top:7px!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-current-step.atmec66e-fix1c-step-col{
+  border-radius:14px!important;
+  padding:10px!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-current-step.atmec66e-fix1c-step-col .label,
+body.atmec66e-modern-testmode #production-test-mode .atmec66e-step-card-head span{
+  color:#67e8f9!important;
+  font-size:11px!important;
+  letter-spacing:.10em!important;
+}
+body.atmec66e-modern-testmode #production-test-mode #prod-current-step{
+  font-size:clamp(18px,1.5vw,25px)!important;
+  line-height:1.1!important;
+  margin-bottom:8px!important;
+}
+body.atmec66e-modern-testmode #production-test-mode #prod-live-measure-panel{
+  border-radius:12px!important;
+  border-color:rgba(103,232,249,.18)!important;
+  background:rgba(2,6,23,.38)!important;
+}
+body.atmec66e-modern-testmode #production-test-mode #prod-live-measure-panel .live-title{
+  color:#bae6fd!important;
+  letter-spacing:.08em!important;
+}
+body.atmec66e-modern-testmode #production-test-mode #prod-live-measure-panel .live-value{
+  color:#f8fafc!important;
+  text-shadow:0 0 12px rgba(34,211,238,.22)!important;
+}
+body.atmec66e-modern-testmode #production-test-mode #prod-sequence-log{
+  border-radius:14px!important;
+  padding:8px!important;
+  background:rgba(2,6,23,.36)!important;
+}
+body.atmec66e-modern-testmode #production-test-mode #prod-sequence-log .prod-seq-row,
+body.atmec66e-modern-testmode #production-test-mode #prod-sequence-log .atmec66e-log-row{
+  min-height:34px!important;
+  border-radius:10px!important;
+  align-items:center!important;
+}
+body.atmec66e-modern-testmode #production-test-mode #prod-sequence-log .prod-seq-num{
+  min-width:34px!important;
+  text-align:center!important;
+  color:#67e8f9!important;
+}
+body.atmec66e-modern-testmode #production-test-mode #prod-sequence-log .prod-seq-step,
+body.atmec66e-modern-testmode #production-test-mode #prod-sequence-log .prod-seq-mode{
+  text-align:left!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .tm-label-panel420{
+  border-color:rgba(103,232,249,.16)!important;
+  background:rgba(15,23,42,.50)!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-progress-head{
+  color:#bfdbfe!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-progress-head b{
+  color:#67e8f9!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-kpis{
+  gap:8px!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-kpi{
+  border-color:rgba(103,232,249,.16)!important;
+  background:rgba(15,23,42,.50)!important;
+}
+@media(max-width:1180px){
+  body.atmec66e-modern-testmode #production-test-mode .prod-main-split-221.atmec66e-fix1c-main-split{
+    grid-template-columns:1fr!important;
+  }
+}

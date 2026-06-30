@@ -1,7 +1,7 @@
 {
-  "name": "at-mec-hm-6-7o-test-mode-switch-alignment-fix",
-  "version": "6.7O_TEST_MODE_SWITCH_ALIGNMENT_FIX",
-  "description": "AT-MEC_HM_6.7O_TEST_MODE_SWITCH_ALIGNMENT_FIX",
+  "name": "at-mec-hm-8-0-ai-ready-enterprise-stable",
+  "version": "8.0.0",
+  "description": "AT-MEC_HM_8.0_AI_READY_ENTERPRISE_STABLE",
   "main": "dist/main/main.js",
   "scripts": {
     "build": "tsc",
@@ -35,11 +35,14 @@
     "db:backup-sqlite": "node scripts/sqlite_enterprise_66c.js backup",
     "db:performance": "node scripts/sqlite_enterprise_66c.js performance",
     "db:cleanup-report": "node scripts/sqlite_enterprise_66c.js cleanup",
-    "db:enterprise-status": "node scripts/sqlite_enterprise_66c.js status"
+    "db:enterprise-status": "node scripts/sqlite_enterprise_66c.js status",
+    "cleanup:audit": "node scripts/cleanup_audit_75.js",
+    "runtime:validate": "node scripts/runtime_validate_80.js",
+    "startup:doctor": "node scripts/startup_doctor_80.js"
   },
   "build": {
     "appId": "com.atemec.platform",
-    "productName": "ATE-MEC HM 6.7O TEST MODE SWITCH ALIGNMENT FIX",
+    "productName": "ATE-MEC HM 8.0 AI READY ENTERPRISE STABLE",
     "directories": {
       "output": "dist_installer"
     },
@@ -49,14 +52,14 @@
         "portable"
       ],
       "icon": "assets/icon.ico",
-      "shortcutName": "ATE-MEC HM 6.7O TEST MODE SWITCH ALIGNMENT FIX"
+      "shortcutName": "ATE-MEC HM 8.0 AI READY ENTERPRISE STABLE"
     },
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "ATE-MEC HM 6.7O TEST MODE SWITCH ALIGNMENT FIX"
+      "shortcutName": "ATE-MEC HM 8.0 AI READY ENTERPRISE STABLE"
     },
     "files": [
       "dist/**/*",
@@ -94,7 +97,7 @@
     "typescript": "^5.4.5",
     "wait-on": "^9.0.10"
   },
-  "productName": "ATE-MEC HM 6.7O TEST MODE SWITCH ALIGNMENT FIX",
+  "productName": "ATE-MEC HM 8.0 AI READY ENTERPRISE STABLE",
   "optionalDependencies": {
     "better-sqlite3": "^11.8.1"
   }

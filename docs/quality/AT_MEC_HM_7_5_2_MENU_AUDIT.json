@@ -1,0 +1,21 @@
+{
+  "version": "AT-MEC_HM_7.5.2_CLEAN_BASELINE_VALIDATED",
+  "createdAt": "2026-06-30T05:53:31.973Z",
+  "primaryMenu": [
+    "Test Mode",
+    "Ricette & Step",
+    "Traceability / Storico",
+    "Repair Center",
+    "Analytics Center",
+    "Hardware & Strumenti",
+    "Enterprise Clean Baseline 7.5.2",
+    "Impostazioni"
+  ],
+  "hiddenDuplicates": [
+    "Database / KPI",
+    "Analisi Produzione",
+    "Product Master legacy 6.0",
+    "Firmware/Revisions legacy 6.1"
+  ],
+  "result": "OK"
+}

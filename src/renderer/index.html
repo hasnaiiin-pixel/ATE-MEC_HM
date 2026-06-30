@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: file:; media-src 'self' blob: file:;">
-<title>ATE-MEC HM 6.7O TEST MODE SWITCH ALIGNMENT FIX</title>
+  <title>ATE-MEC HM 8.0 AI READY ENTERPRISE STABLE</title>
 <link rel="stylesheet" href="css/app.css">
 <link rel="stylesheet" href="css/modules/17-repository-center.css">
 </head>
@@ -19,7 +19,7 @@
   <div class="login-card">
     <img id="login-large-logo" class="login-hero-logo" title="Logo aziendale">
     <div class="login-brand">
-      <div><div class="login-title">ATE-MEC HM 6.7O TEST MODE SWITCH ALIGNMENT FIX</div><div class="login-sub">Production Test & Traceability Suite</div></div>
+      <div><div class="login-title">ATE-MEC HM 8.0 AI READY ENTERPRISE STABLE</div><div class="login-sub">Production Test & Traceability Suite</div></div>
     </div>
     <div class="col"><label>Utente disponibile</label><select id="op-name" class="login-user-select"><option value="Operatore">Operatore</option></select></div>
     <div class="col"><label>Password</label><input id="op-password" type="password" placeholder="Password"></div>
@@ -33,7 +33,7 @@
 
 <div id="topbar">
   <img id="app-large-logo" class="app-logo-large"><div class="app-brand-pro"><span class="logo" id="app-title-logo">ATE-MEC HM</span><span class="app-subtitle-pro">Production Test & Traceability Suite</span></div>
-  <span class="ver">6.7O_SWITCH_ALIGNMENT_FIX</span>
+  <span class="ver">8.0_AI_READY_ENTERPRISE_STABLE</span>
   <div id="hw-badges" style="display:flex;gap:6px;"></div>
   <span class="spacer"></span>
   <button class="btn btn-success btn-xs chrome-toggle" onclick="goDashboard63C()" title="Torna alla Dashboard">🏠 Dashboard</button>
@@ -207,7 +207,7 @@
   <div id="sidebar">
     <div class="section-title">🏭 Banco prova</div>
     <div class="side-card">
-      <div style="font-size:17px;font-weight:900;color:var(--accent);letter-spacing:1px;">ATE-MEC HM 6.7O TEST MODE SWITCH ALIGNMENT FIX</div>
+      <div style="font-size:17px;font-weight:900;color:var(--accent);letter-spacing:1px;">ATE-MEC HM 8.0 AI READY ENTERPRISE STABLE</div>
       <div id="logged-user-box" class="hint">Accesso non effettuato</div>
       <button class="btn btn-ghost btn-sm side-nav-btn" onclick="showTab('operator-profile-tab', null); refreshOperatorProfile413O()">👤 Profilo collaboratore</button>
       <button class="btn btn-ghost btn-sm side-nav-btn" onclick="logoutAndLock()">🔒 Logout / cambia utente</button>
@@ -222,7 +222,7 @@
         <button class="btn btn-ghost btn-sm side-nav-btn submenu-btn" onclick="showMultiStationMonitor63C()">🖥️ Multi Station Monitor</button>
         <button class="btn btn-ghost btn-sm side-nav-btn submenu-btn" onclick="showSupervisorDashboard63D()">📡 Supervisor Dashboard</button>
         <button class="btn btn-ghost btn-sm side-nav-btn submenu-btn" onclick="showTab('factory-core-tab', null); loadFactoryEnterprise418B()">🏭 Factory Enterprise</button>
-        <!-- 6.7B_FIX1: moduli legacy Work Orders/Product Master e Firmware/Revisioni nascosti dal menu per evitare doppioni.
+        <!-- 7.5 CLEAN: moduli legacy Work Orders/Product Master 6.0 e Firmware/Revisioni 6.1 decommissionati dal runtime per evitare doppioni.
              Sorgenti uniche: Master Data Enterprise + Work Orders / MES Ready. -->
       </details>
       <details class="nav-group" open><summary>🧾 Ricette <span>▾</span></summary>
@@ -241,15 +241,19 @@
         <button class="btn btn-ghost btn-sm side-nav-btn submenu-btn" onclick="showTab('traceability-tab', null); initTraceabilitySerialPage()">🔎 Storico Seriali</button>
         <button class="btn btn-ghost btn-sm side-nav-btn submenu-btn" onclick="showRepairCenter65A()">🛠 Repair Center</button>
         <button class="btn btn-ghost btn-sm side-nav-btn submenu-btn" onclick="showTab('unit-card-tab', null); initUnitCardPage410E()">🧬 Scheda Unità</button>
-        <button class="btn btn-ghost btn-sm side-nav-btn submenu-btn" onclick="showTab('database-tab', null); loadDatabaseDashboard()">📊 Database / KPI</button>
-        <button class="btn btn-ghost btn-sm side-nav-btn submenu-btn" onclick="showTab('production-analysis-tab', null); loadProductionAnalysisDashboard412A()">📈 Analisi Produzione</button>
         <button class="btn btn-ghost btn-sm side-nav-btn submenu-btn" onclick="showTab('analytics-center-tab', null); loadAnalyticsCenter419B2()">📊 Analytics Center</button>
+      </details>
+      <details class="nav-group" open><summary>🤖 AI Copilot <span>▾</span></summary>
+        <button class="btn btn-primary btn-sm side-nav-btn submenu-btn" onclick="showAiCopilot76()">🤖 AI Copilot Center</button>
+        <button class="btn btn-success btn-sm side-nav-btn submenu-btn" onclick="showAiReady80()">🚀 AI Ready 8.0</button>
+        <button class="btn btn-ghost btn-sm side-nav-btn submenu-btn" onclick="showAiCopilot76(); setTimeout(runAiCompleteAnalysis762,300)">🧠 Analisi completa AI</button>
+        <button class="btn btn-ghost btn-sm side-nav-btn submenu-btn" onclick="showAiCopilot76(); setTimeout(function(){ if(window.showAiProviderApproval77) window.showAiProviderApproval77(); },300)">🔐 Provider & Approvazioni AI</button>
       </details>
       <details class="submenu-device" open><summary>🧰 Hardware / Strumenti <span>▾</span></summary>
         <button class="btn btn-ghost btn-sm side-nav-btn submenu-btn" onclick="showTab('device-tab', null); renderDeviceManagerPage413RA()">🧠 Device Manager</button>
         
         <button class="btn btn-ghost btn-sm side-nav-btn submenu-btn" onclick="showTab('pl303-tab', null); loadPl303Settings()">🔋 Alimentatore PL303</button>
-        <button class="btn btn-ghost btn-sm side-nav-btn submenu-btn" onclick="showTab('esp32-tab', document.querySelector('[data-tab=esp32]')); initEsp32ControlPage()">🧩 ESP32 Controller I/O</button>
+        <button class="btn btn-ghost btn-sm side-nav-btn submenu-btn" onclick="showTab('esp32-tab', document.querySelector('[data-tab=esp32]')); initEsp32ControlPage()">🧩 Industrial I/O Controller</button>
         <button class="btn btn-ghost btn-sm side-nav-btn submenu-btn" onclick="showTab('commhub-tab', null); initCommunicationHub()">💬 Communication Hub</button>
         <button class="btn btn-ghost btn-sm side-nav-btn submenu-btn" onclick="showTab('qr-tab', null); setTimeout(()=>document.getElementById('qr-manual-input-standalone')?.focus(),150)">▦ Scanner QR / Serial Number</button>
         <button class="btn btn-ghost btn-sm side-nav-btn submenu-btn" onclick="showTab('meter-tab', document.querySelector('[data-tab=meter]'))">📊 Keysight Multimetro</button>
@@ -266,7 +270,7 @@
         <button class="btn btn-ghost btn-sm side-nav-btn submenu-btn" onclick="showTab('data-archive-tab', null); loadDataArchiveDashboard412B()">🗄️ Archivio Dati</button>
         <button class="btn btn-ghost btn-sm side-nav-btn submenu-btn" onclick="showBackupRestore423C()">💾 Backup & Restore</button>
         <button class="btn btn-ghost btn-sm side-nav-btn submenu-btn" onclick="showAudioVoice421()">🔊🎤 Audio & Voice</button>
-        <button class="btn btn-ghost btn-sm side-nav-btn submenu-btn" onclick="showEnterpriseStable422()">🛡️ Enterprise Stable</button>
+        <button class="btn btn-ghost btn-sm side-nav-btn submenu-btn" onclick="showEnterpriseBackbone75()">🛡️ Enterprise Clean Baseline</button>
         <button class="btn btn-ghost btn-sm side-nav-btn submenu-btn" onclick="showTab('settings-tab', document.querySelector('[data-tab=settings]'))">⚙️ Configurazione</button>
       </details>
     </div>
@@ -327,12 +331,11 @@
     <!-- TAB: LABEL MANAGER 4.20A1 -->
     <div data-partial-mount="label-manager-tab" data-partial-src="partials/label-manager.html"></div>
     <div data-partial-mount="print-engine-tab" data-partial-src="partials/print-engine.html"></div>
-    <div data-partial-mount="work-order-product-tab" data-partial-src="partials/work-order-product-60.html"></div>
-    <div data-partial-mount="revision-firmware-tab" data-partial-src="partials/revision-firmware-61.html"></div>
     <div data-partial-mount="master-data-67a-tab" data-partial-src="partials/master-data-67a.html"></div>
     <div data-partial-mount="mes-ready-67b-tab" data-partial-src="partials/mes-ready-67b.html"></div>
     <div data-partial-mount="audio-voice-tab" data-partial-src="partials/audio-voice-421ab.html"></div>
     <div data-partial-mount="enterprise-stable-tab" data-partial-src="partials/enterprise-stable-422.html"></div>
+    <div data-partial-mount="ai-copilot-tab" data-partial-src="partials/ai-copilot-76.html"></div>
 
     <div data-partial-mount="repository-center-424a-tab" data-partial-src="partials/repository-center-424a.html"></div>
     <div data-partial-mount="production-execution-63a-tab" data-partial-src="partials/production-execution-63a.html"></div>
@@ -735,12 +738,16 @@
 <script src="js/modules/analytics/analytics-center-419b1.js"></script>
 <script src="js/modules/labels/label-manager-420a1.js"></script>
 <script src="js/modules/printers/print-engine-420a5.js"></script>
-<script src="js/modules/factory/work-order-product-60.js"></script>
-<script src="js/modules/factory/revision-firmware-61.js"></script>
 <script src="js/modules/factory/master-data-67a.js"></script>
 <script src="js/modules/factory/mes-ready-67b.js"></script>
 <script src="js/modules/audio/audio-voice-421ab.js"></script>
 <script src="js/modules/core/enterprise-stable-422.js"></script>
+<script src="js/modules/core/enterprise-backbone-73.js"></script>
+<script src="js/modules/core/enterprise-data-contract-74.js"></script>
+<script src="js/modules/core/enterprise-clean-baseline-75.js"></script>
+<script src="js/modules/ai/ai-copilot-76.js"></script>
+<script src="js/modules/ai/ai-provider-approval-77.js"></script>
+<script src="js/modules/ai/ai-ready-80.js"></script>
 <script src="js/modules/core/backup-restore-423c.js"></script>
 <script src="js/modules/repository/repository-center-424a.js"></script>
 <script src="js/modules/factory/production-execution-63a.js"></script>
@@ -751,8 +758,6 @@
 <script src="js/modules/ui/test-mode-start-workflow-66e-fix1e.js"></script>
 <script src="js/modules/factory/wo-start-integration-67b-fix2a.js"></script>
 <script src="js/modules/device-manager/device-manager-safe-67c.js"></script>
-<link rel="stylesheet" href="css/modules/15-work-order-product.css">
-<link rel="stylesheet" href="css/modules/16-revision-firmware.css">
 <link rel="stylesheet" href="css/modules/17-audio-voice.css">
 <link rel="stylesheet" href="css/modules/18-enterprise-stable.css">
 <link rel="stylesheet" href="css/modules/19-backup-restore.css">
@@ -767,6 +772,13 @@
 <link rel="stylesheet" href="css/modules/28-device-manager-safe.css">
 <link rel="stylesheet" href="css/layout-editor.css" data-source="atmec-layout-editor-398-style">
 <link rel="stylesheet" href="css/modules/29-test-mode-operator-flags.css">
+<link rel="stylesheet" href="css/modules/30-test-mode-polish-68.css">
+<link rel="stylesheet" href="css/modules/31-wo-production-69.css">
+<link rel="stylesheet" href="css/modules/32-enterprise-data-contract-74.css">
+<link rel="stylesheet" href="css/modules/33-enterprise-clean-baseline-75.css">
+<link rel="stylesheet" href="css/modules/34-ai-copilot-76.css">
+<link rel="stylesheet" href="css/modules/35-ai-provider-approval-77.css">
+<link rel="stylesheet" href="css/modules/36-ai-ready-80.css">
 <script src="js/layout-editor.js" data-source="atmec-layout-editor-398-script"></script>
 <script src="js/layout-editor-managers.js" data-source="atmec-layout-editor-managers-398"></script>
 <script src="js/version.js" data-source="atmec-version-script"></script>

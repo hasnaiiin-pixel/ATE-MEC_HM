@@ -1,0 +1,63 @@
+{
+  "version": "AT-MEC_HM_8.0_AI_READY_ENTERPRISE_STABLE",
+  "createdAt": "2026-06-30T11:09:21.085Z",
+  "checks": [
+    {
+      "label": "package.json presente",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "dist/main/main.js presente",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "src/renderer/index.html presente",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "AI Copilot script presente",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "AI Provider Approval script presente",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "AI Ready 8.0 script presente",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "AI Ready 8.0 CSS presente",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "node_modules presente",
+      "ok": true,
+      "detail": "se manca, eseguire INSTALLA prima o lasciare che AVVIA installi"
+    },
+    {
+      "label": "Electron binario presente",
+      "ok": true,
+      "detail": "se manca, eseguire npm install senza --ignore-scripts"
+    },
+    {
+      "label": "Porta 8080 libera oppure gestita",
+      "ok": true,
+      "detail": "porta libera"
+    },
+    {
+      "label": "IotServer startup-safe",
+      "ok": true,
+      "detail": "EADDRINUSE non deve chiudere app"
+    }
+  ],
+  "criticalMissing": false,
+  "electronMissing": false
+}

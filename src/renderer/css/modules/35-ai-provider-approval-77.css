@@ -1,0 +1,57 @@
+/* AT-MEC_HM 7.7 - AI Provider & Approval Safe */
+.ai77-provider-status{margin:12px 0 10px;border:1px solid rgba(96,165,250,.30);background:rgba(15,23,42,.58);border-radius:999px;padding:8px 12px;color:#dbeafe;font-size:12px;font-weight:900;display:inline-flex;align-items:center;gap:8px;}
+.ai77-provider-status.success{border-color:rgba(34,197,94,.42);background:rgba(22,101,52,.20);color:#dcfce7;}
+.ai77-provider-status.error{border-color:rgba(248,113,113,.48);background:rgba(127,29,29,.20);color:#fee2e2;}
+.ai77-provider-status.warn{border-color:rgba(245,158,11,.44);background:rgba(146,64,14,.18);color:#fef3c7;}
+.ai77-provider-result-wrap,.ai77-approval-wrap{margin-top:14px;border:1px solid rgba(148,163,184,.18);border-radius:16px;background:rgba(2,6,23,.34);padding:12px;}
+.ai77-provider-result-wrap h4,.ai77-approval-wrap h4{margin:0 0 10px;color:#dbeafe;font-size:14px;}
+.ai77-provider-result{border:1px solid rgba(148,163,184,.16);border-radius:14px;background:rgba(15,23,42,.48);padding:11px;min-height:58px;}
+.ai77-provider-answer b{display:block;color:#f8fafc;margin-bottom:8px;}
+.ai77-provider-answer pre{white-space:pre-wrap;word-break:break-word;margin:0;background:rgba(2,6,23,.72);border:1px solid rgba(148,163,184,.18);border-radius:12px;padding:10px;color:#dbeafe;font-family:Consolas,Monaco,monospace;font-size:12px;line-height:1.45;max-height:280px;overflow:auto;}
+.ai77-check-list{display:flex;flex-direction:column;gap:7px;}
+.ai77-check{display:grid;grid-template-columns:64px 1fr 1.2fr;gap:9px;align-items:center;border:1px solid rgba(148,163,184,.16);border-radius:12px;padding:8px 10px;background:rgba(2,6,23,.36);}
+.ai77-check b{border-radius:999px;padding:5px 7px;text-align:center;background:rgba(148,163,184,.14);font-size:10px;letter-spacing:.06em;}
+.ai77-check.ok{border-color:rgba(34,197,94,.28);}.ai77-check.warn{border-color:rgba(245,158,11,.40);}
+.ai77-check span{font-weight:900;color:#f8fafc;font-size:12px;}.ai77-check small{color:var(--text2);font-size:11px;}
+.ai77-approval-head{margin-bottom:10px;}
+.ai77-approval-queue{display:flex;flex-direction:column;gap:9px;}
+.ai77-approval-item{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;border:1px solid rgba(148,163,184,.18);border-radius:14px;background:rgba(15,23,42,.48);padding:11px 12px;}
+.ai77-approval-item b{display:block;font-size:13px;color:#f8fafc;}
+.ai77-approval-item small{display:block;margin-top:4px;color:var(--text2);font-size:11px;line-height:1.35;}
+.ai77-approval-item em{display:block;margin-top:5px;font-style:normal;color:#dbeafe;font-size:11px;line-height:1.35;}
+.ai77-approval-item.approved_no_runtime_change{border-color:rgba(34,197,94,.32);}
+.ai77-approval-item.rejected{border-color:rgba(248,113,113,.38);opacity:.78;}
+.ai77-approval-actions{display:flex;gap:7px;align-items:center;}
+.ai76-provider-grid button{min-height:36px;}
+#ai77-provider-api-key{font-family:Consolas,Monaco,monospace;}
+@media(max-width:900px){.ai77-check{grid-template-columns:1fr}.ai77-approval-item{grid-template-columns:1fr}.ai77-approval-actions{justify-content:flex-start;flex-wrap:wrap;}}
+
+/* AT-MEC_HM 7.7.1 - AI UX selection + approval persistence */
+[data-ai-action].ai76-action-selected,
+[data-ai-main].ai76-action-selected{
+  border-color:rgba(96,165,250,.78)!important;
+  background:linear-gradient(135deg,rgba(37,99,235,.72),rgba(79,70,229,.66))!important;
+  color:#f8fafc!important;
+  box-shadow:0 0 0 3px rgba(96,165,250,.18),0 12px 28px rgba(30,64,175,.22)!important;
+}
+.ai76-section-selected{
+  border-color:rgba(96,165,250,.72)!important;
+  box-shadow:0 0 0 3px rgba(96,165,250,.14),0 20px 52px rgba(15,23,42,.40)!important;
+}
+.ai771-roadmap-wrap{margin-top:14px;border:1px solid rgba(96,165,250,.22);border-radius:16px;background:rgba(15,23,42,.42);padding:12px;}
+.ai771-roadmap-wrap h4{margin:0 0 10px;font-size:14px;color:#dbeafe;letter-spacing:.02em;}
+.ai771-roadmap-readiness{display:grid;grid-template-columns:repeat(3,minmax(180px,1fr));gap:8px;}
+.ai771-roadmap-step{border:1px solid rgba(148,163,184,.18);border-radius:13px;background:rgba(2,6,23,.38);padding:9px 10px;min-width:0;}
+.ai771-roadmap-step b{display:inline-flex;align-items:center;justify-content:center;min-width:48px;border-radius:999px;padding:4px 8px;font-size:10px;letter-spacing:.06em;background:rgba(148,163,184,.16);color:#dbeafe;}
+.ai771-roadmap-step span{display:block;margin-top:6px;font-size:12px;font-weight:900;color:#f8fafc;}
+.ai771-roadmap-step small{display:block;margin-top:3px;font-size:11px;color:var(--text2);line-height:1.35;}
+.ai771-roadmap-step.ok{border-color:rgba(34,197,94,.30);}
+.ai771-roadmap-step.warn{border-color:rgba(245,158,11,.40);}
+.ai77-status-pill{display:inline-flex;align-items:center;justify-content:center;min-width:86px;border:1px solid rgba(148,163,184,.24);border-radius:999px;padding:6px 8px;font-size:10px;font-weight:900;letter-spacing:.05em;color:#dbeafe;background:rgba(15,23,42,.70);}
+.ai77-status-pill.approved_no_runtime_change{border-color:rgba(34,197,94,.42);color:#dcfce7;background:rgba(22,101,52,.22);}
+.ai77-status-pill.rejected{border-color:rgba(248,113,113,.48);color:#fee2e2;background:rgba(127,29,29,.20);}
+.ai77-status-pill.pending{border-color:rgba(245,158,11,.40);color:#fef3c7;background:rgba(146,64,14,.18);}
+.ai77-decision-note{color:#c4b5fd!important;}
+.ai77-approval-item.approved_no_runtime_change{background:rgba(22,101,52,.10);}
+.ai77-approval-item.rejected{background:rgba(127,29,29,.10);}
+@media(max-width:1100px){.ai771-roadmap-readiness{grid-template-columns:1fr;}.ai77-status-pill{min-width:0;}}

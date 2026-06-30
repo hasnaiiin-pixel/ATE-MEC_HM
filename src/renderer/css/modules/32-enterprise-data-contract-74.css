@@ -1,0 +1,134 @@
+/* AT-MEC_HM 7.4 - Enterprise Data Contract + Consistency Layer */
+.enterprise74-card{
+  margin-top:16px;
+  border-color:rgba(129,140,248,.26);
+  background:linear-gradient(180deg,rgba(30,41,59,.72),rgba(2,6,23,.48));
+}
+.enterprise74-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:14px;
+  margin-bottom:12px;
+}
+.enterprise74-head h3{margin:0 0 6px;font-size:19px;letter-spacing:.01em}
+.enterprise74-head p{margin:0;color:#a5b4fc;max-width:880px;line-height:1.45;font-size:12px}
+.enterprise74-scoreline{
+  display:grid;
+  grid-template-columns:150px minmax(0,1fr);
+  gap:12px;
+  align-items:stretch;
+  margin:12px 0;
+}
+.enterprise74-scorebox{
+  min-height:96px;
+  border-radius:20px;
+  display:grid;
+  place-items:center;
+  background:rgba(59,130,246,.10);
+  border:1px solid rgba(129,140,248,.28);
+}
+.enterprise74-scorebox b{font-size:30px;color:#e0e7ff;font-weight:1000}
+.enterprise74-scorebox span{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#93c5fd;font-weight:900}
+.enterprise74-context-grid{
+  display:grid;
+  grid-template-columns:repeat(9,minmax(94px,1fr));
+  gap:7px;
+  height:100%;
+}
+.enterprise74-context-grid>div{
+  padding:9px 10px;
+  border-radius:14px;
+  background:rgba(2,6,23,.44);
+  border:1px solid rgba(148,163,184,.14);
+  min-width:0;
+}
+.enterprise74-context-grid span{
+  display:block;
+  color:#93c5fd;
+  font-size:9px;
+  font-weight:1000;
+  text-transform:uppercase;
+  letter-spacing:.07em;
+}
+.enterprise74-context-grid b{
+  display:block;
+  margin-top:4px;
+  color:#f8fafc;
+  font-size:13px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.enterprise74-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:14px;
+  margin:14px 0;
+}
+.enterprise74-list{display:grid;gap:8px}
+.enterprise74-field,
+.enterprise74-issue{
+  padding:10px 12px;
+  border-radius:15px;
+  background:rgba(2,6,23,.45);
+  border:1px solid rgba(148,163,184,.15);
+  font-size:12px;
+}
+.enterprise74-field{
+  display:grid;
+  grid-template-columns:minmax(130px,1fr) minmax(120px,1.2fr);
+  gap:10px;
+  align-items:center;
+}
+.enterprise74-field b,
+.enterprise74-issue b{display:block;color:#e5edf7;font-size:13px}
+.enterprise74-field small,
+.enterprise74-issue small{display:block;color:#94a3b8;font-size:11px;margin-top:3px}
+.enterprise74-field span{
+  display:block;
+  text-align:right;
+  color:#f8fafc;
+  font-weight:900;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.enterprise74-field.ok{border-color:rgba(34,197,94,.22);background:rgba(20,83,45,.14)}
+.enterprise74-field.error{border-color:rgba(239,68,68,.28);background:rgba(127,29,29,.18)}
+.enterprise74-field.info{border-color:rgba(56,189,248,.18);background:rgba(12,74,110,.12)}
+.enterprise74-issue span{display:block;color:#cbd5e1;margin-top:3px;line-height:1.35}
+.enterprise74-issue.ok{border-color:rgba(34,197,94,.28);background:rgba(20,83,45,.16)}
+.enterprise74-issue.warn{border-color:rgba(245,158,11,.28);background:rgba(120,53,15,.18)}
+.enterprise74-issue.error{border-color:rgba(239,68,68,.32);background:rgba(127,29,29,.20)}
+.enterprise74-issue.info{border-color:rgba(56,189,248,.24);background:rgba(12,74,110,.16)}
+.enterprise74-keygrid{
+  display:grid;
+  grid-template-columns:repeat(6,minmax(100px,1fr));
+  gap:8px;
+  margin:8px 0;
+}
+.enterprise74-keygrid>div{
+  padding:9px 10px;
+  border-radius:14px;
+  background:rgba(15,23,42,.64);
+  border:1px solid rgba(148,163,184,.14);
+}
+.enterprise74-keygrid span{display:block;color:#a5b4fc;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.06em}
+.enterprise74-keygrid b{display:block;color:#fff;font-size:20px;margin-top:2px}
+.enterprise74-keydetails{margin-top:8px;padding:10px;border-radius:14px;background:rgba(2,6,23,.35);border:1px solid rgba(148,163,184,.12)}
+.enterprise74-keydetails summary{cursor:pointer;color:#bfdbfe;font-size:12px;font-weight:900}
+.enterprise74-keydetails div{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;max-height:170px;overflow:auto}
+.enterprise74-keydetails code{font-size:10px;color:#cbd5e1;background:rgba(15,23,42,.82);border:1px solid rgba(148,163,184,.12);border-radius:999px;padding:4px 7px}
+#enterprise74-meta{font-size:11px;color:#c4b5fd;font-weight:800;margin-top:4px}
+@media(max-width:1250px){
+  .enterprise74-scoreline,.enterprise74-grid{grid-template-columns:1fr}
+  .enterprise74-context-grid{grid-template-columns:repeat(3,minmax(120px,1fr))}
+  .enterprise74-keygrid{grid-template-columns:repeat(3,minmax(100px,1fr))}
+}
+@media(max-width:720px){
+  .enterprise74-head{display:block}
+  .enterprise74-context-grid,.enterprise74-keygrid{grid-template-columns:1fr}
+  .enterprise74-field{grid-template-columns:1fr}
+  .enterprise74-field span{text-align:left}
+}
