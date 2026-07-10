@@ -1,7 +1,7 @@
 <div id="ai-copilot-tab" class="tab-content enterprise422-page ai76-page">
   <div class="enterprise422-hero ai76-hero">
     <div>
-      <div class="enterprise422-eyebrow">AT-MEC_HM_8.0_AI_READY_ENTERPRISE_STABLE</div>
+      <div class="enterprise422-eyebrow">AT-MEC_HM_9.5.2_TESTMODE_AI_MENU_CHAT_CLEANUP</div>
       <h2>🤖 AI Copilot Center</h2>
       <p>Menu dedicato AI: analisi locale/read-only sopra moduli esistenti. Non crea nuove Traceability, Repair, Analytics, MES, Factory o Work Orders.</p>
     </div>
@@ -11,8 +11,8 @@
   <section id="enterprise76-ai-card" class="enterprise422-card enterprise422-wide enterprise76-ai-card">
     <div class="enterprise76-head">
       <div>
-        <h3>🤖 AI Copilot 8.0 — AI Ready Enterprise Stable</h3>
-        <p class="hint">AI Copilot completo, provider sicuro, approvazioni manuali e readiness score finale. Nessuna azione automatica su ricette, WO, utenti, test o hardware.</p>
+        <h3>🤖 AI Copilot 9.5.2 — Menu pulito + Chat Provider UX</h3>
+        <p class="hint">AI Copilot consolidato: chat, command center, action queue e supervisor restano una sola pagina. Hardening 9.5 controlla doppioni, sicurezza provider, runtime e prontezza release candidate.</p>
         <div id="ai76-meta">AI Copilot non ancora analizzato.</div>
         <div id="ai76-ui-status" class="ai76-ui-status">Pronto. Premi un pulsante AI.</div>
       </div>
@@ -31,6 +31,91 @@
     </div>
   </section>
 
+  <section id="ai93-live-chat" class="enterprise422-card enterprise422-wide enterprise76-ai-card ai93-chat-card">
+    <div class="enterprise76-head">
+      <div>
+        <h3>💬 AI Live Chat 9.3 — Conversazione visibile</h3>
+        <p class="hint">Chat AI sopra il contesto AT-MEC HM: risposte visibili nel programma, storico conversazione, messaggi operatore e creazione proposta in Action Queue. Read-only: nessuna modifica automatica.</p>
+        <div id="ai952-chat-provider-banner" class="ai952-chat-provider-banner">Modalità AI: locale/offline · nessun dato inviato fuori dal PC.</div>
+        <div id="ai93-chat-status" class="ai93-chat-status">Chat pronta. Scrivi una domanda oppure premi Analizza con AI.</div>
+      </div>
+      <div class="row wrap">
+        <button class="btn btn-primary" data-ai-main="chat93" onclick="showAiLiveChat93()">Chat AI 9.3</button>
+        <button class="btn btn-success" data-ai-main="chat93" onclick="askAiLiveChat93()">Chiedi ad AI</button>
+        <button class="btn btn-ghost" data-ai-main="chat93" onclick="analyzeWithAiLiveChat93()">Analizza con AI</button>
+        <button class="btn btn-ghost" onclick="copyAiLastAnswer93()">Copia risposta</button>
+        <button class="btn btn-ghost" onclick="testAiProviderFromChat952()">Test provider</button>
+        <button class="btn btn-warn" onclick="createAiActionFromLastAnswer93()">Crea azione da risposta</button>
+        <button class="btn btn-ghost" onclick="exportAiChat93()">Esporta chat</button>
+      </div>
+    </div>
+    <div class="ai93-chat-layout">
+      <div class="ai93-chat-main">
+        <div id="ai93-chat-history" class="ai93-chat-history"><div class="hint">Nessuna conversazione. Le risposte AI appariranno qui, non solo in Developer Tools.</div></div>
+        <div class="ai93-input-row">
+          <textarea id="ai93-question" class="ai93-question" placeholder="Scrivi una domanda per AI: es. Analizza questa commessa e dimmi cosa controllare."></textarea>
+          <div class="ai93-input-actions">
+            <button class="btn btn-primary" onclick="askAiLiveChat93()">Invia</button>
+            <button class="btn btn-ghost" onclick="clearAiChat93()">Pulisci chat</button>
+          </div>
+        </div>
+      </div>
+      <div class="ai93-chat-side">
+        <h4>🔔 Messaggi AI visibili</h4>
+        <div id="ai93-visible-messages" class="ai93-visible-messages"><div class="hint">Qui appariranno toast/badge AI importanti.</div></div>
+        <h4>📦 Contesto usato</h4>
+        <div id="ai93-context-summary" class="ai93-context-summary"><div class="hint">Premi Chat AI 9.3 o Analizza con AI.</div></div>
+        <h4>🛡️ Regole sicurezza</h4>
+        <div class="ai93-safe-box">
+          <div><b>READ ONLY</b><span>AI risponde e propone, non modifica runtime.</span></div>
+          <div><b>CONFERMA ESTERNA</b><span>Provider esterno solo su conferma operatore.</span></div>
+          <div><b>NO API KEY EXPORT</b><span>La chiave non entra in report/chat export.</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="ai95-enterprise-hardening" class="enterprise422-card enterprise422-wide enterprise76-ai-card ai95-hardening-card">
+    <div class="enterprise76-head">
+      <div>
+        <h3>🧱 Enterprise Hardening RC 9.5</h3>
+        <p class="hint">Controllo finale prima della 10.0: verifica runtime, menu, sicurezza AI, export, moduli duplicati e readiness produzione. Nessuna nuova funzione business, nessuna modifica automatica.</p>
+        <div id="ai95-hardening-status" class="ai95-status">Hardening non ancora eseguito.</div>
+      </div>
+      <div class="row wrap">
+        <button class="btn btn-success" data-ai-main="hardening95" onclick="runAiEnterpriseHardening95()">Esegui Hardening 9.5</button>
+        <button class="btn btn-ghost" onclick="exportAiEnterpriseHardening95()">Esporta report 9.5</button>
+      </div>
+    </div>
+    <div class="ai95-top">
+      <div class="ai95-score-box">
+        <span>RC Score</span>
+        <b id="ai95-rc-score">--%</b>
+        <em id="ai95-rc-state">CHECK</em>
+      </div>
+      <div id="ai95-status-grid" class="ai95-status-grid"><div class="hint">Premi Esegui Hardening 9.5.</div></div>
+    </div>
+    <div class="ai95-grid">
+      <div class="ai95-panel">
+        <h4>🧭 Menu / anti-doppioni</h4>
+        <div id="ai95-menu-audit" class="ai95-list"><div class="hint">Audit menu non ancora eseguito.</div></div>
+      </div>
+      <div class="ai95-panel">
+        <h4>🛡️ Sicurezza AI</h4>
+        <div id="ai95-security-audit" class="ai95-list"><div class="hint">Audit sicurezza non ancora eseguito.</div></div>
+      </div>
+    </div>
+    <div class="ai95-grid">
+      <div class="ai95-panel">
+        <h4>📦 Moduli / runtime</h4>
+        <div id="ai95-runtime-audit" class="ai95-list"><div class="hint">Audit runtime non ancora eseguito.</div></div>
+      </div>
+      <div class="ai95-panel">
+        <h4>📄 Release Candidate report</h4>
+        <div id="ai95-report-preview" class="ai95-report-preview"><div class="hint">Report 9.5 non ancora generato.</div></div>
+      </div>
+    </div>
+  </section>
 
 
   <section id="ai80-status-center" class="enterprise422-card enterprise422-wide enterprise76-ai-card ai80-ready-card">
@@ -57,6 +142,124 @@
         <h4>🛡️ Safe Mode + Report finale</h4>
         <div id="ai80-safe-mode-summary" class="ai80-safe-mode-summary"><div class="hint">Safe mode in attesa di aggiornamento.</div></div>
         <div id="ai80-final-report-preview" class="ai80-final-report-preview"><div class="hint">Report finale non ancora generato.</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="ai90-command-center" class="enterprise422-card enterprise422-wide enterprise76-ai-card ai90-command-card">
+    <div class="enterprise76-head">
+      <div>
+        <h3>🧠 AI Factory Command Center 9.0</h3>
+        <p class="hint">Supervisione AI centrale sopra moduli esistenti: produzione, WO, qualità, repair, traceability, factory, device e AI Ready. Read-only: nessuna modifica automatica.</p>
+      </div>
+      <div class="row wrap">
+        <button class="btn btn-success" data-ai-main="command90" onclick="runAiFactoryCommand90()">Aggiorna Command Center 9.0</button>
+        <button class="btn btn-ghost" onclick="exportAiFactoryCommandReport90()">Esporta report 9.0</button>
+      </div>
+    </div>
+    <div class="ai90-command-top">
+      <div class="ai90-command-score">
+        <div>
+          <span>Rischio AI Factory</span>
+          <b id="ai90-command-score">--%</b>
+          <em id="ai90-command-state" class="ai90-command-state warn">CHECK</em>
+        </div>
+      </div>
+      <div id="ai90-command-status-grid" class="ai90-status-grid"><div class="hint">Premi Aggiorna Command Center 9.0.</div></div>
+    </div>
+    <div class="ai90-command-grid">
+      <div class="ai90-panel">
+        <h4>📡 Stato moduli letti</h4>
+        <div id="ai90-module-feed"><div class="hint">Nessuna lettura eseguita.</div></div>
+      </div>
+      <div class="ai90-panel">
+        <h4>⚠️ Anomalie / rischi</h4>
+        <div id="ai90-anomaly-list"><div class="hint">Nessuna anomalia calcolata.</div></div>
+      </div>
+    </div>
+    <div class="ai90-command-grid">
+      <div class="ai90-panel">
+        <h4>✅ Azioni consigliate</h4>
+        <div id="ai90-action-list"><div class="hint">Premi Aggiorna Command Center 9.0.</div></div>
+      </div>
+      <div class="ai90-panel">
+        <h4>📄 Preview report AI Factory</h4>
+        <div id="ai90-report-preview"><div class="hint">Report non ancora generato.</div></div>
+      </div>
+    </div>
+  </section>
+
+
+  <section id="ai92-production-supervisor" class="enterprise422-card enterprise422-wide enterprise76-ai-card ai92-supervisor-card">
+    <div class="enterprise76-head">
+      <div>
+        <h3>🏭 AI Production Supervisor 9.2</h3>
+        <p class="hint">Supervisione produzione sopra WO, Analytics, Repair, Factory, Device e Action Queue esistenti. Read-only: segnala rischio, residuo, qualità e priorità operative senza creare dashboard duplicate.</p>
+      </div>
+      <div class="row wrap">
+        <button class="btn btn-success" data-ai-main="supervisor92" onclick="runAiProductionSupervisor92()">Aggiorna Production Supervisor 9.2</button>
+        <button class="btn btn-ghost" onclick="exportAiProductionSupervisor92()">Esporta report 9.2</button>
+      </div>
+    </div>
+    <div class="ai92-top">
+      <div class="ai92-score">
+        <div>
+          <span>Rischio produzione</span>
+          <b id="ai92-supervisor-score">--%</b>
+          <em id="ai92-supervisor-state" class="ai92-supervisor-state warn">CHECK</em>
+        </div>
+      </div>
+      <div id="ai92-production-kpi" class="ai92-kpi-grid"><div class="hint">Premi Aggiorna Production Supervisor 9.2.</div></div>
+    </div>
+    <div class="ai92-grid">
+      <div class="ai92-panel">
+        <h4>⚠️ Rischi produzione</h4>
+        <div id="ai92-risk-lanes" class="ai92-risk-lanes"><div class="hint">Nessun rischio calcolato.</div></div>
+      </div>
+      <div class="ai92-panel">
+        <h4>✅ Priorità operative consigliate</h4>
+        <div id="ai92-supervisor-actions" class="ai92-action-list"><div class="hint">Premi Aggiorna Production Supervisor 9.2.</div></div>
+      </div>
+    </div>
+    <div class="ai92-grid">
+      <div class="ai92-panel">
+        <h4>👷 Checklist operatore / tecnico</h4>
+        <div id="ai92-operator-checklist" class="ai92-checklist"><div class="hint">Checklist non ancora generata.</div></div>
+      </div>
+      <div class="ai92-panel">
+        <h4>📄 Preview report 9.2</h4>
+        <div id="ai92-report-preview" class="ai92-report-preview"><div class="hint">Report non ancora generato.</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="ai91-action-queue" class="enterprise422-card enterprise422-wide enterprise76-ai-card ai91-action-card">
+    <div class="enterprise76-head">
+      <div>
+        <h3>📋 AI Action Queue 9.1 — Azioni manuali approvate</h3>
+        <p class="hint">Trasforma le azioni consigliate da AI Factory Command Center e AI Workbench in una coda operativa manuale. Approva/Rifiuta/Completa registrano solo lo stato, senza modificare ricette, WO, test, utenti o hardware.</p>
+      </div>
+      <div class="row wrap">
+        <button class="btn btn-success" data-ai-main="action91" onclick="refreshAiActionQueue91()">Aggiorna coda azioni 9.1</button>
+        <button class="btn btn-ghost" onclick="exportAiActionQueue91()">Esporta coda azioni</button>
+      </div>
+    </div>
+    <div id="ai91-action-summary" class="ai91-action-summary"><div class="hint">Premi Aggiorna coda azioni 9.1.</div></div>
+    <div class="ai91-action-grid">
+      <div class="ai91-panel ai91-panel-main">
+        <h4>📌 Coda azioni AI</h4>
+        <div id="ai91-action-list" class="ai91-action-list"><div class="hint">Nessuna coda generata.</div></div>
+      </div>
+      <div class="ai91-panel">
+        <h4>🛡️ Regole sicurezza 9.1</h4>
+        <div id="ai91-safety-box" class="ai91-safety-box">
+          <div><b>READ ONLY</b><span>AI non applica modifiche automatiche.</span></div>
+          <div><b>APPROVAZIONE MANUALE</b><span>Ogni voce resta decisione operatore.</span></div>
+          <div><b>NESSUN DOPPIONE</b><span>Usa Command Center, Workbench e Approvazioni esistenti.</span></div>
+          <div><b>NO HARDWARE ACTION</b><span>Nessun comando a strumenti o device.</span></div>
+        </div>
+        <h4>📄 Preview export</h4>
+        <div id="ai91-report-preview" class="ai91-report-preview"><div class="hint">Report non ancora generato.</div></div>
       </div>
     </div>
   </section>
@@ -132,7 +335,14 @@
     </div>
   </section>
 
-  <section class="enterprise422-card enterprise422-wide enterprise76-ai-card">
+  <section id="ai952-settings-provider" class="enterprise422-card enterprise422-wide enterprise76-ai-card ai952-settings-card">
+    <div class="ai952-settings-head">
+      <div>
+        <h3>🔐 Impostazioni AI — Provider, Approvazioni e Diagnostica</h3>
+        <p class="hint">Qui sono raccolte le impostazioni AI prima sparse nel menu: provider, approvazioni, AI Ready 8.0 e Hardening 9.5. La chat resta read-only e non modifica dati.</p>
+      </div>
+      <div id="ai952-provider-pill" class="ai952-provider-pill">Provider: locale/offline</div>
+    </div>
     <div class="enterprise76-grid">
       <div>
         <h4>Insight AI locali / anti-doppioni</h4>

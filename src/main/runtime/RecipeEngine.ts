@@ -16,7 +16,7 @@ export interface TestStep {
   type:
     | 'DigitalInputCheck' | 'DigitalOutputSet'
     | 'VoltageMeasurement' | 'CurrentMeasurement'
-    | 'AnalogInputMeasurement' | 'ResistanceTest' | 'FrequencyTest'
+    | 'AnalogInputMeasurement' | 'ResistanceTest' | 'FrequencyTest' | 'StableMeasurement'
     | 'SCPICommand' | 'Delay' | 'ManualMeasurement' | 'PowerSupplySet' | 'PowerSupplyMeasureCurrent'
     | 'GotoIfFail' | 'LoopStart' | 'LoopEnd'
     | 'FirmwareErase' | 'FirmwareFlash' | 'FirmwareVerify';
@@ -56,6 +56,7 @@ export interface TestStep {
   ps_output_on?: boolean;
   instruction_image?: string;
   stable_time_ms?: number;
+  sample_interval_ms?: number;
   manual_value?: any;
   manual_input_enabled?: boolean;
   stop_on_fail?: boolean;
@@ -83,6 +84,8 @@ interface StepResult {
   error?: string;
   measurement_source?: 'AUTOMATICA' | 'MANUALE' | 'SISTEMA';
   measurement_device?: string;
+  device_display?: string;
+  instrument?: string;
   target?: number;
   tolerance?: number;
   min?: number;
@@ -98,8 +101,11 @@ export class RecipeEngine {
   private running = false;
   private manualSeq = 0;
   private manualResolvers: Record<number, (response: any) => void> = {};
+  private pendingManualResponses: Record<number, any> = {};
   private failResolver: ((action: 'continue' | 'stop') => void) | null = null;
   private stopRequestedByOperator = false;
+  private measurementRetrySeq = 0;
+  private activeStableMeasurementStepId: number | null = null;
 
   constructor(
     private stateMachine: StateMachine,
@@ -129,7 +135,14 @@ export class RecipeEngine {
 
   public resolveManualStep(requestId: number, response: any): void {
     const resolver = this.manualResolvers[requestId];
-    if (resolver) { resolver(response || {}); delete this.manualResolvers[requestId]; }
+    if (resolver) {
+      resolver(response || {});
+      delete this.manualResolvers[requestId];
+      return;
+    }
+    // 10.1.11: se la UI risponde molto velocemente, conserva la risposta fino a quando
+    // il resolver dello step manuale viene registrato. Evita il problema del primo click perso.
+    if (requestId) this.pendingManualResponses[requestId] = response || {};
   }
 
   public resolveFailureAction(action: 'continue' | 'stop'): void {
@@ -151,6 +164,23 @@ export class RecipeEngine {
 
   public isRunning(): boolean { return this.running; }
 
+  public requestCurrentMeasurementRetry(): { ok: boolean; step_id?: number; error?: string } {
+    if (!this.running || this.activeStableMeasurementStepId === null) {
+      return { ok: false, error: 'Nessuna misura stabilizzata attiva da riprovare.' };
+    }
+    this.measurementRetrySeq++;
+    this.eventBus.emit('step_detail', {
+      step_id: this.activeStableMeasurementStepId,
+      level: 'info',
+      message: 'RIPROVA MISURA richiesto da operatore: timer stabilità e timeout misura riavviati.',
+      status: 'RIPROVA MISURA',
+      retry_requested: true,
+      stable_elapsed_ms: 0,
+      timeout_elapsed_ms: 0
+    });
+    return { ok: true, step_id: this.activeStableMeasurementStepId };
+  }
+
   public forceResetAfterStop(): void {
     // Reset duro e controllato usato dal tasto STOP TEST per evitare stato 'test in esecuzione' bloccato
     // dopo FAIL, manual step, debug o promesse hardware pendenti.
@@ -171,6 +201,8 @@ export class RecipeEngine {
 
     this.stopRequestedByOperator = false;
     this.running = true;
+    this.measurementRetrySeq = 0;
+    this.activeStableMeasurementStepId = null;
     this.loopCounters = {};
     this.stateMachine.transitionTo('RUNNING');
     this.eventBus.emit('recipe_loaded', { name: recipe.recipe_name, version: recipe.version });
@@ -188,7 +220,7 @@ export class RecipeEngine {
     }
 
     recipe = { ...recipe, steps: (recipe.steps || []).filter(s => s.enabled !== false) };
-    const source = recipe.power_metadata || 'PL303_PROGRAMMABLE';
+    const source = this.resolvePowerSource(recipe);
 
     try {
     if (source === 'PL303_PROGRAMMABLE') {
@@ -220,11 +252,11 @@ export class RecipeEngine {
       const step = recipe.steps[idx];
 
       if (this.debugMode) {
-        this.eventBus.emit('step_started', { step_id: step.step_id, type: step.type, label: step.label, description: step.description, waitingDebug: true });
+        this.eventBus.emit('step_started', { step_id: step.step_id, type: step.type, label: step.label, description: step.description, waitingDebug: true, timeout: step.timeout, stable_time_ms: step.stable_time_ms, sample_interval_ms: step.sample_interval_ms, min: step.min, max: step.max, target: step.target, tolerance: step.tolerance, unit: step.unit, device: this.normalizeMeasurementDeviceName(step.device_mapping || step.device), device_display: this.measurementDeviceDisplayName(step.device_mapping || step.device) });
         this.eventBus.emit('step_detail', { step_id: step.step_id, level: 'info', message: this.describeStep(step) });
         await new Promise<void>(res => { this.debugResolver = res; });
       } else {
-        this.eventBus.emit('step_started', { step_id: step.step_id, type: step.type, label: step.label, description: step.description, waitingDebug: false });
+        this.eventBus.emit('step_started', { step_id: step.step_id, type: step.type, label: step.label, description: step.description, waitingDebug: false, timeout: step.timeout, stable_time_ms: step.stable_time_ms, sample_interval_ms: step.sample_interval_ms, min: step.min, max: step.max, target: step.target, tolerance: step.tolerance, unit: step.unit, device: this.normalizeMeasurementDeviceName(step.device_mapping || step.device), device_display: this.measurementDeviceDisplayName(step.device_mapping || step.device) });
         this.eventBus.emit('step_detail', { step_id: step.step_id, level: 'info', message: this.describeStep(step) });
       }
 
@@ -255,7 +287,7 @@ export class RecipeEngine {
         label: step.label || step.description || '',
         component: step.component || step.component_name || step.refdes || '',
         test_point: step.test_point || step.testPoint || step.tp || '',
-        device: step.device_mapping || step.device || step.io_type || stepResult.measurement_device || '',
+        device: this.normalizeMeasurementDeviceName(step.device_mapping || step.device), device_display: this.measurementDeviceDisplayName(step.device_mapping || step.device) || step.io_type || stepResult.measurement_device || '',
         channel: step.channel,
         measured: stepResult.measured,
         measurement_source: stepResult.measurement_source,
@@ -426,7 +458,7 @@ export class RecipeEngine {
 
   private async requestManualStep(step: TestStep): Promise<any> {
     const requestId = ++this.manualSeq;
-    this.eventBus.emit('manual_step_request', {
+    const payload = {
       requestId,
       step_id: step.step_id,
       type: step.type,
@@ -441,16 +473,25 @@ export class RecipeEngine {
       stable_time_ms: Number(step.stable_time_ms ?? step.timeout ?? 1000),
       manual_fallback: (step as any).manual_fallback || false,
       fallback_reason: (step as any).fallback_reason || ''
-    });
+    };
     return new Promise(resolve => {
       const timer = setTimeout(() => {
         delete this.manualResolvers[requestId];
+        delete this.pendingManualResponses[requestId];
         resolve({ ok:false, action:'timeout' });
       }, Math.max(60000, Number(step.timeout || 1000) + 600000));
       this.manualResolvers[requestId] = (response) => {
         clearTimeout(timer);
+        delete this.pendingManualResponses[requestId];
         resolve(response || {});
       };
+      const early = this.pendingManualResponses[requestId];
+      if (early !== undefined) {
+        this.manualResolvers[requestId](early);
+        delete this.manualResolvers[requestId];
+        return;
+      }
+      this.eventBus.emit('manual_step_request', payload);
     });
   }
 
@@ -461,9 +502,46 @@ export class RecipeEngine {
     if (step.type === 'AnalogInputMeasurement') return `Misura DMM OK${result.measured !== undefined ? `: ${result.measured}` : ''}`;
     if (step.type === 'PowerSupplySet') return `Alimentatore CH${step.ps_channel || step.channel || 1} OK`;
     if (step.type === 'PowerSupplyMeasureCurrent') return `Consumo CH${step.ps_channel || step.channel || 1} OK`;
+    if (step.type === 'StableMeasurement') return `Misura stabilizzata OK${result.measured !== undefined ? `: ${result.measured}` : ''}`;
     if (step.type === 'ManualMeasurement') return `Manuale OK${result.measured !== undefined ? `: ${typeof result.measured === 'object' ? JSON.stringify(result.measured) : result.measured}` : ''}`;
     if (step.type === 'Delay') return `Attesa OK`;
     return `${step.label || step.type} OK`;
+  }
+
+
+  private resolvePowerSource(recipe: Recipe): string {
+    // 10.1.4: PL303 non deve accendersi/essere interrogato solo perché una vecchia ricetta o WO
+    // porta power_metadata=PL303_PROGRAMMABLE. Lo usiamo solo se c'è uno step reale PL303.
+    const explicit = String((recipe as any).power_metadata || '').trim();
+    const hasPowerSupplyStep = (recipe.steps || []).some(s => {
+      if (!s || s.enabled === false) return false;
+      const type = String(s.type || '');
+      const dev = this.normalizeMeasurementDeviceName((s as any).device_mapping || (s as any).device);
+      return ['PowerSupplySet','PowerSupplyMeasureCurrent'].includes(type) || dev === 'AimTTi_PL303';
+    });
+    if (explicit === 'PL303_PROGRAMMABLE') return hasPowerSupplyStep ? 'PL303_PROGRAMMABLE' : 'MANUAL_POWER';
+    if (explicit === 'ESP32_RELAY_POWER') return explicit;
+    if (explicit && explicit !== 'MANUAL_POWER') return explicit;
+    return hasPowerSupplyStep ? 'PL303_PROGRAMMABLE' : 'MANUAL_POWER';
+  }
+
+  private normalizeMeasurementDeviceName(name?: string): string {
+    const raw = String(name || '').trim();
+    const n = raw.toLowerCase();
+    if (!raw || ['auto','default','dmm','multimeter','multimetro','keysight','keysight_34461a','keysight_34465a','34461a','34465a'].includes(n) || n.includes('keysight') || n.includes('34461') || n.includes('34465') || n.includes('multimet')) {
+      return 'Keysight_34461A';
+    }
+    if (n.includes('aimtti_pl303') || n.includes('pl303') || n.includes('tti') || n.includes('aliment')) return 'AimTTi_PL303';
+    if (n.includes('modbus_serial') || n.includes('esp32')) return 'modbus_serial';
+    return raw;
+  }
+
+  private measurementDeviceDisplayName(name?: string): string {
+    const normalized = this.normalizeMeasurementDeviceName(name);
+    if (normalized === 'Keysight_34461A') return 'Keysight 34461A';
+    if (normalized === 'AimTTi_PL303') return 'Alimentatore PL303QMD-P';
+    if (normalized === 'modbus_serial') return 'Controller I/O';
+    return normalized || 'Strumento';
   }
 
 
@@ -491,7 +569,7 @@ export class RecipeEngine {
       success: ok,
       measured,
       measurement_source: source,
-      measurement_device: source === 'AUTOMATICA' ? (step.device_mapping || 'Keysight_34461A') : 'operatore/manuale',
+      measurement_device: source === 'AUTOMATICA' ? this.normalizeMeasurementDeviceName(step.device_mapping || step.device) : 'operatore/manuale',
       target: step.target,
       tolerance: step.tolerance,
       min,
@@ -527,9 +605,303 @@ export class RecipeEngine {
     return this.requestManualMeasurementValue(step, msg);
   }
 
+
+
+  private stableMeasurementCommand(step: TestStep): string {
+    if (step.command) return String(step.command).trim();
+    const u = String(step.unit || '').toLowerCase();
+    if (u.includes('ohm') || u.includes('ω')) return 'MEAS:RES?';
+    if (u.includes('a') && !u.includes('hz')) return 'MEAS:CURR:DC?';
+    if (u.includes('hz')) return 'MEAS:FREQ?';
+    return 'MEAS:VOLT:DC?';
+  }
+
+  private stableMeasurementKind(step: TestStep): 'RES' | 'CURR_DC' | 'FREQ' | 'VOLT_DC' {
+    const txt = `${step.command || ''} ${step.unit || ''} ${step.label || ''}`.toLowerCase();
+    if (txt.includes('res') || txt.includes('ohm') || txt.includes('ω')) return 'RES';
+    if (txt.includes('curr') || txt.includes('ampere') || /\ba\b/.test(txt)) return 'CURR_DC';
+    if (txt.includes('freq') || txt.includes('hz')) return 'FREQ';
+    return 'VOLT_DC';
+  }
+
+  private stableMeasurementPrepareCommands(step: TestStep): string[] {
+    // 10.1.4: prepara Keysight una sola volta. Durante il polling non mandiamo più MEAS:*?
+    // ripetuti perché riconfigurano continuamente il DMM e possono causare OVERLOAD/Remote Command Error.
+    const kind = this.stableMeasurementKind(step);
+    if (kind === 'RES') return ['*CLS', 'CONF:RES', 'SENS:RES:RANG:AUTO ON', 'SENS:RES:NPLC 0.02', 'TRIG:SOUR IMM', 'SAMP:COUN 1', '*CLS'];
+    if (kind === 'CURR_DC') return ['*CLS', 'CONF:CURR:DC', 'SENS:CURR:DC:RANG:AUTO ON', 'SENS:CURR:DC:NPLC 0.02', 'TRIG:SOUR IMM', 'SAMP:COUN 1', '*CLS'];
+    if (kind === 'FREQ') return ['*CLS', 'CONF:FREQ', 'TRIG:SOUR IMM', 'SAMP:COUN 1', '*CLS'];
+    return ['*CLS', 'CONF:VOLT:DC', 'SENS:VOLT:DC:RANG:AUTO ON', 'SENS:VOLT:DC:NPLC 0.02', 'TRIG:SOUR IMM', 'SAMP:COUN 1', '*CLS'];
+  }
+
+  private isDefaultStableMeasurementCommand(step: TestStep): boolean {
+    const cmd = this.stableMeasurementCommand(step).toUpperCase().replace(/\s+/g, '');
+    return ['MEAS:RES?','MEAS:VOLT:DC?','MEAS:CURR:DC?','MEAS:FREQ?'].includes(cmd);
+  }
+
+  private async prepareStableMeasurementDevice(step: TestStep, device: string): Promise<{ prepared: boolean; readCommand: string; error?: string }> {
+    if (device !== 'Keysight_34461A') return { prepared: false, readCommand: this.stableMeasurementCommand(step) };
+    // Per comandi custom lasciamo il comportamento ricetta, ma puliamo comunque la coda errori.
+    if (!this.isDefaultStableMeasurementCommand(step)) {
+      try { await this.withTimeout(this.hal.writeSCPI(device, '*CLS'), 1200, 'Keysight *CLS'); } catch {}
+      return { prepared: false, readCommand: this.stableMeasurementCommand(step) };
+    }
+    try {
+      for (const cmd of this.stableMeasurementPrepareCommands(step)) {
+        try {
+          await this.withTimeout(this.hal.writeSCPI(device, cmd), 1800, `Keysight prepare ${cmd}`);
+          await new Promise(res => setTimeout(res, 45));
+        } catch (cmdErr) {
+          // Alcune opzioni possono non essere supportate su tutte le modalità. Non blocchiamo:
+          // si prosegue con READ? se la configurazione principale è stata accettata, altrimenti fallback.
+          const msg = cmdErr instanceof Error ? cmdErr.message : String(cmdErr);
+          if (/CONF:/i.test(cmd)) throw new Error(msg);
+        }
+      }
+      return { prepared: true, readCommand: 'READ?' };
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      try { await this.withTimeout(this.hal.writeSCPI(device, '*CLS'), 1200, 'Keysight clear after prepare error'); } catch {}
+      return { prepared: false, readCommand: this.stableMeasurementCommand(step), error: msg };
+    }
+  }
+
+  private parseStableMeasurementRaw(raw: any): { value: any; display: string; invalid: boolean; overload: boolean; error?: string } {
+    const text = String(raw ?? '').trim();
+    const upper = text.toUpperCase();
+    if (!text) return { value: null, display: 'N/D', invalid: true, overload: false, error: 'risposta vuota' };
+    if (/OVLD|OVERLOAD|OLOAD|INF|NAN|TIMEOUT|ERROR/.test(upper)) {
+      return { value: text, display: /OVLD|OVERLOAD|OLOAD/.test(upper) ? 'OVERLOAD' : text, invalid: true, overload: /OVLD|OVERLOAD|OLOAD/.test(upper), error: text };
+    }
+    const val = parseFloat(text.replace(',', '.'));
+    if (!Number.isFinite(val)) return { value: text, display: text, invalid: true, overload: false, error: 'valore non numerico' };
+    // I DMM Keysight usano spesso 9.9E37/9.91E37 per overload/open input.
+    if (Math.abs(val) > 1e30) return { value: val, display: 'OVERLOAD', invalid: true, overload: true, error: text };
+    return { value: val, display: String(val), invalid: false, overload: false };
+  }
+
+  private async readStableMeasurementValue(step: TestStep, readTimeoutMs: number, readCommand?: string): Promise<{ value: any; display: string; invalid: boolean; overload: boolean; raw: any; error?: string }> {
+    const raw = await this.withTimeout(
+      this.hal.querySCPI(this.normalizeMeasurementDeviceName(step.device_mapping || step.device), readCommand || this.stableMeasurementCommand(step)),
+      readTimeoutMs,
+      'stable measurement read'
+    );
+    const parsed = this.parseStableMeasurementRaw(raw);
+    return { ...parsed, raw };
+  }
+
+  private async executeStableMeasurement(step: TestStep): Promise<StepResult> {
+    const timeoutMs = Math.max(1000, Number(step.timeout) || 10000);
+    const stableMs = Math.max(0, Number(step.stable_time_ms) || 1000);
+    const requestedSampleMs = Math.max(50, Number(step.sample_interval_ms) || 100);
+    const measurementDevice = this.normalizeMeasurementDeviceName(step.device_mapping || step.device);
+    const measurementDeviceDisplay = this.measurementDeviceDisplayName(measurementDevice);
+    // 10.1.8: flusso automatico veloce con popup operatore pulito. La misura assistita dall'operatore resta AUTOMATICA
+    // quando esiste uno strumento reale (Keysight/DMM), anche se vecchie ricette hanno measurement_mode='manual'.
+    const instrumentLiveMode = measurementDevice === 'Keysight_34461A' || /keysight|3446|dmm|multimet|scpi/i.test(`${step.device_mapping || ''} ${step.device || ''} ${step.manual_measure_type || ''}`);
+    const sampleMs = measurementDevice === 'Keysight_34461A' ? Math.max(100, requestedSampleMs) : requestedSampleMs;
+    const readTimeoutMs = measurementDevice === 'Keysight_34461A' ? Math.max(450, Math.min(900, sampleMs * 6)) : Math.max(500, Math.min(2500, sampleMs * 4));
+    let startedAt = Date.now();
+    let stableStart = 0;
+    let lastValue: any = null;
+    let lastError = '';
+    let lastEmit = 0;
+    let lastStatus = '';
+    let seenRetrySeq = this.measurementRetrySeq;
+    this.activeStableMeasurementStepId = step.step_id;
+    const { min, max } = this.measurementBounds(step);
+    let preparedRead: { prepared: boolean; readCommand: string; error?: string } = { prepared: false, readCommand: this.stableMeasurementCommand(step) };
+
+    const emitLive = (payload: any = {}) => {
+      this.eventBus.emit('step_detail', {
+        step_id: step.step_id,
+        type: step.type,
+        label: step.label || step.description || '',
+        description: step.description || step.label || '',
+        step_label: step.label || step.description || '',
+        level: payload.level || 'info',
+        message: payload.message || 'Misura stabilizzata live',
+        value: payload.value ?? lastValue,
+        measured: payload.measured ?? payload.value ?? lastValue,
+        raw: payload.raw,
+        min,
+        max,
+        unit: step.unit || '',
+        device: measurementDevice,
+        device_display: measurementDeviceDisplay,
+        instrument: measurementDeviceDisplay,
+        tolerance: step.tolerance,
+        status: payload.status || 'LETTURA LIVE',
+        stable_elapsed_ms: payload.stable_elapsed_ms ?? 0,
+        stable_required_ms: stableMs,
+        timeout_elapsed_ms: Date.now() - startedAt,
+        timeout_ms: timeoutMs,
+        sample_interval_ms: sampleMs,
+        requested_sample_interval_ms: requestedSampleMs,
+        target: step.target,
+        timestamp: new Date().toISOString(),
+        live_popup: true,
+        auto_advance: true
+      });
+    };
+
+    if (step.measurement_mode === 'manual' && !instrumentLiveMode) {
+      const manualVal = await this.requestManualMeasurementValue(step, 'Misura stabilizzata configurata come manuale');
+      const res = this.buildMeasurementResult(step, manualVal, 'MANUALE', 'Misura stabilizzata manuale');
+      if (res.success && stableMs > 0) await this.sleepInterruptible(stableMs);
+      this.activeStableMeasurementStepId = null;
+      return { ...res, details: `${res.details}; stabilizzazione manuale ${stableMs} ms` };
+    }
+
+    preparedRead = await this.prepareStableMeasurementDevice(step, measurementDevice);
+    if (preparedRead.error) {
+      emitLive({
+        level: 'warn',
+        status: 'PREPARAZIONE STRUMENTO WARNING',
+        message: `Preparazione sicura ${measurementDeviceDisplay} non completa (${preparedRead.error}). Uso comando ricetta con polling protetto.`
+      });
+    } else {
+      emitLive({ status: 'LETTURA LIVE', message: `Misura live ${measurementDeviceDisplay} avviata; polling ${sampleMs} ms.` });
+    }
+
+    while ((Date.now() - startedAt) <= timeoutMs) {
+      if (this.stateMachine.getState() === 'FAULT') throw new Error('Esecuzione interrotta');
+      while (this.stateMachine.getState() === 'PAUSED') {
+        await new Promise<void>(res => { this.debugResolver = res; });
+      }
+
+      if (seenRetrySeq !== this.measurementRetrySeq) {
+        seenRetrySeq = this.measurementRetrySeq;
+        startedAt = Date.now();
+        stableStart = 0;
+        lastError = '';
+        lastStatus = 'RIPROVA MISURA';
+        preparedRead = await this.prepareStableMeasurementDevice(step, measurementDevice);
+        emitLive({
+          level: 'info',
+          status: 'RIPROVA MISURA',
+          message: 'Riprova misura: lettura live continua, timer stabilità e timeout riavviati.',
+          stable_elapsed_ms: 0,
+          retry_requested: true
+        });
+      }
+
+      try {
+        const read = await this.readStableMeasurementValue(step, readTimeoutMs, preparedRead.readCommand);
+        lastValue = read.invalid ? read.display : read.value;
+        const invalid = !!read.invalid;
+        const res = invalid
+          ? { success: false, measured: lastValue, details: read.error || read.display } as StepResult
+          : this.buildMeasurementResult(step, read.value, 'AUTOMATICA', 'Misura stabilizzata');
+        const inside = !invalid && !!res.success;
+        if (inside) {
+          if (!stableStart) stableStart = Date.now();
+        } else {
+          stableStart = 0;
+        }
+        const stableElapsed = inside && stableStart ? Date.now() - stableStart : 0;
+        const status = invalid ? (read.overload ? 'OVERLOAD / NON VALIDO' : 'VALORE NON VALIDO') : (inside ? 'IN STABILIZZAZIONE' : 'FUORI RANGE');
+        const now = Date.now();
+        if (now - lastEmit >= 100 || status !== lastStatus || stableElapsed >= stableMs) {
+          lastEmit = now;
+          lastStatus = status;
+          emitLive({
+            level: invalid ? 'warn' : 'info',
+            status,
+            message: invalid
+              ? `Misura stabilizzata: ${read.display}; stabilità azzerata; range ${min === -Infinity ? '-∞' : min} ÷ ${max === Infinity ? '+∞' : max}`
+              : `Misura stabilizzata: ${read.value} ${step.unit || ''}; stabile ${stableElapsed}/${stableMs} ms; range ${min === -Infinity ? '-∞' : min} ÷ ${max === Infinity ? '+∞' : max}`,
+            value: lastValue,
+            measured: lastValue,
+            raw: read.raw,
+            stable_elapsed_ms: stableElapsed
+          });
+        }
+
+        if (inside) {
+          const remainingStableMs = stableMs - stableElapsed;
+          if (stableMs <= 0 || remainingStableMs <= 0) {
+            emitLive({
+              level: 'info',
+              status: 'OK STABILE',
+              message: `Misura stabilizzata OK: ${lastValue} ${step.unit || ''}; pass automatico immediato`,
+              value: lastValue,
+              measured: lastValue,
+              raw: read.raw,
+              stable_elapsed_ms: stableMs
+            });
+            this.activeStableMeasurementStepId = null;
+            return { ...res, success: true, details: `${res.details}; valore stabile per ${stableMs} ms; pass automatico immediato; polling ${sampleMs} ms` };
+          }
+          const waitMs = Math.max(1, Math.min(sampleMs, remainingStableMs));
+          await this.sleepInterruptible(waitMs);
+          if (this.stateMachine.getState() === 'FAULT') throw new Error('Esecuzione interrotta');
+          if (seenRetrySeq !== this.measurementRetrySeq) continue;
+          const finalStableElapsed = Date.now() - stableStart;
+          if (finalStableElapsed >= stableMs) {
+            emitLive({
+              level: 'info',
+              status: 'OK STABILE',
+              message: `Misura stabilizzata OK: ${lastValue} ${step.unit || ''}; pass automatico immediato`,
+              value: lastValue,
+              measured: lastValue,
+              raw: read.raw,
+              stable_elapsed_ms: stableMs
+            });
+            this.activeStableMeasurementStepId = null;
+            return { ...res, success: true, details: `${res.details}; valore stabile per ${stableMs} ms; pass automatico immediato; polling ${sampleMs} ms` };
+          }
+          continue;
+        }
+      } catch (err) {
+        lastError = err instanceof Error ? err.message : String(err);
+        const now = Date.now();
+        if (now - lastEmit >= 500 || lastStatus !== 'LETTURA NON DISPONIBILE') {
+          lastEmit = now;
+          lastStatus = 'LETTURA NON DISPONIBILE';
+          emitLive({
+            level: 'warn',
+            status: 'LETTURA NON DISPONIBILE',
+            message: `Lettura misura stabilizzata non disponibile: ${lastError}. Ritento automaticamente fino a timeout.`,
+            stable_elapsed_ms: 0
+          });
+        }
+      }
+      await this.sleepInterruptible(sampleMs);
+    }
+
+    if (step.measurement_mode !== 'automatic' && step.manual_fallback_enabled !== false) {
+      try {
+        emitLive({ level: 'warn', status: 'FAIL / INSERIMENTO MANUALE', message: 'Timeout misura stabilizzata automatica: fallback manuale attivo.', stable_elapsed_ms: 0 });
+        const manualVal = await this.requestManualMeasurementValue(step, lastError || 'Timeout misura stabilizzata automatica');
+        this.activeStableMeasurementStepId = null;
+        return this.buildMeasurementResult(step, manualVal, 'MANUALE', 'Misura stabilizzata fallback manuale');
+      } catch {}
+    }
+    this.activeStableMeasurementStepId = null;
+    return {
+      success: false,
+      measured: lastValue,
+      measurement_source: 'AUTOMATICA',
+      measurement_device: measurementDevice,
+      device_display: measurementDeviceDisplay,
+      instrument: measurementDeviceDisplay,
+      target: step.target,
+      tolerance: step.tolerance,
+      min,
+      max,
+      unit: step.unit || '',
+      timestamp: new Date().toISOString(),
+      error: `Misura non stabilizzata entro ${timeoutMs} ms. Ultimo valore: ${lastValue ?? 'N/D'} ${step.unit || ''}${lastError ? '. Ultimo errore: ' + lastError : ''}`
+    };
+  }
+
   private async executeStep(step: TestStep): Promise<StepResult> {
     try {
       switch (step.type) {
+
+        case 'StableMeasurement':
+          return await this.executeStableMeasurement(step);
 
         case 'ManualMeasurement': {
           const operator = await this.requestManualStep(step);
@@ -812,6 +1184,7 @@ export class RecipeEngine {
     if (step.type === 'PowerSupplySet') return `${name}Alimentatore PL303QMD-P CH${step.ps_channel || step.channel || 1}: imposta ${step.ps_voltage ?? step.value?.voltage ?? 0} V / ${step.ps_current ?? step.value?.current ?? 0} A e output ${(step.ps_output_on ?? step.value?.outputOn ?? true) ? 'ON' : 'OFF'}.`;
     if (step.type === 'PowerSupplyMeasureCurrent') return `${name}Misura consumo alimentatore PL303QMD-P CH${step.ps_channel || step.channel || 1}: limite ${step.min ?? '-∞'} ÷ ${step.max ?? '+∞'} ${step.unit || 'A'}.`;
     if (step.type === 'AnalogInputMeasurement') return `${name}Multimetro digitale: acquisisci misura analogica (${step.command || 'MEAS:VOLT:DC?'}) e verifica ${step.min ?? '-∞'} ÷ ${step.max ?? '+∞'} ${step.unit || 'V'}.`;
+    if (step.type === 'StableMeasurement') return `${name}Misura stabilizzata su ${this.measurementDeviceDisplayName(step.device_mapping || step.device)}: target ${step.target ?? 'N/D'}, limiti ${step.min ?? '-∞'} ÷ ${step.max ?? '+∞'} ${step.unit || ''}, stabile per ${step.stable_time_ms ?? 1000} ms, timeout ${step.timeout ?? 10000} ms, su FAIL ${step.stop_on_fail === false ? 'continua' : 'ferma'}.`;
     if (['VoltageMeasurement','CurrentMeasurement','ResistanceTest','FrequencyTest'].includes(step.type)) return `${name}${step.type} su ${step.device_mapping}: origine ${step.measurement_mode || 'auto_with_fallback'}, comando ${step.command || 'default'}, target ${step.target ?? 'N/D'}, tolleranza ±${step.tolerance ?? 'N/D'}, limiti ${step.min ?? '-∞'} ÷ ${step.max ?? '+∞'} ${step.unit || ''}.`;
     if (step.type === 'Delay') return `${name}Attesa ${step.timeout || 500} ms.`;
     if (step.type === 'ManualMeasurement') return `${name}Step manuale: mostra istruzioni, attende conferma operatore, stabilizza ${step.stable_time_ms ?? step.timeout ?? 1000} ms e ${step.manual_input_enabled ? 'usa misura manuale inserita dall\'operatore' : 'acquisisce ' + (step.manual_measure_type || step.io_type || 'CONFIRM')}.`;

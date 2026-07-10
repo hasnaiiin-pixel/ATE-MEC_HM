@@ -7,12 +7,29 @@
       ],
       "level": 10
     },
+    "Tecnico": {
+      "permissions": [
+        "run_test",
+        "view_reports",
+        "debug_mode",
+        "view_traceability",
+        "view_kpi",
+        "manage_repair",
+        "ai_read",
+        "export_data"
+      ],
+      "level": 30
+    },
     "Technician": {
       "permissions": [
         "run_test",
         "view_reports",
         "debug_mode",
-        "view_traceability"
+        "view_traceability",
+        "view_kpi",
+        "manage_repair",
+        "ai_read",
+        "export_data"
       ],
       "level": 30
     },
@@ -25,7 +42,10 @@
         "config_hardware",
         "view_traceability",
         "view_kpi",
-        "manage_data"
+        "manage_data",
+        "manage_repair",
+        "ai_read",
+        "export_data"
       ],
       "level": 60
     },
@@ -42,7 +62,10 @@
         "test_elements",
         "view_traceability",
         "view_kpi",
-        "manage_data"
+        "manage_data",
+        "manage_ai",
+        "config_ai",
+        "export_data"
       ],
       "level": 80
     },
@@ -60,7 +83,21 @@
         "test_elements",
         "view_traceability",
         "view_kpi",
-        "manage_data"
+        "manage_data",
+        "sign_quality",
+        "approve_reports",
+        "manage_ai",
+        "config_ai",
+        "reset_data",
+        "manage_work_orders",
+        "manage_repair",
+        "export_data",
+        "import_data",
+        "factory_admin",
+        "runtime_validate",
+        "startup_doctor",
+        "driver_install",
+        "driver_check"
       ],
       "level": 100
     },
@@ -68,27 +105,32 @@
       "permissions": [
         "view_reports",
         "sign_quality",
-        "approve_reports"
+        "approve_reports",
+        "view_kpi",
+        "view_traceability",
+        "ai_read"
       ],
       "level": 60
     }
   },
   "users": [
     {
-      "username": "admin",
+      "username": "Admin",
       "displayName": "Admin",
       "role": "Admin",
-      "salt": "bd161c457887e4e35e3f01a6bcb12f52",
-      "passwordHash": "e5e65fd88c58385482f1886aac8d9dd148a3ac07c2dac7323850019193f98bb9",
-      "enabled": true
+      "salt": "7ba408bdef8e8a25e3491405906e56aa",
+      "passwordHash": "scrypt$7ba408bdef8e8a25e3491405906e56aa$2587b3eeed373bde2f99767aed80141fb494e5c17a800f14f9b34155966adf30f03147a8ca0f8bab44f379cdd14350616e6f931909706afd4c1c61e82d61d9ca",
+      "enabled": true,
+      "operatorCode": "ADMIN"
     },
     {
-      "username": "mirza",
-      "displayName": "Mirza",
-      "role": "Operator",
-      "salt": "1a0972d41057b989dea001df46a1a24b",
-      "passwordHash": "431bd2ee25963454e8d349a484bdfc4ee80160f58b8bc5447ee931f59abd63ea",
-      "enabled": true
+      "username": "Tecnico",
+      "displayName": "Tecnico",
+      "role": "Tecnico",
+      "salt": "0c975acd312285fcbf4b3a8730f3c747",
+      "passwordHash": "scrypt$0c975acd312285fcbf4b3a8730f3c747$494010e5825630298c95d4a467931ea27d161a3478ee6beb0ec5457c387b2858342fb170f305d63bb7255faeb2d0bd853bc626bbeca0a952536bda0fef04e378",
+      "enabled": true,
+      "operatorCode": "TECNICO"
     }
   ]
 }

@@ -6,6 +6,8 @@
   const $=(id)=>document.getElementById(id);
   function log(msg,data){try{console.log('[TEST UX 6.6D]',msg,data||'');}catch(_e){}}
   function text(el){return String((el&&el.textContent)||'');}
+  function stableLiveActive66d(){return !!(document.body&&document.body.classList&&document.body.classList.contains('vexon-stable-live-active'));}
+  function unifiedStablePopupVisible10112(){const p=$('vx1018-live-popup'); return stableLiveActive66d() || !!(p && p.style.display!=='none');}
   function parseNum(v){const n=parseFloat(String(v||'').replace(',','.').replace(/[^0-9+\-.]/g,'')); return Number.isFinite(n)?n:null;}
   function readLimits(){
     const info=[text($('manual-step-measure-info')),text($('manual-step-limits'))].join(' ');
@@ -28,6 +30,7 @@
     return card;
   }
   function updateTolerance(){
+    if(stableLiveActive66d()) return;
     const input=$('manual-step-value'); const card=ensureToleranceCard(); if(!input||!card)return;
     const v=parseNum(input.value); const lim=readLimits();
     if(v==null){card.className='atmec66d-tolerance-card wait'; card.innerHTML='<div><strong>Valutazione misura</strong><br><span>Inserisci un valore per verificare la tolleranza.</span></div><b>IN ATTESA</b>'; return;}
@@ -41,6 +44,7 @@
     input.addEventListener('input',updateTolerance); input.addEventListener('change',updateTolerance);
   }
   function decorateManualPanel(){
+    if(unifiedStablePopupVisible10112()) return;
     const modal=$('manual-step-modal'); if(!modal)return;
     modal.classList.add('atmec66d-side-action-panel');
     installInputHook(); ensureToleranceCard(); updateTolerance();
@@ -52,6 +56,7 @@
   }
   window.atmec66dShowActionHint=function(title,msg){
     try{
+      if(unifiedStablePopupVisible10112()) return;
       let wrap=$('atmec66d-action-strip'); if(!wrap){wrap=document.createElement('div'); wrap.id='atmec66d-action-strip'; wrap.className='atmec66d-action-strip'; document.body.appendChild(wrap);} 
       wrap.innerHTML='<div class="atmec66d-action-strip-card"><h4>⚠ '+String(title||'Azione richiesta')+'</h4><p>'+String(msg||'')+'</p></div>';
       clearTimeout(window.__atmec66dHintTimer); window.__atmec66dHintTimer=setTimeout(()=>{try{wrap.remove();}catch(_e){}},3600);

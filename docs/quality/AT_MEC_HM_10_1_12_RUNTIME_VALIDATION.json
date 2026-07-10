@@ -1,0 +1,97 @@
+{
+  "version": "AT-MEC_HM_10.1.12_STABLE_ACTION_UNIQUE_FAST_START_FIX",
+  "createdAt": "2026-07-02T10:09:10.687Z",
+  "score": 100,
+  "checks": [
+    {
+      "label": "package VEXON 10.1.12",
+      "ok": true,
+      "detail": "vexon-industrial-test-platform-10-1-12 10.1.12"
+    },
+    {
+      "label": "package-lock 10.1.12",
+      "ok": true,
+      "detail": "package-lock root"
+    },
+    {
+      "label": "runtime script 10.1.12",
+      "ok": true,
+      "detail": "package script"
+    },
+    {
+      "label": "startup doctor 10.1.12",
+      "ok": true,
+      "detail": "package script"
+    },
+    {
+      "label": "Version renderer 10.1.12",
+      "ok": true,
+      "detail": "version.js"
+    },
+    {
+      "label": "Settings 10.1.12",
+      "ok": true,
+      "detail": "app_settings"
+    },
+    {
+      "label": "Unified action hide function",
+      "ok": true,
+      "detail": "action live suppresses legacy panels"
+    },
+    {
+      "label": "Stable step id shared",
+      "ok": true,
+      "detail": "shared stable step id"
+    },
+    {
+      "label": "Legacy manual panel suppressed",
+      "ok": true,
+      "detail": "manual-step-request guard"
+    },
+    {
+      "label": "Legacy fault panel suppressed",
+      "ok": true,
+      "detail": "step-failed guard"
+    },
+    {
+      "label": "UX action strip disabled during stable live",
+      "ok": true,
+      "detail": "66d action hint guard"
+    },
+    {
+      "label": "CSS hides legacy panels in stable live",
+      "ok": true,
+      "detail": "css guard"
+    },
+    {
+      "label": "Fast start production data skip gate",
+      "ok": true,
+      "detail": "start workflow gate skip"
+    },
+    {
+      "label": "Start feedback immediate",
+      "ok": true,
+      "detail": "start feedback"
+    },
+    {
+      "label": "Recover non blocking if not fault",
+      "ok": true,
+      "detail": "recover optimization"
+    },
+    {
+      "label": "Dashboard no duplicate autoconnect",
+      "ok": true,
+      "detail": "dashboard start optimization"
+    },
+    {
+      "label": "BAT VEXON 10.1.12 presenti",
+      "ok": true,
+      "detail": "bat"
+    },
+    {
+      "label": "Release notes 10.1.12",
+      "ok": true,
+      "detail": "release notes"
+    }
+  ]
+}

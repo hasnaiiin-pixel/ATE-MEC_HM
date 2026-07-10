@@ -1,0 +1,53 @@
+{
+  "version": "AT-MEC_HM_10.1_VEXON_BRANDING_AND_STABLE_MEASUREMENT",
+  "createdAt": "2026-07-01T12:12:39.582Z",
+  "checks": [
+    {
+      "label": "package.json",
+      "ok": true,
+      "detail": "root"
+    },
+    {
+      "label": "dist/main/main.js",
+      "ok": true,
+      "detail": "electron main"
+    },
+    {
+      "label": "dist/main/runtime/RecipeEngine.js",
+      "ok": true,
+      "detail": "recipe engine"
+    },
+    {
+      "label": "renderer index",
+      "ok": true,
+      "detail": "ui"
+    },
+    {
+      "label": "MIRZA icon",
+      "ok": true,
+      "detail": "app icon"
+    },
+    {
+      "label": "VEXON mark",
+      "ok": true,
+      "detail": "name logo"
+    },
+    {
+      "label": "config users",
+      "ok": true,
+      "detail": "Admin/Tecnico"
+    },
+    {
+      "label": "drivers folder",
+      "ok": true,
+      "detail": "drivers optional"
+    },
+    {
+      "label": "electron",
+      "ok": false,
+      "detail": "node_modules"
+    }
+  ],
+  "criticalMissing": false,
+  "electronMissing": true
+}

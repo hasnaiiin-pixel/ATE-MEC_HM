@@ -60,6 +60,7 @@
   }
 
   function renderAssistedManual(){
+    if(document.body && document.body.classList && document.body.classList.contains('vexon-stable-live-active')) return;
     const panel=ensureAssistedPanel(); const input=$('manual-step-value'); if(!panel||!input) return;
     const ctx=readManualContext(); const current=parseNum(input.value); const ev=evalValue(current,ctx);
     const liveState=ctx.live.offline?'offline':'online';
@@ -95,6 +96,7 @@
   }
 
   function enhanceManualModal(){
+    if(document.body && document.body.classList && document.body.classList.contains('vexon-stable-live-active')) return;
     const modal=$('manual-step-modal'); if(!modal) return;
     modal.classList.add('atmec66e-modern-modal');
     try{
@@ -115,11 +117,10 @@
   }
 
   function ensureInstrumentBar(){
-    const root=$('production-test-mode'); if(!root || $('atmec66e-instrument-bar')) return;
-    const bar=document.createElement('div'); bar.id='atmec66e-instrument-bar'; bar.className='atmec66e-instrument-bar';
-    bar.innerHTML=['PL303','Multimetro','ESP32','Repository'].map(x=>`<div class="atmec66e-instrument" data-name="${x}"><span class="dot ok"></span><b>${x}</b><small>OK</small></div>`).join('');
-    const target=q('.prod-status-line')||q('.prod-recipe-name')||root.firstElementChild;
-    target?.insertAdjacentElement('afterend',bar);
+    // AT-MEC_HM 9.5.2: the top device-state strip is intentionally disabled.
+    // Device status remains available in the dedicated Strumenti/Device Manager card, not in the operator WO/SN header.
+    try{ const old=$('atmec66e-instrument-bar'); if(old) old.remove(); }catch(_e){}
+    return;
   }
   function updateInstrumentBar(){
     ensureInstrumentBar();
@@ -184,23 +185,42 @@
   }
 
 
-  async function populateActiveLoginUsers(){
-    const el=$('op-name'); if(!el || el.tagName!=='SELECT' || el.__atmec66eUsers) return; el.__atmec66eUsers=true;
+  async function populateActiveLoginUsers(force=false){
+    const el=$('op-name'); if(!el || el.tagName!=='SELECT') return;
+    if(el.__atmec66eUsers && !force) return; el.__atmec66eUsers=true;
     let users=[];
-    try{ if(window.api && typeof api.listUsers==='function'){ const raw=await api.listUsers(); users=Array.isArray(raw)?raw:[]; } }catch(_e){}
-    users=(users||[]).filter(u=>u && u.enabled!==false);
-    const fallback=[{username:'admin',displayName:'Admin'},{username:'Operatore',displayName:'Operatore'}];
-    const list=users.length?users:fallback;
+    try{
+      if(window.api && typeof api.listLoginUsers==='function'){
+        const raw=await api.listLoginUsers();
+        users=Array.isArray(raw)?raw:[];
+      }
+    }catch(_e){}
+    // Fallback 10.0.1: il login deve mostrare sempre gli utenti production iniziali anche prima del login Admin.
+    const fallback=[{username:'Admin',displayName:'Admin',role:'Admin'},{username:'Tecnico',displayName:'Tecnico',role:'Tecnico'}];
+    const base=(users&&users.length?users:fallback).filter(u=>u && u.enabled!==false);
+    const seen=new Set();
+    const list=[];
+    [...base, ...fallback].forEach(u=>{
+      const key=String(u.username||u.displayName||u||'').toLowerCase();
+      if(!key || seen.has(key)) return;
+      seen.add(key); list.push(u);
+    });
     const prev=el.value;
-    el.innerHTML=list.map(u=>`<option value="${esc(u.username||u.displayName||u)}">${esc(u.displayName||u.username||u)}</option>`).join('');
+    el.innerHTML=list.map(u=>{
+      const value=esc(u.username||u.displayName||u);
+      const role=u.role?` — ${esc(u.role)}`:'';
+      return `<option value="${value}">${esc(u.displayName||u.username||u)}${role}</option>`;
+    }).join('');
     if(prev && Array.from(el.options).some(o=>o.value===prev)) el.value=prev;
+    else if(Array.from(el.options).some(o=>o.value==='Admin')) el.value='Admin';
   }
 
   function init(){
     try{document.body.classList.add('atmec66e-modern-testmode');}catch(_e){}
     watchManualModal(); ensureInstrumentBar(); ensureSessionKpi(); modernizeStepCard(); watchLog(); enhanceLog(); populateActiveLoginUsers();
     setInterval(()=>{updateInstrumentBar(); refreshSessionKpi(); updateStepStatus(); enhanceLog();},1200);
-    console.log('[TEST UX 7.3] Test Mode Backbone Unified inizializzato');
+    window.populateActiveLoginUsers1001 = populateActiveLoginUsers;
+    console.log('[TEST UX 10.0.1] Login users visible fix inizializzato');
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init); else init();
 })();

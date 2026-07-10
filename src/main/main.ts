@@ -190,7 +190,8 @@ function createWindow(): void {
     minWidth: 1280,
     minHeight: 800,
     backgroundColor: '#0d0d14',
-    title: 'AT-MEC HM 6.3A_FIX2 PRODUCTION PAGE RENDER FIX',
+    title: 'VEXON 10.1.3 - Industrial Test Platform',
+    icon: path.join(__dirname, '../../assets/icon.ico'),
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
@@ -377,6 +378,7 @@ safeIpcHandle('get-current-user', () => userManager.getCurrentUser());
 
 safeIpcHandle('list-roles', () => userManager.listRoles());
 safeIpcHandle('list-users', () => userManager.listUsers());
+safeIpcHandle('list-login-users', () => userManager.listLoginUsers());
 safeIpcHandle('create-role', (_e, { role, permissions, level }) => userManager.createRole(role, permissions || [], level));
 safeIpcHandle('create-user', (_e, { username, displayName, role, password, operatorCode, photoDataUrl }) => userManager.createUser(username, displayName, role, password, operatorCode, photoDataUrl));
 safeIpcHandle('delete-user', (_e, username) => userManager.deleteUser(username));
@@ -558,6 +560,10 @@ safeIpcHandle('set-debug-mode', (_e, enabled: boolean) => {
 safeIpcHandle('next-step', () => {
   recipeEngine.nextStep();
   return { ok: true };
+});
+
+safeIpcHandle('retry-current-measurement', () => {
+  return recipeEngine.requestCurrentMeasurementRetry();
 });
 
 safeIpcHandle('manual-step-response', (_e, { requestId, response }) => {

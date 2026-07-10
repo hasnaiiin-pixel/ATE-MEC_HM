@@ -920,12 +920,13 @@
       h.addEventListener('mousedown',function(e){ e.stopPropagation(); if(e.stopImmediatePropagation) e.stopImmediatePropagation(); },true);
     });
   }
+  function stableLiveActiveLayout1018(){return !!(document.body&&document.body.classList&&document.body.classList.contains('vexon-stable-live-active'));}
   function boot(){
     hardenHandle();
     protectHandleEvents();
-    var mo=new MutationObserver(function(){ hardenHandle(); protectHandleEvents(); });
+    var mo=new MutationObserver(function(){ if(stableLiveActiveLayout1018()) return; hardenHandle(); protectHandleEvents(); });
     try{ mo.observe(document.body,{childList:true,subtree:true,characterData:true}); }catch(_e){}
-    setInterval(function(){ hardenHandle(); protectHandleEvents(); },350);
+    setInterval(function(){ if(stableLiveActiveLayout1018()) return; hardenHandle(); protectHandleEvents(); },1000);
   }
   ready(boot);
   window.atMec394Handle={fix:hardenHandle,events:protectHandleEvents};

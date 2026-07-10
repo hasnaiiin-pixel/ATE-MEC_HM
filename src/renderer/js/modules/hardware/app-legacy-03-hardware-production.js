@@ -670,6 +670,29 @@ async function autoConnectProductionInstruments(showLog=false) {
     excludedInstruments = Array.isArray(cfg.excludedInstruments) ? cfg.excludedInstruments : [];
     const required = new Set(getRequiredInstrumentsForRecipe());
     const isExcluded = name => window.isRecipeInstrumentExcluded ? window.isRecipeInstrumentExcluded(name) : excludedInstruments.includes(name);
+    // VEXON 10.1.9: avvio più rapido. Se gli strumenti richiesti sono già LIVE,
+    // non eseguire reconnect a ogni START.
+    function normRows1019(raw){
+      if(Array.isArray(raw)) return raw;
+      if(raw&&Array.isArray(raw.rows)) return raw.rows;
+      if(raw&&Array.isArray(raw.statuses)) return raw.statuses;
+      if(raw&&typeof raw==='object') return Object.entries(raw).map(([k,v])=>Object.assign({name:k},(v&&typeof v==='object')?v:{status:v}));
+      return [];
+    }
+    function txt1019(x){return String((x&&(x.name||x.device||x.label||x.type||x.group||x.driver||x._logical||x._title))||'').toLowerCase();}
+    function aliases1019(name){const n=String(name||'').toLowerCase(); if(n.includes('keysight')||n.includes('34461')||n.includes('multimet'))return ['keysight_34461a','keysight','34461','multimetro','dmm']; if(n.includes('pl303')||n.includes('tti')||n.includes('alimentatore'))return ['aimtti_pl303','pl303','tti','alimentatore']; if(n.includes('modbus')||n.includes('esp32'))return ['modbus_serial','esp32','controller']; return [n];}
+    function live1019(st){if(!st)return false; if(st.manualSimulation||st.mock===true||String(st.status||st.state||'').toUpperCase().includes('SIM'))return false; if(st.live===true||st.connected===true||st.ok===true||st.online===true)return true; return ['ONLINE','LIVE','CONNECTED','OK'].includes(String(st.status||st.state||'').toUpperCase());}
+    function find1019(name,rows){const a=aliases1019(name); return rows.find(x=>a.some(k=>txt1019(x).includes(k)))||null;}
+    let shared1019={}; try{shared1019=JSON.parse(localStorage.getItem('atmec67c_device_status_shared')||'{}')||{};}catch(_e){}
+    const currentRows1019=normRows1019(latestHardwareStatuses||[]).concat(normRows1019(shared1019));
+    const requiredActive1019=[...required].filter(name=>!isExcluded(name));
+    if(requiredActive1019.length && currentRows1019.length && requiredActive1019.every(name=>live1019(find1019(name,currentRows1019)))){
+      latestHardwareStatuses=currentRows1019;
+      updateHwBadges(latestHardwareStatuses);
+      renderProductionHardwareList();
+      if(showLog) addLog(document.getElementById('run-log'),'Strumenti richiesti già LIVE: reconnect saltato per avvio rapido.','info');
+      return;
+    }
     const configs = [];
     const missingConfig = [];
 

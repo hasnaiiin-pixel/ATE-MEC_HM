@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: file:; media-src 'self' blob: file:;">
-  <title>ATE-MEC HM 8.0 AI READY ENTERPRISE STABLE</title>
+  <title>VEXON 10.1.2 - Industrial Test Platform</title>
 <link rel="stylesheet" href="css/app.css">
 <link rel="stylesheet" href="css/modules/17-repository-center.css">
 </head>
@@ -19,9 +19,9 @@
   <div class="login-card">
     <img id="login-large-logo" class="login-hero-logo" title="Logo aziendale">
     <div class="login-brand">
-      <div><div class="login-title">ATE-MEC HM 8.0 AI READY ENTERPRISE STABLE</div><div class="login-sub">Production Test & Traceability Suite</div></div>
+      <div class="vexon-brand-stack"><div class="login-title vexon-brand-title"><span class="vexon-mark-box"><img class="vexon-mark" src="assets/VEXON_MARK.png" alt="VEXON"></span>VEXON</div><div class="login-sub">Industrial Test Platform</div></div>
     </div>
-    <div class="col"><label>Utente disponibile</label><select id="op-name" class="login-user-select"><option value="Operatore">Operatore</option></select></div>
+    <div class="col"><label>Utente disponibile</label><select id="op-name" class="login-user-select"><option value="Admin">Admin</option><option value="Tecnico">Tecnico</option></select></div>
     <div class="col"><label>Password</label><input id="op-password" type="password" placeholder="Password"></div>
     <div class="hint">Il ruolo e il livello accesso vengono decisi automaticamente da username e password.</div>
     <button class="btn btn-primary btn-3d" onclick="doLogin()">🔐 ACCEDI</button>
@@ -32,8 +32,9 @@
 <div id="ui-watchdog">⚠️ Operazione lenta: puoi premere STOP o attendere timeout.</div>
 
 <div id="topbar">
-  <img id="app-large-logo" class="app-logo-large"><div class="app-brand-pro"><span class="logo" id="app-title-logo">ATE-MEC HM</span><span class="app-subtitle-pro">Production Test & Traceability Suite</span></div>
-  <span class="ver">8.0_AI_READY_ENTERPRISE_STABLE</span>
+  <img id="app-large-logo" class="app-logo-large"><div class="app-brand-pro"><span class="logo" id="app-title-logo">VEXON</span><span class="app-subtitle-pro">Industrial Test Platform</span></div>
+  <div id="vexon-global-top-brand" class="vexon-top-center-brand"><span class="vexon-mark-box"><img class="vexon-mark" src="assets/VEXON_MARK.png" alt="VEXON"></span><span class="vexon-name">VEXON</span><small>Industrial Test Platform</small></div>
+  <span class="ver">10.1.3</span>
   <div id="hw-badges" style="display:flex;gap:6px;"></div>
   <span class="spacer"></span>
   <button class="btn btn-success btn-xs chrome-toggle" onclick="goDashboard63C()" title="Torna alla Dashboard">🏠 Dashboard</button>
@@ -48,9 +49,10 @@
 
 <div id="production-test-mode" data-ui-id="testmode.page" aria-live="polite">
   <div class="prod-test-header">
+    <div id="vexon-prod-top-brand" class="vexon-top-center-brand vexon-prod-top-center"><span class="vexon-mark-box"><img class="vexon-mark" src="assets/VEXON_MARK.png" alt="VEXON"></span><span class="vexon-name">VEXON</span><small>Industrial Test Platform</small></div>
     <img id="prod-company-logo" class="prod-test-logo" title="Logo azienda">
     <div class="prod-test-title">
-      <h1>ATE-MEC TEST MODE</h1>
+      <h1>TEST MODE</h1>
       <div class="subtitle">Modalità produzione — interfaccia operatore semplificata</div>
     </div>
     <div class="prod-emergency-top">
@@ -122,7 +124,7 @@
         </div>
         <div class="tm-label-body420">
           <div id="tm-label-preview420" class="tm-label-preview420 waiting">
-            <div class="tm-label-brand420">AT-MEC HM</div>
+            <div class="tm-label-brand420">VEXON</div>
             <div class="tm-label-sn420">SN: —</div>
             <div class="tm-label-meta420">WO: — · LOT: —</div>
             <div class="tm-label-result420">IN ATTESA</div>
@@ -207,7 +209,7 @@
   <div id="sidebar">
     <div class="section-title">🏭 Banco prova</div>
     <div class="side-card">
-      <div style="font-size:17px;font-weight:900;color:var(--accent);letter-spacing:1px;">ATE-MEC HM 8.0 AI READY ENTERPRISE STABLE</div>
+      <div style="font-size:17px;font-weight:900;color:var(--accent);letter-spacing:1px;"><span class="vexon-section-name"><span class="vexon-mark-box"><img class="vexon-mark" src="assets/VEXON_MARK.png" alt="VEXON"></span>VEXON</span></div>
       <div id="logged-user-box" class="hint">Accesso non effettuato</div>
       <button class="btn btn-ghost btn-sm side-nav-btn" onclick="showTab('operator-profile-tab', null); refreshOperatorProfile413O()">👤 Profilo collaboratore</button>
       <button class="btn btn-ghost btn-sm side-nav-btn" onclick="logoutAndLock()">🔒 Logout / cambia utente</button>
@@ -243,11 +245,11 @@
         <button class="btn btn-ghost btn-sm side-nav-btn submenu-btn" onclick="showTab('unit-card-tab', null); initUnitCardPage410E()">🧬 Scheda Unità</button>
         <button class="btn btn-ghost btn-sm side-nav-btn submenu-btn" onclick="showTab('analytics-center-tab', null); loadAnalyticsCenter419B2()">📊 Analytics Center</button>
       </details>
-      <details class="nav-group" open><summary>🤖 AI Copilot <span>▾</span></summary>
-        <button class="btn btn-primary btn-sm side-nav-btn submenu-btn" onclick="showAiCopilot76()">🤖 AI Copilot Center</button>
-        <button class="btn btn-success btn-sm side-nav-btn submenu-btn" onclick="showAiReady80()">🚀 AI Ready 8.0</button>
-        <button class="btn btn-ghost btn-sm side-nav-btn submenu-btn" onclick="showAiCopilot76(); setTimeout(runAiCompleteAnalysis762,300)">🧠 Analisi completa AI</button>
-        <button class="btn btn-ghost btn-sm side-nav-btn submenu-btn" onclick="showAiCopilot76(); setTimeout(function(){ if(window.showAiProviderApproval77) window.showAiProviderApproval77(); },300)">🔐 Provider & Approvazioni AI</button>
+      <details class="nav-group ai952-simple-menu" open><summary>🤖 AI Copilot <span>▾</span></summary>
+        <button class="btn btn-primary btn-sm side-nav-btn submenu-btn" onclick="showAiChat952()">💬 Chat AI</button>
+        <button class="btn btn-success btn-sm side-nav-btn submenu-btn" onclick="showAiCommandCenter952()">🧠 Command Center</button>
+        <button class="btn btn-warn btn-sm side-nav-btn submenu-btn" onclick="showAiActions952()">📋 Azioni AI</button>
+        <button class="btn btn-ghost btn-sm side-nav-btn submenu-btn" onclick="showAiSettings952()">🔐 Impostazioni AI</button>
       </details>
       <details class="submenu-device" open><summary>🧰 Hardware / Strumenti <span>▾</span></summary>
         <button class="btn btn-ghost btn-sm side-nav-btn submenu-btn" onclick="showTab('device-tab', null); renderDeviceManagerPage413RA()">🧠 Device Manager</button>
@@ -396,7 +398,8 @@
 <div style="display:none">
   <input id="recipe-enabled" type="checkbox" checked>
   <input id="recipe-name-inp" value="Nuova Ricetta">
-  <select id="new-step-type"><option value="VoltageMeasurement">VoltageMeasurement</option><option value="CurrentMeasurement">CurrentMeasurement</option><option value="AnalogInputMeasurement">AnalogInputMeasurement</option><option value="ResistanceTest">ResistanceTest</option><option value="FrequencyTest">FrequencyTest</option><option value="DigitalOutputSet">DigitalOutputSet</option><option value="DigitalInputCheck">DigitalInputCheck</option><option value="ManualMeasurement">ManualMeasurement</option><option value="PowerSupplySet">PowerSupplySet</option><option value="PowerSupplyMeasureCurrent">PowerSupplyMeasureCurrent</option><option value="SCPICommand">SCPICommand</option><option value="Delay">Delay</option><option value="FirmwareFlash">FirmwareFlash</option></select>
+  <select id="new-step-type"><option value="VoltageMeasurement">VoltageMeasurement</option><option value="CurrentMeasurement">CurrentMeasurement</option><option value="AnalogInputMeasurement">AnalogInputMeasurement</option><option value="ResistanceTest">ResistanceTest</option>
+              <option value="StableMeasurement">StableMeasurement</option><option value="FrequencyTest">FrequencyTest</option><option value="DigitalOutputSet">DigitalOutputSet</option><option value="DigitalInputCheck">DigitalInputCheck</option><option value="ManualMeasurement">ManualMeasurement</option><option value="PowerSupplySet">PowerSupplySet</option><option value="PowerSupplyMeasureCurrent">PowerSupplyMeasureCurrent</option><option value="SCPICommand">SCPICommand</option><option value="Delay">Delay</option><option value="FirmwareFlash">FirmwareFlash</option></select>
   <div id="steps-list"></div>
 </div>
 
@@ -421,6 +424,7 @@
               <option value="measure_current">Misura corrente</option>
               <option value="measure_analog">Leggi ingresso analogico</option>
               <option value="measure_resistance">Misura resistenza</option>
+              <option value="stable_measurement">Misura stabilizzata</option>
               <option value="measure_frequency">Misura frequenza</option>
               <option value="measure_continuity">Controllo continuità</option>
               <option value="measure_temp">Misura temperatura</option>
@@ -488,6 +492,7 @@
               <option value="CurrentMeasurement">CurrentMeasurement</option>
               <option value="AnalogInputMeasurement">AnalogInputMeasurement</option>
               <option value="ResistanceTest">ResistanceTest</option>
+              <option value="StableMeasurement">StableMeasurement</option>
               <option value="FrequencyTest">FrequencyTest</option>
               <option value="DigitalInputCheck">DigitalInputCheck</option>
               <option value="DigitalOutputSet">DigitalOutputSet</option>
@@ -616,6 +621,19 @@
           <div class="wizard-field" data-field="stable_time">
             <label>Tempo stabilizzazione misura ms</label>
             <input id="w-stable-time" type="number" min="0" step="100" value="1000">
+          </div>
+          <div class="wizard-field" data-field="stable_sample_interval">
+            <label>Intervallo lettura misura ms</label>
+            <input id="w-sample-interval" type="number" min="50" step="50" value="100">
+            <div class="hint">Ogni quanti ms leggere lo strumento durante la stabilizzazione.</div>
+          </div>
+          <div class="wizard-field" data-field="on_fail">
+            <label>Azione su FAIL</label>
+            <select id="w-on-fail">
+              <option value="stop">FERMA TEST</option>
+              <option value="continue">CONTINUA TEST</option>
+            </select>
+            <div class="hint">CONTINUA TEST registra il FAIL nel report ma passa agli step successivi.</div>
           </div>
           <div class="wizard-field wide" data-field="instruction_image">
             <label>Immagine dimostrativa istruzione</label>
@@ -748,6 +766,12 @@
 <script src="js/modules/ai/ai-copilot-76.js"></script>
 <script src="js/modules/ai/ai-provider-approval-77.js"></script>
 <script src="js/modules/ai/ai-ready-80.js"></script>
+<script src="js/modules/ai/ai-factory-command-center-90.js"></script>
+<script src="js/modules/ai/ai-action-queue-91.js"></script>
+<script src="js/modules/ai/ai-production-supervisor-92.js"></script>
+<script src="js/modules/ai/ai-live-chat-93.js"></script>
+<script src="js/modules/ai/ai-enterprise-hardening-95.js"></script>
+<script src="js/modules/ai/ai-menu-chat-ux-952.js"></script>
 <script src="js/modules/core/backup-restore-423c.js"></script>
 <script src="js/modules/repository/repository-center-424a.js"></script>
 <script src="js/modules/factory/production-execution-63a.js"></script>
@@ -756,6 +780,7 @@
 <script src="js/modules/ui/test-mode-ux-66d.js"></script>
 <script src="js/modules/ui/test-mode-modern-66e.js"></script>
 <script src="js/modules/ui/test-mode-start-workflow-66e-fix1e.js"></script>
+<script src="js/modules/ui/action-live-measurement-1012.js"></script>
 <script src="js/modules/factory/wo-start-integration-67b-fix2a.js"></script>
 <script src="js/modules/device-manager/device-manager-safe-67c.js"></script>
 <link rel="stylesheet" href="css/modules/17-audio-voice.css">
@@ -779,8 +804,18 @@
 <link rel="stylesheet" href="css/modules/34-ai-copilot-76.css">
 <link rel="stylesheet" href="css/modules/35-ai-provider-approval-77.css">
 <link rel="stylesheet" href="css/modules/36-ai-ready-80.css">
+<link rel="stylesheet" href="css/modules/37-ai-factory-command-center-90.css">
+<link rel="stylesheet" href="css/modules/38-ai-action-queue-91.css">
+<link rel="stylesheet" href="css/modules/39-ai-production-supervisor-92.css">
+<link rel="stylesheet" href="css/modules/40-ai-live-chat-93.css">
+<link rel="stylesheet" href="css/modules/41-ai-enterprise-hardening-95.css">
+<link rel="stylesheet" href="css/modules/42-testmode-ai-menu-chat-952.css">
+<link rel="stylesheet" href="css/modules/43-testmode-topbar-strict-953.css">
+<link rel="stylesheet" href="css/modules/44-vexon-name-101.css">
+<link rel="stylesheet" href="css/modules/45-action-live-measurement-1012.css">
 <script src="js/layout-editor.js" data-source="atmec-layout-editor-398-script"></script>
 <script src="js/layout-editor-managers.js" data-source="atmec-layout-editor-managers-398"></script>
+<script src="js/modules/ui/vexon-branding-101.js"></script>
 <script src="js/version.js" data-source="atmec-version-script"></script>
 
 </body>

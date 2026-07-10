@@ -1,0 +1,43 @@
+{
+  "version": "AT-MEC_HM_10.0_ENTERPRISE_STABLE_CLEAN_PRODUCTION_WITH_DRIVERS",
+  "createdAt": "2026-07-01T08:55:46.318Z",
+  "checks": [
+    {
+      "label": "package.json",
+      "ok": true,
+      "detail": "root"
+    },
+    {
+      "label": "dist/main/main.js",
+      "ok": true,
+      "detail": "electron main"
+    },
+    {
+      "label": "renderer index",
+      "ok": true,
+      "detail": "ui"
+    },
+    {
+      "label": "config users",
+      "ok": true,
+      "detail": "Admin/Tecnico"
+    },
+    {
+      "label": "database clean",
+      "ok": true,
+      "detail": "json db"
+    },
+    {
+      "label": "drivers folder",
+      "ok": true,
+      "detail": "drivers optional"
+    },
+    {
+      "label": "electron",
+      "ok": false,
+      "detail": "node_modules"
+    }
+  ],
+  "criticalMissing": false,
+  "electronMissing": true
+}

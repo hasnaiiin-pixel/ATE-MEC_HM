@@ -1,0 +1,42 @@
+{
+  "version": "AT-MEC_HM_10.0_ENTERPRISE_STABLE_CLEAN_PRODUCTION_WITH_DRIVERS",
+  "createdAt": "2026-07-02T09:26:28.221Z",
+  "score": 100,
+  "checks": [
+    {
+      "label": "No legacy 6.0/6.1 runtime",
+      "ok": true,
+      "detail": "legacy non caricati"
+    },
+    {
+      "label": "Menu AI semplificato mantenuto",
+      "ok": true,
+      "detail": "AI menu presente"
+    },
+    {
+      "label": "Test Mode topbar strict CSS presente",
+      "ok": true,
+      "detail": "topbar strict"
+    },
+    {
+      "label": "Utenti clean production",
+      "ok": true,
+      "detail": "Admin/Tecnico"
+    },
+    {
+      "label": "Ricette e storico puliti",
+      "ok": true,
+      "detail": "local db zero"
+    },
+    {
+      "label": "Enterprise dati produzione puliti",
+      "ok": true,
+      "detail": "enterprise zero"
+    },
+    {
+      "label": "Driver manager 10.0",
+      "ok": true,
+      "detail": "driver scripts"
+    }
+  ]
+}

@@ -1,0 +1,385 @@
+/* AT-MEC_HM_9.5.3 - Test Mode topbar strict alignment fix
+   Loaded after 9.5.2. Purpose: deterministic 4-block operator topbar, no switch/text overflow. */
+
+body.atmec66e-modern-testmode #production-test-mode .prod-operator-bar{
+  display:grid!important;
+  grid-template-columns:minmax(344px,1fr) 150px 372px 235px!important;
+  grid-template-areas:"wo commessa sn sample"!important;
+  gap:8px!important;
+  align-items:stretch!important;
+  width:100%!important;
+  max-width:100%!important;
+  min-height:64px!important;
+  height:64px!important;
+  margin:5px 0 8px!important;
+  padding:0!important;
+  overflow:hidden!important;
+  box-sizing:border-box!important;
+}
+
+body.atmec66e-modern-testmode #production-test-mode .prod-op-cell{
+  min-width:0!important;
+  width:auto!important;
+  max-width:none!important;
+  height:64px!important;
+  min-height:64px!important;
+  max-height:64px!important;
+  padding:6px!important;
+  display:grid!important;
+  align-content:center!important;
+  justify-content:stretch!important;
+  box-sizing:border-box!important;
+  overflow:hidden!important;
+  border-radius:13px!important;
+}
+
+body.atmec66e-modern-testmode #production-test-mode .prod-op-wo{
+  grid-area:wo!important;
+  grid-template-columns:130px 108px 80px!important;
+  gap:6px!important;
+  align-items:center!important;
+  justify-content:start!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-op-commessa{
+  grid-area:commessa!important;
+  justify-items:center!important;
+  align-items:center!important;
+  text-align:center!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-op-sn{
+  grid-area:sn!important;
+  justify-items:center!important;
+  align-items:center!important;
+  text-align:center!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-op-sample{
+  grid-area:sample!important;
+  justify-items:center!important;
+  align-items:center!important;
+  text-align:center!important;
+}
+
+/* Top labels: centered and visually stronger. */
+body.atmec66e-modern-testmode #production-test-mode .prod-op-commessa>label,
+body.atmec66e-modern-testmode #production-test-mode .prod-op-sn>label,
+body.atmec66e-modern-testmode #production-test-mode .prod-op-sample>label{
+  display:block!important;
+  width:100%!important;
+  margin:0 0 5px!important;
+  padding:0!important;
+  text-align:center!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+  line-height:11px!important;
+  font-size:10px!important;
+  font-weight:1000!important;
+  letter-spacing:.11em!important;
+  text-transform:uppercase!important;
+  color:#93c5fd!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-op-commessa>label{color:#fde68a!important;}
+body.atmec66e-modern-testmode #production-test-mode .prod-op-sample>label{color:#c4b5fd!important;}
+
+/* WO block: three items must always stay inside the first rectangle. */
+body.atmec66e-modern-testmode #production-test-mode .prod-switch-wo{
+  width:130px!important;
+  min-width:130px!important;
+  max-width:130px!important;
+}
+body.atmec66e-modern-testmode #production-test-mode #atmec67b-wo-open-btn{
+  width:108px!important;
+  min-width:108px!important;
+  max-width:108px!important;
+  height:32px!important;
+  min-height:32px!important;
+  max-height:32px!important;
+  padding:0 6px!important;
+  border-radius:9px!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+  white-space:nowrap!important;
+  font-size:10px!important;
+  font-weight:900!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-op-wo #atmec67b-selected-wo-chip{
+  width:80px!important;
+  min-width:80px!important;
+  max-width:80px!important;
+  height:32px!important;
+  min-height:32px!important;
+  max-height:32px!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  padding:0 6px!important;
+  box-sizing:border-box!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+  white-space:nowrap!important;
+  font-size:10px!important;
+  line-height:1!important;
+}
+
+/* Commessa field: compact, centered, max 10 digits. */
+body.atmec66e-modern-testmode #production-test-mode #prod-lot-number{
+  width:10ch!important;
+  min-width:10ch!important;
+  max-width:10ch!important;
+  height:33px!important;
+  min-height:33px!important;
+  max-height:33px!important;
+  justify-self:center!important;
+  text-align:center!important;
+  font-size:14px!important;
+  font-weight:1000!important;
+  padding:0 7px!important;
+  box-sizing:border-box!important;
+}
+
+/* Serial Number block: field + QR button + obbligatorio switch. */
+body.atmec66e-modern-testmode #production-test-mode .prod-op-inline-sn{
+  display:grid!important;
+  grid-template-columns:156px 32px 160px!important;
+  width:360px!important;
+  min-width:360px!important;
+  max-width:360px!important;
+  height:33px!important;
+  min-height:33px!important;
+  max-height:33px!important;
+  gap:6px!important;
+  align-items:center!important;
+  justify-content:center!important;
+  overflow:hidden!important;
+  box-sizing:border-box!important;
+}
+body.atmec66e-modern-testmode #production-test-mode #prod-serial-input{
+  width:156px!important;
+  min-width:156px!important;
+  max-width:156px!important;
+  height:33px!important;
+  min-height:33px!important;
+  max-height:33px!important;
+  text-align:center!important;
+  padding:0 8px!important;
+  box-sizing:border-box!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-op-inline-sn>.btn{
+  width:32px!important;
+  min-width:32px!important;
+  max-width:32px!important;
+  height:33px!important;
+  min-height:33px!important;
+  max-height:33px!important;
+  padding:0!important;
+  border-radius:9px!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-switch-serial{
+  width:160px!important;
+  min-width:160px!important;
+  max-width:160px!important;
+}
+
+/* Test campione: wizard + abilita switch. */
+body.atmec66e-modern-testmode #production-test-mode .prod-op-inline-sample{
+  display:grid!important;
+  grid-template-columns:112px 105px!important;
+  width:223px!important;
+  min-width:223px!important;
+  max-width:223px!important;
+  height:33px!important;
+  min-height:33px!important;
+  max-height:33px!important;
+  gap:6px!important;
+  align-items:center!important;
+  justify-content:center!important;
+  overflow:hidden!important;
+  box-sizing:border-box!important;
+}
+body.atmec66e-modern-testmode #production-test-mode #sample-startup-wizard-btn{
+  width:112px!important;
+  min-width:112px!important;
+  max-width:112px!important;
+  height:33px!important;
+  min-height:33px!important;
+  max-height:33px!important;
+  padding:0 8px!important;
+  border-radius:9px!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+  white-space:nowrap!important;
+  font-size:10px!important;
+  font-weight:900!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-switch-sample{
+  width:105px!important;
+  min-width:105px!important;
+  max-width:105px!important;
+}
+
+/* Switch component: custom track only, checkbox hidden, never clipped by global checkbox CSS. */
+body.atmec66e-modern-testmode #production-test-mode .prod-op-cell label.prod-switch-control{
+  display:flex!important;
+  flex-direction:row!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  gap:5px!important;
+  height:33px!important;
+  min-height:33px!important;
+  max-height:33px!important;
+  padding:4px 6px!important;
+  margin:0!important;
+  border:1px solid rgba(148,163,184,.26)!important;
+  border-radius:9px!important;
+  background:rgba(15,23,42,.68)!important;
+  color:#bfdbfe!important;
+  box-sizing:border-box!important;
+  overflow:hidden!important;
+  cursor:pointer!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-op-cell label.prod-switch-control>span:first-child{
+  display:block!important;
+  flex:1 1 auto!important;
+  min-width:0!important;
+  margin:0!important;
+  padding:0!important;
+  text-align:left!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:clip!important;
+  line-height:1!important;
+  font-size:8px!important;
+  font-weight:1000!important;
+  letter-spacing:.015em!important;
+  text-transform:uppercase!important;
+  color:#bfdbfe!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-switch-wo>span:first-child{font-size:7.4px!important;letter-spacing:0!important;}
+body.atmec66e-modern-testmode #production-test-mode .prod-switch-serial>span:first-child{font-size:7.8px!important;letter-spacing:0!important;}
+body.atmec66e-modern-testmode #production-test-mode .prod-switch-sample>span:first-child{font-size:8px!important;}
+
+body.atmec66e-modern-testmode #production-test-mode .prod-switch-control input[type="checkbox"],
+body.atmec66e-modern-testmode #production-test-mode #atmec67b-use-wo-prod,
+body.atmec66e-modern-testmode #production-test-mode #serial-required-prod,
+body.atmec66e-modern-testmode #production-test-mode #sample-test-required-prod{
+  position:absolute!important;
+  opacity:0!important;
+  pointer-events:none!important;
+  width:1px!important;
+  min-width:1px!important;
+  max-width:1px!important;
+  height:1px!important;
+  min-height:1px!important;
+  max-height:1px!important;
+  margin:0!important;
+  padding:0!important;
+  border:0!important;
+  appearance:none!important;
+  -webkit-appearance:none!important;
+  transform:none!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-switch-control input[type="checkbox"]::before,
+body.atmec66e-modern-testmode #production-test-mode .prod-switch-control input[type="checkbox"]::after,
+body.atmec66e-modern-testmode #production-test-mode #atmec67b-use-wo-prod::before,
+body.atmec66e-modern-testmode #production-test-mode #atmec67b-use-wo-prod::after,
+body.atmec66e-modern-testmode #production-test-mode #serial-required-prod::before,
+body.atmec66e-modern-testmode #production-test-mode #serial-required-prod::after,
+body.atmec66e-modern-testmode #production-test-mode #sample-test-required-prod::before,
+body.atmec66e-modern-testmode #production-test-mode #sample-test-required-prod::after{
+  content:none!important;
+  display:none!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-switch-track{
+  position:relative!important;
+  display:inline-block!important;
+  flex:0 0 42px!important;
+  width:42px!important;
+  min-width:42px!important;
+  max-width:42px!important;
+  height:22px!important;
+  min-height:22px!important;
+  max-height:22px!important;
+  border-radius:999px!important;
+  border:1px solid rgba(255,255,255,.24)!important;
+  background:rgba(255,255,255,.14)!important;
+  box-shadow:none!important;
+  overflow:hidden!important;
+  transform:none!important;
+  box-sizing:border-box!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-switch-track::before{
+  content:""!important;
+  position:absolute!important;
+  left:3px!important;
+  top:2px!important;
+  width:16px!important;
+  height:16px!important;
+  border-radius:999px!important;
+  background:#fff!important;
+  box-shadow:0 1px 6px rgba(0,0,0,.35)!important;
+  transition:left .16s ease!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-switch-track::after{
+  content:"OFF"!important;
+  position:absolute!important;
+  right:4px!important;
+  top:5px!important;
+  line-height:1!important;
+  font-size:7px!important;
+  font-weight:1000!important;
+  color:rgba(255,255,255,.84)!important;
+  transform:none!important;
+  letter-spacing:0!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-switch-control input[type="checkbox"]:checked + .prod-switch-track{
+  background:linear-gradient(90deg,#0891b2,#22c55e)!important;
+  border-color:rgba(34,197,94,.80)!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-switch-control input[type="checkbox"]:checked + .prod-switch-track::before{
+  left:21px!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-switch-control input[type="checkbox"]:checked + .prod-switch-track::after{
+  content:"ON"!important;
+  left:5px!important;
+  right:auto!important;
+  top:5px!important;
+  color:#031417!important;
+  transform:none!important;
+}
+
+/* The WO lock note must not overlap the operator row. Keep topbar clean. */
+body.atmec66e-modern-testmode #production-test-mode.atmec69a-wo-locked-mode .prod-recipe-compact-row::after{
+  display:none!important;
+  content:none!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-status-line,
+body.atmec66e-modern-testmode #production-test-mode #atmec66e-instrument-bar{
+  display:none!important;
+}
+
+@media(max-width:1168px){
+  body.atmec66e-modern-testmode #production-test-mode .prod-operator-bar{
+    grid-template-columns:minmax(344px,1fr) 150px!important;
+    grid-template-areas:"wo commessa" "sn sample"!important;
+    height:136px!important;
+    min-height:136px!important;
+    max-height:none!important;
+    overflow:visible!important;
+  }
+}
+@media(max-width:720px){
+  body.atmec66e-modern-testmode #production-test-mode .prod-operator-bar{
+    grid-template-columns:1fr!important;
+    grid-template-areas:"wo" "commessa" "sn" "sample"!important;
+    height:auto!important;
+    min-height:auto!important;
+    overflow:visible!important;
+  }
+  body.atmec66e-modern-testmode #production-test-mode .prod-op-wo,
+  body.atmec66e-modern-testmode #production-test-mode .prod-op-commessa,
+  body.atmec66e-modern-testmode #production-test-mode .prod-op-sn,
+  body.atmec66e-modern-testmode #production-test-mode .prod-op-sample{
+    width:100%!important;
+    max-width:100%!important;
+  }
+}

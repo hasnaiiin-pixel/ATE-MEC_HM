@@ -1,32 +1,35 @@
 {
-  "schemaVersion": 41702,
-  "createdAt": "2026-06-14T15:43:02.563Z",
-  "updatedAt": "2026-06-30T11:09:58.079Z",
+  "schemaVersion": 100000,
+  "createdAt": "2026-07-01T08:56:32.993Z",
+  "updatedAt": "2026-07-01T08:56:32.993Z",
   "backend": "json_enterprise",
   "sqliteReady": false,
+  "environment": "clean_production_10_0",
   "tables": {
     "users": [
       {
-        "username": "admin",
+        "username": "Admin",
         "displayName": "Admin",
         "role": "Admin",
-        "salt": "bd161c457887e4e35e3f01a6bcb12f52",
-        "passwordHash": "e5e65fd88c58385482f1886aac8d9dd148a3ac07c2dac7323850019193f98bb9",
+        "salt": "7ba408bdef8e8a25e3491405906e56aa",
+        "passwordHash": "scrypt$7ba408bdef8e8a25e3491405906e56aa$2587b3eeed373bde2f99767aed80141fb494e5c17a800f14f9b34155966adf30f03147a8ca0f8bab44f379cdd14350616e6f931909706afd4c1c61e82d61d9ca",
         "enabled": true,
+        "operatorCode": "ADMIN",
         "id": "admin",
-        "updatedAt": "2026-06-14T15:43:02.569Z",
-        "createdAt": "2026-06-14T15:43:02.569Z"
+        "createdAt": "2026-07-01T08:56:32.993Z",
+        "updatedAt": "2026-07-01T08:56:32.993Z"
       },
       {
-        "username": "mirza",
-        "displayName": "Mirza",
-        "role": "Operator",
-        "salt": "1a0972d41057b989dea001df46a1a24b",
-        "passwordHash": "431bd2ee25963454e8d349a484bdfc4ee80160f58b8bc5447ee931f59abd63ea",
+        "username": "Tecnico",
+        "displayName": "Tecnico",
+        "role": "Tecnico",
+        "salt": "0c975acd312285fcbf4b3a8730f3c747",
+        "passwordHash": "scrypt$0c975acd312285fcbf4b3a8730f3c747$494010e5825630298c95d4a467931ea27d161a3478ee6beb0ec5457c387b2858342fb170f305d63bb7255faeb2d0bd853bc626bbeca0a952536bda0fef04e378",
         "enabled": true,
-        "id": "mirza",
-        "updatedAt": "2026-06-14T15:43:02.570Z",
-        "createdAt": "2026-06-14T15:43:02.570Z"
+        "operatorCode": "TECNICO",
+        "id": "tecnico",
+        "createdAt": "2026-07-01T08:56:32.993Z",
+        "updatedAt": "2026-07-01T08:56:32.993Z"
       }
     ],
     "roles": [
@@ -38,8 +41,25 @@
         ],
         "level": 10,
         "id": "operator",
-        "updatedAt": "2026-06-14T15:43:02.571Z",
-        "createdAt": "2026-06-14T15:43:02.571Z"
+        "createdAt": "2026-07-01T08:56:32.993Z",
+        "updatedAt": "2026-07-01T08:56:32.993Z"
+      },
+      {
+        "role": "Tecnico",
+        "permissions": [
+          "run_test",
+          "view_reports",
+          "debug_mode",
+          "view_traceability",
+          "view_kpi",
+          "manage_repair",
+          "ai_read",
+          "export_data"
+        ],
+        "level": 30,
+        "id": "tecnico",
+        "createdAt": "2026-07-01T08:56:32.993Z",
+        "updatedAt": "2026-07-01T08:56:32.993Z"
       },
       {
         "role": "Technician",
@@ -47,12 +67,16 @@
           "run_test",
           "view_reports",
           "debug_mode",
-          "view_traceability"
+          "view_traceability",
+          "view_kpi",
+          "manage_repair",
+          "ai_read",
+          "export_data"
         ],
         "level": 30,
         "id": "technician",
-        "updatedAt": "2026-06-14T15:43:02.571Z",
-        "createdAt": "2026-06-14T15:43:02.571Z"
+        "createdAt": "2026-07-01T08:56:32.993Z",
+        "updatedAt": "2026-07-01T08:56:32.993Z"
       },
       {
         "role": "Engineer",
@@ -64,12 +88,15 @@
           "config_hardware",
           "view_traceability",
           "view_kpi",
-          "manage_data"
+          "manage_data",
+          "manage_repair",
+          "ai_read",
+          "export_data"
         ],
         "level": 60,
         "id": "engineer",
-        "updatedAt": "2026-06-14T15:43:02.572Z",
-        "createdAt": "2026-06-14T15:43:02.572Z"
+        "createdAt": "2026-07-01T08:56:32.993Z",
+        "updatedAt": "2026-07-01T08:56:32.993Z"
       },
       {
         "role": "Developer",
@@ -85,12 +112,15 @@
           "test_elements",
           "view_traceability",
           "view_kpi",
-          "manage_data"
+          "manage_data",
+          "manage_ai",
+          "config_ai",
+          "export_data"
         ],
         "level": 80,
         "id": "developer",
-        "updatedAt": "2026-06-14T15:43:02.573Z",
-        "createdAt": "2026-06-14T15:43:02.573Z"
+        "createdAt": "2026-07-01T08:56:32.993Z",
+        "updatedAt": "2026-07-01T08:56:32.993Z"
       },
       {
         "role": "Admin",
@@ -107,24 +137,41 @@
           "test_elements",
           "view_traceability",
           "view_kpi",
-          "manage_data"
+          "manage_data",
+          "sign_quality",
+          "approve_reports",
+          "manage_ai",
+          "config_ai",
+          "reset_data",
+          "manage_work_orders",
+          "manage_repair",
+          "export_data",
+          "import_data",
+          "factory_admin",
+          "runtime_validate",
+          "startup_doctor",
+          "driver_install",
+          "driver_check"
         ],
         "level": 100,
         "id": "admin",
-        "updatedAt": "2026-06-14T15:43:02.573Z",
-        "createdAt": "2026-06-14T15:43:02.573Z"
+        "createdAt": "2026-07-01T08:56:32.993Z",
+        "updatedAt": "2026-07-01T08:56:32.993Z"
       },
       {
         "role": "Qualità",
         "permissions": [
           "view_reports",
           "sign_quality",
-          "approve_reports"
+          "approve_reports",
+          "view_kpi",
+          "view_traceability",
+          "ai_read"
         ],
         "level": 60,
         "id": "qualità",
-        "updatedAt": "2026-06-14T15:43:02.574Z",
-        "createdAt": "2026-06-14T15:43:02.574Z"
+        "createdAt": "2026-07-01T08:56:32.993Z",
+        "updatedAt": "2026-07-01T08:56:32.993Z"
       }
     ],
     "permissions": [
@@ -132,1495 +179,556 @@
         "role": "Operator",
         "permission": "run_test",
         "id": "operator_run_test",
-        "updatedAt": "2026-06-14T15:43:02.575Z",
-        "createdAt": "2026-06-14T15:43:02.575Z"
+        "createdAt": "2026-07-01T08:56:32.993Z",
+        "updatedAt": "2026-07-01T08:56:32.993Z"
       },
       {
         "role": "Operator",
         "permission": "view_reports",
         "id": "operator_view_reports",
-        "updatedAt": "2026-06-14T15:43:02.575Z",
-        "createdAt": "2026-06-14T15:43:02.575Z"
+        "createdAt": "2026-07-01T08:56:32.993Z",
+        "updatedAt": "2026-07-01T08:56:32.993Z"
+      },
+      {
+        "role": "Tecnico",
+        "permission": "run_test",
+        "id": "tecnico_run_test",
+        "createdAt": "2026-07-01T08:56:32.993Z",
+        "updatedAt": "2026-07-01T08:56:32.993Z"
+      },
+      {
+        "role": "Tecnico",
+        "permission": "view_reports",
+        "id": "tecnico_view_reports",
+        "createdAt": "2026-07-01T08:56:32.993Z",
+        "updatedAt": "2026-07-01T08:56:32.993Z"
+      },
+      {
+        "role": "Tecnico",
+        "permission": "debug_mode",
+        "id": "tecnico_debug_mode",
+        "createdAt": "2026-07-01T08:56:32.993Z",
+        "updatedAt": "2026-07-01T08:56:32.993Z"
+      },
+      {
+        "role": "Tecnico",
+        "permission": "view_traceability",
+        "id": "tecnico_view_traceability",
+        "createdAt": "2026-07-01T08:56:32.993Z",
+        "updatedAt": "2026-07-01T08:56:32.993Z"
+      },
+      {
+        "role": "Tecnico",
+        "permission": "view_kpi",
+        "id": "tecnico_view_kpi",
+        "createdAt": "2026-07-01T08:56:32.993Z",
+        "updatedAt": "2026-07-01T08:56:32.993Z"
+      },
+      {
+        "role": "Tecnico",
+        "permission": "manage_repair",
+        "id": "tecnico_manage_repair",
+        "createdAt": "2026-07-01T08:56:32.993Z",
+        "updatedAt": "2026-07-01T08:56:32.993Z"
+      },
+      {
+        "role": "Tecnico",
+        "permission": "ai_read",
+        "id": "tecnico_ai_read",
+        "createdAt": "2026-07-01T08:56:32.993Z",
+        "updatedAt": "2026-07-01T08:56:32.993Z"
+      },
+      {
+        "role": "Tecnico",
+        "permission": "export_data",
+        "id": "tecnico_export_data",
+        "createdAt": "2026-07-01T08:56:32.993Z",
+        "updatedAt": "2026-07-01T08:56:32.993Z"
       },
       {
         "role": "Technician",
         "permission": "run_test",
         "id": "technician_run_test",
-        "updatedAt": "2026-06-14T15:43:02.575Z",
-        "createdAt": "2026-06-14T15:43:02.575Z"
+        "createdAt": "2026-07-01T08:56:32.993Z",
+        "updatedAt": "2026-07-01T08:56:32.993Z"
       },
       {
         "role": "Technician",
         "permission": "view_reports",
         "id": "technician_view_reports",
-        "updatedAt": "2026-06-14T15:43:02.576Z",
-        "createdAt": "2026-06-14T15:43:02.576Z"
+        "createdAt": "2026-07-01T08:56:32.993Z",
+        "updatedAt": "2026-07-01T08:56:32.993Z"
       },
       {
         "role": "Technician",
         "permission": "debug_mode",
         "id": "technician_debug_mode",
-        "updatedAt": "2026-06-14T15:43:02.576Z",
-        "createdAt": "2026-06-14T15:43:02.576Z"
+        "createdAt": "2026-07-01T08:56:32.993Z",
+        "updatedAt": "2026-07-01T08:56:32.993Z"
       },
       {
         "role": "Technician",
         "permission": "view_traceability",
         "id": "technician_view_traceability",
-        "updatedAt": "2026-06-14T15:43:02.577Z",
-        "createdAt": "2026-06-14T15:43:02.577Z"
+        "createdAt": "2026-07-01T08:56:32.993Z",
+        "updatedAt": "2026-07-01T08:56:32.993Z"
+      },
+      {
+        "role": "Technician",
+        "permission": "view_kpi",
+        "id": "technician_view_kpi",
+        "createdAt": "2026-07-01T08:56:32.993Z",
+        "updatedAt": "2026-07-01T08:56:32.993Z"
+      },
+      {
+        "role": "Technician",
+        "permission": "manage_repair",
+        "id": "technician_manage_repair",
+        "createdAt": "2026-07-01T08:56:32.993Z",
+        "updatedAt": "2026-07-01T08:56:32.993Z"
+      },
+      {
+        "role": "Technician",
+        "permission": "ai_read",
+        "id": "technician_ai_read",
+        "createdAt": "2026-07-01T08:56:32.993Z",
+        "updatedAt": "2026-07-01T08:56:32.993Z"
+      },
+      {
+        "role": "Technician",
+        "permission": "export_data",
+        "id": "technician_export_data",
+        "createdAt": "2026-07-01T08:56:32.993Z",
+        "updatedAt": "2026-07-01T08:56:32.993Z"
       },
       {
         "role": "Engineer",
         "permission": "run_test",
         "id": "engineer_run_test",
-        "updatedAt": "2026-06-14T15:43:02.577Z",
-        "createdAt": "2026-06-14T15:43:02.577Z"
+        "createdAt": "2026-07-01T08:56:32.993Z",
+        "updatedAt": "2026-07-01T08:56:32.993Z"
       },
       {
         "role": "Engineer",
         "permission": "view_reports",
         "id": "engineer_view_reports",
-        "updatedAt": "2026-06-14T15:43:02.578Z",
-        "createdAt": "2026-06-14T15:43:02.578Z"
+        "createdAt": "2026-07-01T08:56:32.993Z",
+        "updatedAt": "2026-07-01T08:56:32.993Z"
       },
       {
         "role": "Engineer",
         "permission": "debug_mode",
         "id": "engineer_debug_mode",
-        "updatedAt": "2026-06-14T15:43:02.578Z",
-        "createdAt": "2026-06-14T15:43:02.578Z"
+        "createdAt": "2026-07-01T08:56:32.993Z",
+        "updatedAt": "2026-07-01T08:56:32.993Z"
       },
       {
         "role": "Engineer",
         "permission": "edit_recipe",
         "id": "engineer_edit_recipe",
-        "updatedAt": "2026-06-14T15:43:02.579Z",
-        "createdAt": "2026-06-14T15:43:02.579Z"
+        "createdAt": "2026-07-01T08:56:32.993Z",
+        "updatedAt": "2026-07-01T08:56:32.993Z"
       },
       {
         "role": "Engineer",
         "permission": "config_hardware",
         "id": "engineer_config_hardware",
-        "updatedAt": "2026-06-14T15:43:02.579Z",
-        "createdAt": "2026-06-14T15:43:02.579Z"
+        "createdAt": "2026-07-01T08:56:32.993Z",
+        "updatedAt": "2026-07-01T08:56:32.993Z"
       },
       {
         "role": "Engineer",
         "permission": "view_traceability",
         "id": "engineer_view_traceability",
-        "updatedAt": "2026-06-14T15:43:02.579Z",
-        "createdAt": "2026-06-14T15:43:02.579Z"
+        "createdAt": "2026-07-01T08:56:32.993Z",
+        "updatedAt": "2026-07-01T08:56:32.993Z"
       },
       {
         "role": "Engineer",
         "permission": "view_kpi",
         "id": "engineer_view_kpi",
-        "updatedAt": "2026-06-14T15:43:02.580Z",
-        "createdAt": "2026-06-14T15:43:02.580Z"
+        "createdAt": "2026-07-01T08:56:32.993Z",
+        "updatedAt": "2026-07-01T08:56:32.993Z"
       },
       {
         "role": "Engineer",
         "permission": "manage_data",
         "id": "engineer_manage_data",
-        "updatedAt": "2026-06-14T15:43:02.580Z",
-        "createdAt": "2026-06-14T15:43:02.580Z"
+        "createdAt": "2026-07-01T08:56:32.993Z",
+        "updatedAt": "2026-07-01T08:56:32.993Z"
+      },
+      {
+        "role": "Engineer",
+        "permission": "manage_repair",
+        "id": "engineer_manage_repair",
+        "createdAt": "2026-07-01T08:56:32.993Z",
+        "updatedAt": "2026-07-01T08:56:32.993Z"
+      },
+      {
+        "role": "Engineer",
+        "permission": "ai_read",
+        "id": "engineer_ai_read",
+        "createdAt": "2026-07-01T08:56:32.993Z",
+        "updatedAt": "2026-07-01T08:56:32.993Z"
+      },
+      {
+        "role": "Engineer",
+        "permission": "export_data",
+        "id": "engineer_export_data",
+        "createdAt": "2026-07-01T08:56:32.993Z",
+        "updatedAt": "2026-07-01T08:56:32.993Z"
       },
       {
         "role": "Developer",
         "permission": "run_test",
         "id": "developer_run_test",
-        "updatedAt": "2026-06-14T15:43:02.580Z",
-        "createdAt": "2026-06-14T15:43:02.580Z"
+        "createdAt": "2026-07-01T08:56:32.993Z",
+        "updatedAt": "2026-07-01T08:56:32.993Z"
       },
       {
         "role": "Developer",
         "permission": "view_reports",
         "id": "developer_view_reports",
-        "updatedAt": "2026-06-14T15:43:02.581Z",
-        "createdAt": "2026-06-14T15:43:02.581Z"
+        "createdAt": "2026-07-01T08:56:32.993Z",
+        "updatedAt": "2026-07-01T08:56:32.993Z"
       },
       {
         "role": "Developer",
         "permission": "debug_mode",
         "id": "developer_debug_mode",
-        "updatedAt": "2026-06-14T15:43:02.581Z",
-        "createdAt": "2026-06-14T15:43:02.581Z"
+        "createdAt": "2026-07-01T08:56:32.993Z",
+        "updatedAt": "2026-07-01T08:56:32.993Z"
       },
       {
         "role": "Developer",
         "permission": "edit_recipe",
         "id": "developer_edit_recipe",
-        "updatedAt": "2026-06-14T15:43:02.582Z",
-        "createdAt": "2026-06-14T15:43:02.582Z"
+        "createdAt": "2026-07-01T08:56:32.993Z",
+        "updatedAt": "2026-07-01T08:56:32.993Z"
       },
       {
         "role": "Developer",
         "permission": "config_hardware",
         "id": "developer_config_hardware",
-        "updatedAt": "2026-06-14T15:43:02.583Z",
-        "createdAt": "2026-06-14T15:43:02.583Z"
+        "createdAt": "2026-07-01T08:56:32.993Z",
+        "updatedAt": "2026-07-01T08:56:32.993Z"
       },
       {
         "role": "Developer",
         "permission": "manage_branding",
         "id": "developer_manage_branding",
-        "updatedAt": "2026-06-14T15:43:02.584Z",
-        "createdAt": "2026-06-14T15:43:02.584Z"
+        "createdAt": "2026-07-01T08:56:32.993Z",
+        "updatedAt": "2026-07-01T08:56:32.993Z"
       },
       {
         "role": "Developer",
         "permission": "edit_layout",
         "id": "developer_edit_layout",
-        "updatedAt": "2026-06-14T15:43:02.585Z",
-        "createdAt": "2026-06-14T15:43:02.585Z"
+        "createdAt": "2026-07-01T08:56:32.993Z",
+        "updatedAt": "2026-07-01T08:56:32.993Z"
       },
       {
         "role": "Developer",
         "permission": "show_ui_ids",
         "id": "developer_show_ui_ids",
-        "updatedAt": "2026-06-14T15:43:02.585Z",
-        "createdAt": "2026-06-14T15:43:02.585Z"
+        "createdAt": "2026-07-01T08:56:32.993Z",
+        "updatedAt": "2026-07-01T08:56:32.993Z"
       },
       {
         "role": "Developer",
         "permission": "test_elements",
         "id": "developer_test_elements",
-        "updatedAt": "2026-06-14T15:43:02.586Z",
-        "createdAt": "2026-06-14T15:43:02.586Z"
+        "createdAt": "2026-07-01T08:56:32.993Z",
+        "updatedAt": "2026-07-01T08:56:32.993Z"
       },
       {
         "role": "Developer",
         "permission": "view_traceability",
         "id": "developer_view_traceability",
-        "updatedAt": "2026-06-14T15:43:02.588Z",
-        "createdAt": "2026-06-14T15:43:02.588Z"
+        "createdAt": "2026-07-01T08:56:32.993Z",
+        "updatedAt": "2026-07-01T08:56:32.993Z"
       },
       {
         "role": "Developer",
         "permission": "view_kpi",
         "id": "developer_view_kpi",
-        "updatedAt": "2026-06-14T15:43:02.589Z",
-        "createdAt": "2026-06-14T15:43:02.589Z"
+        "createdAt": "2026-07-01T08:56:32.993Z",
+        "updatedAt": "2026-07-01T08:56:32.993Z"
       },
       {
         "role": "Developer",
         "permission": "manage_data",
         "id": "developer_manage_data",
-        "updatedAt": "2026-06-14T15:43:02.589Z",
-        "createdAt": "2026-06-14T15:43:02.589Z"
+        "createdAt": "2026-07-01T08:56:32.993Z",
+        "updatedAt": "2026-07-01T08:56:32.993Z"
+      },
+      {
+        "role": "Developer",
+        "permission": "manage_ai",
+        "id": "developer_manage_ai",
+        "createdAt": "2026-07-01T08:56:32.993Z",
+        "updatedAt": "2026-07-01T08:56:32.993Z"
+      },
+      {
+        "role": "Developer",
+        "permission": "config_ai",
+        "id": "developer_config_ai",
+        "createdAt": "2026-07-01T08:56:32.993Z",
+        "updatedAt": "2026-07-01T08:56:32.993Z"
+      },
+      {
+        "role": "Developer",
+        "permission": "export_data",
+        "id": "developer_export_data",
+        "createdAt": "2026-07-01T08:56:32.993Z",
+        "updatedAt": "2026-07-01T08:56:32.993Z"
       },
       {
         "role": "Admin",
         "permission": "run_test",
         "id": "admin_run_test",
-        "updatedAt": "2026-06-14T15:43:02.590Z",
-        "createdAt": "2026-06-14T15:43:02.590Z"
+        "createdAt": "2026-07-01T08:56:32.993Z",
+        "updatedAt": "2026-07-01T08:56:32.993Z"
       },
       {
         "role": "Admin",
         "permission": "view_reports",
         "id": "admin_view_reports",
-        "updatedAt": "2026-06-14T15:43:02.592Z",
-        "createdAt": "2026-06-14T15:43:02.592Z"
+        "createdAt": "2026-07-01T08:56:32.993Z",
+        "updatedAt": "2026-07-01T08:56:32.993Z"
       },
       {
         "role": "Admin",
         "permission": "debug_mode",
         "id": "admin_debug_mode",
-        "updatedAt": "2026-06-14T15:43:02.592Z",
-        "createdAt": "2026-06-14T15:43:02.592Z"
+        "createdAt": "2026-07-01T08:56:32.993Z",
+        "updatedAt": "2026-07-01T08:56:32.993Z"
       },
       {
         "role": "Admin",
         "permission": "edit_recipe",
         "id": "admin_edit_recipe",
-        "updatedAt": "2026-06-14T15:43:02.593Z",
-        "createdAt": "2026-06-14T15:43:02.593Z"
+        "createdAt": "2026-07-01T08:56:32.993Z",
+        "updatedAt": "2026-07-01T08:56:32.993Z"
       },
       {
         "role": "Admin",
         "permission": "config_hardware",
         "id": "admin_config_hardware",
-        "updatedAt": "2026-06-14T15:43:02.594Z",
-        "createdAt": "2026-06-14T15:43:02.594Z"
+        "createdAt": "2026-07-01T08:56:32.993Z",
+        "updatedAt": "2026-07-01T08:56:32.993Z"
       },
       {
         "role": "Admin",
         "permission": "manage_users",
         "id": "admin_manage_users",
-        "updatedAt": "2026-06-14T15:43:02.595Z",
-        "createdAt": "2026-06-14T15:43:02.595Z"
+        "createdAt": "2026-07-01T08:56:32.993Z",
+        "updatedAt": "2026-07-01T08:56:32.993Z"
       },
       {
         "role": "Admin",
         "permission": "manage_branding",
         "id": "admin_manage_branding",
-        "updatedAt": "2026-06-14T15:43:02.595Z",
-        "createdAt": "2026-06-14T15:43:02.595Z"
+        "createdAt": "2026-07-01T08:56:32.993Z",
+        "updatedAt": "2026-07-01T08:56:32.993Z"
       },
       {
         "role": "Admin",
         "permission": "edit_layout",
         "id": "admin_edit_layout",
-        "updatedAt": "2026-06-14T15:43:02.596Z",
-        "createdAt": "2026-06-14T15:43:02.596Z"
+        "createdAt": "2026-07-01T08:56:32.993Z",
+        "updatedAt": "2026-07-01T08:56:32.993Z"
       },
       {
         "role": "Admin",
         "permission": "show_ui_ids",
         "id": "admin_show_ui_ids",
-        "updatedAt": "2026-06-14T15:43:02.597Z",
-        "createdAt": "2026-06-14T15:43:02.597Z"
+        "createdAt": "2026-07-01T08:56:32.993Z",
+        "updatedAt": "2026-07-01T08:56:32.993Z"
       },
       {
         "role": "Admin",
         "permission": "test_elements",
         "id": "admin_test_elements",
-        "updatedAt": "2026-06-14T15:43:02.597Z",
-        "createdAt": "2026-06-14T15:43:02.597Z"
+        "createdAt": "2026-07-01T08:56:32.993Z",
+        "updatedAt": "2026-07-01T08:56:32.993Z"
       },
       {
         "role": "Admin",
         "permission": "view_traceability",
         "id": "admin_view_traceability",
-        "updatedAt": "2026-06-14T15:43:02.598Z",
-        "createdAt": "2026-06-14T15:43:02.598Z"
+        "createdAt": "2026-07-01T08:56:32.993Z",
+        "updatedAt": "2026-07-01T08:56:32.993Z"
       },
       {
         "role": "Admin",
         "permission": "view_kpi",
         "id": "admin_view_kpi",
-        "updatedAt": "2026-06-14T15:43:02.599Z",
-        "createdAt": "2026-06-14T15:43:02.599Z"
+        "createdAt": "2026-07-01T08:56:32.993Z",
+        "updatedAt": "2026-07-01T08:56:32.993Z"
       },
       {
         "role": "Admin",
         "permission": "manage_data",
         "id": "admin_manage_data",
-        "updatedAt": "2026-06-14T15:43:02.600Z",
-        "createdAt": "2026-06-14T15:43:02.600Z"
+        "createdAt": "2026-07-01T08:56:32.993Z",
+        "updatedAt": "2026-07-01T08:56:32.993Z"
+      },
+      {
+        "role": "Admin",
+        "permission": "sign_quality",
+        "id": "admin_sign_quality",
+        "createdAt": "2026-07-01T08:56:32.993Z",
+        "updatedAt": "2026-07-01T08:56:32.993Z"
+      },
+      {
+        "role": "Admin",
+        "permission": "approve_reports",
+        "id": "admin_approve_reports",
+        "createdAt": "2026-07-01T08:56:32.993Z",
+        "updatedAt": "2026-07-01T08:56:32.993Z"
+      },
+      {
+        "role": "Admin",
+        "permission": "manage_ai",
+        "id": "admin_manage_ai",
+        "createdAt": "2026-07-01T08:56:32.993Z",
+        "updatedAt": "2026-07-01T08:56:32.993Z"
+      },
+      {
+        "role": "Admin",
+        "permission": "config_ai",
+        "id": "admin_config_ai",
+        "createdAt": "2026-07-01T08:56:32.993Z",
+        "updatedAt": "2026-07-01T08:56:32.993Z"
+      },
+      {
+        "role": "Admin",
+        "permission": "reset_data",
+        "id": "admin_reset_data",
+        "createdAt": "2026-07-01T08:56:32.993Z",
+        "updatedAt": "2026-07-01T08:56:32.993Z"
+      },
+      {
+        "role": "Admin",
+        "permission": "manage_work_orders",
+        "id": "admin_manage_work_orders",
+        "createdAt": "2026-07-01T08:56:32.993Z",
+        "updatedAt": "2026-07-01T08:56:32.993Z"
+      },
+      {
+        "role": "Admin",
+        "permission": "manage_repair",
+        "id": "admin_manage_repair",
+        "createdAt": "2026-07-01T08:56:32.993Z",
+        "updatedAt": "2026-07-01T08:56:32.993Z"
+      },
+      {
+        "role": "Admin",
+        "permission": "export_data",
+        "id": "admin_export_data",
+        "createdAt": "2026-07-01T08:56:32.993Z",
+        "updatedAt": "2026-07-01T08:56:32.993Z"
+      },
+      {
+        "role": "Admin",
+        "permission": "import_data",
+        "id": "admin_import_data",
+        "createdAt": "2026-07-01T08:56:32.993Z",
+        "updatedAt": "2026-07-01T08:56:32.993Z"
+      },
+      {
+        "role": "Admin",
+        "permission": "factory_admin",
+        "id": "admin_factory_admin",
+        "createdAt": "2026-07-01T08:56:32.993Z",
+        "updatedAt": "2026-07-01T08:56:32.993Z"
+      },
+      {
+        "role": "Admin",
+        "permission": "runtime_validate",
+        "id": "admin_runtime_validate",
+        "createdAt": "2026-07-01T08:56:32.993Z",
+        "updatedAt": "2026-07-01T08:56:32.993Z"
+      },
+      {
+        "role": "Admin",
+        "permission": "startup_doctor",
+        "id": "admin_startup_doctor",
+        "createdAt": "2026-07-01T08:56:32.993Z",
+        "updatedAt": "2026-07-01T08:56:32.993Z"
+      },
+      {
+        "role": "Admin",
+        "permission": "driver_install",
+        "id": "admin_driver_install",
+        "createdAt": "2026-07-01T08:56:32.993Z",
+        "updatedAt": "2026-07-01T08:56:32.993Z"
+      },
+      {
+        "role": "Admin",
+        "permission": "driver_check",
+        "id": "admin_driver_check",
+        "createdAt": "2026-07-01T08:56:32.993Z",
+        "updatedAt": "2026-07-01T08:56:32.993Z"
       },
       {
         "role": "Qualità",
         "permission": "view_reports",
         "id": "qualità_view_reports",
-        "updatedAt": "2026-06-14T15:43:02.601Z",
-        "createdAt": "2026-06-14T15:43:02.601Z"
+        "createdAt": "2026-07-01T08:56:32.993Z",
+        "updatedAt": "2026-07-01T08:56:32.993Z"
       },
       {
         "role": "Qualità",
         "permission": "sign_quality",
         "id": "qualità_sign_quality",
-        "updatedAt": "2026-06-14T15:43:02.602Z",
-        "createdAt": "2026-06-14T15:43:02.602Z"
+        "createdAt": "2026-07-01T08:56:32.993Z",
+        "updatedAt": "2026-07-01T08:56:32.993Z"
       },
       {
         "role": "Qualità",
         "permission": "approve_reports",
         "id": "qualità_approve_reports",
-        "updatedAt": "2026-06-14T15:43:02.602Z",
-        "createdAt": "2026-06-14T15:43:02.602Z"
+        "createdAt": "2026-07-01T08:56:32.993Z",
+        "updatedAt": "2026-07-01T08:56:32.993Z"
+      },
+      {
+        "role": "Qualità",
+        "permission": "view_kpi",
+        "id": "qualità_view_kpi",
+        "createdAt": "2026-07-01T08:56:32.993Z",
+        "updatedAt": "2026-07-01T08:56:32.993Z"
+      },
+      {
+        "role": "Qualità",
+        "permission": "view_traceability",
+        "id": "qualità_view_traceability",
+        "createdAt": "2026-07-01T08:56:32.993Z",
+        "updatedAt": "2026-07-01T08:56:32.993Z"
+      },
+      {
+        "role": "Qualità",
+        "permission": "ai_read",
+        "id": "qualità_ai_read",
+        "createdAt": "2026-07-01T08:56:32.993Z",
+        "updatedAt": "2026-07-01T08:56:32.993Z"
       }
     ],
-    "recipes": [
-      {
-        "id": "nuova ricetta",
-        "recipe_name": "Nuova Ricetta",
-        "latestVersion": 4,
-        "updatedAt": "2026-06-14T15:43:02.608Z",
-        "latestRevisionId": "recipe_1780499188959_736a7ee1",
-        "createdAt": "2026-06-14T15:43:02.604Z"
-      }
-    ],
-    "recipe_versions": [
-      {
-        "id": "recipe_1780499051207_4a5df09b",
-        "recipe_name": "Nuova Ricetta",
-        "version": 2,
-        "created_at": "2026-06-03T15:04:11.207Z",
-        "author": "Admin",
-        "note": "Salvataggio da HMI",
-        "recipe": {
-          "recipe_name": "Nuova Ricetta",
-          "version": 2,
-          "enabled": true,
-          "power_metadata": "PL303_PROGRAMMABLE",
-          "steps": [
-            {
-              "step_id": 1,
-              "type": "ManualMeasurement",
-              "enabled": true,
-              "label": "Step manuale guidato",
-              "description": "Posizionare le sonde sui punti indicati. Quando il contatto è stabile premere Conferma: il sistema acquisisce la misura automaticamente.",
-              "io_type": "SYSTEM",
-              "device_mapping": "system",
-              "timeout": 2500,
-              "min": 0,
-              "max": 3.3,
-              "unit": "V",
-              "command": "MEAS:VOLT:DC?",
-              "manual_measure_type": "CONFIRM",
-              "manual_input_enabled": true,
-              "stable_time_ms": 1000
-            }
-          ]
-        },
-        "updatedAt": "2026-06-14T15:43:02.603Z",
-        "createdAt": "2026-06-14T15:43:02.604Z"
-      },
-      {
-        "id": "recipe_1780499133870_0e14c23b",
-        "recipe_name": "Nuova Ricetta",
-        "version": 3,
-        "created_at": "2026-06-03T15:05:33.870Z",
-        "author": "Admin",
-        "note": "Salvataggio da HMI",
-        "recipe": {
-          "recipe_name": "Nuova Ricetta",
-          "version": 3,
-          "enabled": true,
-          "power_metadata": "PL303_PROGRAMMABLE",
-          "steps": [
-            {
-              "step_id": 1,
-              "type": "ManualMeasurement",
-              "enabled": true,
-              "label": "Step manuale guidato",
-              "description": "Posizionare le sonde sui punti indicati. Quando il contatto è stabile premere Conferma: il sistema acquisisce la misura automaticamente.",
-              "io_type": "SYSTEM",
-              "device_mapping": "system",
-              "timeout": 2500,
-              "min": 0,
-              "max": 3.3,
-              "unit": "V",
-              "command": "MEAS:VOLT:DC?",
-              "manual_measure_type": "CONFIRM",
-              "manual_input_enabled": false,
-              "stable_time_ms": 1000
-            }
-          ]
-        },
-        "updatedAt": "2026-06-14T15:43:02.606Z",
-        "createdAt": "2026-06-14T15:43:02.606Z"
-      },
-      {
-        "id": "recipe_1780499188959_736a7ee1",
-        "recipe_name": "Nuova Ricetta",
-        "version": 4,
-        "created_at": "2026-06-03T15:06:28.959Z",
-        "author": "Admin",
-        "note": "Salvataggio da HMI",
-        "recipe": {
-          "recipe_name": "Nuova Ricetta",
-          "version": 4,
-          "enabled": true,
-          "power_metadata": "PL303_PROGRAMMABLE",
-          "steps": [
-            {
-              "step_id": 1,
-              "type": "ResistanceTest",
-              "enabled": true,
-              "label": "Misura resistenza",
-              "description": "",
-              "io_type": "SCPI",
-              "device_mapping": "Keysight_34461A",
-              "timeout": 2000,
-              "min": 450,
-              "max": 510,
-              "unit": "Ω",
-              "command": "MEAS:RES?"
-            }
-          ]
-        },
-        "updatedAt": "2026-06-14T15:43:02.607Z",
-        "createdAt": "2026-06-14T15:43:02.607Z"
-      }
-    ],
-    "test_results": [
-      {
-        "timestamp": "2026-06-03T15:04:50.051Z",
-        "operator": "Admin",
-        "recipe_name": "Nuova Ricetta",
-        "recipe_version": 2,
-        "serial_dut": "",
-        "lot_number": "10000",
-        "work_order": "10000",
-        "repair_note": "",
-        "final_result": "PASS",
-        "execution_time_ms": 18740,
-        "steps_log": [
-          {
-            "step_id": 1,
-            "type": "ManualMeasurement",
-            "measured": 3.1,
-            "result": "PASS"
-          }
-        ],
-        "id": "test_1781451782609_df55ce43",
-        "updatedAt": "2026-06-14T15:43:02.609Z",
-        "createdAt": "2026-06-14T15:43:02.609Z"
-      },
-      {
-        "timestamp": "2026-06-03T15:05:06.691Z",
-        "operator": "Admin",
-        "recipe_name": "Nuova Ricetta",
-        "recipe_version": 2,
-        "serial_dut": "",
-        "lot_number": "10000",
-        "work_order": "10000",
-        "repair_note": "",
-        "final_result": "FAIL",
-        "execution_time_ms": 11987,
-        "steps_log": [
-          {
-            "step_id": 1,
-            "type": "ManualMeasurement",
-            "measured": "FAIL manuale",
-            "result": "FAIL"
-          }
-        ],
-        "id": "test_1781451782611_7f2e7af1",
-        "updatedAt": "2026-06-14T15:43:02.611Z",
-        "createdAt": "2026-06-14T15:43:02.611Z"
-      },
-      {
-        "timestamp": "2026-06-03T15:05:49.612Z",
-        "operator": "Admin",
-        "recipe_name": "Nuova Ricetta",
-        "recipe_version": 3,
-        "serial_dut": "",
-        "lot_number": "10000",
-        "work_order": "10000",
-        "repair_note": "",
-        "final_result": "PASS",
-        "execution_time_ms": 5043,
-        "steps_log": [
-          {
-            "step_id": 1,
-            "type": "ManualMeasurement",
-            "measured": "CONFERMATO",
-            "result": "PASS"
-          }
-        ],
-        "id": "test_1781451782613_d39264e7",
-        "updatedAt": "2026-06-14T15:43:02.613Z",
-        "createdAt": "2026-06-14T15:43:02.613Z"
-      },
-      {
-        "timestamp": "2026-06-03T15:06:00.162Z",
-        "operator": "Admin",
-        "recipe_name": "Nuova Ricetta",
-        "recipe_version": 3,
-        "serial_dut": "",
-        "lot_number": "10000",
-        "work_order": "10000",
-        "repair_note": "",
-        "final_result": "FAIL",
-        "execution_time_ms": 5918,
-        "steps_log": [
-          {
-            "step_id": 1,
-            "type": "ManualMeasurement",
-            "measured": null,
-            "result": "FAIL"
-          }
-        ],
-        "id": "test_1781451782614_512c21fb",
-        "updatedAt": "2026-06-14T15:43:02.615Z",
-        "createdAt": "2026-06-14T15:43:02.615Z"
-      },
-      {
-        "timestamp": "2026-06-03T15:06:50.276Z",
-        "operator": "Admin",
-        "recipe_name": "Nuova Ricetta",
-        "recipe_version": 4,
-        "serial_dut": "",
-        "lot_number": "10000",
-        "work_order": "10000",
-        "repair_note": "",
-        "final_result": "FAIL",
-        "execution_time_ms": 4987,
-        "steps_log": [
-          {
-            "step_id": 1,
-            "type": "ResistanceTest",
-            "measured": 9.9e+37,
-            "result": "FAIL"
-          }
-        ],
-        "id": "test_1781451782617_b9c27c76",
-        "updatedAt": "2026-06-14T15:43:02.617Z",
-        "createdAt": "2026-06-14T15:43:02.618Z"
-      },
-      {
-        "timestamp": "2026-06-26T07:31:46.790Z",
-        "operator": "Admin",
-        "recipe_name": "TEST_rix_COBO",
-        "recipe_version": 2,
-        "serial_dut": "4444",
-        "lot_number": "1000700",
-        "work_order": "1000700",
-        "repair_note": "",
-        "final_result": "FAIL",
-        "execution_time_ms": 20045,
-        "steps_log": [
-          {
-            "step_id": 1,
-            "type": "PowerSupplySet",
-            "measured": {
-              "channel": 1,
-              "voltage": 18.5,
-              "current": 1,
-              "outputOn": true
-            },
-            "result": "DONE"
-          },
-          {
-            "step_id": 2,
-            "type": "ManualMeasurement",
-            "measured": 1.65,
-            "measurement_source": "MANUALE",
-            "measurement_device": "operatore/manuale",
-            "min": 0,
-            "max": 3.3,
-            "unit": "V",
-            "timestamp": "2026-06-26T07:31:34.916Z",
-            "result": "PASS"
-          },
-          {
-            "step_id": 3,
-            "type": "ManualMeasurement",
-            "measured": 10,
-            "measurement_source": "MANUALE",
-            "measurement_device": "operatore/manuale",
-            "min": 500,
-            "max": 999,
-            "unit": "",
-            "timestamp": "2026-06-26T07:31:45.545Z",
-            "result": "FAIL"
-          },
-          {
-            "step_id": 4,
-            "type": "PowerSupplySet",
-            "measured": {
-              "channel": 1,
-              "voltage": 0,
-              "current": 0,
-              "outputOn": false
-            },
-            "result": "DONE"
-          }
-        ],
-        "station_id": "BANC123",
-        "station_name": "ATE0151",
-        "station_department": "COLLAUDO",
-        "station_site": "LAB0000",
-        "customer_name": "COBO",
-        "customer_logo": "",
-        "product_name": "1212",
-        "id": "test_1782459106793_ab7aec21",
-        "updatedAt": "2026-06-26T07:31:46.794Z",
-        "createdAt": "2026-06-26T07:31:46.794Z"
-      },
-      {
-        "timestamp": "2026-06-26T07:32:19.019Z",
-        "operator": "Admin",
-        "recipe_name": "TEST_rix_COBO",
-        "recipe_version": 2,
-        "serial_dut": "4444",
-        "lot_number": "1000700",
-        "work_order": "1000700",
-        "repair_note": "grgg",
-        "final_result": "FAIL",
-        "execution_time_ms": 13704,
-        "steps_log": [
-          {
-            "step_id": 1,
-            "type": "PowerSupplySet",
-            "measured": {
-              "channel": 1,
-              "voltage": 18.5,
-              "current": 1,
-              "outputOn": true
-            },
-            "result": "DONE"
-          },
-          {
-            "step_id": 2,
-            "type": "ManualMeasurement",
-            "measured": 1.65,
-            "measurement_source": "MANUALE",
-            "measurement_device": "operatore/manuale",
-            "min": 0,
-            "max": 3.3,
-            "unit": "V",
-            "timestamp": "2026-06-26T07:32:11.780Z",
-            "result": "PASS"
-          },
-          {
-            "step_id": 3,
-            "type": "ManualMeasurement",
-            "measured": 10,
-            "measurement_source": "MANUALE",
-            "measurement_device": "operatore/manuale",
-            "min": 500,
-            "max": 999,
-            "unit": "",
-            "timestamp": "2026-06-26T07:32:17.769Z",
-            "result": "FAIL"
-          },
-          {
-            "step_id": 4,
-            "type": "PowerSupplySet",
-            "measured": {
-              "channel": 1,
-              "voltage": 0,
-              "current": 0,
-              "outputOn": false
-            },
-            "result": "DONE"
-          }
-        ],
-        "station_id": "BANC123",
-        "station_name": "ATE0151",
-        "station_department": "COLLAUDO",
-        "station_site": "LAB0000",
-        "customer_name": "COBO",
-        "customer_logo": "",
-        "product_name": "1212",
-        "id": "test_1782459139024_7db5a8a7",
-        "updatedAt": "2026-06-26T07:32:19.025Z",
-        "createdAt": "2026-06-26T07:32:19.025Z"
-      },
-      {
-        "timestamp": "2026-06-26T07:35:23.549Z",
-        "operator": "Admin",
-        "recipe_name": "TEST_rix_COBO",
-        "recipe_version": 2,
-        "serial_dut": "4444",
-        "lot_number": "1000700",
-        "work_order": "1000700",
-        "repair_note": "tyhtrh",
-        "final_result": "PASS",
-        "execution_time_ms": 10381,
-        "steps_log": [
-          {
-            "step_id": 1,
-            "type": "PowerSupplySet",
-            "measured": {
-              "channel": 1,
-              "voltage": 18.5,
-              "current": 1,
-              "outputOn": true
-            },
-            "result": "DONE"
-          },
-          {
-            "step_id": 2,
-            "type": "ManualMeasurement",
-            "measured": 1.5,
-            "measurement_source": "MANUALE",
-            "measurement_device": "operatore/manuale",
-            "min": 0,
-            "max": 3.3,
-            "unit": "V",
-            "timestamp": "2026-06-26T07:35:19.200Z",
-            "result": "PASS"
-          },
-          {
-            "step_id": 3,
-            "type": "ManualMeasurement",
-            "measured": 500,
-            "measurement_source": "MANUALE",
-            "measurement_device": "operatore/manuale",
-            "min": 500,
-            "max": 999,
-            "unit": "",
-            "timestamp": "2026-06-26T07:35:22.305Z",
-            "result": "PASS"
-          },
-          {
-            "step_id": 4,
-            "type": "PowerSupplySet",
-            "measured": {
-              "channel": 1,
-              "voltage": 0,
-              "current": 0,
-              "outputOn": false
-            },
-            "result": "DONE"
-          }
-        ],
-        "station_id": "BANC123",
-        "station_name": "ATE0151",
-        "station_department": "COLLAUDO",
-        "station_site": "LAB0000",
-        "customer_name": "COBO",
-        "customer_logo": "",
-        "product_name": "1212",
-        "id": "test_1782459323552_b7c5af95",
-        "updatedAt": "2026-06-26T07:35:23.552Z",
-        "createdAt": "2026-06-26T07:35:23.552Z"
-      },
-      {
-        "timestamp": "2026-06-30T11:09:58.061Z",
-        "operator": "Admin",
-        "recipe_name": "TEST_rix",
-        "recipe_version": 2,
-        "serial_dut": "020",
-        "lot_number": "1000900",
-        "work_order": "1000900",
-        "repair_note": "",
-        "final_result": "PASS",
-        "execution_time_ms": 8885,
-        "steps_log": [
-          {
-            "step_id": 1,
-            "type": "PowerSupplySet",
-            "label": "Alimentatore ON",
-            "component": "",
-            "test_point": "",
-            "device": "AimTTi_PL303",
-            "channel": 1,
-            "measured": {
-              "channel": 1,
-              "voltage": 18.5,
-              "current": 1,
-              "outputOn": true
-            },
-            "result": "DONE"
-          },
-          {
-            "step_id": 2,
-            "type": "ManualMeasurement",
-            "label": "Step manuale guidato",
-            "component": "",
-            "test_point": "",
-            "device": "Keysight_34461A",
-            "measured": 1.6,
-            "measurement_source": "MANUALE",
-            "measurement_device": "operatore/manuale",
-            "min": 0,
-            "max": 3.3,
-            "unit": "V",
-            "timestamp": "2026-06-30T11:09:53.815Z",
-            "result": "PASS"
-          },
-          {
-            "step_id": 3,
-            "type": "ManualMeasurement",
-            "label": "Inserimento misura manuale",
-            "component": "",
-            "test_point": "",
-            "device": "Keysight_34461A",
-            "measured": 500,
-            "measurement_source": "MANUALE",
-            "measurement_device": "operatore/manuale",
-            "min": 500,
-            "max": 999,
-            "unit": "",
-            "timestamp": "2026-06-30T11:09:56.804Z",
-            "result": "PASS"
-          },
-          {
-            "step_id": 4,
-            "type": "PowerSupplySet",
-            "label": "Alimentatore OFF sicuro",
-            "component": "",
-            "test_point": "",
-            "device": "AimTTi_PL303",
-            "channel": 1,
-            "measured": {
-              "channel": 1,
-              "voltage": 0,
-              "current": 0,
-              "outputOn": false
-            },
-            "result": "DONE"
-          }
-        ],
-        "station_id": "BANC123",
-        "station_name": "ATE0151",
-        "station_department": "COLLAUDO",
-        "station_site": "LAB0000",
-        "customer_name": "MEC",
-        "customer_logo": "",
-        "product_name": "1212",
-        "id": "test_1782817798065_a60017c7",
-        "updatedAt": "2026-06-30T11:09:58.066Z",
-        "createdAt": "2026-06-30T11:09:58.066Z"
-      }
-    ],
-    "test_steps": [
-      {
-        "step_id": 1,
-        "type": "ManualMeasurement",
-        "measured": 3.1,
-        "result": "PASS",
-        "testResultId": "test_1781451782609_df55ce43",
-        "index": 1,
-        "id": "test_1781451782609_df55ce43_step_1",
-        "updatedAt": "2026-06-14T15:43:02.610Z",
-        "createdAt": "2026-06-14T15:43:02.610Z"
-      },
-      {
-        "step_id": 1,
-        "type": "ManualMeasurement",
-        "measured": "FAIL manuale",
-        "result": "FAIL",
-        "testResultId": "test_1781451782611_7f2e7af1",
-        "index": 1,
-        "id": "test_1781451782611_7f2e7af1_step_1",
-        "updatedAt": "2026-06-14T15:43:02.612Z",
-        "createdAt": "2026-06-14T15:43:02.612Z"
-      },
-      {
-        "step_id": 1,
-        "type": "ManualMeasurement",
-        "measured": "CONFERMATO",
-        "result": "PASS",
-        "testResultId": "test_1781451782613_d39264e7",
-        "index": 1,
-        "id": "test_1781451782613_d39264e7_step_1",
-        "updatedAt": "2026-06-14T15:43:02.614Z",
-        "createdAt": "2026-06-14T15:43:02.614Z"
-      },
-      {
-        "step_id": 1,
-        "type": "ManualMeasurement",
-        "measured": null,
-        "result": "FAIL",
-        "testResultId": "test_1781451782614_512c21fb",
-        "index": 1,
-        "id": "test_1781451782614_512c21fb_step_1",
-        "updatedAt": "2026-06-14T15:43:02.616Z",
-        "createdAt": "2026-06-14T15:43:02.616Z"
-      },
-      {
-        "step_id": 1,
-        "type": "ResistanceTest",
-        "measured": 9.9e+37,
-        "result": "FAIL",
-        "testResultId": "test_1781451782617_b9c27c76",
-        "index": 1,
-        "id": "test_1781451782617_b9c27c76_step_1",
-        "updatedAt": "2026-06-14T15:43:02.618Z",
-        "createdAt": "2026-06-14T15:43:02.618Z"
-      },
-      {
-        "step_id": 1,
-        "type": "PowerSupplySet",
-        "measured": {
-          "channel": 1,
-          "voltage": 18.5,
-          "current": 1,
-          "outputOn": true
-        },
-        "result": "DONE",
-        "testResultId": "test_1782459106793_ab7aec21",
-        "index": 1,
-        "id": "test_1782459106793_ab7aec21_step_1",
-        "updatedAt": "2026-06-26T07:31:46.805Z",
-        "createdAt": "2026-06-26T07:31:46.805Z"
-      },
-      {
-        "step_id": 2,
-        "type": "ManualMeasurement",
-        "measured": 1.65,
-        "measurement_source": "MANUALE",
-        "measurement_device": "operatore/manuale",
-        "min": 0,
-        "max": 3.3,
-        "unit": "V",
-        "timestamp": "2026-06-26T07:31:34.916Z",
-        "result": "PASS",
-        "testResultId": "test_1782459106793_ab7aec21",
-        "index": 2,
-        "id": "test_1782459106793_ab7aec21_step_2",
-        "updatedAt": "2026-06-26T07:31:46.807Z",
-        "createdAt": "2026-06-26T07:31:46.807Z"
-      },
-      {
-        "step_id": 3,
-        "type": "ManualMeasurement",
-        "measured": 10,
-        "measurement_source": "MANUALE",
-        "measurement_device": "operatore/manuale",
-        "min": 500,
-        "max": 999,
-        "unit": "",
-        "timestamp": "2026-06-26T07:31:45.545Z",
-        "result": "FAIL",
-        "testResultId": "test_1782459106793_ab7aec21",
-        "index": 3,
-        "id": "test_1782459106793_ab7aec21_step_3",
-        "updatedAt": "2026-06-26T07:31:46.811Z",
-        "createdAt": "2026-06-26T07:31:46.811Z"
-      },
-      {
-        "step_id": 4,
-        "type": "PowerSupplySet",
-        "measured": {
-          "channel": 1,
-          "voltage": 0,
-          "current": 0,
-          "outputOn": false
-        },
-        "result": "DONE",
-        "testResultId": "test_1782459106793_ab7aec21",
-        "index": 4,
-        "id": "test_1782459106793_ab7aec21_step_4",
-        "updatedAt": "2026-06-26T07:31:46.813Z",
-        "createdAt": "2026-06-26T07:31:46.813Z"
-      },
-      {
-        "step_id": 1,
-        "type": "PowerSupplySet",
-        "measured": {
-          "channel": 1,
-          "voltage": 18.5,
-          "current": 1,
-          "outputOn": true
-        },
-        "result": "DONE",
-        "testResultId": "test_1782459139024_7db5a8a7",
-        "index": 1,
-        "id": "test_1782459139024_7db5a8a7_step_1",
-        "updatedAt": "2026-06-26T07:32:19.030Z",
-        "createdAt": "2026-06-26T07:32:19.030Z"
-      },
-      {
-        "step_id": 2,
-        "type": "ManualMeasurement",
-        "measured": 1.65,
-        "measurement_source": "MANUALE",
-        "measurement_device": "operatore/manuale",
-        "min": 0,
-        "max": 3.3,
-        "unit": "V",
-        "timestamp": "2026-06-26T07:32:11.780Z",
-        "result": "PASS",
-        "testResultId": "test_1782459139024_7db5a8a7",
-        "index": 2,
-        "id": "test_1782459139024_7db5a8a7_step_2",
-        "updatedAt": "2026-06-26T07:32:19.033Z",
-        "createdAt": "2026-06-26T07:32:19.033Z"
-      },
-      {
-        "step_id": 3,
-        "type": "ManualMeasurement",
-        "measured": 10,
-        "measurement_source": "MANUALE",
-        "measurement_device": "operatore/manuale",
-        "min": 500,
-        "max": 999,
-        "unit": "",
-        "timestamp": "2026-06-26T07:32:17.769Z",
-        "result": "FAIL",
-        "testResultId": "test_1782459139024_7db5a8a7",
-        "index": 3,
-        "id": "test_1782459139024_7db5a8a7_step_3",
-        "updatedAt": "2026-06-26T07:32:19.036Z",
-        "createdAt": "2026-06-26T07:32:19.036Z"
-      },
-      {
-        "step_id": 4,
-        "type": "PowerSupplySet",
-        "measured": {
-          "channel": 1,
-          "voltage": 0,
-          "current": 0,
-          "outputOn": false
-        },
-        "result": "DONE",
-        "testResultId": "test_1782459139024_7db5a8a7",
-        "index": 4,
-        "id": "test_1782459139024_7db5a8a7_step_4",
-        "updatedAt": "2026-06-26T07:32:19.039Z",
-        "createdAt": "2026-06-26T07:32:19.039Z"
-      },
-      {
-        "step_id": 1,
-        "type": "PowerSupplySet",
-        "measured": {
-          "channel": 1,
-          "voltage": 18.5,
-          "current": 1,
-          "outputOn": true
-        },
-        "result": "DONE",
-        "testResultId": "test_1782459323552_b7c5af95",
-        "index": 1,
-        "id": "test_1782459323552_b7c5af95_step_1",
-        "updatedAt": "2026-06-26T07:35:23.563Z",
-        "createdAt": "2026-06-26T07:35:23.563Z"
-      },
-      {
-        "step_id": 2,
-        "type": "ManualMeasurement",
-        "measured": 1.5,
-        "measurement_source": "MANUALE",
-        "measurement_device": "operatore/manuale",
-        "min": 0,
-        "max": 3.3,
-        "unit": "V",
-        "timestamp": "2026-06-26T07:35:19.200Z",
-        "result": "PASS",
-        "testResultId": "test_1782459323552_b7c5af95",
-        "index": 2,
-        "id": "test_1782459323552_b7c5af95_step_2",
-        "updatedAt": "2026-06-26T07:35:23.566Z",
-        "createdAt": "2026-06-26T07:35:23.566Z"
-      },
-      {
-        "step_id": 3,
-        "type": "ManualMeasurement",
-        "measured": 500,
-        "measurement_source": "MANUALE",
-        "measurement_device": "operatore/manuale",
-        "min": 500,
-        "max": 999,
-        "unit": "",
-        "timestamp": "2026-06-26T07:35:22.305Z",
-        "result": "PASS",
-        "testResultId": "test_1782459323552_b7c5af95",
-        "index": 3,
-        "id": "test_1782459323552_b7c5af95_step_3",
-        "updatedAt": "2026-06-26T07:35:23.570Z",
-        "createdAt": "2026-06-26T07:35:23.570Z"
-      },
-      {
-        "step_id": 4,
-        "type": "PowerSupplySet",
-        "measured": {
-          "channel": 1,
-          "voltage": 0,
-          "current": 0,
-          "outputOn": false
-        },
-        "result": "DONE",
-        "testResultId": "test_1782459323552_b7c5af95",
-        "index": 4,
-        "id": "test_1782459323552_b7c5af95_step_4",
-        "updatedAt": "2026-06-26T07:35:23.572Z",
-        "createdAt": "2026-06-26T07:35:23.572Z"
-      },
-      {
-        "step_id": 1,
-        "type": "PowerSupplySet",
-        "label": "Alimentatore ON",
-        "component": "",
-        "test_point": "",
-        "device": "AimTTi_PL303",
-        "channel": 1,
-        "measured": {
-          "channel": 1,
-          "voltage": 18.5,
-          "current": 1,
-          "outputOn": true
-        },
-        "result": "DONE",
-        "testResultId": "test_1782817798065_a60017c7",
-        "index": 1,
-        "id": "test_1782817798065_a60017c7_step_1",
-        "updatedAt": "2026-06-30T11:09:58.071Z",
-        "createdAt": "2026-06-30T11:09:58.071Z"
-      },
-      {
-        "step_id": 2,
-        "type": "ManualMeasurement",
-        "label": "Step manuale guidato",
-        "component": "",
-        "test_point": "",
-        "device": "Keysight_34461A",
-        "measured": 1.6,
-        "measurement_source": "MANUALE",
-        "measurement_device": "operatore/manuale",
-        "min": 0,
-        "max": 3.3,
-        "unit": "V",
-        "timestamp": "2026-06-30T11:09:53.815Z",
-        "result": "PASS",
-        "testResultId": "test_1782817798065_a60017c7",
-        "index": 2,
-        "id": "test_1782817798065_a60017c7_step_2",
-        "updatedAt": "2026-06-30T11:09:58.074Z",
-        "createdAt": "2026-06-30T11:09:58.074Z"
-      },
-      {
-        "step_id": 3,
-        "type": "ManualMeasurement",
-        "label": "Inserimento misura manuale",
-        "component": "",
-        "test_point": "",
-        "device": "Keysight_34461A",
-        "measured": 500,
-        "measurement_source": "MANUALE",
-        "measurement_device": "operatore/manuale",
-        "min": 500,
-        "max": 999,
-        "unit": "",
-        "timestamp": "2026-06-30T11:09:56.804Z",
-        "result": "PASS",
-        "testResultId": "test_1782817798065_a60017c7",
-        "index": 3,
-        "id": "test_1782817798065_a60017c7_step_3",
-        "updatedAt": "2026-06-30T11:09:58.076Z",
-        "createdAt": "2026-06-30T11:09:58.076Z"
-      },
-      {
-        "step_id": 4,
-        "type": "PowerSupplySet",
-        "label": "Alimentatore OFF sicuro",
-        "component": "",
-        "test_point": "",
-        "device": "AimTTi_PL303",
-        "channel": 1,
-        "measured": {
-          "channel": 1,
-          "voltage": 0,
-          "current": 0,
-          "outputOn": false
-        },
-        "result": "DONE",
-        "testResultId": "test_1782817798065_a60017c7",
-        "index": 4,
-        "id": "test_1782817798065_a60017c7_step_4",
-        "updatedAt": "2026-06-30T11:09:58.079Z",
-        "createdAt": "2026-06-30T11:09:58.079Z"
-      }
-    ],
-    "serial_history": [
-      {
-        "id": "4444_test_1782459106793_ab7aec21",
-        "serial": "4444",
-        "eventType": "TEST",
-        "result": "FAIL",
-        "timestamp": "2026-06-26T07:31:46.790Z",
-        "report": {
-          "timestamp": "2026-06-26T07:31:46.790Z",
-          "operator": "Admin",
-          "recipe_name": "TEST_rix_COBO",
-          "recipe_version": 2,
-          "serial_dut": "4444",
-          "lot_number": "1000700",
-          "work_order": "1000700",
-          "repair_note": "",
-          "final_result": "FAIL",
-          "execution_time_ms": 20045,
-          "steps_log": [
-            {
-              "step_id": 1,
-              "type": "PowerSupplySet",
-              "measured": {
-                "channel": 1,
-                "voltage": 18.5,
-                "current": 1,
-                "outputOn": true
-              },
-              "result": "DONE"
-            },
-            {
-              "step_id": 2,
-              "type": "ManualMeasurement",
-              "measured": 1.65,
-              "measurement_source": "MANUALE",
-              "measurement_device": "operatore/manuale",
-              "min": 0,
-              "max": 3.3,
-              "unit": "V",
-              "timestamp": "2026-06-26T07:31:34.916Z",
-              "result": "PASS"
-            },
-            {
-              "step_id": 3,
-              "type": "ManualMeasurement",
-              "measured": 10,
-              "measurement_source": "MANUALE",
-              "measurement_device": "operatore/manuale",
-              "min": 500,
-              "max": 999,
-              "unit": "",
-              "timestamp": "2026-06-26T07:31:45.545Z",
-              "result": "FAIL"
-            },
-            {
-              "step_id": 4,
-              "type": "PowerSupplySet",
-              "measured": {
-                "channel": 1,
-                "voltage": 0,
-                "current": 0,
-                "outputOn": false
-              },
-              "result": "DONE"
-            }
-          ],
-          "station_id": "BANC123",
-          "station_name": "ATE0151",
-          "station_department": "COLLAUDO",
-          "station_site": "LAB0000",
-          "customer_name": "COBO",
-          "customer_logo": "",
-          "product_name": "1212"
-        },
-        "updatedAt": "2026-06-26T07:31:46.802Z",
-        "createdAt": "2026-06-26T07:31:46.802Z"
-      },
-      {
-        "id": "4444_test_1782459139024_7db5a8a7",
-        "serial": "4444",
-        "eventType": "TEST",
-        "result": "FAIL",
-        "timestamp": "2026-06-26T07:32:19.019Z",
-        "report": {
-          "timestamp": "2026-06-26T07:32:19.019Z",
-          "operator": "Admin",
-          "recipe_name": "TEST_rix_COBO",
-          "recipe_version": 2,
-          "serial_dut": "4444",
-          "lot_number": "1000700",
-          "work_order": "1000700",
-          "repair_note": "grgg",
-          "final_result": "FAIL",
-          "execution_time_ms": 13704,
-          "steps_log": [
-            {
-              "step_id": 1,
-              "type": "PowerSupplySet",
-              "measured": {
-                "channel": 1,
-                "voltage": 18.5,
-                "current": 1,
-                "outputOn": true
-              },
-              "result": "DONE"
-            },
-            {
-              "step_id": 2,
-              "type": "ManualMeasurement",
-              "measured": 1.65,
-              "measurement_source": "MANUALE",
-              "measurement_device": "operatore/manuale",
-              "min": 0,
-              "max": 3.3,
-              "unit": "V",
-              "timestamp": "2026-06-26T07:32:11.780Z",
-              "result": "PASS"
-            },
-            {
-              "step_id": 3,
-              "type": "ManualMeasurement",
-              "measured": 10,
-              "measurement_source": "MANUALE",
-              "measurement_device": "operatore/manuale",
-              "min": 500,
-              "max": 999,
-              "unit": "",
-              "timestamp": "2026-06-26T07:32:17.769Z",
-              "result": "FAIL"
-            },
-            {
-              "step_id": 4,
-              "type": "PowerSupplySet",
-              "measured": {
-                "channel": 1,
-                "voltage": 0,
-                "current": 0,
-                "outputOn": false
-              },
-              "result": "DONE"
-            }
-          ],
-          "station_id": "BANC123",
-          "station_name": "ATE0151",
-          "station_department": "COLLAUDO",
-          "station_site": "LAB0000",
-          "customer_name": "COBO",
-          "customer_logo": "",
-          "product_name": "1212"
-        },
-        "updatedAt": "2026-06-26T07:32:19.027Z",
-        "createdAt": "2026-06-26T07:32:19.027Z"
-      },
-      {
-        "id": "4444_test_1782459323552_b7c5af95",
-        "serial": "4444",
-        "eventType": "TEST",
-        "result": "PASS",
-        "timestamp": "2026-06-26T07:35:23.549Z",
-        "report": {
-          "timestamp": "2026-06-26T07:35:23.549Z",
-          "operator": "Admin",
-          "recipe_name": "TEST_rix_COBO",
-          "recipe_version": 2,
-          "serial_dut": "4444",
-          "lot_number": "1000700",
-          "work_order": "1000700",
-          "repair_note": "tyhtrh",
-          "final_result": "PASS",
-          "execution_time_ms": 10381,
-          "steps_log": [
-            {
-              "step_id": 1,
-              "type": "PowerSupplySet",
-              "measured": {
-                "channel": 1,
-                "voltage": 18.5,
-                "current": 1,
-                "outputOn": true
-              },
-              "result": "DONE"
-            },
-            {
-              "step_id": 2,
-              "type": "ManualMeasurement",
-              "measured": 1.5,
-              "measurement_source": "MANUALE",
-              "measurement_device": "operatore/manuale",
-              "min": 0,
-              "max": 3.3,
-              "unit": "V",
-              "timestamp": "2026-06-26T07:35:19.200Z",
-              "result": "PASS"
-            },
-            {
-              "step_id": 3,
-              "type": "ManualMeasurement",
-              "measured": 500,
-              "measurement_source": "MANUALE",
-              "measurement_device": "operatore/manuale",
-              "min": 500,
-              "max": 999,
-              "unit": "",
-              "timestamp": "2026-06-26T07:35:22.305Z",
-              "result": "PASS"
-            },
-            {
-              "step_id": 4,
-              "type": "PowerSupplySet",
-              "measured": {
-                "channel": 1,
-                "voltage": 0,
-                "current": 0,
-                "outputOn": false
-              },
-              "result": "DONE"
-            }
-          ],
-          "station_id": "BANC123",
-          "station_name": "ATE0151",
-          "station_department": "COLLAUDO",
-          "station_site": "LAB0000",
-          "customer_name": "COBO",
-          "customer_logo": "",
-          "product_name": "1212"
-        },
-        "updatedAt": "2026-06-26T07:35:23.560Z",
-        "createdAt": "2026-06-26T07:35:23.560Z"
-      },
-      {
-        "id": "020_test_1782817798065_a60017c7",
-        "serial": "020",
-        "eventType": "TEST",
-        "result": "PASS",
-        "timestamp": "2026-06-30T11:09:58.061Z",
-        "report": {
-          "timestamp": "2026-06-30T11:09:58.061Z",
-          "operator": "Admin",
-          "recipe_name": "TEST_rix",
-          "recipe_version": 2,
-          "serial_dut": "020",
-          "lot_number": "1000900",
-          "work_order": "1000900",
-          "repair_note": "",
-          "final_result": "PASS",
-          "execution_time_ms": 8885,
-          "steps_log": [
-            {
-              "step_id": 1,
-              "type": "PowerSupplySet",
-              "label": "Alimentatore ON",
-              "component": "",
-              "test_point": "",
-              "device": "AimTTi_PL303",
-              "channel": 1,
-              "measured": {
-                "channel": 1,
-                "voltage": 18.5,
-                "current": 1,
-                "outputOn": true
-              },
-              "result": "DONE"
-            },
-            {
-              "step_id": 2,
-              "type": "ManualMeasurement",
-              "label": "Step manuale guidato",
-              "component": "",
-              "test_point": "",
-              "device": "Keysight_34461A",
-              "measured": 1.6,
-              "measurement_source": "MANUALE",
-              "measurement_device": "operatore/manuale",
-              "min": 0,
-              "max": 3.3,
-              "unit": "V",
-              "timestamp": "2026-06-30T11:09:53.815Z",
-              "result": "PASS"
-            },
-            {
-              "step_id": 3,
-              "type": "ManualMeasurement",
-              "label": "Inserimento misura manuale",
-              "component": "",
-              "test_point": "",
-              "device": "Keysight_34461A",
-              "measured": 500,
-              "measurement_source": "MANUALE",
-              "measurement_device": "operatore/manuale",
-              "min": 500,
-              "max": 999,
-              "unit": "",
-              "timestamp": "2026-06-30T11:09:56.804Z",
-              "result": "PASS"
-            },
-            {
-              "step_id": 4,
-              "type": "PowerSupplySet",
-              "label": "Alimentatore OFF sicuro",
-              "component": "",
-              "test_point": "",
-              "device": "AimTTi_PL303",
-              "channel": 1,
-              "measured": {
-                "channel": 1,
-                "voltage": 0,
-                "current": 0,
-                "outputOn": false
-              },
-              "result": "DONE"
-            }
-          ],
-          "station_id": "BANC123",
-          "station_name": "ATE0151",
-          "station_department": "COLLAUDO",
-          "station_site": "LAB0000",
-          "customer_name": "MEC",
-          "customer_logo": "",
-          "product_name": "1212"
-        },
-        "updatedAt": "2026-06-30T11:09:58.069Z",
-        "createdAt": "2026-06-30T11:09:58.069Z"
-      }
-    ],
+    "recipes": [],
+    "recipe_versions": [],
+    "test_results": [],
+    "test_steps": [],
+    "serial_history": [],
     "firmware_history": [],
     "repairs": [],
     "devices": [],
     "device_events": [],
     "device_configs": [],
     "production_stats": [],
-    "quality_stats": []
+    "quality_stats": [],
+    "work_orders": [],
+    "ai_messages": [],
+    "ai_action_queue": []
   }
 }

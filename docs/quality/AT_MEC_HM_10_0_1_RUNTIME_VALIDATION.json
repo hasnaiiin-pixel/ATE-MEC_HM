@@ -1,0 +1,87 @@
+{
+  "version": "AT-MEC_HM_10.0.1_LOGIN_USERS_VISIBLE_FIX",
+  "createdAt": "2026-07-01T09:20:20.301Z",
+  "score": 100,
+  "checks": [
+    {
+      "label": "package 10.0.1",
+      "ok": true,
+      "detail": "at-mec-hm-10-0-1-login-users-visible-fix 10.0.1"
+    },
+    {
+      "label": "package-lock 10.0.1",
+      "ok": true,
+      "detail": "package-lock root"
+    },
+    {
+      "label": "runtime script 10.0.1",
+      "ok": true,
+      "detail": "package script"
+    },
+    {
+      "label": "startup doctor 10.0.1",
+      "ok": true,
+      "detail": "package script"
+    },
+    {
+      "label": "utenti produzione presenti",
+      "ok": true,
+      "detail": "Admin/Tecnico"
+    },
+    {
+      "label": "Admin livello 100",
+      "ok": true,
+      "detail": "Admin full"
+    },
+    {
+      "label": "Tecnico limitato",
+      "ok": true,
+      "detail": "Tecnico no manage_users"
+    },
+    {
+      "label": "database locale pulito",
+      "ok": true,
+      "detail": "recipes/testReports/repairs zero"
+    },
+    {
+      "label": "database enterprise pulito",
+      "ok": true,
+      "detail": "enterprise zero dati produzione"
+    },
+    {
+      "label": "recipes pulite",
+      "ok": true,
+      "detail": "nessuna ricetta json"
+    },
+    {
+      "label": "certificati puliti",
+      "ok": true,
+      "detail": "nessun pdf storico"
+    },
+    {
+      "label": "drivers manager presente",
+      "ok": true,
+      "detail": "driver scripts"
+    },
+    {
+      "label": "BAT 10.0.1 presenti",
+      "ok": true,
+      "detail": "install/avvia/installer"
+    },
+    {
+      "label": "index 10.0.1",
+      "ok": true,
+      "detail": "title"
+    },
+    {
+      "label": "version.js 10.0.1",
+      "ok": true,
+      "detail": "version label"
+    },
+    {
+      "label": "legacy 6.0/6.1 fuori runtime",
+      "ok": true,
+      "detail": "no legacy runtime"
+    }
+  ]
+}

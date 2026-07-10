@@ -1,0 +1,97 @@
+{
+  "version": "AT-MEC_HM_10.1.6_ACTION_STABLE_MEASUREMENT_FAST_CLEAN_FIX",
+  "createdAt": "2026-07-02T06:21:17.283Z",
+  "score": 100,
+  "checks": [
+    {
+      "label": "package VEXON 10.1.6",
+      "ok": true,
+      "detail": "vexon-industrial-test-platform-10-1-6 10.1.6"
+    },
+    {
+      "label": "package-lock 10.1.6",
+      "ok": true,
+      "detail": "package-lock root"
+    },
+    {
+      "label": "runtime script 10.1.6",
+      "ok": true,
+      "detail": "package script"
+    },
+    {
+      "label": "startup doctor 10.1.6",
+      "ok": true,
+      "detail": "package script"
+    },
+    {
+      "label": "MIRZA icon unchanged",
+      "ok": true,
+      "detail": "app icon remains MIRZA"
+    },
+    {
+      "label": "MEC/MIRZA assets kept",
+      "ok": true,
+      "detail": "logos kept"
+    },
+    {
+      "label": "VEXON name/logo only",
+      "ok": true,
+      "detail": "name brand present"
+    },
+    {
+      "label": "StableMeasurement engine present",
+      "ok": true,
+      "detail": "engine/dist"
+    },
+    {
+      "label": "Keysight safe prepare once",
+      "ok": true,
+      "detail": "safe prepare"
+    },
+    {
+      "label": "Keysight polling 100ms",
+      "ok": true,
+      "detail": "polling min 100"
+    },
+    {
+      "label": "Fast pass after stability",
+      "ok": true,
+      "detail": "fast pass"
+    },
+    {
+      "label": "Action dock pulito in area destra",
+      "ok": true,
+      "detail": "action dock clean"
+    },
+    {
+      "label": "Manual fallback solo dopo FAIL",
+      "ok": true,
+      "detail": "manual fail panel"
+    },
+    {
+      "label": "Retry misura button enforced",
+      "ok": true,
+      "detail": "retry in action"
+    },
+    {
+      "label": "CSS scoped to Test Mode/modal",
+      "ok": true,
+      "detail": "scoped css"
+    },
+    {
+      "label": "Test Mode layout not touched by branding",
+      "ok": true,
+      "detail": "no invasive layout"
+    },
+    {
+      "label": "Admin/Tecnico presenti",
+      "ok": true,
+      "detail": "login users"
+    },
+    {
+      "label": "BAT VEXON 10.1.6 presenti",
+      "ok": true,
+      "detail": "bat"
+    }
+  ]
+}

@@ -1,0 +1,58 @@
+{
+  "version": "AT-MEC_HM_10.1.7_STABLE_MEASUREMENT_LIVE_POPUP_FAST_UI_ENGINE_FIX",
+  "createdAt": "2026-07-02T06:48:17.331Z",
+  "checks": [
+    {
+      "label": "package.json",
+      "ok": true,
+      "detail": "root"
+    },
+    {
+      "label": "dist/main/main.js",
+      "ok": true,
+      "detail": "electron main"
+    },
+    {
+      "label": "dist/main/runtime/RecipeEngine.js",
+      "ok": true,
+      "detail": "recipe engine"
+    },
+    {
+      "label": "renderer index",
+      "ok": true,
+      "detail": "ui"
+    },
+    {
+      "label": "MIRZA icon",
+      "ok": true,
+      "detail": "app icon"
+    },
+    {
+      "label": "VEXON mark",
+      "ok": true,
+      "detail": "name logo"
+    },
+    {
+      "label": "stable live popup JS",
+      "ok": true,
+      "detail": "live popup"
+    },
+    {
+      "label": "config users",
+      "ok": true,
+      "detail": "Admin/Tecnico"
+    },
+    {
+      "label": "drivers folder",
+      "ok": true,
+      "detail": "drivers optional"
+    },
+    {
+      "label": "electron",
+      "ok": false,
+      "detail": "node_modules"
+    }
+  ],
+  "criticalMissing": false,
+  "electronMissing": true
+}

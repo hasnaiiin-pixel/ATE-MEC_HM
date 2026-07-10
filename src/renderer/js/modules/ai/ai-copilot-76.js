@@ -1,9 +1,9 @@
-// AT-MEC_HM 8.0 - AI Copilot Complete + Approval Persistence UX
+// AT-MEC_HM 9.0 - AI Copilot Complete + Approval Persistence UX
 // Integrazione AI read-only sopra moduli esistenti. Non duplica Traceability, Repair, Analytics, MES o Factory.
 (function(){
   'use strict';
 
-  var VERSION='AT-MEC_HM_8.0_AI_READY_ENTERPRISE_STABLE';
+  var VERSION='AT-MEC_HM_9.0_AI_FACTORY_COMMAND_CENTER';
   var CONTEXT_KEY='atmec76_ai_context';
   var INSIGHTS_KEY='atmec76_ai_insights';
   var PROVIDER_KEY='atmec76_ai_provider_config';
@@ -44,8 +44,8 @@
     try{
       setUiStatus(m,t||'info');
       var fn=(typeof window.showToast==='function')?window.showToast:((typeof window.toast==='function')?window.toast:null);
-      if(fn) fn(m,t||'info'); else console.log('[AI 8.0]',m);
-    }catch(_){console.log('[AI 8.0]',m);}
+      if(fn) fn(m,t||'info'); else console.log('[AI 9.0]',m);
+    }catch(_){console.log('[AI 9.0]',m);}
   }
   function focusAiPanel(id){
     try{
@@ -631,7 +631,7 @@
   window.buildAiProjectContext76=function(){setActiveAiSection('context'); var ctx=buildContext(); renderContext(ctx); toast('Contesto AI aggiornato','success'); return ctx;};
   window.runAiLocalAnalysis76=function(){setActiveAiSection('context'); var ctx=buildContext(); var r=localAnalysis(ctx); renderContext(ctx); renderInsights(r); renderPrompt(buildPrompt(ctx,r)); toast('Analisi AI locale completata','success'); focusAiPanel('ai76-context-grid'); return r;};
   window.createAiPrompt76=function(){setActiveAiSection('prompt'); var ctx=buildContext(); var r=localAnalysis(ctx); var p=buildPrompt(ctx,r); renderContext(ctx); renderInsights(r); renderPrompt(p); toast('Prompt AI generato in modalità anti-doppioni','success'); focusAiPanel('ai76-prompt'); return p;};
-  window.exportAiContext76=function(){var ctx=buildContext(); var r=localAnalysis(ctx); download('AT_MEC_HM_8_0_AI_CONTEXT_'+Date.now()+'.json',JSON.stringify({context:ctx,analysis:r},null,2),'application/json');};
+  window.exportAiContext76=function(){var ctx=buildContext(); var r=localAnalysis(ctx); download('AT_MEC_HM_9_0_AI_CONTEXT_'+Date.now()+'.json',JSON.stringify({context:ctx,analysis:r},null,2),'application/json');};
   window.copyAiPrompt76=function(){
     setActiveAiSection('prompt');
     var ctx=buildContext();
@@ -652,15 +652,15 @@
   window.runAiFailAdvisor76=function(){setActiveAiSection('fail'); var rows=failAdvisor(buildContext()); renderMiniList('ai76-fail-insights',rows); toast('FAIL / Qualità aggiornata: '+rows.length+' insight','success'); focusAiPanel('ai76-fail-insights'); return rows;};
   window.runAiRecipeAdvisor76=function(){setActiveAiSection('recipe'); var rows=recipeAdvisor(buildContext()); renderMiniList('ai76-recipe-insights',rows); toast('Review ricetta aggiornata: '+rows.length+' insight','success'); focusAiPanel('ai76-recipe-insights'); return rows;};
   window.createAiActionPlan76=function(){setActiveAiSection('plan'); var plan=actionPlan(buildContext()); toast('Piano azione AI locale creato: '+arr(plan.steps).length+' azioni','success'); focusAiPanel('ai76-action-plan'); return plan;};
-  window.exportAiFullReport76=function(){var report=read(COMPLETE_KEY,null)||runCompleteAnalysis(); download('AT_MEC_HM_8_0_AI_FULL_REPORT_'+Date.now()+'.json',JSON.stringify(report,null,2),'application/json'); toast('Report AI esportato','success'); return report;};
-  window.runAiCompleteAnalysis762=function(){setActiveAiSection('complete'); var report=runCompleteAnalysis(); toast('Analisi AI completa 8.0 completata','success'); focusAiPanel('ai762-report-preview'); return report;};
-  window.exportAiCompleteReport762=function(){var report=read(COMPLETE_KEY,null)||runCompleteAnalysis(); download('AT_MEC_HM_8_0_AI_COMPLETE_REPORT_'+Date.now()+'.json',JSON.stringify(report,null,2),'application/json'); toast('Report AI completo esportato','success'); return report;};
+  window.exportAiFullReport76=function(){var report=read(COMPLETE_KEY,null)||runCompleteAnalysis(); download('AT_MEC_HM_9_0_AI_FULL_REPORT_'+Date.now()+'.json',JSON.stringify(report,null,2),'application/json'); toast('Report AI esportato','success'); return report;};
+  window.runAiCompleteAnalysis762=function(){setActiveAiSection('complete'); var report=runCompleteAnalysis(); toast('Analisi AI completa 9.0 completata','success'); focusAiPanel('ai762-report-preview'); return report;};
+  window.exportAiCompleteReport762=function(){var report=read(COMPLETE_KEY,null)||runCompleteAnalysis(); download('AT_MEC_HM_9_0_AI_COMPLETE_REPORT_'+Date.now()+'.json',JSON.stringify(report,null,2),'application/json'); toast('Report AI completo esportato','success'); return report;};
   window.saveAiProviderSettings76=saveProviderFromUi;
   window.showAiCopilot76=function(){
     try{if(window.showTab)window.showTab('ai-copilot-tab',null); else if(typeof window.showEnterpriseBackbone75==='function')window.showEnterpriseBackbone75();}catch(_){if(typeof window.showEnterpriseBackbone75==='function')window.showEnterpriseBackbone75();}
-    setTimeout(function(){try{renderAll(); var el=$('enterprise76-ai-card'); if(el&&el.scrollIntoView)el.scrollIntoView({behavior:'smooth',block:'start'});}catch(e){console.warn('[AI 8.0]',e);}},250);
+    setTimeout(function(){try{renderAll(); var el=$('enterprise76-ai-card'); if(el&&el.scrollIntoView)el.scrollIntoView({behavior:'smooth',block:'start'});}catch(e){console.warn('[AI 9.0]',e);}},250);
   };
 
-  function init(){setTimeout(function(){try{renderAll(); restoreActiveAiSection();}catch(e){console.warn('[AI 8.0 init]',e);}},1100);}
+  function init(){setTimeout(function(){try{renderAll(); restoreActiveAiSection();}catch(e){console.warn('[AI 9.0 init]',e);}},1100);}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init); else init();
 })();

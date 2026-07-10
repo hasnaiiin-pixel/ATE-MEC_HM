@@ -1,0 +1,188 @@
+/* AT-MEC_HM_9.5.2 - Test Mode layout cleanup + AI menu simplified + Chat Provider UX
+   Loaded last. Purpose: clean operator top bar, keep switches on same line, remove top device-state strip, simplify AI navigation visuals. */
+
+/* ---------- AI menu simplified ---------- */
+.ai952-simple-menu .submenu-btn{
+  min-height:34px!important;
+  justify-content:flex-start!important;
+  font-weight:900!important;
+}
+.ai952-simple-menu .submenu-btn:nth-of-type(1){background:linear-gradient(135deg,rgba(124,58,237,.95),rgba(37,99,235,.92))!important;color:#fff!important;}
+.ai952-simple-menu .submenu-btn:nth-of-type(2){background:linear-gradient(135deg,rgba(16,185,129,.95),rgba(34,197,94,.88))!important;color:#062014!important;}
+.ai952-simple-menu .submenu-btn:nth-of-type(3){background:linear-gradient(135deg,rgba(245,158,11,.96),rgba(217,119,6,.92))!important;color:#1f1302!important;}
+.ai952-simple-menu .submenu-btn:nth-of-type(4){background:rgba(15,23,42,.78)!important;color:#e0f2fe!important;border:1px solid rgba(125,211,252,.22)!important;}
+
+/* ---------- AI Chat provider UX ---------- */
+.ai952-chat-provider-banner,
+.ai952-provider-pill{
+  display:inline-flex!important;
+  align-items:center!important;
+  gap:8px!important;
+  min-height:30px!important;
+  margin:8px 0 0!important;
+  padding:7px 11px!important;
+  border-radius:999px!important;
+  border:1px solid rgba(125,211,252,.26)!important;
+  background:rgba(8,47,73,.32)!important;
+  color:#bae6fd!important;
+  font-size:12px!important;
+  font-weight:900!important;
+  letter-spacing:.02em!important;
+}
+.ai952-chat-provider-banner.local,
+.ai952-provider-pill.local{border-color:rgba(34,197,94,.35)!important;background:rgba(20,83,45,.22)!important;color:#bbf7d0!important;}
+.ai952-chat-provider-banner.provider,
+.ai952-provider-pill.provider{border-color:rgba(245,158,11,.40)!important;background:rgba(120,53,15,.22)!important;color:#fde68a!important;}
+.ai952-chat-provider-banner.error,
+.ai952-provider-pill.error{border-color:rgba(239,68,68,.40)!important;background:rgba(127,29,29,.22)!important;color:#fecaca!important;}
+.ai952-settings-card{border-color:rgba(125,211,252,.22)!important;}
+.ai952-settings-head{display:flex!important;justify-content:space-between!important;gap:14px!important;align-items:flex-start!important;margin-bottom:14px!important;}
+.ai952-settings-head h3{margin:0!important;color:#e0f2fe!important;}
+@media(max-width:900px){.ai952-settings-head{display:block!important}.ai952-provider-pill{margin-top:8px!important}}
+
+/* ---------- Test Mode top operator bar definitive cleanup ---------- */
+body.atmec66e-modern-testmode #production-test-mode .prod-operator-bar{
+  display:grid!important;
+  grid-template-columns:minmax(340px,1fr) 140px 360px 232px!important;
+  grid-template-areas:"wo commessa sn sample"!important;
+  gap:8px!important;
+  align-items:stretch!important;
+  min-height:60px!important;
+  margin:4px 0 8px!important;
+  padding:0!important;
+  overflow:visible!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-op-cell{
+  height:60px!important;
+  min-height:60px!important;
+  max-height:60px!important;
+  padding:6px 8px!important;
+  display:grid!important;
+  align-content:center!important;
+  justify-content:stretch!important;
+  overflow:hidden!important;
+  box-sizing:border-box!important;
+  border-radius:12px!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-op-wo{
+  grid-area:wo!important;
+  grid-template-columns:128px 112px minmax(70px,88px)!important;
+  gap:7px!important;
+  align-items:center!important;
+  justify-content:start!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-op-commessa{grid-area:commessa!important;width:140px!important;max-width:140px!important;justify-items:center!important;text-align:center!important;}
+body.atmec66e-modern-testmode #production-test-mode .prod-op-sn{grid-area:sn!important;width:360px!important;max-width:360px!important;justify-items:center!important;text-align:center!important;}
+body.atmec66e-modern-testmode #production-test-mode .prod-op-sample{grid-area:sample!important;width:232px!important;max-width:232px!important;justify-items:center!important;text-align:center!important;}
+
+body.atmec66e-modern-testmode #production-test-mode .prod-op-commessa>label,
+body.atmec66e-modern-testmode #production-test-mode .prod-op-sn>label,
+body.atmec66e-modern-testmode #production-test-mode .prod-op-sample>label{
+  display:block!important;
+  width:100%!important;
+  margin:0 0 4px!important;
+  padding:0!important;
+  text-align:center!important;
+  white-space:nowrap!important;
+  color:#93c5fd!important;
+  font-size:10px!important;
+  line-height:11px!important;
+  font-weight:1000!important;
+  letter-spacing:.10em!important;
+  text-transform:uppercase!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-op-commessa>label{color:#fde68a!important;}
+body.atmec66e-modern-testmode #production-test-mode .prod-op-sample>label{color:#c4b5fd!important;}
+
+body.atmec66e-modern-testmode #production-test-mode #atmec67b-wo-open-btn{
+  width:112px!important;min-width:112px!important;max-width:112px!important;height:32px!important;min-height:32px!important;max-height:32px!important;padding:0 8px!important;border-radius:9px!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-op-wo #atmec67b-selected-wo-chip{
+  width:88px!important;min-width:70px!important;max-width:88px!important;height:32px!important;min-height:32px!important;max-height:32px!important;
+  display:flex!important;align-items:center!important;justify-content:center!important;padding:0 7px!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important;font-size:11px!important;box-sizing:border-box!important;
+}
+body.atmec66e-modern-testmode #production-test-mode #prod-lot-number{
+  width:11ch!important;min-width:11ch!important;max-width:11ch!important;height:32px!important;min-height:32px!important;max-height:32px!important;text-align:center!important;font-size:14px!important;font-weight:1000!important;justify-self:center!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-op-inline-sn{
+  display:grid!important;grid-template-columns:148px 32px 158px!important;width:348px!important;min-width:348px!important;max-width:348px!important;gap:6px!important;align-items:center!important;justify-content:center!important;height:32px!important;overflow:hidden!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-op-inline-sample{
+  display:grid!important;grid-template-columns:116px 100px!important;width:222px!important;min-width:222px!important;max-width:222px!important;gap:6px!important;align-items:center!important;justify-content:center!important;height:32px!important;overflow:hidden!important;
+}
+body.atmec66e-modern-testmode #production-test-mode #prod-serial-input{
+  width:148px!important;min-width:148px!important;max-width:148px!important;height:32px!important;min-height:32px!important;max-height:32px!important;text-align:center!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-op-inline-sn>.btn{
+  width:32px!important;min-width:32px!important;max-width:32px!important;height:32px!important;min-height:32px!important;max-height:32px!important;padding:0!important;border-radius:9px!important;
+}
+body.atmec66e-modern-testmode #production-test-mode #sample-startup-wizard-btn{
+  width:116px!important;min-width:116px!important;max-width:116px!important;height:32px!important;min-height:32px!important;max-height:32px!important;padding:0 8px!important;border-radius:9px!important;
+}
+
+/* Switches: same row as text, centered, no vertical clipping. */
+body.atmec66e-modern-testmode #production-test-mode .prod-op-cell label.prod-switch-control{
+  display:flex!important;
+  flex-direction:row!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:6px!important;
+  height:32px!important;
+  min-height:32px!important;
+  max-height:32px!important;
+  padding:3px 6px!important;
+  margin:0!important;
+  border:1px solid rgba(148,163,184,.24)!important;
+  border-radius:9px!important;
+  background:rgba(15,23,42,.66)!important;
+  overflow:hidden!important;
+  box-sizing:border-box!important;
+  cursor:pointer!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-op-cell label.prod-switch-control>span:first-child{
+  display:block!important;
+  width:auto!important;
+  min-width:0!important;
+  margin:0!important;
+  padding:0!important;
+  line-height:1!important;
+  text-align:center!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:clip!important;
+  color:#bfdbfe!important;
+  font-size:8.5px!important;
+  font-weight:1000!important;
+  letter-spacing:.02em!important;
+  text-transform:uppercase!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-switch-wo{width:128px!important;min-width:128px!important;max-width:128px!important;}
+body.atmec66e-modern-testmode #production-test-mode .prod-switch-serial{width:158px!important;min-width:158px!important;max-width:158px!important;}
+body.atmec66e-modern-testmode #production-test-mode .prod-switch-sample{width:100px!important;min-width:100px!important;max-width:100px!important;}
+body.atmec66e-modern-testmode #production-test-mode .prod-switch-track{
+  flex:0 0 42px!important;width:42px!important;min-width:42px!important;max-width:42px!important;height:22px!important;min-height:22px!important;max-height:22px!important;align-self:center!important;justify-self:center!important;overflow:hidden!important;
+}
+body.atmec66e-modern-testmode #production-test-mode .prod-switch-track::after{top:6px!important;transform:none!important;}
+body.atmec66e-modern-testmode #production-test-mode .prod-switch-control input[type="checkbox"]:checked + .prod-switch-track::after{top:6px!important;transform:none!important;}
+
+/* Top device-state strip must not be mixed with operator bar. Device state remains in the dedicated Strumenti card. */
+body.atmec66e-modern-testmode #production-test-mode #atmec66e-instrument-bar{display:none!important;}
+body.atmec66e-modern-testmode #production-test-mode .prod-status-line{display:none!important;}
+body.atmec66e-modern-testmode #production-test-mode .prod-recipe-name{display:none!important;}
+
+@media(max-width:1180px){
+  body.atmec66e-modern-testmode #production-test-mode .prod-operator-bar{
+    grid-template-columns:minmax(330px,1fr) 140px!important;
+    grid-template-areas:"wo commessa" "sn sample"!important;
+    min-height:128px!important;
+  }
+  body.atmec66e-modern-testmode #production-test-mode .prod-op-sn,
+  body.atmec66e-modern-testmode #production-test-mode .prod-op-sample{justify-self:start!important;}
+}
+@media(max-width:760px){
+  body.atmec66e-modern-testmode #production-test-mode .prod-operator-bar{grid-template-columns:1fr!important;grid-template-areas:"wo" "commessa" "sn" "sample"!important;min-height:auto!important;}
+  body.atmec66e-modern-testmode #production-test-mode .prod-op-wo,
+  body.atmec66e-modern-testmode #production-test-mode .prod-op-commessa,
+  body.atmec66e-modern-testmode #production-test-mode .prod-op-sn,
+  body.atmec66e-modern-testmode #production-test-mode .prod-op-sample{width:100%!important;max-width:100%!important;}
+}

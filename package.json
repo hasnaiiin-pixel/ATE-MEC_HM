@@ -1,7 +1,7 @@
 {
-  "name": "at-mec-hm-8-0-ai-ready-enterprise-stable",
-  "version": "8.0.0",
-  "description": "AT-MEC_HM_8.0_AI_READY_ENTERPRISE_STABLE",
+  "name": "vexon-industrial-test-platform-10-1-12",
+  "version": "10.1.12",
+  "description": "AT-MEC_HM_10.1.12_STABLE_ACTION_UNIQUE_FAST_START_FIX",
   "main": "dist/main/main.js",
   "scripts": {
     "build": "tsc",
@@ -37,12 +37,14 @@
     "db:cleanup-report": "node scripts/sqlite_enterprise_66c.js cleanup",
     "db:enterprise-status": "node scripts/sqlite_enterprise_66c.js status",
     "cleanup:audit": "node scripts/cleanup_audit_75.js",
-    "runtime:validate": "node scripts/runtime_validate_80.js",
-    "startup:doctor": "node scripts/startup_doctor_80.js"
+    "runtime:validate": "node scripts/runtime_validate_10112.js",
+    "startup:doctor": "node scripts/startup_doctor_10112.js",
+    "production:reset": "node scripts/production_reset_100.js",
+    "drivers:check": "node scripts/driver_check_100.js"
   },
   "build": {
-    "appId": "com.atemec.platform",
-    "productName": "ATE-MEC HM 8.0 AI READY ENTERPRISE STABLE",
+    "appId": "com.mirza.vexon",
+    "productName": "VEXON Industrial Test Platform",
     "directories": {
       "output": "dist_installer"
     },
@@ -52,14 +54,14 @@
         "portable"
       ],
       "icon": "assets/icon.ico",
-      "shortcutName": "ATE-MEC HM 8.0 AI READY ENTERPRISE STABLE"
+      "shortcutName": "VEXON"
     },
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "ATE-MEC HM 8.0 AI READY ENTERPRISE STABLE"
+      "shortcutName": "VEXON"
     },
     "files": [
       "dist/**/*",
@@ -71,7 +73,8 @@
       "firmware/**/*",
       "docs/**/*",
       "data/**/*",
-      "scripts/**/*"
+      "scripts/**/*",
+      "database/**/*"
     ],
     "extraResources": [
       "firmware/**/*",
@@ -97,7 +100,7 @@
     "typescript": "^5.4.5",
     "wait-on": "^9.0.10"
   },
-  "productName": "ATE-MEC HM 8.0 AI READY ENTERPRISE STABLE",
+  "productName": "VEXON Industrial Test Platform",
   "optionalDependencies": {
     "better-sqlite3": "^11.8.1"
   }

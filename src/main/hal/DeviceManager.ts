@@ -22,6 +22,16 @@ export interface DeviceStatus {
 }
 
 export class DeviceManager {
+  private normalizeDeviceName(deviceName: string): string {
+    const raw = String(deviceName || '').trim();
+    const n = raw.toLowerCase();
+    if (!raw) return raw;
+    if (n === 'keysight' || n === 'dmm' || n === 'multimeter' || n === 'multimetro' || n === 'keysight_34465a' || n === '34461a' || n === '34465a' || n.includes('keysight') || n.includes('34461') || n.includes('34465') || n.includes('multimet')) return 'Keysight_34461A';
+    if (n.includes('aimtti_pl303') || n.includes('pl303') || n.includes('tti') || n.includes('aliment')) return 'AimTTi_PL303';
+    if (n.includes('modbus_serial') || n.includes('esp32') || n === 'esp32_serial') return 'modbus_serial';
+    return raw;
+  }
+
   private mockMode: Record<string, boolean> = {};
   private scpiSockets: Record<string, net.Socket> = {};
   private modbusClient: ModbusRTU | null = null;
@@ -38,9 +48,8 @@ export class DeviceManager {
   private modbusTimeoutCount = 0;
 
   public async connectDevice(deviceName: string, connectionString: string, portOrBaud: number = 5025): Promise<boolean> {
-    // AT-MEC_HM_3.1: nome strumento ufficiale Keysight 34461A.
-    // Per retrocompatibilità accettiamo anche eventuali vecchie ricette/configurazioni 34465A.
-    if (deviceName === 'Keysight_34465A') deviceName = 'Keysight_34461A';
+    deviceName = this.normalizeDeviceName(deviceName);
+    // AT-MEC_HM_10.1.3: accetta alias ricetta/UI Keysight, Multimetro, DMM, 34461/34465 e li porta allo strumento reale.
     const previousConnection = this.deviceRegistry[deviceName];
     this.deviceRegistry[deviceName] = connectionString;
     // AT-MEC 2.24: se uno strumento è già connesso sulla stessa porta non chiudere/riaprire.
@@ -393,7 +402,7 @@ export class DeviceManager {
   }
 
   public getMockMode(name: string): boolean {
-    if (name === 'Keysight_34465A') name = 'Keysight_34461A';
+    name = this.normalizeDeviceName(name);
     return this.mockMode[name] ?? true;
   }
 
@@ -407,6 +416,7 @@ export class DeviceManager {
   }
 
   public isDeviceLive(name: string): boolean {
+    name = this.normalizeDeviceName(name);
     // AT-MEC_HM_2.17: la ricetta continua a richiedere "modbus_serial" come nome logico,
     // ma l'hardware reale è ESP32 USB JSON. Se il backend ESP32 è connesso, lo stato è LIVE.
     if (name === 'modbus_serial') {
@@ -447,11 +457,18 @@ export class DeviceManager {
       if (normalized && normalized !== 'QR_Scanner') required.add(normalized);
     };
 
-    if (recipe.power_metadata === 'PL303_PROGRAMMABLE') addRequired('AimTTi_PL303');
+    const activeSteps = (recipe.steps || []).filter(step => step && step.enabled !== false);
+    const hasRealPl303Step = activeSteps.some(step => {
+      const type = String(step.type || '');
+      const dev = normalizeRequired(String(step.device_mapping || ''));
+      return ['PowerSupplySet','PowerSupplyMeasureCurrent'].includes(type) || dev === 'AimTTi_PL303';
+    });
+    // 10.1.4: power_metadata vecchio da WO/ricette non deve rendere il PL303 obbligatorio.
+    // Il PL303 viene richiesto solo se uno step reale lo usa.
+    if (recipe.power_metadata === 'PL303_PROGRAMMABLE' && hasRealPl303Step) addRequired('AimTTi_PL303');
     if (recipe.power_metadata === 'ESP32_RELAY_POWER') addRequired('modbus_serial');
 
-    for (const step of recipe.steps || []) {
-      if (step.enabled === false) continue;
+    for (const step of activeSteps) {
       const device = String(step.device_mapping || '').trim();
       const deviceKey = device.toLowerCase();
 
@@ -462,7 +479,7 @@ export class DeviceManager {
         if (step.type === 'ManualMeasurement') continue;
       }
       if (['DI', 'DO'].includes(step.io_type || '') || step.type === 'DigitalInputCheck' || step.type === 'DigitalOutputSet') { addRequired('modbus_serial'); continue; }
-      if (['VoltageMeasurement','CurrentMeasurement','ResistanceTest','FrequencyTest','AnalogInputMeasurement'].includes(step.type || '')) { addRequired(device || 'Keysight_34461A'); continue; }
+      if (['VoltageMeasurement','CurrentMeasurement','ResistanceTest','FrequencyTest','AnalogInputMeasurement','StableMeasurement'].includes(step.type || '')) { addRequired(device || 'Keysight_34461A'); continue; }
       if (step.type === 'ManualMeasurement') {
         const manualType = String(step.manual_measure_type || step.io_type || '').toUpperCase();
         const requiresScpiDevice = manualType === 'SCPI' || manualType.startsWith('SCPI_');
@@ -478,6 +495,7 @@ export class DeviceManager {
   }
 
   public async writeSCPI(deviceName: string, cmd: string): Promise<void> {
+    deviceName = this.normalizeDeviceName(deviceName);
     if (this.mockMode[deviceName]) return;
     if (this.visaResources[deviceName]) {
       const out = await this.execVisaBridge(['query', this.visaResources[deviceName], cmd], 15000);
@@ -495,7 +513,7 @@ export class DeviceManager {
   }
 
   public async querySCPI(deviceName: string, cmd: string): Promise<string> {
-    if (deviceName === 'Keysight_34465A') deviceName = 'Keysight_34461A';
+    deviceName = this.normalizeDeviceName(deviceName);
     if (this.mockMode[deviceName]) {
       let rawMock = 0;
       let calKey = '';

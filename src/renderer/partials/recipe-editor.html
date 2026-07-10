@@ -24,6 +24,7 @@
               <button class="recipe-template-btn" onclick="addQuickRecipeStep('measure_voltage')">📏 Misura tensione<span>Valore atteso con min/max.</span></button>
               <button class="recipe-template-btn" onclick="addQuickRecipeStep('measure_current')">📈 Misura corrente<span>Consumo reale in ampere.</span></button>
               <button class="recipe-template-btn" onclick="addQuickRecipeStep('measure_ohm')">Ω Misura ohm<span>Resistenza con tolleranza.</span></button>
+              <button class="recipe-template-btn" onclick="addQuickRecipeStep('stable_measurement')">🎯 Misura stabilizzata<span>PASS solo se il valore resta nel range per il tempo impostato.</span></button>
               <button class="recipe-template-btn" onclick="addQuickRecipeStep('multi_channel_resistance')">🧪 Test multi-canale Ω<span>Uscite associate, valori separati e canali guasti.</span></button>
               <button class="recipe-template-btn" onclick="addQuickRecipeStep('measure_freq')">Hz Frequenza<span>Frequenza con limiti.</span></button>
               <button class="recipe-template-btn" onclick="addQuickRecipeStep('measure_continuity')">🔔 Continuità<span>Controllo circuito aperto/chiuso.</span></button>
@@ -41,6 +42,7 @@
                 <div class="recipe-type-tab active" onclick="selectRecipeStepType('DigitalOutputSet', this)">🔌 Uscita digitale<br><span class="hint">solo DO</span></div>
                 <div class="recipe-type-tab" onclick="selectRecipeStepType('DigitalInputCheck', this)">👁️ Ingresso digitale<br><span class="hint">solo DI</span></div>
                 <div class="recipe-type-tab" onclick="selectRecipeStepType('VoltageMeasurement', this)">📊 Multimetro<br><span class="hint">V/I/Ω/Hz</span></div>
+                <div class="recipe-type-tab" onclick="selectRecipeStepType('StableMeasurement', this)">🎯 Stabilizzata<br><span class="hint">range + tempo</span></div>
                 <div class="recipe-type-tab" onclick="selectRecipeStepType('PowerSupplySet', this)">🔋 Alimentatore<br><span class="hint">PL303 CH1/CH2</span></div>
                 <div class="recipe-type-tab" onclick="selectRecipeStepType('PowerSupplyMeasureCurrent', this)">📈 Consumo<br><span class="hint">Misura corrente PL303</span></div>
                 <div class="recipe-type-tab" onclick="selectRecipeStepType('ManualMeasurement', this)">✋ Manuale<br><span class="hint">istruzioni + misura</span></div>
@@ -48,7 +50,7 @@
                 <div class="recipe-type-tab" onclick="selectRecipeStepType('SCPICommand', this)">💬 SCPI<br><span class="hint">strumenti</span></div>
               </div>
             </div>
-            <select id="new-step-type-page" style="display:none"><option value="DigitalOutputSet">DigitalOutputSet</option><option value="DigitalInputCheck">DigitalInputCheck</option><option value="VoltageMeasurement">VoltageMeasurement</option><option value="CurrentMeasurement">CurrentMeasurement</option><option value="AnalogInputMeasurement">AnalogInputMeasurement</option><option value="ResistanceTest">ResistanceTest</option><option value="FrequencyTest">FrequencyTest</option><option value="ManualMeasurement">ManualMeasurement</option><option value="PowerSupplySet">PowerSupplySet</option><option value="PowerSupplyMeasureCurrent">PowerSupplyMeasureCurrent</option><option value="SCPICommand">SCPICommand</option><option value="Delay">Delay</option><option value="FirmwareFlash">FirmwareFlash</option></select>
+            <select id="new-step-type-page" style="display:none"><option value="DigitalOutputSet">DigitalOutputSet</option><option value="DigitalInputCheck">DigitalInputCheck</option><option value="VoltageMeasurement">VoltageMeasurement</option><option value="CurrentMeasurement">CurrentMeasurement</option><option value="AnalogInputMeasurement">AnalogInputMeasurement</option><option value="ResistanceTest">ResistanceTest</option><option value="StableMeasurement">StableMeasurement</option><option value="FrequencyTest">FrequencyTest</option><option value="ManualMeasurement">ManualMeasurement</option><option value="PowerSupplySet">PowerSupplySet</option><option value="PowerSupplyMeasureCurrent">PowerSupplyMeasureCurrent</option><option value="SCPICommand">SCPICommand</option><option value="Delay">Delay</option><option value="FirmwareFlash">FirmwareFlash</option></select>
             <div class="recipe-actions-grid">
               <button class="btn btn-primary" onclick="openStepWizardFromPage()">🧙 Aggiungi step</button>
               <button class="btn btn-primary" onclick="saveRecipe()">💾 Salva</button>

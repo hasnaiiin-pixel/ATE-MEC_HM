@@ -36,11 +36,12 @@ export class UserManager {
   private legacyDbPath = path.join(process.cwd(), 'config', 'users.json');
   private roles: Record<string, RoleRecord> = {
     Operator:   { level: 10,  permissions: ['run_test', 'view_reports'] },
-    Technician: { level: 30,  permissions: ['run_test', 'view_reports', 'debug_mode', 'view_traceability'] },
-    Engineer:   { level: 60,  permissions: ['run_test', 'view_reports', 'debug_mode', 'edit_recipe', 'config_hardware', 'view_traceability', 'view_kpi', 'manage_data'] },
-    Developer:  { level: 80,  permissions: ['run_test', 'view_reports', 'debug_mode', 'edit_recipe', 'config_hardware', 'manage_branding', 'edit_layout', 'show_ui_ids', 'test_elements', 'view_traceability', 'view_kpi'] },
-    Admin:      { level: 100, permissions: ['run_test', 'view_reports', 'debug_mode', 'edit_recipe', 'config_hardware', 'manage_users', 'manage_branding', 'edit_layout', 'show_ui_ids', 'test_elements', 'view_traceability', 'view_kpi', 'manage_data', 'sign_quality', 'approve_reports'] },
-    Qualità:    { level: 60,  permissions: ['view_reports', 'sign_quality', 'approve_reports'] }
+    Tecnico:    { level: 30,  permissions: ['run_test', 'view_reports', 'debug_mode', 'view_traceability', 'view_kpi', 'manage_repair', 'ai_read', 'export_data'] },
+    Technician: { level: 30,  permissions: ['run_test', 'view_reports', 'debug_mode', 'view_traceability', 'view_kpi', 'manage_repair', 'ai_read', 'export_data'] },
+    Engineer:   { level: 60,  permissions: ['run_test', 'view_reports', 'debug_mode', 'edit_recipe', 'config_hardware', 'view_traceability', 'view_kpi', 'manage_data', 'manage_repair', 'ai_read', 'export_data'] },
+    Developer:  { level: 80,  permissions: ['run_test', 'view_reports', 'debug_mode', 'edit_recipe', 'config_hardware', 'manage_branding', 'edit_layout', 'show_ui_ids', 'test_elements', 'view_traceability', 'view_kpi', 'manage_data', 'manage_ai', 'config_ai', 'export_data'] },
+    Admin:      { level: 100, permissions: ['run_test', 'view_reports', 'debug_mode', 'edit_recipe', 'config_hardware', 'manage_users', 'manage_branding', 'edit_layout', 'show_ui_ids', 'test_elements', 'view_traceability', 'view_kpi', 'manage_data', 'sign_quality', 'approve_reports', 'manage_ai', 'config_ai', 'reset_data', 'manage_work_orders', 'manage_repair', 'export_data', 'import_data', 'factory_admin', 'runtime_validate', 'startup_doctor', 'driver_install', 'driver_check'] },
+    Qualità:    { level: 60,  permissions: ['view_reports', 'sign_quality', 'approve_reports', 'view_kpi', 'view_traceability', 'ai_read'] }
   };
 
   private users: StoredUser[] = [];
@@ -119,8 +120,8 @@ export class UserManager {
       }
     };
 
-    ensureUser('admin', 'Admin', 'Admin', 'admin', true);
-    ensureUser('mirza', 'Mirza', 'Operator', 'mirza');
+    ensureUser('Admin', 'Admin', 'Admin', 'Criicket@Hasnaiin@786!', true);
+    ensureUser('Tecnico', 'Tecnico', 'Tecnico', 'Tecnico@786!', true);
   }
 
   private loadJson(file: string): UserDb | null {
@@ -308,6 +309,21 @@ export class UserManager {
   public listUsers(): Array<{ username: string; displayName: string; role: Role; enabled: boolean; level: number; permissions: string[] }> | { ok: false; error: string } {
     if (!this.canCurrentUser('manage_users')) return { ok: false, error: 'Permessi insufficienti: manage_users richiesto.' };
     return this.users.map(({ username, displayName, role, enabled, operatorCode, photoDataUrl }) => ({ username, displayName, role, enabled, operatorCode: operatorCode || username, photoDataUrl: photoDataUrl || '', level: this.roles[role]?.level ?? 0, permissions: this.normalizePermissions(this.roles[role]?.permissions || []) }));
+  }
+
+  /**
+   * 10.0.1 - elenco pubblico e sicuro per la pagina login.
+   * Non espone password, hash, salt o permessi; serve solo a mostrare gli utenti attivi nel selettore iniziale.
+   */
+  public listLoginUsers(): Array<{ username: string; displayName: string; role: Role; operatorCode: string }> {
+    return this.users
+      .filter(u => u && u.enabled !== false)
+      .map(({ username, displayName, role, operatorCode }) => ({
+        username,
+        displayName: displayName || username,
+        role,
+        operatorCode: operatorCode || username
+      }));
   }
 
   public hasPermission(role: Role | null, action: string): boolean {

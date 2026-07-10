@@ -1,14 +1,11 @@
-@"
+# AT-MEC HM - generated/runtime files
 node_modules/
-dist/
-build/
-out/
+dist_installer/
+dist_installer*/
 release/
 releases/
 installer/
 installers/
-*.exe
-*.msi
 *.zip
 *.7z
 *.rar
@@ -33,4 +30,3 @@ exports/
 export/
 __pycache__/
 *.pyc
-"@ | Set-Content -Encoding UTF8 .gitignore

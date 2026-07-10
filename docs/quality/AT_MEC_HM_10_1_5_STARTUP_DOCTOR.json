@@ -1,0 +1,58 @@
+{
+  "version": "AT-MEC_HM_10.1.5_ACTION_MANUAL_LIVE_MEASUREMENT_FAST_PASS_FIX",
+  "createdAt": "2026-07-01T14:59:44.426Z",
+  "checks": [
+    {
+      "label": "package.json",
+      "ok": true,
+      "detail": "root"
+    },
+    {
+      "label": "dist/main/main.js",
+      "ok": true,
+      "detail": "electron main"
+    },
+    {
+      "label": "dist/main/runtime/RecipeEngine.js",
+      "ok": true,
+      "detail": "recipe engine"
+    },
+    {
+      "label": "renderer index",
+      "ok": true,
+      "detail": "ui"
+    },
+    {
+      "label": "MIRZA icon",
+      "ok": true,
+      "detail": "app icon"
+    },
+    {
+      "label": "VEXON mark",
+      "ok": true,
+      "detail": "name logo"
+    },
+    {
+      "label": "action live measurement JS",
+      "ok": true,
+      "detail": "retry/live action"
+    },
+    {
+      "label": "config users",
+      "ok": true,
+      "detail": "Admin/Tecnico"
+    },
+    {
+      "label": "drivers folder",
+      "ok": true,
+      "detail": "drivers optional"
+    },
+    {
+      "label": "electron",
+      "ok": false,
+      "detail": "node_modules"
+    }
+  ],
+  "criticalMissing": false,
+  "electronMissing": true
+}

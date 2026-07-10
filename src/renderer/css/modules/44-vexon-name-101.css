@@ -1,0 +1,112 @@
+/* VEXON 10.1.1 - name-only branding fix.
+   Regola: VEXON = nome programma; icona app = MIRZA; MEC/MIRZA restano invariati.
+   Questo CSS non inserisce pannelli dentro le pagine e non modifica la griglia del Test Mode. */
+
+.vexon-mark-box{
+  width:30px;
+  height:30px;
+  min-width:30px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  background:#fff;
+  border:1px solid rgba(255,255,255,.82);
+  border-radius:9px;
+  padding:3px;
+  box-shadow:0 4px 12px rgba(0,0,0,.25), 0 0 0 1px rgba(0,102,255,.10) inset;
+}
+.vexon-mark{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  display:block;
+  filter:none!important;
+  margin:0!important;
+}
+.vexon-brand-title,
+.vexon-section-name{
+  display:inline-flex!important;
+  align-items:center;
+  gap:8px;
+  white-space:nowrap;
+  letter-spacing:.08em;
+  font-weight:950;
+  color:#f6fbff;
+}
+.vexon-brand-title{font-size:30px;}
+.vexon-brand-stack{display:flex;flex-direction:column;align-items:center;gap:3px;}
+
+#topbar{position:relative!important;}
+#vexon-global-top-brand,
+.vexon-top-center-brand{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  min-height:34px;
+  padding:3px 12px 3px 4px;
+  border:1px solid rgba(0,123,255,.24);
+  border-radius:999px;
+  background:linear-gradient(90deg,rgba(8,13,24,.88),rgba(10,36,72,.72));
+  box-shadow:0 8px 24px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.06);
+  color:#f8fbff;
+  pointer-events:none;
+  z-index:4;
+}
+#vexon-global-top-brand{
+  position:absolute;
+  left:50%;
+  top:5px;
+  transform:translateX(-50%);
+}
+.vexon-top-center-brand .vexon-name{
+  font-size:17px;
+  line-height:1;
+  font-weight:950;
+  letter-spacing:.12em;
+  color:#f8fbff;
+}
+.vexon-top-center-brand small{
+  font-size:9px;
+  line-height:1;
+  font-weight:800;
+  letter-spacing:.09em;
+  text-transform:uppercase;
+  color:#9fc8ff;
+  white-space:nowrap;
+}
+#topbar .app-brand-pro{
+  min-width:170px!important;
+}
+#topbar #app-title-logo{
+  color:var(--accent)!important;
+  font-size:18px!important;
+  letter-spacing:2px!important;
+}
+
+body.production-test-active #production-test-mode .prod-test-header{
+  position:relative!important;
+}
+body.production-test-active #production-test-mode .vexon-prod-top-center{
+  position:absolute;
+  left:50%;
+  top:4px;
+  transform:translateX(-50%);
+}
+body.production-test-active #production-test-mode .prod-test-title{
+  padding-top:18px!important;
+}
+body.production-test-active #production-test-mode .prod-test-title h1{
+  letter-spacing:.08em!important;
+}
+
+.tm-label-brand420{letter-spacing:.08em;font-weight:950;}
+.stable-progress-chip{display:inline-flex;align-items:center;gap:6px;border:1px solid rgba(0,212,255,.25);border-radius:999px;padding:3px 8px;background:rgba(0,212,255,.08);font-size:11px;color:#dff8ff;}
+
+@media(max-width:1200px){
+  #vexon-global-top-brand small{display:none;}
+  #vexon-global-top-brand{padding-right:8px;}
+}
+@media(max-width:980px){
+  #vexon-global-top-brand{display:none!important;}
+  body.production-test-active #production-test-mode .vexon-prod-top-center small{display:none;}
+}

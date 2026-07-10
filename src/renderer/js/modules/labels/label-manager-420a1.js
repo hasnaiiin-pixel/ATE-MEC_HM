@@ -548,6 +548,8 @@
     var binding=bindingForRecipe(ctx.recipe);
     if(binding.testModeIntegration === false){ refreshTestModeLabelPanel420A4(ctx); return {ok:false, skipped:true, reason:'collegamento Test Mode disattivato'}; }
     var tpl=templateForOutcome(binding, ctx.outcome);
+    // 10.1.8 guard: non stampare etichetta simulata se seriale/WO non sono ancora valorizzati.
+    if((!ctx.serial || ctx.serial==='—') && (!ctx.workorder || ctx.workorder==='—')){ refreshTestModeLabelPanel420A4(ctx); return {ok:false, skipped:true, reason:'seriale/WO non valorizzati', template:tpl}; }
     var auto=autoForOutcome(s, binding, ctx.outcome);
     applyContextToLabelManager(ctx, tpl);
     var row={kind:'AUTO_TEST',outcome:ctx.outcome,template:tpl,serial:ctx.serial,workorder:ctx.workorder,lot:ctx.lot,recipe:ctx.recipe,revision:ctx.revision,printer:val('label420-printer','windows-default'),reportId:ctx.reportId,simulated:!!s.simulatePrint};

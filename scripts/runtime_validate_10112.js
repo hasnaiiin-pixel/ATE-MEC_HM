@@ -1,0 +1,45 @@
+const fs=require('fs');
+const path=require('path');
+const root=path.join(__dirname,'..');
+const RELEASE='AT-MEC_HM_10.1.12_STABLE_ACTION_UNIQUE_FAST_START_FIX';
+function exists(p){return fs.existsSync(path.join(root,p));}
+function read(p){return fs.readFileSync(path.join(root,p),'utf8');}
+const checks=[];
+function add(label,ok,detail=''){checks.push({label,ok:!!ok,detail});}
+const pkg=JSON.parse(read('package.json'));
+const lock=JSON.parse(read('package-lock.json'));
+const actionJs=read('src/renderer/js/modules/ui/action-live-measurement-1012.js');
+const legacyTrace=read('src/renderer/js/modules/traceability/app-legacy-05-traceability-unit.js');
+const ux66d=read('src/renderer/js/modules/ui/test-mode-ux-66d.js');
+const startWorkflow=read('src/renderer/js/modules/ui/test-mode-start-workflow-66e-fix1e.js');
+const startUi=read('src/renderer/js/modules/ui/app-legacy-02-dashboard-reports-ui.js');
+const recipes=read('src/renderer/js/modules/recipes/app-legacy-04-recipes-runtime.js');
+const css=read('src/renderer/css/modules/45-action-live-measurement-1012.css');
+const versionJs=read('src/renderer/js/version.js');
+const settings=JSON.parse(read('config/app_settings.json'));
+add('package VEXON 10.1.12',pkg.version==='10.1.12' && pkg.name==='vexon-industrial-test-platform-10-1-12',`${pkg.name} ${pkg.version}`);
+add('package-lock 10.1.12',lock.version==='10.1.12' && lock.packages && lock.packages[''] && lock.packages[''].version==='10.1.12','package-lock root');
+add('runtime script 10.1.12',pkg.scripts && pkg.scripts['runtime:validate']==='node scripts/runtime_validate_10112.js','package script');
+add('startup doctor 10.1.12',pkg.scripts && pkg.scripts['startup:doctor']==='node scripts/startup_doctor_10112.js','package script');
+add('Version renderer 10.1.12',/AT_MEC_VERSION='10\.1\.12'/.test(versionJs)&&/UNIQUE_FAST_START/.test(versionJs),'version.js');
+add('Settings 10.1.12',settings.version==='10.1.12' && /UNIQUE_FAST_START/.test(settings.lastRelease||''),'app_settings');
+add('Unified action hide function',/hideLegacyStableAction10112/.test(actionJs)&&/manual-step-modal/.test(actionJs)&&/atmec66d-action-strip/.test(actionJs),'action live suppresses legacy panels');
+add('Stable step id shared',/__vexon10112StableStepId/.test(actionJs),'shared stable step id');
+add('Legacy manual panel suppressed',/isStableFallback10112/.test(legacyTrace)&&/hideLegacyStableAction10112/.test(legacyTrace),'manual-step-request guard');
+add('Legacy fault panel suppressed',/isStableAction10112/.test(legacyTrace)&&/fault-panel/.test(legacyTrace),'step-failed guard');
+add('UX action strip disabled during stable live',/unifiedStablePopupVisible10112/.test(ux66d),'66d action hint guard');
+add('CSS hides legacy panels in stable live',/body\.vexon-stable-live-active #atmec66d-action-strip/.test(css)&&/#fault-panel\.show/.test(css),'css guard');
+add('Fast start production data skip gate',/productionDataReady10112/.test(startWorkflow)&&/__atmec10112StartBusy/.test(startWorkflow),'start workflow gate skip');
+add('Start feedback immediate',/STARTING/.test(startUi)&&/AVVIO TEST/.test(startUi)&&/__atmec10112StartBusy/.test(startUi),'start feedback');
+add('Recover non blocking if not fault',/stateBefore10112/.test(startUi)&&/non bloccare ogni START/.test(startUi),'recover optimization');
+add('Dashboard no duplicate autoconnect',/evitando il doppio auto-connect/.test(recipes)&&!/await autoConnectProductionInstruments\(false\);\n\s*await startTest\(\);/.test(recipes),'dashboard start optimization');
+add('BAT VEXON 10.1.12 presenti',exists('AVVIA_VEXON_10.1.12.bat')&&exists('INSTALLA_VEXON_10.1.12.bat')&&exists('CREA_INSTALLER_WINDOWS_VEXON_10.1.12.bat'),'bat');
+add('Release notes 10.1.12',exists('docs/releases/README_'+RELEASE+'.md'),'release notes');
+const score=Math.round(checks.filter(c=>c.ok).length/checks.length*100);
+const report={version:RELEASE,createdAt:new Date().toISOString(),score,checks};
+fs.mkdirSync(path.join(root,'docs/quality'),{recursive:true});
+fs.writeFileSync(path.join(root,'docs/quality/AT_MEC_HM_10_1_12_RUNTIME_VALIDATION.json'),JSON.stringify(report,null,2));
+console.log('AT-MEC_HM_10.1.12 runtime validation');
+checks.forEach(c=>console.log(`${c.ok?'OK  ':'FAIL'} ${c.label}${c.detail?' - '+c.detail:''}`));
+console.log(`SCORE ${score}%`);
+if(checks.some(c=>!c.ok)) process.exit(1);

@@ -94,6 +94,16 @@
       setTimeout(()=>{sn.focus(); try{sn.select();}catch(_e){}},80);
     });
   }
+  function productionDataReady10112(){
+    if(!serialRequired()) return true;
+    const serial=String(serialValue()||'').trim();
+    if(!serial) return false;
+    if(useWorkOrderMode()){
+      const awo=activeWorkOrder();
+      return !!(awo && (awo.wo || awo.id));
+    }
+    return !!String(lotValue()||'').trim();
+  }
   function installStartWrapper(){
     if(window.__atmec66eFix1eStartWrapper) return;
     const original=window.startTest;
@@ -101,11 +111,20 @@
     window.__atmec66eFix1eStartWrapper=true;
     window.__atmec66eFix1eOriginalStart=original;
     window.startTest=async function(){
-      if(serialRequired()){
-        const gate=await startGateModal();
-        if(!gate||!gate.ok) return;
+      if(window.__atmec10112StartGateOpen || window.__atmec10112StartBusy) return;
+      window.__atmec10112StartBusy=true;
+      try{
+        if(serialRequired() && !productionDataReady10112()){
+          window.__atmec10112StartGateOpen=true;
+          const gate=await startGateModal();
+          window.__atmec10112StartGateOpen=false;
+          if(!gate||!gate.ok) return;
+        }
+        return await original.apply(this,arguments);
+      } finally {
+        window.__atmec10112StartGateOpen=false;
+        setTimeout(()=>{window.__atmec10112StartBusy=false;},250);
       }
-      return original.apply(this,arguments);
     };
   }
   function installF1(){
@@ -113,15 +132,16 @@
     document.addEventListener('keydown',function(e){
       if(e.key==='F1'){
         e.preventDefault();
+        if(window.__atmec10112StartBusy || window.__atmec10112StartGateOpen) return;
         if(typeof window.startTest==='function') window.startTest();
       }
     },true);
   }
   function watchManualWait(){
     const modal=$('manual-step-modal'); if(!modal||modal.__atmec66eFix1eWait)return; modal.__atmec66eFix1eWait=true;
-    const obs=new MutationObserver(()=>{ if(modal.classList.contains('show')) showOperatorWait('IN ATTESA OPERATORE'); else clearOperatorWait(); });
+    const obs=new MutationObserver(()=>{ if(document.body&&document.body.classList&&document.body.classList.contains('vexon-stable-live-active')){ clearOperatorWait(); return; } if(modal.classList.contains('show')) showOperatorWait('IN ATTESA OPERATORE'); else clearOperatorWait(); });
     obs.observe(modal,{attributes:true,attributeFilter:['class']});
   }
-  function init(){installStartWrapper(); installF1(); watchManualWait(); setInterval(()=>{installStartWrapper(); watchManualWait();},1500); console.log('[TEST UX 6.7F] Start workflow WO lock inizializzato');}
+  function init(){installStartWrapper(); installF1(); watchManualWait(); setInterval(()=>{ if(document.body&&document.body.classList&&document.body.classList.contains('vexon-stable-live-active')) return; installStartWrapper(); watchManualWait();},2000); console.log('[TEST UX 6.7F] Start workflow WO lock inizializzato');}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init); else init();
 })();

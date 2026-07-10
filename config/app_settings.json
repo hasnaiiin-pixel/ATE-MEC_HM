@@ -26,10 +26,25 @@
   "esp32Baud": 115200,
   "companyLogoPath": "assets/default_logos/MEC.PNG",
   "builderLogoPath": "assets/default_logos/MIRZA.png",
-  "excludedInstruments": [
-    "Keysight_34461A"
-  ],
+  "excludedInstruments": [],
   "keysightMode": "USB_VISA",
   "keysightIp": "USB0::0x2A8D::0x1301::MY57216945::0::INSTR",
-  "keysightPort": 9600
+  "keysightPort": 9600,
+  "appName": "VEXON",
+  "appSubtitle": "Industrial Test Platform",
+  "commercialName": "VEXON Industrial Test Platform",
+  "appIconBrand": "MIRZA",
+  "softwareLogoMode": "mini-vexon-near-name-only",
+  "appDisplayName": "VEXON Industrial Test Platform",
+  "version": "10.1.12",
+  "branding": {
+    "programName": "VEXON",
+    "subtitle": "Industrial Test Platform",
+    "appIcon": "MIRZA",
+    "companyLogos": "keep_original",
+    "vexonLogoUsage": "small_near_program_name_only"
+  },
+  "stableMeasurementDeviceBinding": "Keysight_34461A",
+  "instrumentGateMode": "recipe_required_only",
+  "lastRelease": "AT-MEC_HM_10.1.12_STABLE_ACTION_UNIQUE_FAST_START_FIX"
 }

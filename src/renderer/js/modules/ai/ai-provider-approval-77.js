@@ -1,9 +1,9 @@
-// AT-MEC_HM 8.0 - AI Provider Approval Persistence UX
+// AT-MEC_HM 9.0 - AI Provider Approval Persistence UX
 // Estensione sicura della pagina AI Copilot: provider configurabile e coda approvazioni manuali.
 // Non duplica moduli business e non modifica ricette, WO, utenti, test o hardware.
 (function(){
   'use strict';
-  var VERSION='AT-MEC_HM_8.0_AI_READY_ENTERPRISE_STABLE';
+  var VERSION='AT-MEC_HM_9.0_AI_FACTORY_COMMAND_CENTER';
   var CONFIG_KEY='atmec77_ai_provider_config';
   var LEGACY_PROVIDER_KEY='atmec76_ai_provider_config';
   var API_KEY_SESSION='atmec77_ai_provider_api_key_session';
@@ -22,8 +22,8 @@
       var s=$('ai76-ui-status'); if(s){s.textContent=m; s.className='ai76-ui-status '+(t||'info');}
       var ps=$('ai77-provider-status'); if(ps){ps.textContent=m; ps.className='ai77-provider-status '+(t||'info');}
       var fn=(typeof window.showToast==='function')?window.showToast:((typeof window.toast==='function')?window.toast:null);
-      if(fn) fn(m,t||'info'); else console.log('[AI 8.0]',m);
-    }catch(_e){console.log('[AI 8.0]',m);}
+      if(fn) fn(m,t||'info'); else console.log('[AI 9.0]',m);
+    }catch(_e){console.log('[AI 9.0]',m);}
   }
   function defaultConfig(){return {enabled:false,provider:'local_rules',endpoint:'',model:'',mode:'read_only',allowExternal:false,approvalRequired:true,hasApiKey:false,updatedAt:''};}
   function getConfig(){
@@ -218,13 +218,13 @@
   };
   window.exportAiApprovals77=function(){
     var data={version:VERSION,createdAt:now(),config:validation(getConfig()).config,queue:queue(),lastProvider:read(LAST_PROVIDER_KEY,null)};
-    var blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}); var a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='AT_MEC_HM_8_0_AI_APPROVAL_QUEUE_'+Date.now()+'.json'; a.click(); setTimeout(function(){try{URL.revokeObjectURL(a.href);}catch(_e){}},800); toast('Coda approvazioni AI esportata','success');
+    var blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}); var a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='AT_MEC_HM_9_0_AI_APPROVAL_QUEUE_'+Date.now()+'.json'; a.click(); setTimeout(function(){try{URL.revokeObjectURL(a.href);}catch(_e){}},800); toast('Coda approvazioni AI esportata','success');
   };
   window.showAiProviderApproval77=function(){
     try{if(window.setActiveAiSection771)window.setActiveAiSection771('provider');}catch(_e){}
     renderConfig(getConfig()); renderQueue();
     try{var el=$('ai77-provider-status')||$('ai77-approval-queue'); if(el&&el.scrollIntoView)el.scrollIntoView({behavior:'smooth',block:'center'});}catch(_e){}
   };
-  function init(){setTimeout(function(){try{renderConfig(getConfig()); renderQueue();}catch(e){console.warn('[AI 8.0 init]',e);}},1300);}
+  function init(){setTimeout(function(){try{renderConfig(getConfig()); renderQueue();}catch(e){console.warn('[AI 9.0 init]',e);}},1300);}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init); else init();
 })();

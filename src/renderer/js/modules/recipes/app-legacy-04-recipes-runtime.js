@@ -45,7 +45,7 @@ async function loadAppSettings() {
     setImg('app-large-logo', hmiLarge);
     setImg('hmi-main-large-logo', hmiLarge);
     const title = document.getElementById('app-title-logo');
-    if (title) title.style.display = hmiLarge ? 'none' : 'inline';
+    if (title) title.style.display = 'inline-flex'; // VEXON name stays visible; MEC/MIRZA logo remains separate
     setImg('developer-small-logo', developerSmall);
     setImg('login-developer-logo', developerSmall);
     setImg('prod-company-logo', hmiLarge || loginLarge || reportLarge);
@@ -440,7 +440,7 @@ function syncRecipeEnabledInputs(source) {
 function openStepWizardFromPage() {
   const t = document.getElementById('new-step-type-page')?.value;
   if (t && document.getElementById('new-step-type')) document.getElementById('new-step-type').value = t;
-  const catByType = { DigitalOutputSet:'digital_output', DigitalInputCheck:'digital_input', AnalogInputMeasurement:'measure_analog', VoltageMeasurement:'measure_voltage', CurrentMeasurement:'measure_current', ResistanceTest:'measure_resistance', FrequencyTest:'measure_frequency', SCPICommand:'scpi', Delay:'delay', FirmwareFlash:'firmware_flash' };
+  const catByType = { DigitalOutputSet:'digital_output', DigitalInputCheck:'digital_input', AnalogInputMeasurement:'measure_analog', VoltageMeasurement:'measure_voltage', CurrentMeasurement:'measure_current', ResistanceTest:'measure_resistance', StableMeasurement:'stable_measurement', FrequencyTest:'measure_frequency', SCPICommand:'scpi', Delay:'delay', FirmwareFlash:'firmware_flash' };
   if (t && document.getElementById('w-category')) document.getElementById('w-category').value = catByType[t] || 'measure_voltage';
   openStepWizard();
 }
@@ -454,6 +454,7 @@ function recipeStepIcon(step) {
   if (t.includes('PowerSupply')) return step?.ps_output_on === false || step?.value?.outputOn === false ? '🛑' : '🔋';
   if (t.includes('Current')) return '📈';
   if (t.includes('Voltage') || t.includes('Analog')) return '📏';
+  if (t === 'StableMeasurement') return '🎯';
   if (t.includes('Resistance')) return 'Ω';
   if (t.includes('Frequency')) return 'Hz';
   if (t.includes('Manual')) return '✋';
@@ -468,6 +469,7 @@ function describeRecipeStep(step) {
   const push = (k,v) => { if (v !== undefined && v !== null && v !== '') chips.push(`<span class="recipe-value-chip"><b>${escapeHtml(k)}</b> ${escapeHtml(v)}</span>`); };
   if (type === 'PowerSupplySet') { push('CH', step.ps_channel || step.channel || 1); push('V', step.ps_voltage ?? step.value?.voltage); push('I max', step.ps_current ?? step.value?.current); push('OUT', (step.ps_output_on ?? step.value?.outputOn) === false ? 'OFF' : 'ON'); }
   else if (type === 'PowerSupplyMeasureCurrent') { push('CH', step.channel || step.ps_channel || 1); push('Min', step.min); push('Max', step.max); push('Unità', step.unit || 'A'); }
+  else if (type === 'StableMeasurement') { push('Device', step.device_mapping || 'Keysight_34461A'); push('Min', step.min); push('Max', step.max); push('Stabile', (step.stable_time_ms ?? 1000) + ' ms'); push('Sample', (step.sample_interval_ms ?? 100) + ' ms'); push('FAIL', step.stop_on_fail === false ? 'continua' : 'ferma'); push('Unità', step.unit); }
   else if (type.includes('Measurement') || type.includes('Test')) { push('Device', step.device_mapping || 'Manuale'); push('Min', step.min); push('Max', step.max); push('Unità', step.unit); }
   else if (type === 'ManualMeasurement') { push('Tipo', step.manual_measure_type || (step.manual_input_enabled ? 'MANUAL_VALUE' : 'PASS_FAIL')); push('Origine', step.measurement_mode || (step.manual_input_enabled ? 'MANUALE' : 'AUTO')); push('Target', step.target); push('Tol', step.tolerance); push('Min', step.min); push('Max', step.max); push('Unità', step.unit); }
   else if (type === 'Delay') { push('Attesa', (step.timeout || 1000) + ' ms'); }
@@ -485,6 +487,7 @@ function addQuickRecipeStep(kind) {
     measure_voltage:{ type:'VoltageMeasurement', label:'Misura tensione', description:'Misura tensione con limiti e tolleranza', io_type:'SCPI', device_mapping:'Keysight_34461A', command:'MEAS:VOLT:DC?', target:24.0, tolerance:0.5, min:23.5, max:24.5, unit:'V', timeout:2500, measurement_mode:'auto_with_fallback', manual_fallback_enabled:true },
     measure_current:{ type:'CurrentMeasurement', label:'Misura corrente', description:'Misura consumo in ampere con tolleranza', io_type:'SCPI', device_mapping:'Keysight_34461A', command:'MEAS:CURR:DC?', target:0.5, tolerance:0.5, min:0, max:1, unit:'A', timeout:2500, measurement_mode:'auto_with_fallback', manual_fallback_enabled:true },
     measure_ohm:{ type:'ResistanceTest', label:'Misura resistenza', description:'Misura resistenza con tolleranza', io_type:'SCPI', device_mapping:'Keysight_34461A', command:'MEAS:RES?', target:500, tolerance:500, min:0, max:1000, unit:'Ω', timeout:2500, measurement_mode:'auto_with_fallback', manual_fallback_enabled:true },
+    stable_measurement:{ type:'StableMeasurement', label:'Misura stabilizzata 10 Ω', description:'PASS solo se il valore resta nel range per il tempo impostato', io_type:'SCPI', device_mapping:'Keysight_34461A', command:'MEAS:RES?', target:10, tolerance:0.2, min:9.8, max:10.2, unit:'Ω', timeout:10000, stable_time_ms:2000, sample_interval_ms:100, measurement_mode:'auto_with_fallback', manual_fallback_enabled:true, stop_on_fail:true },
     multi_channel_resistance:{ type:'MultiChannelResistanceTest', label:'Test multi-canale resistenza', description:'Misura resistenza canali con uscite associate e valori separati', io_type:'SCPI', device_mapping:'Keysight_34461A', command:'MEAS:RES?', unit:'Ω', timeout:3000, stop_on_fail:false, channel_fail_policy:'continue', channels:Array.from({length:10},(_,n)=>({ name:'CH'+(n+1), output:'OUT'+(n+1), min:10, max:50, stable_ms:500, enabled:true })) },
     measure_freq:{ type:'FrequencyTest', label:'Misura frequenza', description:'Misura frequenza con tolleranza', io_type:'SCPI', device_mapping:'Keysight_34461A', command:'MEAS:FREQ?', target:1000, tolerance:10, min:990, max:1010, unit:'Hz', timeout:2500, measurement_mode:'auto_with_fallback', manual_fallback_enabled:true },
     measure_continuity:{ type:'ManualMeasurement', label:'Controllo continuità', description:'Verifica continuità circuito con valore Ohm manuale/strumento', io_type:'SCPI', device_mapping:'Keysight_34461A', manual_measure_type:'SCPI_OHM', command:'MEAS:RES?', manual_input_enabled:false, manual_fallback_enabled:true, min:0, max:10, unit:'Ω', timeout:2500 },
@@ -734,6 +737,8 @@ function renderRecipeInlineEditor(step, i) {
     ${field('Tol ±', input('tolerance', step.tolerance ?? '', 'number'))}
     ${field('Origine', `<select onchange="updateRecipeStepField(${i}, 'measurement_mode', this.value)"><option value="auto_with_fallback" ${(step.measurement_mode||'auto_with_fallback')==='auto_with_fallback'?'selected':''}>Auto + fallback</option><option value="automatic" ${step.measurement_mode==='automatic'?'selected':''}>Solo auto</option><option value="manual" ${step.measurement_mode==='manual'?'selected':''}>Solo manuale</option></select>`)}
     ${field('Fallback manuale', `<select onchange="updateRecipeStepField(${i}, 'manual_fallback_enabled', this.value==='true')"><option value="true" ${step.manual_fallback_enabled!==false?'selected':''}>Accettato</option><option value="false" ${step.manual_fallback_enabled===false?'selected':''}>Non accettato</option></select>`)}
+    ${type === 'StableMeasurement' ? field('Stabile ms', input('stable_time_ms', step.stable_time_ms ?? 2000, 'number')) : ''}
+    ${type === 'StableMeasurement' ? field('Lettura ogni ms', input('sample_interval_ms', step.sample_interval_ms ?? 100, 'number')) : ''}
     ${field('Unità', input('unit', step.unit || ''))}
     ${field('Salva variabile', input('save_as_variable', step.save_as_variable || ''))}
     ${field('Usa variabile', input('compare_variable', step.compare_variable || ''))}
@@ -778,7 +783,7 @@ function fillMultiChannelRows336(stepIndex, count) { const step = recipe.steps[s
 function updateRecipeStepField(i, prop, value) {
   const step = recipe.steps[i]; if (!step) return;
   let v = value;
-  if (['min','max','target','tolerance','timeout','ps_voltage','ps_current','ps_channel','channel','target_step','value'].includes(prop)) v = value === '' ? '' : Number(value);
+  if (['min','max','target','tolerance','timeout','ps_voltage','ps_current','ps_channel','channel','target_step','value','stable_time_ms','sample_interval_ms'].includes(prop)) v = value === '' ? '' : Number(value);
   if (prop === 'ps_output_on') v = String(value) === 'true';
   if (prop === 'stop_on_fail') v = Boolean(value);
   step[prop] = v;
@@ -802,14 +807,30 @@ function recipeDragEnd(ev){ ev.currentTarget?.classList.remove('dragging'); docu
 function recipeDrop(ev, i){ ev.preventDefault(); document.querySelectorAll('.recipe-flow-card.drop-target').forEach(x=>x.classList.remove('drop-target')); if(recipeDragIndex===null || recipeDragIndex===i) return; const [item]=recipe.steps.splice(recipeDragIndex,1); recipe.steps.splice(i,0,item); recipeDragIndex=null; renumberRecipeSteps(); renderSteps(); }
 function renderDeviceManagerMini() {
   const box = document.getElementById('device-manager-mini'); if (!box) return;
-  const names = ['AimTTi_PL303','modbus_serial','Keysight_34461A'];
+  const norm = name => window.normalizeRecipeInstrumentName ? window.normalizeRecipeInstrumentName(name) : String(name || '').trim();
+  const active = (recipe.steps || []).filter(s => s && s.enabled !== false);
+  const namesSet = new Set();
+  const hasPl303Step = active.some(s => ['PowerSupplySet','PowerSupplyMeasureCurrent'].includes(String(s.type || '')) || norm(s.device_mapping || s.device || '') === 'AimTTi_PL303');
+  if ((recipe.power_metadata || '') === 'ESP32_RELAY_POWER') namesSet.add('modbus_serial');
+  if ((recipe.power_metadata || '') === 'PL303_PROGRAMMABLE' && hasPl303Step) namesSet.add('AimTTi_PL303');
+  active.forEach(s => {
+    const t = String(s.type || '');
+    if (['DI','DO'].includes(s.io_type) || t === 'DigitalInputCheck' || t === 'DigitalOutputSet') namesSet.add('modbus_serial');
+    if (['VoltageMeasurement','CurrentMeasurement','ResistanceTest','FrequencyTest','AnalogInputMeasurement','StableMeasurement'].includes(t)) namesSet.add(norm(s.device_mapping || s.device || 'Keysight_34461A'));
+    if (t === 'PowerSupplySet' || t === 'PowerSupplyMeasureCurrent') namesSet.add('AimTTi_PL303');
+    if (t === 'SCPICommand' && s.device_mapping && !['system','manual','none'].includes(String(s.device_mapping).toLowerCase())) namesSet.add(norm(s.device_mapping));
+  });
+  ['manual','manuale','operator','system','none','QR_Scanner'].forEach(x => namesSet.delete(x));
+  const names = Array.from(namesSet).filter(Boolean);
+  if (!names.length) { box.innerHTML = '<div class="hint">Nessuno strumento automatico richiesto dalla ricetta corrente.</div>'; return; }
   box.innerHTML = names.map(n => {
-    const st = latestHardwareStatuses.find(x => x.name === n) || {};
+    const st = latestHardwareStatuses.find(x => norm(x.name) === n) || {};
     const online = st.connected || st.live || (!st.mock && st.status === 'connected');
     const mock = st.mock;
     const cls = online ? 'device-state-online' : (mock ? 'device-state-offline' : 'device-state-error');
     const txt = online ? 'ONLINE' : (mock ? 'MOCK/OFFLINE' : 'OFFLINE');
-    return `<div class="device-mini-card"><b>${escapeHtml(n)}</b><span class="${cls}">${txt}</span><div class="hint">${escapeHtml(st.connectionString || st.port || st.status || 'nessun dato')}</div></div>`;
+    const label = n === 'Keysight_34461A' ? 'Keysight Multimetro' : n === 'AimTTi_PL303' ? 'Alimentatore PL303' : n === 'modbus_serial' ? 'Controller I/O' : n;
+    return `<div class="device-mini-card"><b>${escapeHtml(label)}</b><span class="${cls}">${txt}</span><div class="hint">${escapeHtml(st.connectionString || st.port || st.status || 'nessun dato')}</div></div>`;
   }).join('');
 }
 async function renderQualityMini() {
@@ -882,8 +903,9 @@ async function loadDashboardRecipeSelection() {
 }
 
 async function startTestFromDashboard() {
+  // 10.1.12: avvio più reattivo. Carica la ricetta e lascia a startTest() il solo controllo strumenti,
+  // evitando il doppio auto-connect che prima faceva sembrare necessario un secondo click.
   await loadDashboardRecipeSelection();
-  await autoConnectProductionInstruments(false);
   await startTest();
 }
 

@@ -58,11 +58,17 @@ if (api) {
   api.on('step-failed', (data) => {
     activeStepId = null; stepStatusMap[data.step_id] = 'fail'; renderSteps(); updateProductionTestMode();
     addLog(document.getElementById('run-log'), `❌ Step #${data.step_id} FAIL — ${escapeHtml(data.diagnosis?.probable_cause || data.error || '')}`, 'fail');
+    let st = null;
+    try { st = (recipe?.steps || []).find(x => Number(x.step_id) === Number(data?.step_id)); } catch(e) {}
+    const isStableAction10112 = !!(st && st.type === 'StableMeasurement') || Number(window.__vexon10112StableStepId || -1) === Number(data?.step_id);
     try {
-      const st = (recipe?.steps || []).find(x => Number(x.step_id) === Number(data?.step_id));
       if (!st || st.stop_on_fail !== false) setTimeout(() => forceFinalizeFail336('step FAIL configurato per fermare'), 120);
       else setTimeout(() => { try { api.failureAction('continue'); } catch(e) {} }, 80);
     } catch(e) {}
+    if (isStableAction10112) {
+      try { window.hideLegacyStableAction10112 && window.hideLegacyStableAction10112('legacy step-failed'); } catch(e) {}
+      return;
+    }
     document.getElementById('fault-panel').classList.add('show');
     document.getElementById('fault-cause').textContent = '🔴 ' + (data.diagnosis?.probable_cause || 'Causa sconosciuta');
     document.getElementById('fault-check').textContent = '🔧 ' + (data.diagnosis?.recommended_check || '');
@@ -73,6 +79,15 @@ if (api) {
   api.on('manual-step-request', (data) => {
     pendingManualRequestId = data.requestId;
     const fallback = data.fallback_reason || data.manual_fallback;
+    let st10112 = null;
+    try { st10112 = (recipe?.steps || []).find(x => Number(x.step_id) === Number(data?.step_id)); } catch(e) {}
+    const isStableFallback10112 = !!fallback && (!!(st10112 && st10112.type === 'StableMeasurement') || Number(window.__vexon10112StableStepId || -1) === Number(data?.step_id) || document.body.classList.contains('vexon-stable-live-active'));
+    if (isStableFallback10112) {
+      // 10.1.12: per StableMeasurement resta attivo solo il popup Action live unificato.
+      // Non aprire il vecchio pannello laterale/manual-step a destra.
+      try { window.hideLegacyStableAction10112 && window.hideLegacyStableAction10112('legacy manual-step-request'); } catch(e) {}
+      return;
+    }
     document.getElementById('manual-step-title').textContent = `${fallback ? '⚠️ Misura multimetro fallita' : '✋ Step manuale'} — ${data.label || 'Step'} #${data.step_id}`;
     document.getElementById('manual-step-instructions').textContent = fallback
       ? `Il multimetro non ha restituito una misura valida. ${data.fallback_reason || ''}

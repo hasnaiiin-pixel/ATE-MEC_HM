@@ -1,14 +1,14 @@
 {
-  "release": "AT-MEC_HM_6.6C_SQLITE_ENTERPRISE_STABLE",
-  "timestamp": "2026-06-17T14:38:51.620Z",
-  "status": "OK",
+  "release": "AT-MEC_HM_10.0_ENTERPRISE_STABLE_CLEAN_PRODUCTION_WITH_DRIVERS",
+  "timestamp": "2026-07-01T00:00:00.000Z",
+  "status": "CLEAN_PRODUCTION_READY",
   "counts": {
-    "tests": 5,
+    "tests": 0,
     "repairs": 0,
-    "recipes": 2,
-    "users": 4,
+    "recipes": 0,
+    "users": 2,
     "workOrders": 0,
-    "repositoryItems": 13
+    "repositoryItems": 0
   },
   "checks": {
     "missingFiles": [],
@@ -16,10 +16,5 @@
     "duplicateRepairs": [],
     "orphanRepairs": []
   },
-  "sizes": {
-    "database": 58569,
-    "config": 6609044,
-    "recipes": 455,
-    "data": 0
-  }
+  "sizes": {}
 }

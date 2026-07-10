@@ -1,0 +1,63 @@
+{
+  "version": "AT-MEC_HM_10.1.3_KEYSIGHT_STABLE_MEASUREMENT_BINDING_FIX",
+  "createdAt": "2026-07-01T13:49:54.409Z",
+  "checks": [
+    {
+      "label": "package.json",
+      "ok": true,
+      "detail": "root"
+    },
+    {
+      "label": "dist/main/main.js",
+      "ok": true,
+      "detail": "electron main"
+    },
+    {
+      "label": "dist/main/runtime/RecipeEngine.js",
+      "ok": true,
+      "detail": "recipe engine"
+    },
+    {
+      "label": "renderer index",
+      "ok": true,
+      "detail": "ui"
+    },
+    {
+      "label": "MIRZA icon",
+      "ok": true,
+      "detail": "app icon"
+    },
+    {
+      "label": "VEXON mark",
+      "ok": true,
+      "detail": "name logo"
+    },
+    {
+      "label": "safe branding JS",
+      "ok": true,
+      "detail": "no page injection"
+    },
+    {
+      "label": "action live measurement JS",
+      "ok": true,
+      "detail": "retry misura"
+    },
+    {
+      "label": "config users",
+      "ok": true,
+      "detail": "Admin/Tecnico"
+    },
+    {
+      "label": "drivers folder",
+      "ok": true,
+      "detail": "drivers optional"
+    },
+    {
+      "label": "electron",
+      "ok": false,
+      "detail": "node_modules"
+    }
+  ],
+  "criticalMissing": false,
+  "electronMissing": true
+}

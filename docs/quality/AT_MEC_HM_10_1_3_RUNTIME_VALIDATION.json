@@ -1,0 +1,147 @@
+{
+  "version": "AT-MEC_HM_10.1.3_KEYSIGHT_STABLE_MEASUREMENT_BINDING_FIX",
+  "createdAt": "2026-07-01T13:51:00.559Z",
+  "score": 100,
+  "checks": [
+    {
+      "label": "package VEXON 10.1.3",
+      "ok": true,
+      "detail": "vexon-industrial-test-platform-10-1-3 10.1.3"
+    },
+    {
+      "label": "package-lock 10.1.3",
+      "ok": true,
+      "detail": "package-lock root"
+    },
+    {
+      "label": "runtime script 10.1.3",
+      "ok": true,
+      "detail": "package script"
+    },
+    {
+      "label": "startup doctor 10.1.3",
+      "ok": true,
+      "detail": "package script"
+    },
+    {
+      "label": "MIRZA icon present",
+      "ok": true,
+      "detail": "app icon remains MIRZA"
+    },
+    {
+      "label": "MEC/MIRZA original assets kept",
+      "ok": true,
+      "detail": "logos kept"
+    },
+    {
+      "label": "VEXON small logo assets",
+      "ok": true,
+      "detail": "mini logo near name"
+    },
+    {
+      "label": "topbar center brand present",
+      "ok": true,
+      "detail": "center name in main/test top bars"
+    },
+    {
+      "label": "no invasive page brand injection",
+      "ok": true,
+      "detail": "Test Mode grid not touched"
+    },
+    {
+      "label": "Test Mode title not expanded by branding JS",
+      "ok": true,
+      "detail": "safe h1"
+    },
+    {
+      "label": "VEXON logo has white background styling",
+      "ok": true,
+      "detail": "white logo box"
+    },
+    {
+      "label": "StableMeasurement in wizard",
+      "ok": true,
+      "detail": "wizard option"
+    },
+    {
+      "label": "StableMeasurement engine TS",
+      "ok": true,
+      "detail": "TS engine"
+    },
+    {
+      "label": "StableMeasurement engine dist",
+      "ok": true,
+      "detail": "dist engine"
+    },
+    {
+      "label": "Action live measurement files",
+      "ok": true,
+      "detail": "action panel additivo"
+    },
+    {
+      "label": "Action live measurement included",
+      "ok": true,
+      "detail": "index includes"
+    },
+    {
+      "label": "Retry misura IPC",
+      "ok": true,
+      "detail": "preload/main IPC"
+    },
+    {
+      "label": "Stable retry engine",
+      "ok": true,
+      "detail": "engine retry"
+    },
+    {
+      "label": "Live stability timeout fields",
+      "ok": true,
+      "detail": "live detail fields"
+    },
+    {
+      "label": "Action UI retry button",
+      "ok": true,
+      "detail": "UI retry"
+    },
+    {
+      "label": "Keysight aliases backend",
+      "ok": true,
+      "detail": "alias Keysight/Multimetro/DMM"
+    },
+    {
+      "label": "StableMeasurement requires Keysight",
+      "ok": true,
+      "detail": "recipe hardware gate"
+    },
+    {
+      "label": "StableMeasurement uses normalized device",
+      "ok": true,
+      "detail": "engine reads selected Keysight"
+    },
+    {
+      "label": "Action shows instrument name",
+      "ok": true,
+      "detail": "action live device label"
+    },
+    {
+      "label": "PL303 not default if unused",
+      "ok": true,
+      "detail": "power source explicit only"
+    },
+    {
+      "label": "fail policy UI",
+      "ok": true,
+      "detail": "stop/continue"
+    },
+    {
+      "label": "Admin/Tecnico presenti",
+      "ok": true,
+      "detail": "login users"
+    },
+    {
+      "label": "BAT VEXON 10.1.3 presenti",
+      "ok": true,
+      "detail": "bat"
+    }
+  ]
+}

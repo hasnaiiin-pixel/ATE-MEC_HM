@@ -319,6 +319,13 @@ async function startTest() {
   if (!requireLogin()) return;
   if (startInProgress) return;
   startInProgress = true;
+  try {
+    window.__atmec10112StartBusy = true;
+    currentRunState = 'STARTING';
+    setStatePill('STARTING');
+    setProductionTimingState('AVVIO TEST');
+    addLog(document.getElementById('run-log'), '▶ Avvio test richiesto: preparo il runtime senza attendere un secondo click.', 'info');
+  } catch(e) {}
   stopWizardLive();
   if (autoPollInterval) { clearInterval(autoPollInterval); autoPollInterval = null; }
   meterPollBusy = false;
@@ -333,8 +340,14 @@ async function startTest() {
     if (recipe.enabled === false) { alert('Ricetta disabilitata: attiva il flag per eseguire.'); return; }
     if (recipe.steps.filter(s => s.enabled !== false).length === 0) { alert('Aggiungi o abilita almeno uno step alla ricetta prima di avviare!'); return; }
     if (!api) { addLog(document.getElementById('run-log'), '⚠️ Avvia tramite Electron (npm run build && npm start)', 'warn'); return; }
-    await guardedUi('RECOVER stato prima avvio', () => api.recoverFault(), { timeoutMs: 2500, logTo: document.getElementById('run-log'), fallback: { ok:false } });
-    await guardedUi('Auto collegamento strumenti necessari', () => autoConnectProductionInstruments(false), { timeoutMs: 8000, logTo: document.getElementById('run-log'), fallback: null });
+    const stateBefore10112 = String(currentRunState || document.getElementById('state-pill')?.textContent || '').toUpperCase();
+    if (/FAULT|ERROR/.test(stateBefore10112)) {
+      await guardedUi('RECOVER stato prima avvio', () => api.recoverFault(), { timeoutMs: 2500, logTo: document.getElementById('run-log'), fallback: { ok:false } });
+    } else {
+      // 10.1.12: non bloccare ogni START con recover completo quando il runtime è già pronto.
+      try { api.recoverFault && api.recoverFault(); } catch(e) {}
+    }
+    await guardedUi('Auto collegamento strumenti necessari', () => autoConnectProductionInstruments(false), { timeoutMs: 4500, logTo: document.getElementById('run-log'), fallback: null });
     if (typeof window.dm413rjPreStartGateSafe === 'function') {
       const dmGate = await window.dm413rjPreStartGateSafe();
       if (!dmGate || dmGate.ok === false) { forceRunIdleUi(); return; }
@@ -392,6 +405,7 @@ async function startTest() {
     if (btnStop) btnStop.disabled = false;
   } finally {
     startInProgress = false;
+    setTimeout(() => { try { window.__atmec10112StartBusy = false; } catch(e) {} }, 250);
     // Se il main ha accettato la ricetta, RUNNING arriverà via evento. Se non è partita, riabilita start.
     const stateText = document.getElementById('state-pill')?.textContent || '';
     if (btnStart && stateText !== 'RUNNING' && stateText !== 'PAUSED') btnStart.disabled = false;
@@ -490,13 +504,20 @@ function getRequiredInstrumentsForRecipe() {
   // Calcola gli strumenti realmente richiesti dalla ricetta attiva.
   // Evita di mostrare o validare PL303/Keysight/Scanner se la ricetta non li usa.
   const required = new Set();
-  const power = recipe.power_metadata || getPowerSourceValue() || 'MANUAL_POWER';
+  const activeSteps = (recipe.steps || []).filter(s => s && s.enabled !== false);
+  const power = recipe.power_metadata || 'MANUAL_POWER';
+  const hasRealPl303Step = activeSteps.some(step => {
+    const t = String(step.type || '');
+    const dev = window.normalizeRecipeInstrumentName ? window.normalizeRecipeInstrumentName(step.device_mapping || step.device || '') : String(step.device_mapping || step.device || '');
+    return t === 'PowerSupplySet' || t === 'PowerSupplyMeasureCurrent' || dev === 'AimTTi_PL303';
+  });
   if (power === 'ESP32_RELAY_POWER') required.add('modbus_serial');
-  if (power === 'PL303_PROGRAMMABLE') required.add('AimTTi_PL303');
-  for (const step of (recipe.steps || []).filter(s => s.enabled !== false)) {
+  // 10.1.4: non mostrare/validare PL303 solo perché arriva power_metadata vecchio da WO/commessa.
+  if (power === 'PL303_PROGRAMMABLE' && hasRealPl303Step) required.add('AimTTi_PL303');
+  for (const step of activeSteps) {
     if (['DI','DO'].includes(step.io_type) || step.type === 'DigitalInputCheck' || step.type === 'DigitalOutputSet') required.add('modbus_serial');
-    if (['VoltageMeasurement','CurrentMeasurement','ResistanceTest','FrequencyTest','AnalogInputMeasurement'].includes(step.type)) required.add(step.device_mapping || 'Keysight_34461A');
-    if (step.type === 'PowerSupplySet') required.add('AimTTi_PL303');
+    if (['VoltageMeasurement','CurrentMeasurement','ResistanceTest','FrequencyTest','AnalogInputMeasurement','StableMeasurement'].includes(step.type)) required.add(step.device_mapping || 'Keysight_34461A');
+    if (step.type === 'PowerSupplySet' || step.type === 'PowerSupplyMeasureCurrent') required.add('AimTTi_PL303');
     if (step.type === 'SCPICommand' && step.device_mapping && step.device_mapping !== 'system') required.add(step.device_mapping);
     if (step.type === 'ManualMeasurement') {
       const manualType = String(step.manual_measure_type || step.io_type || '').toUpperCase();
@@ -573,8 +594,16 @@ async function validateRecipeHardwareBeforeStart() {
     return rows;
   }
 
+  // VEXON 10.1.9: se gli strumenti richiesti sono già LIVE nella cache condivisa,
+  // non bloccare l'avvio ricetta con interrogazioni lente e ripetute.
+  const cachedRows = normalizeRows(latestHardwareStatuses || []).concat(sharedStatusRows());
+  if (cachedRows.length && [...required].every(name => isLive(findStatus(name, cachedRows)))) {
+    latestHardwareStatuses = cachedRows;
+    return { ok: true, missing: [] };
+  }
+
   let rows = [];
-  try { rows = normalizeRows(await withTimeout(api.getHardwareStatuses(), 1800, 'stato hardware')); } catch { rows = []; }
+  try { rows = normalizeRows(await withTimeout(api.getHardwareStatuses(), 700, 'stato hardware')); } catch { rows = []; }
   const sharedRows = sharedStatusRows();
   latestHardwareStatuses = rows.concat(sharedRows);
 

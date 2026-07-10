@@ -405,7 +405,7 @@ const STATE_COLORS = {
 
 const STEP_TYPE_COLORS = {
   VoltageMeasurement: 'type-color-V', CurrentMeasurement: 'type-color-I', AnalogInputMeasurement: 'type-color-I',
-  ResistanceTest: 'type-color-R', FrequencyTest: 'type-color-F',
+  ResistanceTest: 'type-color-R', StableMeasurement: 'type-color-R', FrequencyTest: 'type-color-F',
   Delay: 'type-color-D', SCPICommand: 'type-color-CMD',
   FirmwareErase: 'type-color-FW', FirmwareFlash: 'type-color-FW', FirmwareVerify: 'type-color-FW',
   DigitalOutputSet: 'type-color-IO', DigitalInputCheck: 'type-color-IO', ManualMeasurement: 'type-color-CMD',
@@ -467,6 +467,7 @@ function stepSummary(step) {
   if (step.channel !== undefined) parts.push(`<span class="pill-mini">GPIO ${step.channel}</span>`);
   if (step.min !== undefined || step.max !== undefined) parts.push(`<span class="pill-mini">${step.min ?? '-∞'} ÷ ${step.max ?? '+∞'} ${step.unit || ''}</span>`);
   if (step.value !== undefined && step.type.includes('Digital')) parts.push(`<span class="pill-mini">${step.value ? 'HIGH' : 'LOW'}</span>`);
+  if (step.type === 'StableMeasurement') { parts.push(`<span class="pill-mini">stabile ${step.stable_time_ms ?? 1000} ms</span>`); parts.push(`<span class="pill-mini">sample ${step.sample_interval_ms ?? 100} ms</span>`); parts.push(`<span class="pill-mini">FAIL: ${step.stop_on_fail === false ? 'continua' : 'ferma'}</span>`); }
   if (step.type === 'DigitalOutputSet' && step.output_mode && step.output_mode !== 'set') parts.push(`<span class="pill-mini">${step.output_mode}${step.output_mode === 'pulse' ? ' '+(step.frequency_hz||1)+'Hz x'+(step.pulse_count||1) : ' '+(step.timeout||0)+'ms'}</span>`);
   return parts.length ? `<div class="step-summary">${parts.join('')}</div>` : '';
 }
@@ -558,6 +559,7 @@ const WIZARD_PRESETS = {
   measure_current:   { type:'CurrentMeasurement', io_type:'SCPI', device:'Keysight_34461A', unit:'A', target:0.25, tolerance:0.25, min:0.05, max:0.5, timeout:2000, command:'MEAS:CURR:DC?', label:'Misura corrente', measurement_mode:'auto_with_fallback', manual_fallback_enabled:true },
   measure_analog:    { type:'AnalogInputMeasurement', io_type:'SCPI', device:'Keysight_34461A', unit:'V', target:1.65, tolerance:1.65, min:0, max:3.3, timeout:2500, command:'MEAS:VOLT:DC?', label:'Misura analogica DMM', measurement_mode:'auto_with_fallback', manual_fallback_enabled:true },
   measure_resistance:{ type:'ResistanceTest', io_type:'SCPI', device:'Keysight_34461A', unit:'Ω', target:480, tolerance:30, min:450, max:510, timeout:2000, command:'MEAS:RES?', label:'Misura resistenza', measurement_mode:'auto_with_fallback', manual_fallback_enabled:true },
+  stable_measurement:{ type:'StableMeasurement', io_type:'SCPI', device:'Keysight_34461A', unit:'Ω', target:10, tolerance:0.2, min:9.8, max:10.2, timeout:10000, command:'MEAS:RES?', label:'Misura stabilizzata 10 Ω', measurement_mode:'auto_with_fallback', manual_fallback_enabled:true, stable_time_ms:2000, sample_interval_ms:100, stop_on_fail:true },
   measure_frequency: { type:'FrequencyTest', io_type:'SCPI', device:'Keysight_34461A', unit:'Hz', target:1000, tolerance:10, min:990, max:1010, timeout:2000, command:'MEAS:FREQ?', label:'Misura frequenza', measurement_mode:'auto_with_fallback', manual_fallback_enabled:true },
   measure_continuity:{ type:'ManualMeasurement', io_type:'SCPI', device:'Keysight_34461A', unit:'Ω', target:0, tolerance:10, min:0, max:10, timeout:2500, command:'MEAS:RES?', label:'Controllo continuità', manual_measure_type:'SCPI_OHM', measurement_mode:'auto_with_fallback', manual_fallback_enabled:true },
   measure_temp:      { type:'ManualMeasurement', io_type:'SYSTEM', device:'manual', unit:'°C', target:25, tolerance:10, min:15, max:35, timeout:0, command:'', label:'Misura temperatura', manual_measure_type:'TEMPERATURE', measurement_mode:'manual', manual_input_enabled:true, manual_fallback_enabled:true },
@@ -610,6 +612,8 @@ function applyWizardCategory() {
   document.getElementById('w-manual-type').value = p.manual_measure_type || p.io_type || 'AI';
   const mi = document.getElementById('w-manual-input-enabled'); if (mi) mi.checked = Boolean(p.manual_input_enabled || p.manual_measure_type === 'MANUAL_VALUE');
   document.getElementById('w-stable-time').value = p.stable_time_ms ?? 1000;
+  const si0=document.getElementById('w-sample-interval'); if(si0) si0.value = p.sample_interval_ms ?? 100;
+  const of0=document.getElementById('w-on-fail'); if(of0) of0.value = p.stop_on_fail === false ? 'continue' : 'stop';
   currentInstructionImageDataUrl = '';
   document.getElementById('w-instruction-image-name').value = '';
   document.getElementById('w-instruction-image-preview').style.display = 'none';
@@ -644,6 +648,8 @@ function fillWizardFromStep(step) {
   document.getElementById('w-manual-type').value = step.manual_measure_type || step.io_type || 'AI';
   const mi = document.getElementById('w-manual-input-enabled'); if (mi) mi.checked = Boolean(step.manual_input_enabled || step.manual_measure_type === 'MANUAL_VALUE');
   document.getElementById('w-stable-time').value = step.stable_time_ms ?? step.timeout ?? 1000;
+  const si1=document.getElementById('w-sample-interval'); if(si1) si1.value = step.sample_interval_ms ?? 100;
+  const of1=document.getElementById('w-on-fail'); if(of1) of1.value = step.stop_on_fail === false ? 'continue' : 'stop';
   currentInstructionImageDataUrl = step.instruction_image || '';
   document.getElementById('w-instruction-image-name').value = currentInstructionImageDataUrl ? 'Immagine salvata nella ricetta' : '';
   const prev = document.getElementById('w-instruction-image-preview');
@@ -658,6 +664,7 @@ function guessIoType(type) {
   if (type.startsWith('Firmware')) return 'FW';
   if (type === 'Delay') return 'SYSTEM';
   if (type === 'ManualMeasurement') return document.getElementById('w-manual-type')?.value || 'AI';
+  if (type === 'StableMeasurement') return 'SCPI';
   return 'SCPI';
 }
 
@@ -668,7 +675,8 @@ function syncWizardVisibility() {
   const manualInputEnabled = Boolean(document.getElementById('w-manual-input-enabled')?.checked) || manualKind === 'MANUAL_VALUE' || measureMode === 'manual';
   const isOutputDigital = type === 'DigitalOutputSet';
   const isInputDigital = type === 'DigitalInputCheck';
-  const isMeasurement = ['VoltageMeasurement','CurrentMeasurement','ResistanceTest','FrequencyTest','AnalogInputMeasurement'].includes(type);
+  const isStableMeasurement = type === 'StableMeasurement';
+  const isMeasurement = ['VoltageMeasurement','CurrentMeasurement','ResistanceTest','FrequencyTest','AnalogInputMeasurement','StableMeasurement'].includes(type);
   const isPowerSupply = type === 'PowerSupplySet' || type === 'PowerSupplyMeasureCurrent';
   const isDelay = type === 'Delay';
   const isManual = type === 'ManualMeasurement';
@@ -687,7 +695,7 @@ function syncWizardVisibility() {
   } else if (isInputDigital) {
     show.add('channel'); show.add('value'); show.add('timeout');
   } else if (isMeasurement) {
-    show.add('device'); show.add('command'); show.add('unit'); show.add('min'); show.add('max'); show.add('target'); show.add('tolerance'); show.add('measure_mode'); show.add('manual_fallback'); show.add('measure_preview'); show.add('timeout');
+    show.add('device'); show.add('command'); show.add('unit'); show.add('min'); show.add('max'); show.add('target'); show.add('tolerance'); show.add('measure_mode'); show.add('manual_fallback'); show.add('measure_preview'); show.add('timeout'); show.add('on_fail'); if (isStableMeasurement) { show.add('stable_time'); show.add('stable_sample_interval'); }
   } else if (isPowerSupply) {
     show.add('ps_channel'); show.add('ps_voltage'); show.add('ps_current'); show.add('ps_output'); show.add('timeout');
   } else if (isManual) {
@@ -731,6 +739,7 @@ function syncWizardVisibility() {
   const help = document.getElementById('w-smart-help');
   if (isOutputDigital) help.textContent = 'Uscita digitale: sono visibili solo GPIO DO, stato HIGH/LOW, modalità uscita, timeout e feedback.';
   else if (isInputDigital) help.textContent = 'Ingresso digitale: sono visibili solo GPIO DI, stato atteso HIGH/LOW e timeout. Lo stato I/O è visibile nella griglia.';
+  else if (isStableMeasurement) help.textContent = 'MISURA STABILIZZATA: il valore deve rimanere nel range per il tempo impostato. Se esce dal range, il timer si azzera. Su FAIL puoi fermare o continuare dalla ricetta.';
   else if (isMeasurement) help.textContent = 'Misura universale: scegli automatica da multimetro, solo manuale o automatica con fallback. Nel report viene salvata origine AUTOMATICA/MANUALE, target, tolleranza e timestamp.';
   else if (type === 'PowerSupplySet') help.textContent = 'Alimentatore PL303QMD-P: scegli CH1 o CH2, imposta tensione/corrente e ON/OFF. Lo step usa solo opzioni alimentatore.';
   else if (type === 'PowerSupplyMeasureCurrent') help.textContent = 'Misura consumo dal PL303QMD-P: scegli CH1/CH2 e imposta limiti min/max corrente. A fine step il consumo viene salvato nel report.';
@@ -769,7 +778,8 @@ function updateWizardMeasurePreview412C() {
   const min = document.getElementById('w-min')?.value ?? '';
   const max = document.getElementById('w-max')?.value ?? '';
   const r = calcMeasureRange412C(target, tolerance, min, max);
-  const origin = mode === 'manual' ? 'MANUALE operatore' : (mode === 'automatic' ? 'AUTOMATICA da multimetro digitale' : 'AUTOMATICA + fallback MANUALE');
+  const stableTxt = type === 'StableMeasurement' ? ` · stabilità ${document.getElementById('w-stable-time')?.value || 0} ms` : '';
+  const origin = (mode === 'manual' ? 'MANUALE operatore' : (mode === 'automatic' ? 'AUTOMATICA da multimetro digitale' : 'AUTOMATICA + fallback MANUALE')) + stableTxt;
   const warn = (r.min !== undefined && r.max !== undefined && r.min > r.max) ? '<div class="measure-preview-warn-412c">⚠️ Min maggiore di Max: correggere i valori.</div>' : '';
   const rangeReady = r.min !== undefined && r.max !== undefined;
   box.innerHTML = `
@@ -824,10 +834,15 @@ function wizardStepFromForm(commitId = false) {
     step.min = range412C.min;
     step.max = range412C.max;
   }
-  if (['VoltageMeasurement','CurrentMeasurement','ResistanceTest','FrequencyTest','AnalogInputMeasurement'].includes(type)) {
+  if (['VoltageMeasurement','CurrentMeasurement','ResistanceTest','FrequencyTest','AnalogInputMeasurement','StableMeasurement'].includes(type)) {
     step.measurement_mode = document.getElementById('w-measure-mode')?.value || 'auto_with_fallback';
     step.manual_fallback_enabled = Boolean(document.getElementById('w-manual-fallback-enabled')?.checked);
     if (step.measurement_mode === 'manual') { step.manual_input_enabled = true; step.device_mapping = 'manual'; step.io_type = 'SYSTEM'; }
+    const of=document.getElementById('w-on-fail'); if(of) step.stop_on_fail = of.value !== 'continue';
+    if (type === 'StableMeasurement') {
+      step.stable_time_ms = Number(document.getElementById('w-stable-time')?.value || 0) || 0;
+      step.sample_interval_ms = Number(document.getElementById('w-sample-interval')?.value || 100) || 100;
+    }
   }
   const unit = document.getElementById('w-unit').value.trim();
   if (unit) step.unit = unit;

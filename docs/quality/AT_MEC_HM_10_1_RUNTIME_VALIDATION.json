@@ -1,0 +1,82 @@
+{
+  "version": "AT-MEC_HM_10.1_VEXON_BRANDING_AND_STABLE_MEASUREMENT",
+  "createdAt": "2026-07-01T12:12:20.123Z",
+  "score": 100,
+  "checks": [
+    {
+      "label": "package VEXON 10.1",
+      "ok": true,
+      "detail": "vexon-industrial-test-platform-10-1 10.1.0"
+    },
+    {
+      "label": "package-lock 10.1",
+      "ok": true,
+      "detail": "package-lock root"
+    },
+    {
+      "label": "runtime script 10.1",
+      "ok": true,
+      "detail": "package script"
+    },
+    {
+      "label": "startup doctor 10.1",
+      "ok": true,
+      "detail": "package script"
+    },
+    {
+      "label": "MIRZA icon present",
+      "ok": true,
+      "detail": "app icon uses MIRZA asset"
+    },
+    {
+      "label": "MEC/MIRZA original assets kept",
+      "ok": true,
+      "detail": "logos kept"
+    },
+    {
+      "label": "VEXON mark only asset",
+      "ok": true,
+      "detail": "mini logo near name"
+    },
+    {
+      "label": "index VEXON visible",
+      "ok": true,
+      "detail": "login/topbar/testmode"
+    },
+    {
+      "label": "branding css/js loaded",
+      "ok": true,
+      "detail": "index includes"
+    },
+    {
+      "label": "StableMeasurement in wizard",
+      "ok": true,
+      "detail": "wizard option"
+    },
+    {
+      "label": "StableMeasurement engine TS",
+      "ok": true,
+      "detail": "TS engine"
+    },
+    {
+      "label": "StableMeasurement engine dist",
+      "ok": true,
+      "detail": "dist engine"
+    },
+    {
+      "label": "fail policy UI",
+      "ok": true,
+      "detail": "stop/continue"
+    },
+    {
+      "label": "Admin/Tecnico presenti",
+      "ok": true,
+      "detail": "login users"
+    },
+    {
+      "label": "BAT VEXON 10.1 presenti",
+      "ok": true,
+      "detail": "bat"
+    }
+  ]
+}

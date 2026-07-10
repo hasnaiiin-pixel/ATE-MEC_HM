@@ -1,0 +1,907 @@
+"use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.DeviceManager = void 0;
+/**
+ * DeviceManager - Hardware Abstraction Layer AT-MEC.
+ *
+ * Coordina strumenti reali e mock: ESP32 USB JSON, SCPI, seriali e alimentatori.
+ * Le operazioni ESP32 sono serializzate con una queue unica per evitare concorrenza
+ * sulla porta USB e blocchi dopo letture/scritture ravvicinate.
+ */
+const net = __importStar(require("net"));
+const path = __importStar(require("path"));
+const fs = __importStar(require("fs"));
+const child_process_1 = require("child_process");
+const modbus_serial_1 = __importDefault(require("modbus-serial"));
+const serialport_1 = require("serialport");
+const CalibrationManager_1 = require("./CalibrationManager");
+const Esp32SerialProvider_1 = require("./Esp32SerialProvider");
+class DeviceManager {
+    normalizeDeviceName(deviceName) {
+        const raw = String(deviceName || '').trim();
+        const n = raw.toLowerCase();
+        if (!raw)
+            return raw;
+        if (n === 'keysight' || n === 'dmm' || n === 'multimeter' || n === 'multimetro' || n === 'keysight_34465a' || n === '34461a' || n === '34465a' || n.includes('keysight') || n.includes('34461') || n.includes('34465') || n.includes('multimet'))
+            return 'Keysight_34461A';
+        if (n.includes('aimtti_pl303') || n.includes('pl303') || n.includes('tti') || n.includes('aliment'))
+            return 'AimTTi_PL303';
+        if (n.includes('modbus_serial') || n.includes('esp32') || n === 'esp32_serial')
+            return 'modbus_serial';
+        return raw;
+    }
+    mockMode = {};
+    scpiSockets = {};
+    modbusClient = null;
+    ttiSerialPort = null;
+    scpiSerialPorts = {};
+    visaResources = {};
+    calibration = new CalibrationManager_1.CalibrationManager();
+    esp32Serial = null;
+    deviceRegistry = {};
+    digitalOutputStates = {};
+    modbusQueue = Promise.resolve();
+    modbusPortPath = '';
+    modbusBaudRate = 115200;
+    modbusTimeoutCount = 0;
+    async connectDevice(deviceName, connectionString, portOrBaud = 5025) {
+        deviceName = this.normalizeDeviceName(deviceName);
+        // AT-MEC_HM_10.1.3: accetta alias ricetta/UI Keysight, Multimetro, DMM, 34461/34465 e li porta allo strumento reale.
+        const previousConnection = this.deviceRegistry[deviceName];
+        this.deviceRegistry[deviceName] = connectionString;
+        // AT-MEC 2.24: se uno strumento è già connesso sulla stessa porta non chiudere/riaprire.
+        // Questo evita disconnessioni durante il Test Mode e riduce timeout falsi.
+        if ((deviceName === 'modbus_serial' || deviceName === 'esp32_serial') && this.esp32Serial?.isConnected?.() && connectionString === this.modbusPortPath && !this.getMockMode('modbus_serial')) {
+            return true;
+        }
+        if (connectionString === '127.0.0.1' || connectionString === 'mock') {
+            this.mockMode[deviceName] = true;
+            console.log(`[HAL] ${deviceName} avviato in MODALITÀ SIMULATA.`);
+            return true;
+        }
+        if (deviceName === 'esp32_serial') {
+            this.esp32Serial = new Esp32SerialProvider_1.Esp32SerialProvider();
+            try {
+                await this.esp32Serial.connect(connectionString, portOrBaud);
+                this.mockMode[deviceName] = false;
+                console.log(`[HAL] ESP32-S3 connesso via USB seriale su ${connectionString}`);
+                return true;
+            }
+            catch (err) {
+                this.mockMode[deviceName] = true;
+                console.log(`[HAL] ESP32-S3 seriale non trovato su ${connectionString}. Attivata simulazione.`, err);
+                return true;
+            }
+        }
+        if (deviceName === 'modbus_serial') {
+            // AT-MEC_HM_1_4: manteniamo il nome logico "modbus_serial" per non cambiare
+            // ricette e validazioni, ma il backend stabile verso ESP32 è USB JSON.
+            // Il firmware JSON pulito è quello che l'utente ha verificato funzionante.
+            this.modbusPortPath = connectionString;
+            this.modbusBaudRate = portOrBaud;
+            this.modbusTimeoutCount = 0;
+            await this.closeModbusQuietly();
+            try {
+                this.esp32Serial?.close();
+            }
+            catch { }
+            this.esp32Serial = new Esp32SerialProvider_1.Esp32SerialProvider();
+            try {
+                await this.withLocalTimeout(this.esp32Serial.connect(connectionString, portOrBaud), 3500, 'connect ESP32 JSON');
+                this.mockMode[deviceName] = false;
+                console.log(`[HAL] ESP32-S3 connessa su ${connectionString} come modbus_serial/logico via JSON USB`);
+                return true;
+            }
+            catch (err) {
+                try {
+                    this.esp32Serial?.close();
+                }
+                catch { }
+                this.esp32Serial = null;
+                this.mockMode[deviceName] = true;
+                console.log(`[HAL] ESP32-S3 JSON non trovata su ${connectionString}. Attivata simulazione modbus_serial.`, err);
+                return true;
+            }
+        }
+        if (deviceName === 'AimTTi_PL303') {
+            if (previousConnection === connectionString && !this.getMockMode(deviceName) && (this.ttiSerialPort?.isOpen || (this.scpiSockets[deviceName] && !this.scpiSockets[deviceName].destroyed))) {
+                return true;
+            }
+            // AT-MEC_HM_2.15: driver dedicato alimentatore Aim-TTi PL303QMD-P.
+            // Supporta due modalità: USB/seriale (COMx) ed Ethernet/TCP SCPI.
+            // Se la connessione fallisce non blocca la HMI: passa in MOCK e segnala lo stato.
+            await this.safeCloseSerialPort(this.ttiSerialPort, 'PL303 porta precedente');
+            this.ttiSerialPort = null;
+            delete this.scpiSockets[deviceName];
+            const conn = String(connectionString || '').trim();
+            const isTcp = conn.startsWith('tcp://') || /^\d+\.\d+\.\d+\.\d+$/.test(conn) || /^[a-zA-Z0-9_.-]+:\d+$/.test(conn);
+            if (isTcp) {
+                const clean = conn.replace(/^tcp:\/\//, '');
+                const [host, portText] = clean.includes(':') ? clean.split(':') : [clean, String(portOrBaud || 9221)];
+                return new Promise((resolve) => {
+                    const socket = new net.Socket();
+                    socket.setTimeout(2200);
+                    socket.connect(Number(portText || 9221), host, () => {
+                        this.scpiSockets[deviceName] = socket;
+                        this.mockMode[deviceName] = false;
+                        console.log(`[HAL] Alimentatore Aim-TTi PL303QMD-P connesso Ethernet ${host}:${portText || 9221}`);
+                        resolve(true);
+                    });
+                    socket.on('timeout', () => { socket.destroy(); this.mockMode[deviceName] = true; console.log(`[HAL] PL303 TCP timeout su ${host}. MOCK attivo.`); resolve(true); });
+                    socket.on('error', () => { this.mockMode[deviceName] = true; console.log(`[HAL] PL303 TCP errore su ${host}. MOCK attivo.`); resolve(true); });
+                });
+            }
+            return new Promise((resolve) => {
+                this.ttiSerialPort = new serialport_1.SerialPort({ path: conn, baudRate: portOrBaud }, (err) => {
+                    if (err) {
+                        console.log(`[HAL] Alimentatore Aim-TTi PL303QMD-P non trovato su ${conn}. Attivata simulazione.`);
+                        this.mockMode[deviceName] = true;
+                    }
+                    else {
+                        console.log(`[HAL] Alimentatore Aim-TTi PL303QMD-P connesso via USB su ${conn}`);
+                        this.mockMode[deviceName] = false;
+                    }
+                    resolve(true);
+                });
+            });
+        }
+        if (deviceName === 'Keysight_34461A') {
+            if (previousConnection === connectionString && !this.getMockMode(deviceName) && (this.visaResources[deviceName] || this.scpiSerialPorts[deviceName]?.isOpen || (this.scpiSockets[deviceName] && !this.scpiSockets[deviceName].destroyed))) {
+                return true;
+            }
+            // Driver Keysight 34461A. Modalità supportate:
+            // - Ethernet/LAN SCPI: IP o tcp://IP:5025
+            // - USB seriale/COM quando disponibile come porta virtuale
+            // - USB/VISA/USBTMC: previsto come configurazione; se non esiste un bridge VISA resta in MOCK esplicito
+            await this.safeCloseSerialPort(this.scpiSerialPorts[deviceName], `${deviceName} porta seriale precedente`);
+            delete this.scpiSerialPorts[deviceName];
+            delete this.scpiSockets[deviceName];
+            const conn = String(connectionString || '').trim();
+            const cleanUsb = conn.replace(/^usb:\/\//i, '').replace(/^visa:\/\//i, '');
+            const isVisaResource = /^visa:\/\//i.test(conn) || /^(USB|TCPIP|GPIB).*::INSTR$/i.test(conn);
+            if (isVisaResource) {
+                const resource = cleanUsb;
+                try {
+                    const out = await this.execVisaBridge(['query', resource, '*IDN?'], 15000);
+                    if (!out?.ok)
+                        throw new Error(out?.error || 'Risposta VISA non valida');
+                    const idn = String(out.response || '').trim();
+                    // AT-MEC_HM_3.5: accetta risposte valide anche se Keysight restituisce
+                    // "Keysight Technologies" con maiuscole/minuscole diverse.
+                    // Lo strumento è LIVE se risponde a *IDN? e la risposta contiene 34461A o Keysight.
+                    if (!idn || (!/34461A/i.test(idn) && !/KEYSIGHT/i.test(idn))) {
+                        throw new Error(`Risposta *IDN? inattesa da Keysight 34461A: ${idn || 'vuota'}`);
+                    }
+                    this.visaResources[deviceName] = resource;
+                    this.mockMode[deviceName] = false;
+                    console.log(`[HAL] Keysight 34461A LIVE USB/VISA ${resource}: ${idn}`);
+                    return true;
+                }
+                catch (err) {
+                    delete this.visaResources[deviceName];
+                    this.mockMode[deviceName] = true;
+                    console.log(`[HAL] Keysight 34461A VISA non disponibile su ${resource}. MOCK attivo.`, err?.message || err);
+                    return true;
+                }
+            }
+            if (/^COM\d+$/i.test(cleanUsb) || cleanUsb.startsWith('/dev/')) {
+                return new Promise((resolve) => {
+                    this.scpiSerialPorts[deviceName] = new serialport_1.SerialPort({ path: cleanUsb, baudRate: Number(portOrBaud) || 9600 }, (err) => {
+                        if (err) {
+                            this.mockMode[deviceName] = true;
+                            console.log(`[HAL] Keysight 34461A USB/COM non trovato su ${cleanUsb}. MOCK attivo.`);
+                        }
+                        else {
+                            this.mockMode[deviceName] = false;
+                            console.log(`[HAL] Keysight 34461A connesso USB/COM su ${cleanUsb}`);
+                        }
+                        resolve(true);
+                    });
+                });
+            }
+            // Altrimenti prosegue come strumento TCP/IP SCPI su porta 5025.
+        }
+        return new Promise((resolve) => {
+            const socket = new net.Socket();
+            socket.setTimeout(2000);
+            socket.connect(portOrBaud, connectionString, () => {
+                this.mockMode[deviceName] = false;
+                this.scpiSockets[deviceName] = socket;
+                console.log(`[HAL] Strumento TCP ${deviceName} connesso presso ${connectionString}:${portOrBaud}`);
+                resolve(true);
+            });
+            socket.on('timeout', () => {
+                socket.destroy();
+                this.mockMode[deviceName] = true;
+                console.log(`[HAL] ${deviceName} TCP timeout su ${connectionString}. Attivata simulazione.`);
+                resolve(true);
+            });
+            socket.on('error', () => {
+                this.mockMode[deviceName] = true;
+                console.log(`[HAL] ${deviceName} TCP disconnesso su ${connectionString}. Attivata simulazione.`);
+                resolve(true);
+            });
+        });
+    }
+    withLocalTimeout(task, ms, label) {
+        let timer;
+        return Promise.race([
+            task,
+            new Promise((_, reject) => {
+                timer = setTimeout(() => reject(new Error(`${label} timeout ${ms}ms`)), ms);
+            })
+        ]).finally(() => { if (timer)
+            clearTimeout(timer); });
+    }
+    /**
+     * AT-MEC_HM_3.8 - Chiusura seriale sicura.
+     * Evita il crash Electron "Port is not open" quando un driver prova a chiudere
+     * una porta seriale gia chiusa o mai aperta. L'errore viene registrato come warning
+     * e non viene propagato al main process.
+     */
+    async safeCloseSerialPort(port, label = 'porta seriale') {
+        if (!port)
+            return;
+        try {
+            if (port.isOpen === false)
+                return;
+            await new Promise((resolve) => {
+                try {
+                    port.close?.((err) => {
+                        if (err && !/Port is not open/i.test(err.message || ''))
+                            console.warn(`[HAL] ${label}: errore close non critico:`, err.message || err);
+                        resolve();
+                    });
+                }
+                catch (err) {
+                    if (!/Port is not open/i.test(err?.message || ''))
+                        console.warn(`[HAL] ${label}: eccezione close non critica:`, err?.message || err);
+                    resolve();
+                }
+            });
+        }
+        catch (err) {
+            if (!/Port is not open/i.test(err?.message || ''))
+                console.warn(`[HAL] ${label}: close ignorato:`, err?.message || err);
+        }
+    }
+    safeCloseSerialPortSync(port, label = 'porta seriale') {
+        if (!port)
+            return;
+        try {
+            if (port.isOpen === false)
+                return;
+            port.close?.((err) => {
+                if (err && !/Port is not open/i.test(err.message || ''))
+                    console.warn(`[HAL] ${label}: errore close non critico:`, err.message || err);
+            });
+        }
+        catch (err) {
+            if (!/Port is not open/i.test(err?.message || ''))
+                console.warn(`[HAL] ${label}: eccezione close non critica:`, err?.message || err);
+        }
+    }
+    async closeModbusQuietly() {
+        try {
+            await new Promise((resolve) => this.modbusClient?.close?.(() => resolve()) || resolve());
+        }
+        catch { }
+        this.modbusClient = null;
+    }
+    /**
+     * Esegue il bridge Python VISA per strumenti USBTMC/VISA come Keysight 34461A.
+     * AT-MEC non include librerie Keysight proprietarie: usa Keysight IO Libraries installate
+     * sul PC e PyVISA come ponte leggero. In caso di assenza di Python/PyVISA ritorna errore chiaro.
+     */
+    async execVisaBridge(args, timeoutMs = 15000) {
+        const scriptCandidates = [
+            path.join(process.cwd(), 'scripts', 'keysight_visa_bridge.py'),
+            path.join(__dirname, '..', '..', 'scripts', 'keysight_visa_bridge.py'),
+            path.join(process.resourcesPath || process.cwd(), 'scripts', 'keysight_visa_bridge.py')
+        ];
+        const script = scriptCandidates.find(p => fs.existsSync(p));
+        if (!script)
+            throw new Error('Bridge VISA non trovato: scripts/keysight_visa_bridge.py');
+        const pyCandidates = process.platform === 'win32'
+            ? [{ exe: 'py', prefix: ['-3'] }, { exe: 'python', prefix: [] }, { exe: 'python3', prefix: [] }]
+            : [{ exe: 'python3', prefix: [] }, { exe: 'python', prefix: [] }];
+        let lastErr = null;
+        for (const c of pyCandidates) {
+            try {
+                return await new Promise((resolve, reject) => {
+                    const child = (0, child_process_1.execFile)(c.exe, [...c.prefix, script, ...args], { timeout: timeoutMs, windowsHide: true }, (err, stdout, stderr) => {
+                        if (err) {
+                            reject(new Error(stderr?.trim() || err.message));
+                            return;
+                        }
+                        try {
+                            resolve(JSON.parse(stdout || '{}'));
+                        }
+                        catch {
+                            reject(new Error(`Risposta bridge VISA non valida: ${stdout || stderr}`));
+                        }
+                    });
+                    child.on('error', reject);
+                });
+            }
+            catch (err) {
+                lastErr = err;
+            }
+        }
+        throw new Error(`Python/PyVISA non disponibile: ${lastErr?.message || lastErr}`);
+    }
+    /** Scansione risorse VISA disponibili, es. USB0::0x2A8D::0x1301::MY...::INSTR. */
+    async scanVisaResources() {
+        try {
+            const res = await this.execVisaBridge(['list'], 8000);
+            return Array.isArray(res.resources) ? res.resources : [];
+        }
+        catch (err) {
+            return [{ resource: '', ok: false, error: err?.message || String(err) }];
+        }
+    }
+    async reconnectModbusAfterFault() {
+        if (!this.modbusPortPath || this.mockMode['modbus_serial'])
+            return;
+        const port = this.modbusPortPath;
+        const baud = this.modbusBaudRate || 115200;
+        await this.closeModbusQuietly();
+        this.modbusClient = new modbus_serial_1.default();
+        try {
+            await this.withLocalTimeout(this.modbusClient.connectRTUBuffered(port, { baudRate: baud }), 2500, 'modbus reconnect');
+            await this.withLocalTimeout(Promise.resolve(this.modbusClient.setID(1)), 500, 'modbus setID');
+            try {
+                this.modbusClient.setTimeout?.(800);
+            }
+            catch { }
+            this.mockMode['modbus_serial'] = false;
+            this.modbusTimeoutCount = 0;
+            console.log(`[HAL] Modbus seriale ripristinato su ${port}`);
+        }
+        catch (err) {
+            await this.closeModbusQuietly();
+            this.mockMode['modbus_serial'] = true;
+            console.error('[HAL] Ripristino Modbus fallito:', err);
+        }
+    }
+    runModbusExclusive(label, fn, timeoutMs = 1200) {
+        const run = async () => {
+            if (this.mockMode['modbus_serial'])
+                throw new Error('modbus_serial in MOCK');
+            if (!this.modbusClient)
+                throw new Error('modbus_serial non connesso');
+            try {
+                const result = await this.withLocalTimeout(fn(), timeoutMs, label);
+                this.modbusTimeoutCount = 0;
+                await new Promise(res => setTimeout(res, 20));
+                return result;
+            }
+            catch (err) {
+                this.modbusTimeoutCount++;
+                console.error(`[HAL] ${label} fallito:`, err);
+                if (this.modbusTimeoutCount >= 2) {
+                    await this.reconnectModbusAfterFault();
+                }
+                throw err;
+            }
+        };
+        const chained = this.modbusQueue.then(run, run);
+        this.modbusQueue = chained.catch(() => undefined);
+        return chained;
+    }
+    /**
+     * Protezione anti-blocco della coda ESP32.
+     * Tutte le operazioni GPIO passano qui, una alla volta, con timeout e reset MOCK
+     * dopo errori ripetuti. In questo modo una richiesta lenta non paralizza la HMI.
+     */
+    runEsp32Exclusive(label, fn, timeoutMs = 1500) {
+        const run = async () => {
+            if (this.mockMode['modbus_serial'])
+                throw new Error('modbus_serial in MOCK');
+            if (!this.esp32Serial?.isConnected())
+                throw new Error('ESP32 JSON non connessa');
+            try {
+                const result = await this.withLocalTimeout(fn(), timeoutMs, label);
+                this.modbusTimeoutCount = 0;
+                await new Promise(res => setTimeout(res, 10));
+                return result;
+            }
+            catch (err) {
+                this.modbusTimeoutCount++;
+                console.error(`[HAL] ${label} fallito:`, err);
+                if (this.modbusTimeoutCount >= 3) {
+                    // AT-MEC 2.24: non scollegare subito la ESP32. Mantieni la porta aperta e tenta un
+                    // handshake leggero; solo se la porta è realmente chiusa passa a MOCK.
+                    if (!this.esp32Serial?.isConnected?.()) {
+                        this.mockMode['modbus_serial'] = true;
+                        try {
+                            this.esp32Serial?.close();
+                        }
+                        catch { }
+                        this.esp32Serial = null;
+                    }
+                }
+                throw err;
+            }
+        };
+        const chained = this.modbusQueue.then(run, run);
+        this.modbusQueue = chained.catch(() => undefined);
+        return chained;
+    }
+    getMockMode(name) {
+        name = this.normalizeDeviceName(name);
+        return this.mockMode[name] ?? true;
+    }
+    getAllStatuses() {
+        return Object.keys(this.deviceRegistry).map(name => ({
+            name,
+            connected: !this.getMockMode(name),
+            mock: this.getMockMode(name),
+            connectionString: this.deviceRegistry[name]
+        }));
+    }
+    isDeviceLive(name) {
+        name = this.normalizeDeviceName(name);
+        // AT-MEC_HM_2.17: la ricetta continua a richiedere "modbus_serial" come nome logico,
+        // ma l'hardware reale è ESP32 USB JSON. Se il backend ESP32 è connesso, lo stato è LIVE.
+        if (name === 'modbus_serial') {
+            return Boolean(this.esp32Serial?.isConnected?.()) && !this.getMockMode('modbus_serial');
+        }
+        return this.deviceRegistry[name] !== undefined && !this.getMockMode(name);
+    }
+    getProfessionalDeviceList() {
+        const rows = [
+            { group: 'Controller I/O', name: 'modbus_serial', label: 'ESP32-S3 USB JSON' },
+            { group: 'Alimentatori', name: 'AimTTi_PL303', label: 'Alimentatore PL303QMD-P' },
+            { group: 'Multimetri', name: 'Keysight_34461A', label: 'Keysight 34461A Multimetro SCPI Ethernet/USB' },
+            { group: 'Scanner', name: 'QR_Scanner', label: 'Scanner QR / Barcode' }
+        ];
+        return rows.map(r => ({
+            ...r,
+            live: this.isDeviceLive(r.name) || r.name === 'QR_Scanner',
+            mock: r.name === 'QR_Scanner' ? false : this.getMockMode(r.name),
+            connectionString: this.deviceRegistry[r.name] || (r.name === 'QR_Scanner' ? 'HID/Webcam/manuale' : 'non configurato'),
+            required: false
+        }));
+    }
+    validateRecipeHardware(recipe) {
+        const required = new Set();
+        const normalizeRequired = (name) => {
+            const n = String(name || '').trim().toLowerCase();
+            if (!n)
+                return '';
+            if (n.includes('modbus_serial') || n.includes('esp32') || n === 'esp32_serial')
+                return 'modbus_serial';
+            if (n.includes('aimtti_pl303') || n.includes('pl303') || n.includes('tti'))
+                return 'AimTTi_PL303';
+            if (n.includes('keysight') || n.includes('34461') || n.includes('34465') || n.includes('multimeter') || n.includes('multimetro') || n.includes('dmm'))
+                return 'Keysight_34461A';
+            if (n.includes('scanner') || n.includes('qr'))
+                return 'QR_Scanner';
+            return String(name || '').trim();
+        };
+        const addRequired = (name) => {
+            const normalized = normalizeRequired(name);
+            if (normalized && normalized !== 'QR_Scanner')
+                required.add(normalized);
+        };
+        const activeSteps = (recipe.steps || []).filter(step => step && step.enabled !== false);
+        const hasRealPl303Step = activeSteps.some(step => {
+            const type = String(step.type || '');
+            const dev = normalizeRequired(String(step.device_mapping || ''));
+            return ['PowerSupplySet', 'PowerSupplyMeasureCurrent'].includes(type) || dev === 'AimTTi_PL303';
+        });
+        // 10.1.4: power_metadata vecchio da WO/ricette non deve rendere il PL303 obbligatorio.
+        // Il PL303 viene richiesto solo se uno step reale lo usa.
+        if (recipe.power_metadata === 'PL303_PROGRAMMABLE' && hasRealPl303Step)
+            addRequired('AimTTi_PL303');
+        if (recipe.power_metadata === 'ESP32_RELAY_POWER')
+            addRequired('modbus_serial');
+        for (const step of activeSteps) {
+            const device = String(step.device_mapping || '').trim();
+            const deviceKey = device.toLowerCase();
+            // AT-MEC_HM_4.10H: gli step manuali/operatori non sono hardware LIVE.
+            // In precedenza device_mapping:'manual' entrava tra gli strumenti richiesti e bloccava
+            // l'avvio con errore: "Hardware richiesto non LIVE: manual".
+            if (!device || deviceKey === 'manual' || deviceKey === 'manuale' || deviceKey === 'operator' || deviceKey === 'system' || deviceKey === 'none') {
+                if (step.type === 'ManualMeasurement')
+                    continue;
+            }
+            if (['DI', 'DO'].includes(step.io_type || '') || step.type === 'DigitalInputCheck' || step.type === 'DigitalOutputSet') {
+                addRequired('modbus_serial');
+                continue;
+            }
+            if (['VoltageMeasurement', 'CurrentMeasurement', 'ResistanceTest', 'FrequencyTest', 'AnalogInputMeasurement', 'StableMeasurement'].includes(step.type || '')) {
+                addRequired(device || 'Keysight_34461A');
+                continue;
+            }
+            if (step.type === 'ManualMeasurement') {
+                const manualType = String(step.manual_measure_type || step.io_type || '').toUpperCase();
+                const requiresScpiDevice = manualType === 'SCPI' || manualType.startsWith('SCPI_');
+                if (requiresScpiDevice && device && !['manual', 'manuale', 'operator', 'system', 'none'].includes(deviceKey))
+                    addRequired(device);
+                continue;
+            }
+            if (!device || deviceKey === 'system')
+                continue;
+            addRequired(device);
+        }
+        const missing = Array.from(required).filter(name => !this.isDeviceLive(name));
+        return { ok: missing.length === 0, missing };
+    }
+    async writeSCPI(deviceName, cmd) {
+        deviceName = this.normalizeDeviceName(deviceName);
+        if (this.mockMode[deviceName])
+            return;
+        if (this.visaResources[deviceName]) {
+            const out = await this.execVisaBridge(['query', this.visaResources[deviceName], cmd], 15000);
+            if (!out?.ok)
+                throw new Error(out?.error || 'Errore write VISA');
+            return;
+        }
+        if (deviceName === 'AimTTi_PL303' && this.ttiSerialPort) {
+            this.ttiSerialPort.write(`${cmd}\r\n`);
+            return;
+        }
+        if (this.scpiSockets[deviceName]) {
+            this.scpiSockets[deviceName].write(`${cmd}\n`);
+        }
+    }
+    async querySCPI(deviceName, cmd) {
+        deviceName = this.normalizeDeviceName(deviceName);
+        if (this.mockMode[deviceName]) {
+            let rawMock = 0;
+            let calKey = '';
+            if (cmd.includes('V1O?')) {
+                rawMock = 5.01 + Math.random() * 0.02;
+                calKey = `${deviceName}_Volt`;
+            }
+            else if (cmd.includes('I1O?')) {
+                rawMock = 0.125 + Math.random() * 0.01;
+                calKey = `${deviceName}_Curr`;
+            }
+            else if (cmd.includes('VOLT') || cmd.includes('MEAS:VOLT')) {
+                rawMock = 4.98 + Math.random() * 0.04;
+                calKey = `${deviceName}_Volt`;
+            }
+            else if (cmd.includes('CURR') || cmd.includes('MEAS:CURR')) {
+                rawMock = 0.125 + Math.random() * 0.01;
+                calKey = `${deviceName}_Curr`;
+            }
+            else if (cmd.includes('RES') || cmd.includes('MEAS:RES')) {
+                rawMock = 470 + Math.random() * 5;
+                calKey = `${deviceName}_Volt`;
+            }
+            else if (cmd.includes('FREQ')) {
+                rawMock = 1000 + Math.random() * 2;
+                calKey = `${deviceName}_Volt`;
+            }
+            else
+                return 'MOCK_OK';
+            return this.calibration.applyCalibration(calKey, rawMock).toString();
+        }
+        if (this.visaResources[deviceName]) {
+            const out = await this.execVisaBridge(['query', this.visaResources[deviceName], cmd], 15000);
+            if (!out?.ok)
+                throw new Error(out?.error || 'Errore query VISA');
+            return String(out.response || '').trim();
+        }
+        if (deviceName === 'AimTTi_PL303' && this.ttiSerialPort) {
+            // AT-MEC_HM_3.10 TEST: query PL303 seriale non bloccante.
+            // Il PL303 può rispondere lentamente o non rispondere se la porta/baud non è corretta:
+            // in quel caso ritorniamo TIMEOUT invece di lasciare pendente la Promise.
+            return new Promise((resolve) => {
+                let raw = '';
+                let done = false;
+                const sp = this.ttiSerialPort;
+                const finish = (value) => {
+                    if (done)
+                        return;
+                    done = true;
+                    clearTimeout(timer);
+                    try {
+                        sp.off('data', onData);
+                    }
+                    catch { }
+                    resolve(String(value || '').trim());
+                };
+                const onData = (data) => {
+                    raw += data.toString();
+                    if (raw.includes('\n') || raw.includes('\r'))
+                        finish(raw);
+                };
+                const timer = setTimeout(() => finish('TIMEOUT'), 1200);
+                sp.on('data', onData);
+                sp.write(`${cmd}\r\n`, (err) => { if (err)
+                    finish('TIMEOUT'); });
+            });
+        }
+        if (this.scpiSerialPorts[deviceName]) {
+            return new Promise((resolve) => {
+                const sp = this.scpiSerialPorts[deviceName];
+                const timer = setTimeout(() => resolve('TIMEOUT'), 2500);
+                sp.once('data', (data) => { clearTimeout(timer); resolve(data.toString().trim()); });
+                sp.write(`${cmd}
+`);
+            });
+        }
+        return new Promise((resolve, reject) => {
+            const socket = this.scpiSockets[deviceName];
+            if (!socket) {
+                reject(new Error(`Socket non trovato per ${deviceName}`));
+                return;
+            }
+            socket.once('data', (data) => {
+                const rawNum = parseFloat(data.toString().trim());
+                if (!isNaN(rawNum)) {
+                    const typeKey = cmd.includes('VOLT') ? 'Volt' : 'Curr';
+                    resolve(this.calibration.applyCalibration(`${deviceName}_${typeKey}`, rawNum).toString());
+                }
+                else {
+                    resolve(data.toString().trim());
+                }
+            });
+            socket.write(`${cmd}\n`, (err) => { if (err)
+                reject(err); });
+        });
+    }
+    async setDigitalOutput(channel, state) {
+        // In AT-MEC_HM_1_4 il channel È il GPIO reale serigrafato sulla scheda.
+        // Esempio: channel 4 -> GPIO4 -> pin scritto 4.
+        this.digitalOutputStates[channel] = state;
+        if (this.mockMode['modbus_serial'] || !this.esp32Serial?.isConnected()) {
+            console.log(`[HAL MOCK] Digital OUT GPIO${channel} = ${state}`);
+            return;
+        }
+        await this.runEsp32Exclusive(`writeDigital GPIO${channel}`, async () => {
+            await this.esp32Serial.writeDigital(channel, state);
+        }, 1800);
+    }
+    async readDigitalOutput(channel) {
+        if (this.mockMode['modbus_serial'] || !this.esp32Serial?.isConnected())
+            return this.digitalOutputStates[channel] ?? false;
+        const value = await this.runEsp32Exclusive(`readDigital GPIO${channel}`, async () => this.esp32Serial.readDigital(channel), 1500);
+        this.digitalOutputStates[channel] = value;
+        return value;
+    }
+    async readDigitalInput(channel) {
+        if (this.mockMode['modbus_serial'] || !this.esp32Serial?.isConnected())
+            return Math.random() > 0.5;
+        return this.runEsp32Exclusive(`readDigital GPIO${channel}`, async () => this.esp32Serial.readDigital(channel), 1500);
+    }
+    async readAnalogInput(channel) {
+        if (this.mockMode['modbus_serial'] || !this.esp32Serial?.isConnected())
+            return Math.random() * 3.3;
+        return this.runEsp32Exclusive(`readAnalog GPIO${channel}`, async () => this.esp32Serial.readAnalog(channel), 1800);
+    }
+    async writeAnalogOutput(channel, value) {
+        if (this.mockMode['modbus_serial'] || !this.esp32Serial?.isConnected()) {
+            console.log(`[HAL MOCK] Analog OUT GPIO${channel} = ${value}`);
+            return;
+        }
+        await this.runEsp32Exclusive(`writeAnalog GPIO${channel}`, async () => {
+            await this.esp32Serial.writeAnalog(channel, value);
+        }, 1800);
+    }
+    setEsp32PinMap(entries) {
+        this.esp32Serial?.setPinMap(entries);
+    }
+    async scanSerialPorts() {
+        try {
+            const ports = await serialport_1.SerialPort.list();
+            return ports.map((p) => {
+                const text = `${p.path || ''} ${p.manufacturer || ''} ${p.serialNumber || ''} ${p.vendorId || ''} ${p.productId || ''}`.toLowerCase();
+                const likelyEsp32 = text.includes('espressif') || text.includes('esp32') || text.includes('silicon labs') || text.includes('cp210') || text.includes('ch340') || text.includes('usb jtag');
+                return {
+                    path: p.path,
+                    manufacturer: p.manufacturer,
+                    serialNumber: p.serialNumber,
+                    friendlyName: `${p.path}${p.manufacturer ? ' — ' + p.manufacturer : ''}${p.serialNumber ? ' — SN ' + p.serialNumber : ''}`,
+                    likelyEsp32
+                };
+            });
+        }
+        catch (err) {
+            console.error('[HAL] Errore scansione porte seriali:', err);
+            return [];
+        }
+    }
+    getEsp32IoCatalog() {
+        // AT-MEC_HM_1_4: mappatura diretta. Il campo channel È il numero GPIO fisico serigrafato sulla scheda.
+        // Esempio: channel=4 -> GPIO4 -> pin scritto "4" sulla ESP32-S3 DevKitC-1.
+        const usableDigital = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 21, 47, 48];
+        const analogCapable = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18];
+        const reserved = [0, 19, 20, 43, 44, 45, 46];
+        const special = [35, 36, 37, 38, 39, 40, 41, 42];
+        const row = (io_type, gpio, safe, note) => ({
+            io_type,
+            channel: gpio,
+            gpio,
+            label: `GPIO${gpio}`,
+            allowedFor: io_type === 'DO' ? ['DigitalOutputSet'] : io_type === 'DI' ? ['DigitalInputCheck'] : io_type === 'AI' ? ['AnalogInputMeasurement'] : ['AnalogOutputSet'],
+            safe,
+            note
+        });
+        return [
+            ...usableDigital.map(gpio => row('DO', gpio, true, `Uscita digitale diretta: GPIO${gpio} = pin ${gpio} sulla scheda`)),
+            ...usableDigital.map(gpio => row('DI', gpio, true, `Ingresso digitale diretto: GPIO${gpio} = pin ${gpio} sulla scheda`)),
+            ...analogCapable.map(gpio => row('AI', gpio, true, `Ingresso analogico ADC: GPIO${gpio} = pin ${gpio}; valore 0..3.3V`)),
+            ...reserved.map(gpio => row('DO', gpio, false, `RISERVATO/DA EVITARE: GPIO${gpio}. Non usare per uscite generiche.`)),
+            ...reserved.map(gpio => row('DI', gpio, false, `RISERVATO/DA EVITARE: GPIO${gpio}. Non usare per ingressi generici.`)),
+            ...special.map(gpio => row('DO', gpio, false, `SPI/FSPI speciale: GPIO${gpio}. Disabilitato finché non viene validato sul tuo hardware.`)),
+            ...special.map(gpio => row('DI', gpio, false, `SPI/FSPI speciale: GPIO${gpio}. Disabilitato finché non viene validato sul tuo hardware.`))
+        ];
+    }
+    async getEsp32Info() {
+        const ports = await this.scanSerialPorts();
+        let fwInfo = null;
+        if (!this.mockMode['modbus_serial'] && this.esp32Serial?.isConnected()) {
+            try {
+                fwInfo = await this.runEsp32Exclusive('info ESP32', async () => this.esp32Serial.getInfo(), 1800);
+            }
+            catch { }
+        }
+        return {
+            device: 'ESP32-S3 DevKitC-1 N16R8',
+            transport: 'modbus_serial logico → USB JSON',
+            live: this.isDeviceLive('modbus_serial'),
+            connectionString: this.deviceRegistry['modbus_serial'] || 'mock',
+            firmware: fwInfo,
+            ports,
+            ioCatalog: this.getEsp32IoCatalog()
+        };
+    }
+    /**
+     * AT-MEC_HM_3.6 - Gestione PL303QMD-P a due canali indipendenti.
+     *
+     * channel=1 -> CH1, channel=2 -> CH2.
+     * Comandi SCPI Aim-TTi usati:
+     * - V<ch> <volt>  imposta tensione canale
+     * - I<ch> <ampere> imposta limite corrente canale
+     * - OP<ch> 0/1    uscita canale OFF/ON
+     * La funzione valida i range base e lavora anche in MOCK senza bloccare la HMI.
+     */
+    async setPl303Output(voltage, current, outputOn, channel = 1) {
+        const ch = Math.max(1, Math.min(2, Number(channel) || 1));
+        const v = Math.max(0, Math.min(30.5, Number(voltage) || 0));
+        const i = Math.max(0, Math.min(3.2, Number(current) || 0));
+        try {
+            await this.writeSCPI('AimTTi_PL303', `V${ch} ${v.toFixed(3)}`);
+            await this.pl303CommandDelay(120);
+            await this.writeSCPI('AimTTi_PL303', `I${ch} ${i.toFixed(3)}`);
+            await this.pl303CommandDelay(120);
+            await this.writeSCPI('AimTTi_PL303', `OP${ch} ${outputOn ? 1 : 0}`);
+            await this.pl303CommandDelay(120);
+            return { ok: true, voltage: v, current: i, outputOn: Boolean(outputOn), mock: this.getMockMode('AimTTi_PL303') };
+        }
+        catch (err) {
+            return { ok: false, voltage: v, current: i, outputOn: Boolean(outputOn), mock: this.getMockMode('AimTTi_PL303'), error: err?.message || String(err) };
+        }
+    }
+    /** Legge lo stato sintetico del PL303 per la pagina dedicata alimentatore. */
+    async getPl303Status(channel = 1) {
+        const ch = Math.max(1, Math.min(2, Number(channel) || 1));
+        const mock = this.getMockMode('AimTTi_PL303');
+        if (mock)
+            return { ok: true, mock: true, channel: ch, voltage: 0, current: 0, outputOn: false, connectionString: this.deviceRegistry['AimTTi_PL303'] || 'mock' };
+        const voltageRaw = await this.querySCPI('AimTTi_PL303', `V${ch}O?`).catch(() => 'TIMEOUT');
+        await this.pl303CommandDelay(80);
+        const currentRaw = await this.querySCPI('AimTTi_PL303', `I${ch}O?`).catch(() => 'TIMEOUT');
+        const voltage = parseFloat(String(voltageRaw).replace(',', '.'));
+        const current = parseFloat(String(currentRaw).replace(',', '.'));
+        const timeout = String(voltageRaw).includes('TIMEOUT') || String(currentRaw).includes('TIMEOUT');
+        return {
+            ok: !timeout,
+            mock: false,
+            timeout,
+            warning: timeout ? 'PL303 non ha risposto entro il timeout; controllare porta COM/baud/cavo.' : undefined,
+            channel: ch,
+            voltage: Number.isNaN(voltage) ? undefined : voltage,
+            current: Number.isNaN(current) ? undefined : current,
+            outputOn: undefined,
+            connectionString: this.deviceRegistry['AimTTi_PL303'] || ''
+        };
+    }
+    async pl303CommandDelay(ms = 180) {
+        await new Promise(resolve => setTimeout(resolve, ms));
+    }
+    /**
+     * AT-MEC_HM_3.9 TEST - Spegnimento sicuro alimentatore PL303QMD-P.
+     * Invia OFF CH1 e CH2 con pausa tra i comandi per evitare perdita comando su seriale lenta.
+  
+     * Disattiva sempre CH1 e CH2 in caso di chiusura app, cambio ricetta, fine test, FAIL, STOP, ABORT o EMERGENZA.
+     * Non solleva eccezioni bloccanti: restituisce il dettaglio di ogni canale per log/report.
+     */
+    async safePl303AllOutputsOff(reason = 'SAFETY') {
+        const channels = [];
+        const mock = this.getMockMode('AimTTi_PL303');
+        // Alcuni PL303 via USB/seriale ignorano il secondo comando se arriva immediatamente dopo il primo.
+        // Per sicurezza inviamo CH1 OFF, pausa, CH2 OFF, pausa, poi ripetiamo una seconda volta.
+        for (const pass of [1, 2]) {
+            for (const ch of [1, 2]) {
+                try {
+                    await this.writeSCPI('AimTTi_PL303', `OP${ch} 0`);
+                    await this.pl303CommandDelay(220);
+                    if (pass === 1)
+                        channels.push({ channel: ch, ok: true, outputOn: false });
+                }
+                catch (err) {
+                    if (pass === 1)
+                        channels.push({ channel: ch, ok: false, error: err instanceof Error ? err.message : String(err) });
+                }
+            }
+        }
+        return { ok: channels.every(c => c.ok), reason, channels, mock };
+    }
+    /**
+     * AT-MEC_HM_3.7 - Misura consumo corrente dal PL303QMD-P.
+     * Legge I<ch>O? dal canale selezionato e ritorna la corrente in ampere.
+     */
+    async measurePl303Current(channel = 1) {
+        const ch = Math.max(1, Math.min(2, Number(channel) || 1));
+        const mock = this.getMockMode('AimTTi_PL303');
+        if (mock)
+            return { ok: true, channel: ch, current: 0, unit: 'A', mock: true, raw: 'MOCK' };
+        const raw = await this.querySCPI('AimTTi_PL303', `I${ch}O?`).catch(() => 'TIMEOUT');
+        const current = parseFloat(String(raw).replace(',', '.'));
+        const timeout = String(raw).includes('TIMEOUT');
+        return { ok: true, channel: ch, current: Number.isNaN(current) ? 0 : current, unit: 'A', mock: false, raw: String(raw).trim(), timeout, warning: timeout ? 'timeout lettura corrente PL303' : undefined };
+    }
+    disconnect() {
+        try {
+            this.modbusClient?.close?.(() => undefined);
+        }
+        catch { }
+        try {
+            this.esp32Serial?.close();
+        }
+        catch { }
+        this.safeCloseSerialPortSync(this.ttiSerialPort, 'PL303 disconnect');
+        for (const s of Object.values(this.scpiSockets)) {
+            try {
+                s.destroy();
+            }
+            catch { }
+        }
+        for (const p of Object.values(this.scpiSerialPorts)) {
+            this.safeCloseSerialPortSync(p, 'SCPI serial disconnect');
+        }
+    }
+}
+exports.DeviceManager = DeviceManager;
