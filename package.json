@@ -1,7 +1,7 @@
 {
-  "name": "vexon-industrial-test-platform-10-1-12",
-  "version": "10.1.12",
-  "description": "AT-MEC_HM_10.1.12_STABLE_ACTION_UNIQUE_FAST_START_FIX",
+  "name": "vexon-industrial-test-platform-10-1-15",
+  "version": "10.1.15",
+  "description": "AT-MEC_HM_10.1.15_DMM_PERSISTENT_SESSION_MEASUREMENT_SPEED_FIX",
   "main": "dist/main/main.js",
   "scripts": {
     "build": "tsc",
@@ -37,10 +37,11 @@
     "db:cleanup-report": "node scripts/sqlite_enterprise_66c.js cleanup",
     "db:enterprise-status": "node scripts/sqlite_enterprise_66c.js status",
     "cleanup:audit": "node scripts/cleanup_audit_75.js",
-    "runtime:validate": "node scripts/runtime_validate_10112.js",
-    "startup:doctor": "node scripts/startup_doctor_10112.js",
+    "runtime:validate": "node scripts/runtime_validate_10115.js",
+    "startup:doctor": "node scripts/startup_doctor_10115.js",
     "production:reset": "node scripts/production_reset_100.js",
-    "drivers:check": "node scripts/driver_check_100.js"
+    "drivers:check": "node scripts/driver_check_100.js",
+    "performance:smoke": "node scripts/performance_smoke_10115.js scripts/fixtures/2180321_performance.json"
   },
   "build": {
     "appId": "com.mirza.vexon",

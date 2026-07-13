@@ -1,0 +1,47 @@
+const fs=require('fs');
+const path=require('path');
+const root=path.join(__dirname,'..');
+const RELEASE='AT-MEC_HM_10.1.14_RECIPE_GPIO_PRESET_AUTO_CYCLE_FAST_FIX';
+function exists(p){return fs.existsSync(path.join(root,p));}
+function read(p){return fs.readFileSync(path.join(root,p),'utf8');}
+const checks=[];
+function add(label,ok,detail=''){checks.push({label,ok:!!ok,detail});}
+const pkg=JSON.parse(read('package.json'));
+const lock=JSON.parse(read('package-lock.json'));
+const versionJs=read('src/renderer/js/version.js');
+const settings=JSON.parse(read('config/app_settings.json'));
+const cycle=read('src/renderer/js/modules/ui/recipe-gpio-cycle-10114.js');
+const recipes=read('src/renderer/js/modules/recipes/app-legacy-04-recipes-runtime.js');
+const startUi=read('src/renderer/js/modules/ui/app-legacy-02-dashboard-reports-ui.js');
+const prod=read('src/renderer/js/modules/hardware/app-legacy-03-hardware-production.js');
+const deviceTs=read('src/main/hal/DeviceManager.ts');
+const deviceJs=read('dist/main/hal/DeviceManager.js');
+const index=read('src/renderer/index.html');
+const css=read('src/renderer/css/modules/46-recipe-gpio-cycle-10114.css');
+add('package VEXON 10.1.14',pkg.version==='10.1.14'&&pkg.name==='vexon-industrial-test-platform-10-1-14',`${pkg.name} ${pkg.version}`);
+add('package-lock 10.1.14',lock.version==='10.1.14'&&lock.packages?.['']?.version==='10.1.14','package-lock root');
+add('version renderer 10.1.14',/AT_MEC_VERSION='10\.1\.14'/.test(versionJs)&&/GPIO_PRESET_AUTO_CYCLE/.test(versionJs),'version.js');
+add('settings 10.1.14',settings.version==='10.1.14'&&/AUTO_CYCLE/.test(settings.lastRelease||''),'app_settings');
+add('profili GPIO runtime UI',/gpio_initial_profile/.test(cycle)&&/gpio_inter_test_profile/.test(cycle)&&/gpio_safe_profile/.test(cycle),'3 profiles');
+add('inizializzazione una volta',/preparedKey/.test(cycle)&&/cached:true/.test(cycle)&&/non verrà ricaricato/.test(cycle),'recipe cache');
+add('auto ciclo rimozione + presenza',/WAIT_REMOVAL/.test(cycle)&&/ARMED/.test(cycle)&&/requireRemoval/.test(cycle)&&/triggerAutomaticStart/.test(cycle),'state machine');
+add('poll multimetro solo idle',/pollOnce/.test(cycle)&&/queryMultimeter/.test(cycle)&&/state\.cycleState === 'RUNNING'/.test(cycle),'idle poll');
+add('editor profili e auto ciclo',/renderRecipeGpioCyclePanel10114/.test(recipes)&&/Auto-start da nuova misura/.test(recipes)&&/presence_min/.test(recipes),'recipe editor');
+add('fast start ricetta preparata',/recipePreparedFast10114/.test(startUi)&&/scansione strumenti completa saltata/.test(startUi),'start fast path');
+add('safe profile su stop',/vexon10114ApplySafeProfile/.test(startUi),'stop safe');
+add('preparazione su load test mode',/vexon10114PrepareLoadedRecipe/.test(prod)&&/CARICAMENTO RICETTA TEST MODE/.test(prod),'production load');
+add('hardware requirements TS',/hasRecipeGpioProfile10114/.test(deviceTs)&&/automatic_cycle/.test(deviceTs),'DeviceManager TS');
+add('hardware requirements dist',/hasRecipeGpioProfile10114/.test(deviceJs)&&/automatic_cycle/.test(deviceJs),'DeviceManager JS');
+add('asset JS/CSS caricati',/recipe-gpio-cycle-10114\.js/.test(index)&&/46-recipe-gpio-cycle-10114\.css/.test(index)&&/recipe-gpio-cycle-10114/.test(css),'renderer index');
+add('README root pulita',exists('README.md')&&exists('README_'+RELEASE+'.md')&&!exists('README_AT-MEC_HM_10.1.13_RECIPE_GPIO_HOLD_MEASURE_LIVE_FIX.md'),'current only');
+add('BAT correnti 10.1.14',exists('AVVIA_VEXON_10.1.14.bat')&&exists('INSTALLA_VEXON_10.1.14.bat')&&exists('CREA_INSTALLER_WINDOWS_VEXON_10.1.14.bat'),'current bat');
+add('Excel storico integrato',exists('docs/project_history/AT_MEC_HM_MAPPA_VERSIONI_RFQ_TEMPI_GRAFICI_10_1_14.xlsx'),'project history');
+add('Release notes',exists('docs/releases/README_'+RELEASE+'.md'),'release notes');
+const score=Math.round(checks.filter(c=>c.ok).length/checks.length*100);
+const report={version:RELEASE,createdAt:new Date().toISOString(),score,checks};
+fs.mkdirSync(path.join(root,'docs/quality'),{recursive:true});
+fs.writeFileSync(path.join(root,'docs/quality/AT_MEC_HM_10_1_14_RUNTIME_VALIDATION.json'),JSON.stringify(report,null,2));
+console.log('AT-MEC_HM_10.1.14 runtime validation');
+checks.forEach(c=>console.log(`${c.ok?'OK  ':'FAIL'} ${c.label}${c.detail?' - '+c.detail:''}`));
+console.log(`SCORE ${score}%`);
+if(checks.some(c=>!c.ok)) process.exit(1);

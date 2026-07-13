@@ -8,11 +8,31 @@
 import * as net from 'net';
 import * as path from 'path';
 import * as fs from 'fs';
-import { execFile } from 'child_process';
+import { execFile, spawn, ChildProcessWithoutNullStreams } from 'child_process';
 import ModbusRTU from 'modbus-serial';
 import { SerialPort } from 'serialport';
 import { CalibrationManager } from './CalibrationManager';
 import { Esp32SerialProvider, Esp32PinMapEntry } from './Esp32SerialProvider';
+
+
+interface VisaPendingRequest {
+  resolve: (value: any) => void;
+  reject: (reason?: any) => void;
+  timer: NodeJS.Timeout;
+}
+
+interface VisaPersistentSession {
+  resource: string;
+  child: ChildProcessWithoutNullStreams;
+  buffer: string;
+  sequence: number;
+  pending: Map<number, VisaPendingRequest>;
+  ready: boolean;
+  idn: string;
+  stderr: string;
+  readyResolve?: (idn: string) => void;
+  readyReject?: (reason?: any) => void;
+}
 
 export interface DeviceStatus {
   name: string;
@@ -38,6 +58,9 @@ export class DeviceManager {
   private ttiSerialPort: SerialPort | null = null;
   private scpiSerialPorts: Record<string, SerialPort> = {};
   private visaResources: Record<string, string> = {};
+  /** 10.1.15: processo PyVISA persistente per evitare un nuovo Python/USBTMC a ogni comando. */
+  private visaSessions: Record<string, VisaPersistentSession> = {};
+  private visaCommandQueues: Record<string, Promise<any>> = {};
   private calibration = new CalibrationManager();
   private esp32Serial: Esp32SerialProvider | null = null;
   private deviceRegistry: Record<string, string> = {};
@@ -59,6 +82,7 @@ export class DeviceManager {
     }
 
     if (connectionString === '127.0.0.1' || connectionString === 'mock') {
+      if (deviceName === 'Keysight_34461A') { this.closeVisaPersistentSession(deviceName, 'mock-mode'); delete this.visaResources[deviceName]; }
       this.mockMode[deviceName] = true;
       console.log(`[HAL] ${deviceName} avviato in MODALITÀ SIMULATA.`);
       return true;
@@ -85,6 +109,7 @@ export class DeviceManager {
       this.modbusPortPath = connectionString;
       this.modbusBaudRate = portOrBaud;
       this.modbusTimeoutCount = 0;
+      this.digitalOutputStates = {};
       await this.closeModbusQuietly();
       try { this.esp32Serial?.close(); } catch {}
       this.esp32Serial = new Esp32SerialProvider();
@@ -154,6 +179,10 @@ export class DeviceManager {
       // - USB/VISA/USBTMC: previsto come configurazione; se non esiste un bridge VISA resta in MOCK esplicito
       await this.safeCloseSerialPort(this.scpiSerialPorts[deviceName], `${deviceName} porta seriale precedente`);
       delete this.scpiSerialPorts[deviceName];
+      if (previousConnection && previousConnection !== connectionString) {
+        this.closeVisaPersistentSession(deviceName, 'connection-change');
+        delete this.visaResources[deviceName];
+      }
       delete this.scpiSockets[deviceName];
       const conn = String(connectionString || '').trim();
       const cleanUsb = conn.replace(/^usb:\/\//i, '').replace(/^visa:\/\//i, '');
@@ -161,20 +190,18 @@ export class DeviceManager {
       if (isVisaResource) {
         const resource = cleanUsb;
         try {
-          const out = await this.execVisaBridge(['query', resource, '*IDN?'], 15000);
-          if (!out?.ok) throw new Error(out?.error || 'Risposta VISA non valida');
-          const idn = String(out.response || '').trim();
-          // AT-MEC_HM_3.5: accetta risposte valide anche se Keysight restituisce
-          // "Keysight Technologies" con maiuscole/minuscole diverse.
-          // Lo strumento è LIVE se risponde a *IDN? e la risposta contiene 34461A o Keysight.
+          // 10.1.15: apre una sola sessione PyVISA persistente. La stessa sessione
+          // viene riutilizzata da tutte le misure della ricetta e dei cicli successivi.
+          const idn = await this.startVisaPersistentSession(deviceName, resource, 15000);
           if (!idn || (!/34461A/i.test(idn) && !/KEYSIGHT/i.test(idn))) {
             throw new Error(`Risposta *IDN? inattesa da Keysight 34461A: ${idn || 'vuota'}`);
           }
           this.visaResources[deviceName] = resource;
           this.mockMode[deviceName] = false;
-          console.log(`[HAL] Keysight 34461A LIVE USB/VISA ${resource}: ${idn}`);
+          console.log(`[HAL] Keysight 34461A LIVE USB/VISA persistente ${resource}: ${idn}`);
           return true;
         } catch (err: any) {
+          this.closeVisaPersistentSession(deviceName, 'connect-failed');
           delete this.visaResources[deviceName];
           this.mockMode[deviceName] = true;
           console.log(`[HAL] Keysight 34461A VISA non disponibile su ${resource}. MOCK attivo.`, err?.message || err);
@@ -277,6 +304,214 @@ export class DeviceManager {
   }
 
 
+
+  private visaBridgeScriptPath(): string {
+    const candidates = [
+      path.join(process.cwd(), 'scripts', 'keysight_visa_bridge.py'),
+      path.join(__dirname, '..', '..', 'scripts', 'keysight_visa_bridge.py'),
+      path.join((process as any).resourcesPath || process.cwd(), 'scripts', 'keysight_visa_bridge.py')
+    ];
+    const script = candidates.find(candidate => fs.existsSync(candidate));
+    if (!script) throw new Error('Bridge VISA non trovato: scripts/keysight_visa_bridge.py');
+    return script;
+  }
+
+  private visaPythonCandidates(): Array<{ exe: string; prefix: string[] }> {
+    return process.platform === 'win32'
+      ? [{ exe: 'py', prefix: ['-3'] }, { exe: 'python', prefix: [] }, { exe: 'python3', prefix: [] }]
+      : [{ exe: 'python3', prefix: [] }, { exe: 'python', prefix: [] }];
+  }
+
+  private handleVisaPersistentData(deviceName: string, session: VisaPersistentSession, data: Buffer): void {
+    session.buffer += data.toString('utf8');
+    if (session.buffer.length > 1024 * 1024) session.buffer = '';
+    let newline = session.buffer.indexOf('\n');
+    while (newline >= 0) {
+      const line = session.buffer.slice(0, newline).trim();
+      session.buffer = session.buffer.slice(newline + 1);
+      if (line) {
+        try {
+          const msg = JSON.parse(line);
+          if (msg.event === 'ready') {
+            if (msg.ok === false) session.readyReject?.(new Error(msg.error || 'Avvio sessione VISA fallito'));
+            else {
+              session.ready = true;
+              session.idn = String(msg.idn || '').trim();
+              session.readyResolve?.(session.idn);
+            }
+          } else {
+            const id = Number(msg.id);
+            const pending = session.pending.get(id);
+            if (pending) {
+              clearTimeout(pending.timer);
+              session.pending.delete(id);
+              if (msg.ok === false) pending.reject(new Error(msg.error || 'Errore sessione VISA'));
+              else pending.resolve(msg);
+            }
+          }
+        } catch (err) {
+          console.warn(`[HAL] Riga bridge VISA persistente non valida (${deviceName}):`, line, err);
+        }
+      }
+      newline = session.buffer.indexOf('\n');
+    }
+  }
+
+  private closeVisaPersistentSession(deviceName: string, reason = 'disconnect'): void {
+    deviceName = this.normalizeDeviceName(deviceName);
+    const session = this.visaSessions[deviceName];
+    if (!session) return;
+    delete this.visaSessions[deviceName];
+    delete this.visaCommandQueues[deviceName];
+    session.pending.forEach(pending => {
+      clearTimeout(pending.timer);
+      pending.reject(new Error(`Sessione VISA chiusa: ${reason}`));
+    });
+    session.pending.clear();
+    try {
+      if (!session.child.killed && session.child.stdin.writable) {
+        session.child.stdin.write(JSON.stringify({ id: 0, action: 'close' }) + '\n');
+      }
+    } catch {}
+    try { session.child.kill(); } catch {}
+  }
+
+  private async startVisaPersistentSession(deviceName: string, resource: string, timeoutMs = 15000): Promise<string> {
+    deviceName = this.normalizeDeviceName(deviceName);
+    const existing = this.visaSessions[deviceName];
+    if (existing && existing.resource === resource && existing.ready && !existing.child.killed) return existing.idn;
+    if (existing) this.closeVisaPersistentSession(deviceName, 'resource-change');
+
+    const script = this.visaBridgeScriptPath();
+    let lastError: any = null;
+    for (const candidate of this.visaPythonCandidates()) {
+      try {
+        const idn = await new Promise<string>((resolve, reject) => {
+          let settled = false;
+          const child = spawn(candidate.exe, [...candidate.prefix, script, 'server', resource], {
+            windowsHide: true,
+            stdio: ['pipe', 'pipe', 'pipe']
+          }) as ChildProcessWithoutNullStreams;
+          const session: VisaPersistentSession = {
+            resource,
+            child,
+            buffer: '',
+            sequence: 1,
+            pending: new Map<number, VisaPendingRequest>(),
+            ready: false,
+            idn: '',
+            stderr: ''
+          };
+          session.readyResolve = value => {
+            if (settled) return;
+            settled = true;
+            clearTimeout(timer);
+            resolve(value);
+          };
+          session.readyReject = reason => {
+            if (settled) return;
+            settled = true;
+            clearTimeout(timer);
+            reject(reason);
+          };
+          this.visaSessions[deviceName] = session;
+          child.stdout.on('data', data => this.handleVisaPersistentData(deviceName, session, data));
+          child.stderr.on('data', data => {
+            session.stderr += data.toString('utf8');
+            if (session.stderr.length > 8192) session.stderr = session.stderr.slice(-8192);
+          });
+          child.on('error', err => session.readyReject?.(err));
+          child.on('exit', (code, signal) => {
+            const current = this.visaSessions[deviceName];
+            if (current === session) delete this.visaSessions[deviceName];
+            const error = new Error(`Bridge VISA terminato (${code ?? signal ?? 'N/D'}): ${session.stderr.trim() || 'nessun dettaglio'}`);
+            session.pending.forEach(pending => { clearTimeout(pending.timer); pending.reject(error); });
+            session.pending.clear();
+            if (!session.ready) session.readyReject?.(error);
+          });
+          const timer = setTimeout(() => {
+            session.readyReject?.(new Error(`Timeout avvio sessione VISA ${resource}`));
+            try { child.kill(); } catch {}
+          }, timeoutMs);
+        });
+        return idn;
+      } catch (err) {
+        lastError = err;
+        this.closeVisaPersistentSession(deviceName, 'python-candidate-failed');
+      }
+    }
+    throw new Error(`Python/PyVISA persistente non disponibile: ${lastError?.message || lastError}`);
+  }
+
+  private async sendVisaPersistentRaw(deviceName: string, payload: Record<string, any>, timeoutMs = 10000): Promise<any> {
+    const session = this.visaSessions[deviceName];
+    if (!session || !session.ready || session.child.killed || !session.child.stdin.writable) {
+      throw new Error(`Sessione VISA persistente non pronta per ${deviceName}`);
+    }
+    const id = session.sequence++;
+    return new Promise((resolve, reject) => {
+      const timer = setTimeout(() => {
+        session.pending.delete(id);
+        reject(new Error(`Timeout comando VISA persistente ${payload.action || 'query'}`));
+      }, timeoutMs);
+      session.pending.set(id, { resolve, reject, timer });
+      try {
+        session.child.stdin.write(JSON.stringify({ id, ...payload }) + '\n', err => {
+          if (err) {
+            clearTimeout(timer);
+            session.pending.delete(id);
+            reject(err);
+          }
+        });
+      } catch (err) {
+        clearTimeout(timer);
+        session.pending.delete(id);
+        reject(err);
+      }
+    });
+  }
+
+  private async sendVisaPersistent(deviceName: string, payload: Record<string, any>, timeoutMs = 10000): Promise<any> {
+    deviceName = this.normalizeDeviceName(deviceName);
+    const previous = this.visaCommandQueues[deviceName] || Promise.resolve();
+    const task = previous.catch(() => undefined).then(() => this.sendVisaPersistentRaw(deviceName, payload, timeoutMs));
+    this.visaCommandQueues[deviceName] = task.then(() => undefined, () => undefined);
+    return task;
+  }
+
+  private async executeVisaPersistent(deviceName: string, payload: Record<string, any>, timeoutMs = 10000): Promise<any> {
+    deviceName = this.normalizeDeviceName(deviceName);
+    const resource = this.visaResources[deviceName];
+    if (!resource) throw new Error(`Risorsa VISA non configurata per ${deviceName}`);
+    const startedAt = Date.now();
+    try {
+      await this.startVisaPersistentSession(deviceName, resource, Math.max(8000, timeoutMs));
+      const response = await this.sendVisaPersistent(deviceName, payload, timeoutMs);
+      console.log(`[HAL PERF] VISA ${deviceName} ${payload.action || 'query'} ${Date.now() - startedAt} ms`);
+      return response;
+    } catch (firstError) {
+      // Una sola riconnessione controllata: se il bridge e caduto viene riaperto,
+      // senza trasformare ogni comando in un nuovo processo Python.
+      this.closeVisaPersistentSession(deviceName, 'command-retry');
+      await this.startVisaPersistentSession(deviceName, resource, Math.max(8000, timeoutMs));
+      const response = await this.sendVisaPersistent(deviceName, payload, timeoutMs);
+      console.log(`[HAL PERF] VISA ${deviceName} reconnect ${Date.now() - startedAt} ms`);
+      return response;
+    }
+  }
+
+  /** Configura uno strumento con una sequenza di comandi usando una sola transazione VISA persistente. */
+  public async configureSCPI(deviceName: string, commands: string[]): Promise<void> {
+    deviceName = this.normalizeDeviceName(deviceName);
+    const clean = (commands || []).map(cmd => String(cmd || '').trim()).filter(Boolean);
+    if (!clean.length || this.mockMode[deviceName]) return;
+    if (this.visaResources[deviceName]) {
+      const out = await this.executeVisaPersistent(deviceName, { action: 'batch', commands: clean }, 12000);
+      if (!out?.ok) throw new Error(out?.error || 'Errore configurazione VISA batch');
+      return;
+    }
+    for (const command of clean) await this.writeSCPI(deviceName, command);
+  }
 
   /**
    * Esegue il bridge Python VISA per strumenti USBTMC/VISA come Keysight 34461A.
@@ -441,7 +676,7 @@ export class DeviceManager {
     }));
   }
 
-  public validateRecipeHardware(recipe: { power_metadata?: string; steps?: Array<{ device_mapping?: string; io_type?: string; type?: string; enabled?: boolean; manual_measure_type?: string; manual_input_enabled?: boolean }> }): { ok: boolean; missing: string[] } {
+  public validateRecipeHardware(recipe: { power_metadata?: string; steps?: Array<{ device_mapping?: string; io_type?: string; type?: string; enabled?: boolean; manual_measure_type?: string; manual_input_enabled?: boolean }>; gpio_initial_profile?: any[]; gpio_inter_test_profile?: any[]; gpio_safe_profile?: any[]; automatic_cycle?: any }): { ok: boolean; missing: string[] } {
     const required = new Set<string>();
     const normalizeRequired = (name: string): string => {
       const n = String(name || '').trim().toLowerCase();
@@ -467,6 +702,9 @@ export class DeviceManager {
     // Il PL303 viene richiesto solo se uno step reale lo usa.
     if (recipe.power_metadata === 'PL303_PROGRAMMABLE' && hasRealPl303Step) addRequired('AimTTi_PL303');
     if (recipe.power_metadata === 'ESP32_RELAY_POWER') addRequired('modbus_serial');
+    const hasRecipeGpioProfile10114 = ['gpio_initial_profile','gpio_inter_test_profile','gpio_safe_profile'].some(key => Array.isArray((recipe as any)[key]) && (recipe as any)[key].some((row:any) => row && row.enabled !== false && String(row.channel ?? '').trim() !== '' && Number.isFinite(Number(row.channel))));
+    if (hasRecipeGpioProfile10114) addRequired('modbus_serial');
+    if ((recipe as any).automatic_cycle?.enabled === true) addRequired((recipe as any).automatic_cycle.trigger_device || 'Keysight_34461A');
 
     for (const step of activeSteps) {
       const device = String(step.device_mapping || '').trim();
@@ -479,6 +717,7 @@ export class DeviceManager {
         if (step.type === 'ManualMeasurement') continue;
       }
       if (['DI', 'DO'].includes(step.io_type || '') || step.type === 'DigitalInputCheck' || step.type === 'DigitalOutputSet') { addRequired('modbus_serial'); continue; }
+      if ((step as any).measurement_gpio_enabled === true && Number.isFinite(Number((step as any).measurement_gpio_channel))) addRequired('modbus_serial');
       if (['VoltageMeasurement','CurrentMeasurement','ResistanceTest','FrequencyTest','AnalogInputMeasurement','StableMeasurement'].includes(step.type || '')) { addRequired(device || 'Keysight_34461A'); continue; }
       if (step.type === 'ManualMeasurement') {
         const manualType = String(step.manual_measure_type || step.io_type || '').toUpperCase();
@@ -498,8 +737,8 @@ export class DeviceManager {
     deviceName = this.normalizeDeviceName(deviceName);
     if (this.mockMode[deviceName]) return;
     if (this.visaResources[deviceName]) {
-      const out = await this.execVisaBridge(['query', this.visaResources[deviceName], cmd], 15000);
-      if (!out?.ok) throw new Error(out?.error || 'Errore write VISA');
+      const out = await this.executeVisaPersistent(deviceName, { action: 'write', scpi: cmd }, 10000);
+      if (!out?.ok) throw new Error(out?.error || 'Errore write VISA persistente');
       return;
     }
 
@@ -528,8 +767,8 @@ export class DeviceManager {
     }
 
     if (this.visaResources[deviceName]) {
-      const out = await this.execVisaBridge(['query', this.visaResources[deviceName], cmd], 15000);
-      if (!out?.ok) throw new Error(out?.error || 'Errore query VISA');
+      const out = await this.executeVisaPersistent(deviceName, { action: 'query', scpi: cmd }, 10000);
+      if (!out?.ok) throw new Error(out?.error || 'Errore query VISA persistente');
       return String(out.response || '').trim();
     }
 
@@ -585,16 +824,23 @@ export class DeviceManager {
   }
 
   public async setDigitalOutput(channel: number, state: boolean): Promise<void> {
-    // In AT-MEC_HM_1_4 il channel È il GPIO reale serigrafato sulla scheda.
-    // Esempio: channel 4 -> GPIO4 -> pin scritto 4.
-    this.digitalOutputStates[channel] = state;
+    // 10.1.15: evita scritture seriali duplicate quando il GPIO e gia nello stato richiesto.
+    // La cache viene aggiornata solo dopo la conferma del comando reale.
+    if (this.digitalOutputStates[channel] === state) {
+      console.log(`[HAL PERF] GPIO${channel} gia ${state ? 'HIGH' : 'LOW'}: scrittura saltata`);
+      return;
+    }
     if (this.mockMode['modbus_serial'] || !this.esp32Serial?.isConnected()) {
+      this.digitalOutputStates[channel] = state;
       console.log(`[HAL MOCK] Digital OUT GPIO${channel} = ${state}`);
       return;
     }
+    const startedAt = Date.now();
     await this.runEsp32Exclusive(`writeDigital GPIO${channel}`, async () => {
       await this.esp32Serial!.writeDigital(channel, state);
     }, 1800);
+    this.digitalOutputStates[channel] = state;
+    console.log(`[HAL PERF] GPIO${channel} ${state ? 'HIGH' : 'LOW'} ${Date.now() - startedAt} ms`);
   }
 
   public async readDigitalOutput(channel: number): Promise<boolean> {
@@ -794,6 +1040,7 @@ export class DeviceManager {
     try { this.modbusClient?.close?.(() => undefined); } catch {}
     try { this.esp32Serial?.close(); } catch {}
     this.safeCloseSerialPortSync(this.ttiSerialPort, 'PL303 disconnect')
+    for (const name of Object.keys(this.visaSessions)) this.closeVisaPersistentSession(name, 'device-manager-disconnect');
     for (const s of Object.values(this.scpiSockets)) { try { s.destroy(); } catch {} }
     for (const p of Object.values(this.scpiSerialPorts)) { this.safeCloseSerialPortSync(p, 'SCPI serial disconnect'); }
   }

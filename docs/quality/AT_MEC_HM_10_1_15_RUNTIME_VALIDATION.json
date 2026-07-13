@@ -1,0 +1,102 @@
+{
+  "version": "AT-MEC_HM_10.1.15_DMM_PERSISTENT_SESSION_MEASUREMENT_SPEED_FIX",
+  "createdAt": "2026-07-13T09:42:51.557Z",
+  "score": 100,
+  "checks": [
+    {
+      "label": "package 10.1.15",
+      "ok": true,
+      "detail": "vexon-industrial-test-platform-10-1-15 10.1.15"
+    },
+    {
+      "label": "package-lock 10.1.15",
+      "ok": true,
+      "detail": "package-lock root"
+    },
+    {
+      "label": "renderer version 10.1.15",
+      "ok": true,
+      "detail": "version.js"
+    },
+    {
+      "label": "settings 10.1.15",
+      "ok": true,
+      "detail": "app_settings"
+    },
+    {
+      "label": "Python VISA server persistent",
+      "ok": true,
+      "detail": "single long-lived PyVISA session"
+    },
+    {
+      "label": "DeviceManager persistent TS",
+      "ok": true,
+      "detail": "TS HAL"
+    },
+    {
+      "label": "DeviceManager persistent dist",
+      "ok": true,
+      "detail": "compiled HAL"
+    },
+    {
+      "label": "DMM configuration cache TS",
+      "ok": true,
+      "detail": "cache by measurement mode"
+    },
+    {
+      "label": "DMM configuration cache dist",
+      "ok": true,
+      "detail": "compiled runtime"
+    },
+    {
+      "label": "No fixed 45ms prepare delay",
+      "ok": true,
+      "detail": "removed repeated waits"
+    },
+    {
+      "label": "All DMM measures fast path",
+      "ok": true,
+      "detail": "generic optimized path"
+    },
+    {
+      "label": "StableMeasurement uses SCPI batch",
+      "ok": true,
+      "detail": "prepare once then READ?"
+    },
+    {
+      "label": "GPIO duplicate write skip",
+      "ok": true,
+      "detail": "GPIO state cache"
+    },
+    {
+      "label": "Step performance log",
+      "ok": true,
+      "detail": "timing telemetry"
+    },
+    {
+      "label": "2180321 performance smoke",
+      "ok": true,
+      "detail": " \"label\": \"SW7\",\n      \"prepare_ms\": 0,\n      \"read_ms\": 0,\n      \"read_count\": 3,\n      \"cached_config\": true,\n      \"execute_ms\": 250,\n      \"total_ms\": 252,\n      \"gpio_pre_ms\": 1,\n      \"gpio_post_ms\": 1\n    },\n    {\n      \"step_id\": 9,\n      \"type\": \"StableMeasurement\",\n      \"label\": \"SW8\",\n      \"prepare_ms\": 0,\n      \"read_ms\": 0,\n      \"read_count\": 3,\n      \"cached_config\": true,\n      \"execute_ms\": 250,\n      \"total_ms\": 250,\n      \"gpio_pre_ms\": 0,\n      \"gpio_post_ms\": 0\n    }\n  ]\n}"
+    },
+    {
+      "label": "README root current",
+      "ok": true,
+      "detail": "current only"
+    },
+    {
+      "label": "BAT current 10.1.15",
+      "ok": true,
+      "detail": "root launchers"
+    },
+    {
+      "label": "Excel history integrated",
+      "ok": true,
+      "detail": "versioned + master"
+    },
+    {
+      "label": "Release notes",
+      "ok": true,
+      "detail": "docs/releases"
+    }
+  ]
+}

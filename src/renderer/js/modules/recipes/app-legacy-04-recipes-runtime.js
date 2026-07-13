@@ -469,8 +469,8 @@ function describeRecipeStep(step) {
   const push = (k,v) => { if (v !== undefined && v !== null && v !== '') chips.push(`<span class="recipe-value-chip"><b>${escapeHtml(k)}</b> ${escapeHtml(v)}</span>`); };
   if (type === 'PowerSupplySet') { push('CH', step.ps_channel || step.channel || 1); push('V', step.ps_voltage ?? step.value?.voltage); push('I max', step.ps_current ?? step.value?.current); push('OUT', (step.ps_output_on ?? step.value?.outputOn) === false ? 'OFF' : 'ON'); }
   else if (type === 'PowerSupplyMeasureCurrent') { push('CH', step.channel || step.ps_channel || 1); push('Min', step.min); push('Max', step.max); push('Unità', step.unit || 'A'); }
-  else if (type === 'StableMeasurement') { push('Device', step.device_mapping || 'Keysight_34461A'); push('Min', step.min); push('Max', step.max); push('Stabile', (step.stable_time_ms ?? 1000) + ' ms'); push('Sample', (step.sample_interval_ms ?? 100) + ' ms'); push('FAIL', step.stop_on_fail === false ? 'continua' : 'ferma'); push('Unità', step.unit); }
-  else if (type.includes('Measurement') || type.includes('Test')) { push('Device', step.device_mapping || 'Manuale'); push('Min', step.min); push('Max', step.max); push('Unità', step.unit); }
+  else if (type === 'StableMeasurement') { push('Device', step.device_mapping || 'Keysight_34461A'); push('Min', step.min); push('Max', step.max); push('Stabile', (step.stable_time_ms ?? 1000) + ' ms'); push('Sample', (step.sample_interval_ms ?? 100) + ' ms'); if(step.measurement_gpio_enabled) push('GPIO misura', `GPIO${step.measurement_gpio_channel} ${step.measurement_gpio_state || 'HIGH'} → ${String(step.measurement_gpio_final_mode||'set')==='keep'?'mantieni':(step.measurement_gpio_final_state||'LOW')}`); push('FAIL', step.stop_on_fail === false ? 'continua' : 'ferma'); push('Unità', step.unit); }
+  else if (type.includes('Measurement') || type.includes('Test')) { push('Device', step.device_mapping || 'Manuale'); push('Min', step.min); push('Max', step.max); push('Unità', step.unit); if(step.measurement_gpio_enabled) push('GPIO misura', `GPIO${step.measurement_gpio_channel} ${step.measurement_gpio_state || 'HIGH'} → ${String(step.measurement_gpio_final_mode||'set')==='keep'?'mantieni':(step.measurement_gpio_final_state||'LOW')}`); }
   else if (type === 'ManualMeasurement') { push('Tipo', step.manual_measure_type || (step.manual_input_enabled ? 'MANUAL_VALUE' : 'PASS_FAIL')); push('Origine', step.measurement_mode || (step.manual_input_enabled ? 'MANUALE' : 'AUTO')); push('Target', step.target); push('Tol', step.tolerance); push('Min', step.min); push('Max', step.max); push('Unità', step.unit); }
   else if (type === 'Delay') { push('Attesa', (step.timeout || 1000) + ' ms'); }
   else if (type === 'GotoIfFail') { push('Vai a step_id', step.target_step || 1); }
@@ -487,7 +487,7 @@ function addQuickRecipeStep(kind) {
     measure_voltage:{ type:'VoltageMeasurement', label:'Misura tensione', description:'Misura tensione con limiti e tolleranza', io_type:'SCPI', device_mapping:'Keysight_34461A', command:'MEAS:VOLT:DC?', target:24.0, tolerance:0.5, min:23.5, max:24.5, unit:'V', timeout:2500, measurement_mode:'auto_with_fallback', manual_fallback_enabled:true },
     measure_current:{ type:'CurrentMeasurement', label:'Misura corrente', description:'Misura consumo in ampere con tolleranza', io_type:'SCPI', device_mapping:'Keysight_34461A', command:'MEAS:CURR:DC?', target:0.5, tolerance:0.5, min:0, max:1, unit:'A', timeout:2500, measurement_mode:'auto_with_fallback', manual_fallback_enabled:true },
     measure_ohm:{ type:'ResistanceTest', label:'Misura resistenza', description:'Misura resistenza con tolleranza', io_type:'SCPI', device_mapping:'Keysight_34461A', command:'MEAS:RES?', target:500, tolerance:500, min:0, max:1000, unit:'Ω', timeout:2500, measurement_mode:'auto_with_fallback', manual_fallback_enabled:true },
-    stable_measurement:{ type:'StableMeasurement', label:'Misura stabilizzata 10 Ω', description:'PASS solo se il valore resta nel range per il tempo impostato', io_type:'SCPI', device_mapping:'Keysight_34461A', command:'MEAS:RES?', target:10, tolerance:0.2, min:9.8, max:10.2, unit:'Ω', timeout:10000, stable_time_ms:2000, sample_interval_ms:100, measurement_mode:'auto_with_fallback', manual_fallback_enabled:true, stop_on_fail:true },
+    stable_measurement:{ type:'StableMeasurement', label:'Misura stabilizzata 10 Ω', description:'PASS solo se il valore resta nel range per il tempo impostato', io_type:'SCPI', device_mapping:'Keysight_34461A', command:'MEAS:RES?', target:10, tolerance:0.2, min:9.8, max:10.2, unit:'Ω', timeout:10000, stable_time_ms:2000, sample_interval_ms:100, measurement_mode:'auto_with_fallback', manual_fallback_enabled:true, stop_on_fail:true, measurement_gpio_enabled:false, measurement_gpio_channel:'', measurement_gpio_state:'HIGH', measurement_gpio_final_mode:'set', measurement_gpio_final_state:'LOW' },
     multi_channel_resistance:{ type:'MultiChannelResistanceTest', label:'Test multi-canale resistenza', description:'Misura resistenza canali con uscite associate e valori separati', io_type:'SCPI', device_mapping:'Keysight_34461A', command:'MEAS:RES?', unit:'Ω', timeout:3000, stop_on_fail:false, channel_fail_policy:'continue', channels:Array.from({length:10},(_,n)=>({ name:'CH'+(n+1), output:'OUT'+(n+1), min:10, max:50, stable_ms:500, enabled:true })) },
     measure_freq:{ type:'FrequencyTest', label:'Misura frequenza', description:'Misura frequenza con tolleranza', io_type:'SCPI', device_mapping:'Keysight_34461A', command:'MEAS:FREQ?', target:1000, tolerance:10, min:990, max:1010, unit:'Hz', timeout:2500, measurement_mode:'auto_with_fallback', manual_fallback_enabled:true },
     measure_continuity:{ type:'ManualMeasurement', label:'Controllo continuità', description:'Verifica continuità circuito con valore Ohm manuale/strumento', io_type:'SCPI', device_mapping:'Keysight_34461A', manual_measure_type:'SCPI_OHM', command:'MEAS:RES?', manual_input_enabled:false, manual_fallback_enabled:true, min:0, max:10, unit:'Ω', timeout:2500 },
@@ -581,6 +581,88 @@ function resolveRecipeForExecution414A(srcRecipe, extra = {}) {
   resolved.__resolved_variables_414A = ctx;
   return resolved;
 }
+
+function ensureRecipeGpioCycleConfig10114() {
+  recipe.gpio_initial_profile = Array.isArray(recipe.gpio_initial_profile) ? recipe.gpio_initial_profile : [];
+  recipe.gpio_inter_test_profile = Array.isArray(recipe.gpio_inter_test_profile) ? recipe.gpio_inter_test_profile : [];
+  recipe.gpio_safe_profile = Array.isArray(recipe.gpio_safe_profile) ? recipe.gpio_safe_profile : [];
+  recipe.automatic_cycle = (recipe.automatic_cycle && typeof recipe.automatic_cycle === 'object') ? recipe.automatic_cycle : {
+    enabled:false, trigger_device:'Keysight_34461A', trigger_command:'MEAS:VOLT:DC?',
+    presence_min:'', presence_max:'', absence_min:'', absence_max:'', stable_time_ms:300,
+    removal_stable_ms:250, minimum_cycle_delay_ms:500, poll_interval_ms:400,
+    require_removal_before_next_start:true, start_on_first_detection:true
+  };
+  return recipe;
+}
+function recipeGpioProfileMeta10114(key) {
+  return {
+    gpio_initial_profile:{title:'1. Iniziale ricetta',hint:'Applicato una sola volta quando carichi o cambi ricetta.'},
+    gpio_inter_test_profile:{title:'2. Tra due test',hint:'Solo GPIO necessari al riposo rapido dopo PASS/FAIL.'},
+    gpio_safe_profile:{title:'3. Sicurezza',hint:'Applicato su STOP, cambio ricetta o chiusura.'}
+  }[key] || {title:key,hint:''};
+}
+function renderRecipeGpioProfileRows10114(key) {
+  ensureRecipeGpioCycleConfig10114();
+  const rows = recipe[key] || [];
+  if (!rows.length) return '<div class="hint">Nessun GPIO configurato.</div>';
+  return rows.map((row,i)=>`<div class="recipe-gpio-row-10114">
+    <input type="number" min="0" step="1" title="GPIO" placeholder="GPIO" value="${escapeHtml(row.channel ?? '')}" onchange="updateRecipeGpioProfileField10114('${key}',${i},'channel',this.value)">
+    <select title="Stato" onchange="updateRecipeGpioProfileField10114('${key}',${i},'state',this.value)"><option value="LOW" ${String(row.state||'LOW').toUpperCase()==='LOW'?'selected':''}>LOW</option><option value="HIGH" ${String(row.state||'LOW').toUpperCase()==='HIGH'?'selected':''}>HIGH</option></select>
+    <input type="number" min="0" step="10" title="Ritardo ms" placeholder="ms" value="${escapeHtml(row.delay_ms ?? 0)}" onchange="updateRecipeGpioProfileField10114('${key}',${i},'delay_ms',this.value)">
+    <input title="Descrizione" placeholder="Funzione GPIO" value="${escapeHtml(row.description || '')}" onchange="updateRecipeGpioProfileField10114('${key}',${i},'description',this.value)">
+    <button class="btn btn-danger btn-xs" title="Elimina" onclick="removeRecipeGpioProfileRow10114('${key}',${i})">×</button>
+  </div>`).join('');
+}
+function renderRecipeGpioCyclePanel10114() {
+  ensureRecipeGpioCycleConfig10114();
+  const cfg=recipe.automatic_cycle;
+  const profile=(key)=>{const m=recipeGpioProfileMeta10114(key);return `<div class="recipe-gpio-profile-10114"><h4>${m.title}</h4><div class="hint">${m.hint}</div>${renderRecipeGpioProfileRows10114(key)}<button class="btn btn-ghost btn-xs" onclick="addRecipeGpioProfileRow10114('${key}')">+ Aggiungi GPIO</button></div>`;};
+  const val=(k,d='')=>escapeHtml(cfg[k] ?? d);
+  return `<section class="recipe-gpio-cycle-10114">
+    <div class="recipe-gpio-cycle-head-10114"><div><h3>🔌 Hardware GPIO ricetta e ciclo automatico</h3><p>La configurazione completa viene applicata solo al caricamento ricetta. A fine test vengono comandati solo i GPIO del profilo “Tra due test”, senza ricaricare la ricetta né rallentare il ciclo.</p></div></div>
+    <div class="recipe-gpio-profiles-10114">${profile('gpio_initial_profile')}${profile('gpio_inter_test_profile')}${profile('gpio_safe_profile')}</div>
+    <div class="recipe-auto-cycle-10114"><h4>⚡ Auto-start da nuova misura multimetro</h4><div class="recipe-auto-cycle-grid-10114">
+      <label class="recipe-auto-enable-10114"><input type="checkbox" ${cfg.enabled===true?'checked':''} onchange="updateRecipeAutomaticCycle10114('enabled',this.checked)"> Abilita ciclo automatico</label>
+      <label>Dispositivo<input value="${val('trigger_device','Keysight_34461A')}" onchange="updateRecipeAutomaticCycle10114('trigger_device',this.value)"></label>
+      <label>Comando SCPI<input value="${val('trigger_command','MEAS:VOLT:DC?')}" onchange="updateRecipeAutomaticCycle10114('trigger_command',this.value)"></label>
+      <label>Presenza min<input type="number" step="any" value="${val('presence_min')}" onchange="updateRecipeAutomaticCycle10114('presence_min',this.value)"></label>
+      <label>Presenza max<input type="number" step="any" value="${val('presence_max')}" onchange="updateRecipeAutomaticCycle10114('presence_max',this.value)"></label>
+      <label>Assenza min<input type="number" step="any" value="${val('absence_min')}" onchange="updateRecipeAutomaticCycle10114('absence_min',this.value)"></label>
+      <label>Assenza max<input type="number" step="any" value="${val('absence_max')}" onchange="updateRecipeAutomaticCycle10114('absence_max',this.value)"></label>
+      <label>Stabilità presenza (ms)<input type="number" min="100" step="50" value="${val('stable_time_ms',300)}" onchange="updateRecipeAutomaticCycle10114('stable_time_ms',this.value)"></label>
+      <label>Stabilità rimozione (ms)<input type="number" min="100" step="50" value="${val('removal_stable_ms',250)}" onchange="updateRecipeAutomaticCycle10114('removal_stable_ms',this.value)"></label>
+      <label>Ritardo minimo ciclo (ms)<input type="number" min="0" step="50" value="${val('minimum_cycle_delay_ms',500)}" onchange="updateRecipeAutomaticCycle10114('minimum_cycle_delay_ms',this.value)"></label>
+      <label>Polling multimetro (ms)<input type="number" min="250" step="50" value="${val('poll_interval_ms',400)}" onchange="updateRecipeAutomaticCycle10114('poll_interval_ms',this.value)"></label>
+      <label class="recipe-auto-enable-10114"><input type="checkbox" ${cfg.require_removal_before_next_start!==false?'checked':''} onchange="updateRecipeAutomaticCycle10114('require_removal_before_next_start',this.checked)"> Richiedi rimozione tra test</label>
+      <label class="recipe-auto-enable-10114"><input type="checkbox" ${cfg.start_on_first_detection!==false?'checked':''} onchange="updateRecipeAutomaticCycle10114('start_on_first_detection',this.checked)"> Prima scheda: avvia su misura</label>
+    </div><div class="hint">Per evitare riavvii sulla stessa scheda, dopo ogni test il sistema attende prima il valore di assenza e poi una nuova misura stabile nel range di presenza.</div></div>
+  </section>`;
+}
+function addRecipeGpioProfileRow10114(key) {
+  ensureRecipeGpioCycleConfig10114();
+  recipe[key].push({channel:'',state:'LOW',delay_ms:0,description:'',required:true,enabled:true});
+  renderRecipePage();
+}
+function removeRecipeGpioProfileRow10114(key,index) {
+  ensureRecipeGpioCycleConfig10114();
+  recipe[key].splice(Number(index),1); renderRecipePage();
+}
+function updateRecipeGpioProfileField10114(key,index,field,value) {
+  ensureRecipeGpioCycleConfig10114();
+  const row=recipe[key][Number(index)]; if(!row)return;
+  row[field]=['channel','delay_ms'].includes(field) ? (value===''?'':Number(value)) : value;
+}
+function updateRecipeAutomaticCycle10114(field,value) {
+  ensureRecipeGpioCycleConfig10114();
+  const numeric=['presence_min','presence_max','absence_min','absence_max','stable_time_ms','removal_stable_ms','minimum_cycle_delay_ms','poll_interval_ms'];
+  recipe.automatic_cycle[field]=numeric.includes(field) ? (value===''?'':Number(value)) : value;
+}
+window.addRecipeGpioProfileRow10114=addRecipeGpioProfileRow10114;
+window.removeRecipeGpioProfileRow10114=removeRecipeGpioProfileRow10114;
+window.updateRecipeGpioProfileField10114=updateRecipeGpioProfileField10114;
+window.updateRecipeAutomaticCycle10114=updateRecipeAutomaticCycle10114;
+window.renderRecipeGpioCyclePanel10114=renderRecipeGpioCyclePanel10114;
+
 function renderRecipeVariablesPanel414A() {
   const vars = ensureRecipeVariables414A();
   const ctx = getRecipeVariableContext414A();
@@ -653,8 +735,8 @@ function renderRecipePage() {
   if (enabledPage) enabledPage.checked = recipe.enabled !== false;
   const list = document.getElementById('recipe-steps-page-list');
   if (!list) return;
-  if (!recipe.steps.length) { list.innerHTML = renderRecipeVariablesPanel414A() + '<div class="hint">Nessuno step. Premi “Aggiungi step guidato”.</div>'; updateRecipeHealth(); return; }
-  list.innerHTML = renderRecipeVariablesPanel414A() + recipe.steps.map((step, i) => {
+  if (!recipe.steps.length) { list.innerHTML = renderRecipeGpioCyclePanel10114() + renderRecipeVariablesPanel414A() + '<div class="hint">Nessuno step. Premi “Aggiungi step guidato”.</div>'; updateRecipeHealth(); return; }
+  list.innerHTML = renderRecipeGpioCyclePanel10114() + renderRecipeVariablesPanel414A() + recipe.steps.map((step, i) => {
     const cls = STEP_TYPE_COLORS[step.type] || 'type-color-D';
     const uiSt = stepUiStatus(step);
     const status = ` step-${uiSt}`;
@@ -681,6 +763,26 @@ function renderRecipePage() {
 function recipeDeviceOptions(selected) {
   const opts = ['manual','AimTTi_PL303','Keysight_34461A','modbus_serial','ESP32','MULTIMETER_1'];
   return opts.map(o => `<option value="${escapeHtml(o)}" ${String(selected||'')===o?'selected':''}>${escapeHtml(o)}</option>`).join('');
+}
+
+function renderMeasurementGpioHoldEditor10113(step, i, field, input) {
+  const measurementTypes = ['StableMeasurement','VoltageMeasurement','CurrentMeasurement','ResistanceTest','FrequencyTest','AnalogInputMeasurement'];
+  if (!measurementTypes.includes(String(step?.type || ''))) return '';
+  const enabled = step.measurement_gpio_enabled === true;
+  const ch = step.measurement_gpio_channel ?? '';
+  const active = String(step.measurement_gpio_state ?? 'HIGH').toUpperCase();
+  const finalMode = String(step.measurement_gpio_final_mode || 'set').toLowerCase();
+  const final = String(step.measurement_gpio_final_state ?? 'LOW').toUpperCase();
+  return `
+    <div class="recipe-gpio-hold-10113">
+      <div class="recipe-gpio-hold-title">🔌 GPIO durante misura tester</div>
+      ${field('Usa GPIO', `<select onchange="updateRecipeStepField(${i}, 'measurement_gpio_enabled', this.value==='true')"><option value="false" ${!enabled?'selected':''}>No</option><option value="true" ${enabled?'selected':''}>Sì, tieni attivo</option></select>`)}
+      ${field('GPIO', `<input type="number" min="0" step="1" value="${escapeHtml(ch)}" placeholder="es. 4" onchange="updateRecipeStepField(${i}, 'measurement_gpio_channel', this.value)">`)}
+      ${field('Stato durante', `<select onchange="updateRecipeStepField(${i}, 'measurement_gpio_state', this.value)"><option value="HIGH" ${active==='HIGH'?'selected':''}>HIGH</option><option value="LOW" ${active==='LOW'?'selected':''}>LOW</option></select>`)}
+      ${field('Fine step', `<select onchange="updateRecipeStepField(${i}, 'measurement_gpio_final_mode', this.value)"><option value="set" ${finalMode!=='keep'?'selected':''}>Imposta stato finale</option><option value="keep" ${finalMode==='keep'?'selected':''}>Mantieni stato durante</option></select>`)}
+      ${field('Stato finale', `<select onchange="updateRecipeStepField(${i}, 'measurement_gpio_final_state', this.value)"><option value="LOW" ${final==='LOW'?'selected':''}>LOW</option><option value="HIGH" ${final==='HIGH'?'selected':''}>HIGH</option></select>`)}
+      <div class="recipe-gpio-hold-hint">Il GPIO resta ${active==='LOW'?'LOW':'HIGH'} durante lettura tester, riprova e fallback manuale. Viene cambiato solo quando lo step è finito.</div>
+    </div>`;
 }
 function renderRecipeInlineEditor(step, i) {
   const type = String(step?.type || '');
@@ -743,6 +845,7 @@ function renderRecipeInlineEditor(step, i) {
     ${field('Salva variabile', input('save_as_variable', step.save_as_variable || ''))}
     ${field('Usa variabile', input('compare_variable', step.compare_variable || ''))}
     ${field('Tipo', `<select onchange="updateRecipeStepField(${i}, 'manual_measure_type', this.value)"><option value="MANUAL_VALUE" ${step.manual_measure_type==='MANUAL_VALUE'?'selected':''}>Valore</option><option value="CONFIRM" ${step.manual_measure_type==='CONFIRM'?'selected':''}>PASS/FAIL</option><option value="CONTINUITY" ${step.manual_measure_type==='CONTINUITY'?'selected':''}>Continuità</option><option value="TEMPERATURE" ${step.manual_measure_type==='TEMPERATURE'?'selected':''}>Temperatura</option><option value="POWER" ${step.manual_measure_type==='POWER'?'selected':''}>Potenza</option></select>`)}
+    ${renderMeasurementGpioHoldEditor10113(step, i, field, input)}
     <div class="recipe-measure-preview-412c">${renderMeasurePreviewInline412C(step)}</div>
   </div>`;
 }
@@ -783,9 +886,10 @@ function fillMultiChannelRows336(stepIndex, count) { const step = recipe.steps[s
 function updateRecipeStepField(i, prop, value) {
   const step = recipe.steps[i]; if (!step) return;
   let v = value;
-  if (['min','max','target','tolerance','timeout','ps_voltage','ps_current','ps_channel','channel','target_step','value','stable_time_ms','sample_interval_ms'].includes(prop)) v = value === '' ? '' : Number(value);
+  if (['min','max','target','tolerance','timeout','ps_voltage','ps_current','ps_channel','channel','target_step','value','stable_time_ms','sample_interval_ms','measurement_gpio_channel'].includes(prop)) v = value === '' ? '' : Number(value);
   if (prop === 'ps_output_on') v = String(value) === 'true';
   if (prop === 'stop_on_fail') v = Boolean(value);
+  if (prop === 'measurement_gpio_enabled') v = Boolean(value);
   step[prop] = v;
   if (prop === 'ps_channel') step.channel = Number(v) || 1;
   if (prop === 'ps_voltage') step.value = { ...(step.value || {}), voltage: Number(v) || 0 };
@@ -815,7 +919,7 @@ function renderDeviceManagerMini() {
   if ((recipe.power_metadata || '') === 'PL303_PROGRAMMABLE' && hasPl303Step) namesSet.add('AimTTi_PL303');
   active.forEach(s => {
     const t = String(s.type || '');
-    if (['DI','DO'].includes(s.io_type) || t === 'DigitalInputCheck' || t === 'DigitalOutputSet') namesSet.add('modbus_serial');
+    if (['DI','DO'].includes(s.io_type) || t === 'DigitalInputCheck' || t === 'DigitalOutputSet' || (s.measurement_gpio_enabled === true && Number.isFinite(Number(s.measurement_gpio_channel)))) namesSet.add('modbus_serial');
     if (['VoltageMeasurement','CurrentMeasurement','ResistanceTest','FrequencyTest','AnalogInputMeasurement','StableMeasurement'].includes(t)) namesSet.add(norm(s.device_mapping || s.device || 'Keysight_34461A'));
     if (t === 'PowerSupplySet' || t === 'PowerSupplyMeasureCurrent') namesSet.add('AimTTi_PL303');
     if (t === 'SCPICommand' && s.device_mapping && !['system','manual','none'].includes(String(s.device_mapping).toLowerCase())) namesSet.add(norm(s.device_mapping));
@@ -846,7 +950,7 @@ function updateRecipeHealth() {
   const el = document.getElementById('recipe-health'); if (!el) return;
   const active = recipe.steps.filter(s => s.enabled !== false);
   const power = recipe.power_metadata || getPowerSourceValue();
-  const needsEsp = active.some(s => ['DI','DO'].includes(s.io_type) || s.type === 'DigitalInputCheck' || s.type === 'DigitalOutputSet') || (power === 'ESP32_RELAY_POWER');
+  const needsEsp = active.some(s => ['DI','DO'].includes(s.io_type) || s.type === 'DigitalInputCheck' || s.type === 'DigitalOutputSet' || (s.measurement_gpio_enabled === true && Number.isFinite(Number(s.measurement_gpio_channel)))) || (power === 'ESP32_RELAY_POWER');
   const esp = latestHardwareStatuses.find(x => x.name === 'modbus_serial');
   const espTxt = needsEsp ? (esp && !esp.mock ? '✅ ESP32/modbus_serial LIVE' : '❌ ESP32/modbus_serial non LIVE') : 'ℹ️ ESP32 non richiesto';
   const errors = [];
@@ -856,6 +960,7 @@ function updateRecipeHealth() {
     if (measure && s.target !== undefined && s.target !== '' && s.min !== undefined && s.max !== undefined && (Number(s.target) < Number(s.min) || Number(s.target) > Number(s.max))) errors.push(`Step ${idx+1}: target fuori range`);
     if (measure && !s.unit && s.type !== 'ManualMeasurement') errors.push(`Step ${idx+1}: unità mancante`);
     if (measure && !s.device_mapping) errors.push(`Step ${idx+1}: dispositivo mancante`);
+    if (s.measurement_gpio_enabled === true && !Number.isFinite(Number(s.measurement_gpio_channel))) errors.push(`Step ${idx+1}: GPIO misura attivo ma canale mancante`);
     if (!s.label) errors.push(`Step ${idx+1}: etichetta mancante`); 
   });
   const pl303Needed = active.some(s => s.device_mapping === 'AimTTi_PL303' || s.type === 'PowerSupplySet' || s.type === 'PowerSupplyMeasureCurrent');
@@ -897,7 +1002,7 @@ async function loadDashboardRecipeSelection() {
     let loaded = null;
     try { if (api?.loadRecipe) { const res = await api.loadRecipe(dashSel.value); if (res?.ok) loaded = res.recipe; } } catch {}
     if (!loaded) { try { loaded = JSON.parse(localStorage.getItem('recipe_' + dashSel.value) || 'null'); } catch {} }
-    if (loaded) { recipe = loaded; recipe.steps = Array.isArray(recipe.steps) ? recipe.steps : []; renumberRecipeSteps(); renderSteps(); }
+    if (loaded) { const previousRecipe10114=recipe; recipe = loaded; recipe.steps = Array.isArray(recipe.steps) ? recipe.steps : []; renumberRecipeSteps(); renderSteps(); if(typeof window.vexon10114PrepareLoadedRecipe==='function') await window.vexon10114PrepareLoadedRecipe(recipe,'CARICAMENTO RICETTA DASHBOARD',previousRecipe10114); }
   }
   addLog(document.getElementById('run-log'), `📂 Ricetta dashboard selezionata: <b>${escapeHtml(recipe?.recipe_name || dashSel?.value || '-')}</b>`, 'info');
 }

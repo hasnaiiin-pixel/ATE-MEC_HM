@@ -1,0 +1,42 @@
+const fs=require('fs');
+const path=require('path');
+const root=path.join(__dirname,'..');
+const RELEASE='AT-MEC_HM_10.1.13_RECIPE_GPIO_HOLD_MEASURE_LIVE_FIX';
+function exists(p){return fs.existsSync(path.join(root,p));}
+function read(p){return fs.readFileSync(path.join(root,p),'utf8');}
+const checks=[];
+function add(label,ok,detail=''){checks.push({label,ok:!!ok,detail});}
+const pkg=JSON.parse(read('package.json'));
+const lock=JSON.parse(read('package-lock.json'));
+const engineTs=read('src/main/runtime/RecipeEngine.ts');
+const engineJs=read('dist/main/runtime/RecipeEngine.js');
+const deviceTs=read('src/main/hal/DeviceManager.ts');
+const recipes=read('src/renderer/js/modules/recipes/app-legacy-04-recipes-runtime.js');
+const startUi=read('src/renderer/js/modules/ui/app-legacy-02-dashboard-reports-ui.js');
+const css=read('src/renderer/css/modules/45-action-live-measurement-1012.css');
+const versionJs=read('src/renderer/js/version.js');
+const settings=JSON.parse(read('config/app_settings.json'));
+add('package VEXON 10.1.13',pkg.version==='10.1.13' && pkg.name==='vexon-industrial-test-platform-10-1-13',`${pkg.name} ${pkg.version}`);
+add('package-lock 10.1.13',lock.version==='10.1.13' && lock.packages && lock.packages[''] && lock.packages[''].version==='10.1.13','package-lock root');
+add('runtime script 10.1.13',pkg.scripts && pkg.scripts['runtime:validate']==='node scripts/runtime_validate_10113.js','package script');
+add('startup doctor 10.1.13',pkg.scripts && pkg.scripts['startup:doctor']==='node scripts/startup_doctor_10113.js','package script');
+add('Version renderer 10.1.13',/AT_MEC_VERSION='10\.1\.13'/.test(versionJs)&&/GPIO_HOLD/.test(versionJs),'version.js');
+add('Settings 10.1.13',settings.version==='10.1.13' && /GPIO_HOLD/.test(settings.lastRelease||''),'app_settings');
+add('RecipeEngine GPIO before/after TS',/applyStepMeasurementGpioBefore/.test(engineTs)&&/applyStepMeasurementGpioAfter/.test(engineTs)&&/measurement_gpio_final_state/.test(engineTs),'runtime TS helpers');
+add('RecipeEngine GPIO before/after dist',/applyStepMeasurementGpioBefore/.test(engineJs)&&/applyStepMeasurementGpioAfter/.test(engineJs)&&/GPIO MISURA ATTIVO/.test(engineJs),'runtime dist helpers');
+add('GPIO held through step wrapper',/gpioCtx10113/.test(engineTs)&&/await this.executeStep\(step\)/.test(engineTs)&&/GPIO fine step non confermato/.test(engineTs),'run loop wrapper');
+add('Recipe editor GPIO hold UI',/renderMeasurementGpioHoldEditor10113/.test(recipes)&&/GPIO durante misura tester/.test(recipes)&&/measurement_gpio_enabled/.test(recipes),'recipe UI fields');
+add('Required ESP32 when GPIO hold enabled',/measurement_gpio_enabled/.test(deviceTs)&&/addRequired\('modbus_serial'\)/.test(deviceTs)&&/measurement_gpio_enabled/.test(startUi),'hardware requirements');
+add('CSS GPIO hold block',/recipe-gpio-hold-10113/.test(css),'recipe UI style');
+add('Root cleaned current README only',exists('README.md')&&exists('README_AT-MEC_HM_10.1.13_RECIPE_GPIO_HOLD_MEASURE_LIVE_FIX.md')&&!exists('README_AT-MEC_HM_10.1.12_STABLE_ACTION_UNIQUE_FAST_START_FIX.md'),'root readme cleanup');
+add('BAT VEXON 10.1.13 presenti',exists('AVVIA_VEXON_10.1.13.bat')&&exists('INSTALLA_VEXON_10.1.13.bat')&&exists('CREA_INSTALLER_WINDOWS_VEXON_10.1.13.bat'),'bat current');
+add('Excel project history integrated',exists('docs/project_history/AT_MEC_HM_MAPPA_VERSIONI_RFQ_TEMPI_GRAFICI_10_1_13.xlsx'),'project_history xlsx');
+add('Release notes 10.1.13',exists('docs/releases/README_'+RELEASE+'.md'),'release notes');
+const score=Math.round(checks.filter(c=>c.ok).length/checks.length*100);
+const report={version:RELEASE,createdAt:new Date().toISOString(),score,checks};
+fs.mkdirSync(path.join(root,'docs/quality'),{recursive:true});
+fs.writeFileSync(path.join(root,'docs/quality/AT_MEC_HM_10_1_13_RUNTIME_VALIDATION.json'),JSON.stringify(report,null,2));
+console.log('AT-MEC_HM_10.1.13 runtime validation');
+checks.forEach(c=>console.log(`${c.ok?'OK  ':'FAIL'} ${c.label}${c.detail?' - '+c.detail:''}`));
+console.log(`SCORE ${score}%`);
+if(checks.some(c=>!c.ok)) process.exit(1);

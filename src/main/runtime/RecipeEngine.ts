@@ -60,7 +60,15 @@ export interface TestStep {
   manual_value?: any;
   manual_input_enabled?: boolean;
   stop_on_fail?: boolean;
+  /** 10.1.13: opzionale. Prima dello step di misura imposta un GPIO e lo mantiene attivo fino a fine step. */
+  measurement_gpio_enabled?: boolean;
+  measurement_gpio_channel?: number;
+  measurement_gpio_state?: 'HIGH' | 'LOW' | boolean;
+  /** Stato finale opzionale: se 'keep' mantiene lo stato durante-misura; se 'set' applica measurement_gpio_final_state. */
+  measurement_gpio_final_mode?: 'set' | 'keep';
+  measurement_gpio_final_state?: 'HIGH' | 'LOW' | boolean;
 }
+
 
 
 export interface Recipe {
@@ -74,6 +82,11 @@ export interface Recipe {
   product_name?: string;
   product?: string;
   enabled?: boolean;
+  /** 10.1.14: profili GPIO applicati al caricamento, tra test e in sicurezza. */
+  gpio_initial_profile?: Array<{ channel:number; state:'HIGH'|'LOW'|boolean; delay_ms?:number; description?:string; required?:boolean; enabled?:boolean }>;
+  gpio_inter_test_profile?: Array<{ channel:number; state:'HIGH'|'LOW'|boolean; delay_ms?:number; description?:string; required?:boolean; enabled?:boolean }>;
+  gpio_safe_profile?: Array<{ channel:number; state:'HIGH'|'LOW'|boolean; delay_ms?:number; description?:string; required?:boolean; enabled?:boolean }>;
+  automatic_cycle?: { enabled?:boolean; trigger_device?:string; trigger_command?:string; presence_min?:number; presence_max?:number; absence_min?:number; absence_max?:number; stable_time_ms?:number; removal_stable_ms?:number; minimum_cycle_delay_ms?:number; poll_interval_ms?:number; require_removal_before_next_start?:boolean; start_on_first_detection?:boolean };
   steps: TestStep[];
 }
 
@@ -92,6 +105,7 @@ interface StepResult {
   max?: number;
   unit?: string;
   timestamp?: string;
+  performance?: { prepare_ms?: number; read_ms?: number; read_count?: number; cached_config?: boolean; gpio_pre_ms?: number; gpio_post_ms?: number; execute_ms?: number; total_ms?: number };
 }
 
 export class RecipeEngine {
@@ -106,6 +120,8 @@ export class RecipeEngine {
   private stopRequestedByOperator = false;
   private measurementRetrySeq = 0;
   private activeStableMeasurementStepId: number | null = null;
+  /** 10.1.15: cache configurazione DMM per evitare CONF/RANGE/NPLC a ogni step. */
+  private dmmConfigurationCache: Record<string, { key: string; updatedAt: number }> = {};
 
   constructor(
     private stateMachine: StateMachine,
@@ -252,11 +268,11 @@ export class RecipeEngine {
       const step = recipe.steps[idx];
 
       if (this.debugMode) {
-        this.eventBus.emit('step_started', { step_id: step.step_id, type: step.type, label: step.label, description: step.description, waitingDebug: true, timeout: step.timeout, stable_time_ms: step.stable_time_ms, sample_interval_ms: step.sample_interval_ms, min: step.min, max: step.max, target: step.target, tolerance: step.tolerance, unit: step.unit, device: this.normalizeMeasurementDeviceName(step.device_mapping || step.device), device_display: this.measurementDeviceDisplayName(step.device_mapping || step.device) });
+        this.eventBus.emit('step_started', { step_id: step.step_id, type: step.type, label: step.label, description: step.description, waitingDebug: true, timeout: step.timeout, stable_time_ms: step.stable_time_ms, sample_interval_ms: step.sample_interval_ms, min: step.min, max: step.max, target: step.target, tolerance: step.tolerance, unit: step.unit, measurement_gpio_enabled: step.measurement_gpio_enabled, measurement_gpio_channel: step.measurement_gpio_channel, measurement_gpio_state: step.measurement_gpio_state, measurement_gpio_final_mode: step.measurement_gpio_final_mode, measurement_gpio_final_state: step.measurement_gpio_final_state, device: this.normalizeMeasurementDeviceName(step.device_mapping || step.device), device_display: this.measurementDeviceDisplayName(step.device_mapping || step.device) });
         this.eventBus.emit('step_detail', { step_id: step.step_id, level: 'info', message: this.describeStep(step) });
         await new Promise<void>(res => { this.debugResolver = res; });
       } else {
-        this.eventBus.emit('step_started', { step_id: step.step_id, type: step.type, label: step.label, description: step.description, waitingDebug: false, timeout: step.timeout, stable_time_ms: step.stable_time_ms, sample_interval_ms: step.sample_interval_ms, min: step.min, max: step.max, target: step.target, tolerance: step.tolerance, unit: step.unit, device: this.normalizeMeasurementDeviceName(step.device_mapping || step.device), device_display: this.measurementDeviceDisplayName(step.device_mapping || step.device) });
+        this.eventBus.emit('step_started', { step_id: step.step_id, type: step.type, label: step.label, description: step.description, waitingDebug: false, timeout: step.timeout, stable_time_ms: step.stable_time_ms, sample_interval_ms: step.sample_interval_ms, min: step.min, max: step.max, target: step.target, tolerance: step.tolerance, unit: step.unit, measurement_gpio_enabled: step.measurement_gpio_enabled, measurement_gpio_channel: step.measurement_gpio_channel, measurement_gpio_state: step.measurement_gpio_state, measurement_gpio_final_mode: step.measurement_gpio_final_mode, measurement_gpio_final_state: step.measurement_gpio_final_state, device: this.normalizeMeasurementDeviceName(step.device_mapping || step.device), device_display: this.measurementDeviceDisplayName(step.device_mapping || step.device) });
         this.eventBus.emit('step_detail', { step_id: step.step_id, level: 'info', message: this.describeStep(step) });
       }
 
@@ -280,7 +296,54 @@ export class RecipeEngine {
         continue;
       }
 
-      const stepResult = await this.executeStep(step);
+      const stepStartedAt10115 = Date.now();
+      const gpioPreStartedAt10115 = Date.now();
+      const gpioCtx10113 = await this.applyStepMeasurementGpioBefore(step);
+      const gpioPreMs10115 = Date.now() - gpioPreStartedAt10115;
+      let executeMs10115 = 0;
+      let gpioPostMs10115 = 0;
+      let stepResult: StepResult;
+      if (gpioCtx10113.error) {
+        stepResult = {
+          success: false,
+          measured: { channel: gpioCtx10113.channel, requested: gpioCtx10113.activeState ? 'HIGH' : 'LOW' },
+          error: `GPIO pre-misura non attivato: GPIO${gpioCtx10113.channel} — ${gpioCtx10113.error}`,
+          measurement_source: 'SISTEMA',
+          timestamp: new Date().toISOString()
+        };
+      } else {
+        const executeStartedAt10115 = Date.now();
+        stepResult = await this.executeStep(step);
+        executeMs10115 = Date.now() - executeStartedAt10115;
+        const gpioPostStartedAt10115 = Date.now();
+        const gpioAfter10113 = await this.applyStepMeasurementGpioAfter(step, gpioCtx10113);
+        gpioPostMs10115 = Date.now() - gpioPostStartedAt10115;
+        if (!gpioAfter10113.ok) {
+          stepResult = {
+            ...stepResult,
+            success: false,
+            error: `${stepResult.error || stepResult.details || 'Step completato'}; GPIO fine step non confermato: ${gpioAfter10113.error}`
+          };
+        } else if (gpioAfter10113.details) {
+          stepResult = { ...stepResult, details: `${stepResult.details || ''}; ${gpioAfter10113.details}`.trim() };
+        }
+      }
+      const totalStepMs10115 = Date.now() - stepStartedAt10115;
+      stepResult.performance = {
+        ...(stepResult.performance || {}),
+        gpio_pre_ms: gpioPreMs10115,
+        gpio_post_ms: gpioPostMs10115,
+        execute_ms: executeMs10115 || stepResult.performance?.execute_ms || 0,
+        total_ms: totalStepMs10115
+      };
+      console.log(`[RECIPE PERF] Step ${step.step_id} ${step.label || step.type}: GPIO pre ${gpioPreMs10115} ms, execute ${executeMs10115} ms, GPIO post ${gpioPostMs10115} ms, totale ${totalStepMs10115} ms`);
+      this.eventBus.emit('step_performance', {
+        step_id: step.step_id,
+        type: step.type,
+        label: step.label || step.description || '',
+        ...stepResult.performance
+      });
+
       reportSteps.push({
         step_id: step.step_id,
         type: step.type,
@@ -298,6 +361,13 @@ export class RecipeEngine {
         max: stepResult.max,
         unit: stepResult.unit,
         timestamp: stepResult.timestamp,
+        execution_time_ms: stepResult.performance?.total_ms,
+        gpio_pre_ms: stepResult.performance?.gpio_pre_ms,
+        gpio_post_ms: stepResult.performance?.gpio_post_ms,
+        dmm_prepare_ms: stepResult.performance?.prepare_ms,
+        dmm_read_ms: stepResult.performance?.read_ms,
+        dmm_read_count: stepResult.performance?.read_count,
+        dmm_config_cached: stepResult.performance?.cached_config,
         result: !stepResult.success
           ? 'FAIL'
           : (step.type === 'Delay' || step.type === 'DigitalOutputSet' || step.type === 'SCPICommand' || step.type === 'PowerSupplySet')
@@ -409,6 +479,67 @@ export class RecipeEngine {
         this.stateMachine.transitionTo('IDLE');
         this.stateMachine.transitionTo('READY');
       }
+    }
+  }
+
+
+  private isDmmMeasurementStep(step: TestStep): boolean {
+    return ['StableMeasurement','VoltageMeasurement','CurrentMeasurement','ResistanceTest','FrequencyTest','AnalogInputMeasurement'].includes(String(step?.type || ''));
+  }
+
+  private parseGpioState(value: any, defaultState = true): boolean {
+    if (typeof value === 'boolean') return value;
+    const v = String(value ?? '').trim().toUpperCase();
+    if (['1','TRUE','ON','HIGH','HI','H'].includes(v)) return true;
+    if (['0','FALSE','OFF','LOW','LO','L'].includes(v)) return false;
+    return defaultState;
+  }
+
+  private stepMeasurementGpioEnabled(step: TestStep): boolean {
+    return this.isDmmMeasurementStep(step) && step.measurement_gpio_enabled === true && Number.isFinite(Number(step.measurement_gpio_channel));
+  }
+
+  private async applyStepMeasurementGpioBefore(step: TestStep): Promise<{ applied: boolean; channel?: number; activeState?: boolean; error?: string }> {
+    if (!this.stepMeasurementGpioEnabled(step)) return { applied: false };
+    const channel = Number(step.measurement_gpio_channel);
+    const activeState = this.parseGpioState(step.measurement_gpio_state, true);
+    try {
+      await this.withTimeout(this.hal.setDigitalOutput(channel, activeState), Math.max(1200, Number(step.timeout) || 1200), `GPIO${channel} pre-misura`);
+      this.eventBus.emit('step_detail', {
+        step_id: step.step_id,
+        level: 'info',
+        message: `GPIO${channel} impostato ${activeState ? 'HIGH' : 'LOW'} e mantenuto attivo durante tutta la misura.`,
+        status: 'GPIO MISURA ATTIVO',
+        measurement_gpio_channel: channel,
+        measurement_gpio_state: activeState ? 'HIGH' : 'LOW'
+      });
+      return { applied: true, channel, activeState };
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      this.eventBus.emit('step_detail', { step_id: step.step_id, level: 'fail', message: `GPIO pre-misura non impostato: GPIO${channel} ${activeState ? 'HIGH' : 'LOW'} — ${msg}` });
+      return { applied: false, channel, activeState, error: msg };
+    }
+  }
+
+  private async applyStepMeasurementGpioAfter(step: TestStep, ctx: { applied: boolean; channel?: number; activeState?: boolean }): Promise<{ ok: boolean; details?: string; error?: string }> {
+    if (!ctx || !ctx.applied || !Number.isFinite(Number(ctx.channel))) return { ok: true };
+    const channel = Number(ctx.channel);
+    const finalMode = String(step.measurement_gpio_final_mode || 'set').toLowerCase();
+    if (finalMode === 'keep') {
+      const details = `GPIO${channel}: fine step, stato mantenuto ${ctx.activeState ? 'HIGH' : 'LOW'} come richiesto.`;
+      this.eventBus.emit('step_detail', { step_id: step.step_id, level: 'info', message: details, status: 'GPIO MANTENUTO' });
+      return { ok: true, details };
+    }
+    const finalState = this.parseGpioState(step.measurement_gpio_final_state, false);
+    try {
+      await this.withTimeout(this.hal.setDigitalOutput(channel, finalState), Math.max(1200, Number(step.timeout) || 1200), `GPIO${channel} fine-misura`);
+      const details = `GPIO${channel}: fine step ripristinato ${finalState ? 'HIGH' : 'LOW'}.`;
+      this.eventBus.emit('step_detail', { step_id: step.step_id, level: 'info', message: details, status: 'GPIO FINE STEP', measurement_gpio_final_state: finalState ? 'HIGH' : 'LOW' });
+      return { ok: true, details };
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      this.eventBus.emit('step_detail', { step_id: step.step_id, level: 'fail', message: `GPIO fine step non confermato: GPIO${channel} — ${msg}` });
+      return { ok: false, error: msg };
     }
   }
 
@@ -625,13 +756,13 @@ export class RecipeEngine {
   }
 
   private stableMeasurementPrepareCommands(step: TestStep): string[] {
-    // 10.1.4: prepara Keysight una sola volta. Durante il polling non mandiamo più MEAS:*?
-    // ripetuti perché riconfigurano continuamente il DMM e possono causare OVERLOAD/Remote Command Error.
+    // 10.1.15: sequenza compatta, senza *CLS finale e senza pause fisse tra comandi.
+    // Su USB/VISA viene inviata come batch sulla sessione persistente.
     const kind = this.stableMeasurementKind(step);
-    if (kind === 'RES') return ['*CLS', 'CONF:RES', 'SENS:RES:RANG:AUTO ON', 'SENS:RES:NPLC 0.02', 'TRIG:SOUR IMM', 'SAMP:COUN 1', '*CLS'];
-    if (kind === 'CURR_DC') return ['*CLS', 'CONF:CURR:DC', 'SENS:CURR:DC:RANG:AUTO ON', 'SENS:CURR:DC:NPLC 0.02', 'TRIG:SOUR IMM', 'SAMP:COUN 1', '*CLS'];
-    if (kind === 'FREQ') return ['*CLS', 'CONF:FREQ', 'TRIG:SOUR IMM', 'SAMP:COUN 1', '*CLS'];
-    return ['*CLS', 'CONF:VOLT:DC', 'SENS:VOLT:DC:RANG:AUTO ON', 'SENS:VOLT:DC:NPLC 0.02', 'TRIG:SOUR IMM', 'SAMP:COUN 1', '*CLS'];
+    if (kind === 'RES') return ['*CLS', 'CONF:RES', 'SENS:RES:RANG:AUTO ON', 'SENS:RES:NPLC 0.02', 'TRIG:SOUR IMM', 'SAMP:COUN 1'];
+    if (kind === 'CURR_DC') return ['*CLS', 'CONF:CURR:DC', 'SENS:CURR:DC:RANG:AUTO ON', 'SENS:CURR:DC:NPLC 0.02', 'TRIG:SOUR IMM', 'SAMP:COUN 1'];
+    if (kind === 'FREQ') return ['*CLS', 'CONF:FREQ', 'TRIG:SOUR IMM', 'SAMP:COUN 1'];
+    return ['*CLS', 'CONF:VOLT:DC', 'SENS:VOLT:DC:RANG:AUTO ON', 'SENS:VOLT:DC:NPLC 0.02', 'TRIG:SOUR IMM', 'SAMP:COUN 1'];
   }
 
   private isDefaultStableMeasurementCommand(step: TestStep): boolean {
@@ -639,30 +770,39 @@ export class RecipeEngine {
     return ['MEAS:RES?','MEAS:VOLT:DC?','MEAS:CURR:DC?','MEAS:FREQ?'].includes(cmd);
   }
 
-  private async prepareStableMeasurementDevice(step: TestStep, device: string): Promise<{ prepared: boolean; readCommand: string; error?: string }> {
-    if (device !== 'Keysight_34461A') return { prepared: false, readCommand: this.stableMeasurementCommand(step) };
-    // Per comandi custom lasciamo il comportamento ricetta, ma puliamo comunque la coda errori.
+  private dmmConfigurationKey(step: TestStep, device: string): string {
+    const kind = this.stableMeasurementKind(step);
+    return `${device}|${kind}|AUTO|NPLC=0.02|TRIG=IMM|SAMP=1`;
+  }
+
+  private invalidateDmmConfiguration(device?: string): void {
+    if (device) delete this.dmmConfigurationCache[this.normalizeMeasurementDeviceName(device)];
+    else this.dmmConfigurationCache = {};
+  }
+
+  private async prepareStableMeasurementDevice(step: TestStep, device: string, force = false): Promise<{ prepared: boolean; readCommand: string; error?: string; cached?: boolean; prepareMs?: number }> {
+    if (device !== 'Keysight_34461A') return { prepared: false, readCommand: this.stableMeasurementCommand(step), cached: false, prepareMs: 0 };
     if (!this.isDefaultStableMeasurementCommand(step)) {
-      try { await this.withTimeout(this.hal.writeSCPI(device, '*CLS'), 1200, 'Keysight *CLS'); } catch {}
-      return { prepared: false, readCommand: this.stableMeasurementCommand(step) };
+      return { prepared: false, readCommand: this.stableMeasurementCommand(step), cached: false, prepareMs: 0 };
     }
+    const cacheKey = this.dmmConfigurationKey(step, device);
+    const cached = this.dmmConfigurationCache[device];
+    // Cache valida per 10 minuti e riutilizzata anche tra cicli consecutivi della stessa ricetta.
+    if (!force && cached?.key === cacheKey && Date.now() - cached.updatedAt < 10 * 60 * 1000) {
+      return { prepared: true, readCommand: 'READ?', cached: true, prepareMs: 0 };
+    }
+    const startedAt = Date.now();
     try {
-      for (const cmd of this.stableMeasurementPrepareCommands(step)) {
-        try {
-          await this.withTimeout(this.hal.writeSCPI(device, cmd), 1800, `Keysight prepare ${cmd}`);
-          await new Promise(res => setTimeout(res, 45));
-        } catch (cmdErr) {
-          // Alcune opzioni possono non essere supportate su tutte le modalità. Non blocchiamo:
-          // si prosegue con READ? se la configurazione principale è stata accettata, altrimenti fallback.
-          const msg = cmdErr instanceof Error ? cmdErr.message : String(cmdErr);
-          if (/CONF:/i.test(cmd)) throw new Error(msg);
-        }
-      }
-      return { prepared: true, readCommand: 'READ?' };
+      await this.withTimeout(this.hal.configureSCPI(device, this.stableMeasurementPrepareCommands(step)), 5000, `Keysight configure ${this.stableMeasurementKind(step)}`);
+      this.dmmConfigurationCache[device] = { key: cacheKey, updatedAt: Date.now() };
+      const prepareMs = Date.now() - startedAt;
+      console.log(`[RECIPE PERF] DMM ${device} configurato ${this.stableMeasurementKind(step)} in ${prepareMs} ms`);
+      return { prepared: true, readCommand: 'READ?', cached: false, prepareMs };
     } catch (err) {
+      this.invalidateDmmConfiguration(device);
       const msg = err instanceof Error ? err.message : String(err);
       try { await this.withTimeout(this.hal.writeSCPI(device, '*CLS'), 1200, 'Keysight clear after prepare error'); } catch {}
-      return { prepared: false, readCommand: this.stableMeasurementCommand(step), error: msg };
+      return { prepared: false, readCommand: this.stableMeasurementCommand(step), error: msg, cached: false, prepareMs: Date.now() - startedAt };
     }
   }
 
@@ -691,6 +831,12 @@ export class RecipeEngine {
   }
 
   private async executeStableMeasurement(step: TestStep): Promise<StepResult> {
+    const functionStartedAt = Date.now();
+    let dmmPrepareMs = 0;
+    let dmmReadMs = 0;
+    let dmmReadCount = 0;
+    let cachedConfig = false;
+    let recoveryReconfigured = false;
     const timeoutMs = Math.max(1000, Number(step.timeout) || 10000);
     const stableMs = Math.max(0, Number(step.stable_time_ms) || 1000);
     const requestedSampleMs = Math.max(50, Number(step.sample_interval_ms) || 100);
@@ -710,7 +856,7 @@ export class RecipeEngine {
     let seenRetrySeq = this.measurementRetrySeq;
     this.activeStableMeasurementStepId = step.step_id;
     const { min, max } = this.measurementBounds(step);
-    let preparedRead: { prepared: boolean; readCommand: string; error?: string } = { prepared: false, readCommand: this.stableMeasurementCommand(step) };
+    let preparedRead: { prepared: boolean; readCommand: string; error?: string; cached?: boolean; prepareMs?: number } = { prepared: false, readCommand: this.stableMeasurementCommand(step), cached: false, prepareMs: 0 };
 
     const emitLive = (payload: any = {}) => {
       this.eventBus.emit('step_detail', {
@@ -750,10 +896,12 @@ export class RecipeEngine {
       const res = this.buildMeasurementResult(step, manualVal, 'MANUALE', 'Misura stabilizzata manuale');
       if (res.success && stableMs > 0) await this.sleepInterruptible(stableMs);
       this.activeStableMeasurementStepId = null;
-      return { ...res, details: `${res.details}; stabilizzazione manuale ${stableMs} ms` };
+      return { ...res, details: `${res.details}; stabilizzazione manuale ${stableMs} ms`, performance: { total_ms: Date.now() - functionStartedAt, execute_ms: Date.now() - functionStartedAt } };
     }
 
     preparedRead = await this.prepareStableMeasurementDevice(step, measurementDevice);
+    dmmPrepareMs += Number(preparedRead.prepareMs || 0);
+    cachedConfig = !!preparedRead.cached;
     if (preparedRead.error) {
       emitLive({
         level: 'warn',
@@ -776,7 +924,10 @@ export class RecipeEngine {
         stableStart = 0;
         lastError = '';
         lastStatus = 'RIPROVA MISURA';
-        preparedRead = await this.prepareStableMeasurementDevice(step, measurementDevice);
+        preparedRead = await this.prepareStableMeasurementDevice(step, measurementDevice, true);
+        dmmPrepareMs += Number(preparedRead.prepareMs || 0);
+        cachedConfig = false;
+        recoveryReconfigured = true;
         emitLive({
           level: 'info',
           status: 'RIPROVA MISURA',
@@ -787,7 +938,11 @@ export class RecipeEngine {
       }
 
       try {
+        const readStartedAt = Date.now();
         const read = await this.readStableMeasurementValue(step, readTimeoutMs, preparedRead.readCommand);
+        dmmReadMs += Date.now() - readStartedAt;
+        dmmReadCount++;
+        recoveryReconfigured = false;
         lastValue = read.invalid ? read.display : read.value;
         const invalid = !!read.invalid;
         const res = invalid
@@ -831,7 +986,7 @@ export class RecipeEngine {
               stable_elapsed_ms: stableMs
             });
             this.activeStableMeasurementStepId = null;
-            return { ...res, success: true, details: `${res.details}; valore stabile per ${stableMs} ms; pass automatico immediato; polling ${sampleMs} ms` };
+            return { ...res, success: true, details: `${res.details}; valore stabile per ${stableMs} ms; pass automatico immediato; polling ${sampleMs} ms; DMM ${cachedConfig ? 'cache' : 'configurato'}`, performance: { prepare_ms: dmmPrepareMs, read_ms: dmmReadMs, read_count: dmmReadCount, cached_config: cachedConfig, execute_ms: Date.now() - functionStartedAt, total_ms: Date.now() - functionStartedAt } };
           }
           const waitMs = Math.max(1, Math.min(sampleMs, remainingStableMs));
           await this.sleepInterruptible(waitMs);
@@ -849,12 +1004,22 @@ export class RecipeEngine {
               stable_elapsed_ms: stableMs
             });
             this.activeStableMeasurementStepId = null;
-            return { ...res, success: true, details: `${res.details}; valore stabile per ${stableMs} ms; pass automatico immediato; polling ${sampleMs} ms` };
+            return { ...res, success: true, details: `${res.details}; valore stabile per ${stableMs} ms; pass automatico immediato; polling ${sampleMs} ms; DMM ${cachedConfig ? 'cache' : 'configurato'}`, performance: { prepare_ms: dmmPrepareMs, read_ms: dmmReadMs, read_count: dmmReadCount, cached_config: cachedConfig, execute_ms: Date.now() - functionStartedAt, total_ms: Date.now() - functionStartedAt } };
           }
           continue;
         }
       } catch (err) {
         lastError = err instanceof Error ? err.message : String(err);
+        if (!recoveryReconfigured && measurementDevice === 'Keysight_34461A' && this.isDefaultStableMeasurementCommand(step)) {
+          this.invalidateDmmConfiguration(measurementDevice);
+          const recovery = await this.prepareStableMeasurementDevice(step, measurementDevice, true);
+          dmmPrepareMs += Number(recovery.prepareMs || 0);
+          if (!recovery.error) {
+            preparedRead = recovery;
+            cachedConfig = false;
+            recoveryReconfigured = true;
+          }
+        }
         const now = Date.now();
         if (now - lastEmit >= 500 || lastStatus !== 'LETTURA NON DISPONIBILE') {
           lastEmit = now;
@@ -875,7 +1040,8 @@ export class RecipeEngine {
         emitLive({ level: 'warn', status: 'FAIL / INSERIMENTO MANUALE', message: 'Timeout misura stabilizzata automatica: fallback manuale attivo.', stable_elapsed_ms: 0 });
         const manualVal = await this.requestManualMeasurementValue(step, lastError || 'Timeout misura stabilizzata automatica');
         this.activeStableMeasurementStepId = null;
-        return this.buildMeasurementResult(step, manualVal, 'MANUALE', 'Misura stabilizzata fallback manuale');
+        const manualResult = this.buildMeasurementResult(step, manualVal, 'MANUALE', 'Misura stabilizzata fallback manuale');
+        return { ...manualResult, performance: { prepare_ms: dmmPrepareMs, read_ms: dmmReadMs, read_count: dmmReadCount, cached_config: cachedConfig, execute_ms: Date.now() - functionStartedAt, total_ms: Date.now() - functionStartedAt } };
       } catch {}
     }
     this.activeStableMeasurementStepId = null;
@@ -892,8 +1058,59 @@ export class RecipeEngine {
       max,
       unit: step.unit || '',
       timestamp: new Date().toISOString(),
-      error: `Misura non stabilizzata entro ${timeoutMs} ms. Ultimo valore: ${lastValue ?? 'N/D'} ${step.unit || ''}${lastError ? '. Ultimo errore: ' + lastError : ''}`
+      error: `Misura non stabilizzata entro ${timeoutMs} ms. Ultimo valore: ${lastValue ?? 'N/D'} ${step.unit || ''}${lastError ? '. Ultimo errore: ' + lastError : ''}`,
+      performance: { prepare_ms: dmmPrepareMs, read_ms: dmmReadMs, read_count: dmmReadCount, cached_config: cachedConfig, execute_ms: Date.now() - functionStartedAt, total_ms: Date.now() - functionStartedAt }
     };
+  }
+
+  private async executeFastDmmMeasurement(step: TestStep, defaultCommand: string, automaticLabel: string, manualLabel: string): Promise<StepResult> {
+    const startedAt = Date.now();
+    if (step.measurement_mode === 'manual') {
+      const manualVal = await this.requestManualMeasurementValue(step, 'Misura configurata come solo manuale');
+      const result = this.buildMeasurementResult(step, manualVal, 'MANUALE', manualLabel);
+      return { ...result, performance: { execute_ms: Date.now() - startedAt, total_ms: Date.now() - startedAt } };
+    }
+
+    const device = this.normalizeMeasurementDeviceName(step.device_mapping || step.device || 'Keysight_34461A');
+    const configuredStep = { ...step, command: step.command || defaultCommand } as TestStep;
+    let prepared = await this.prepareStableMeasurementDevice(configuredStep, device);
+    let readCommand = prepared.readCommand || configuredStep.command || defaultCommand;
+    let prepareMs = Number(prepared.prepareMs || 0);
+    let readMs = 0;
+    let readCount = 0;
+    try {
+      const readStartedAt = Date.now();
+      let raw = await this.withTimeout(this.hal.querySCPI(device, readCommand), Math.max(700, Math.min(3000, Number(step.timeout) || 2000)), `DMM ${automaticLabel}`);
+      readMs += Date.now() - readStartedAt;
+      readCount++;
+      let parsed = this.parseStableMeasurementRaw(raw);
+      if (parsed.invalid) throw new Error(parsed.error || parsed.display);
+      const result = this.buildMeasurementResult(step, parsed.value, 'AUTOMATICA', automaticLabel);
+      return { ...result, performance: { prepare_ms: prepareMs, read_ms: readMs, read_count: readCount, cached_config: !!prepared.cached, execute_ms: Date.now() - startedAt, total_ms: Date.now() - startedAt } };
+    } catch (firstError) {
+      // Una sola riconfigurazione reale dopo errore; in condizioni normali la cache evita tutto il setup.
+      if (device === 'Keysight_34461A' && this.isDefaultStableMeasurementCommand(configuredStep)) {
+        this.invalidateDmmConfiguration(device);
+        prepared = await this.prepareStableMeasurementDevice(configuredStep, device, true);
+        prepareMs += Number(prepared.prepareMs || 0);
+        readCommand = prepared.readCommand || configuredStep.command || defaultCommand;
+        if (!prepared.error) {
+          try {
+            const retryStartedAt = Date.now();
+            const raw = await this.withTimeout(this.hal.querySCPI(device, readCommand), Math.max(700, Math.min(3000, Number(step.timeout) || 2000)), `DMM retry ${automaticLabel}`);
+            readMs += Date.now() - retryStartedAt;
+            readCount++;
+            const parsed = this.parseStableMeasurementRaw(raw);
+            if (parsed.invalid) throw new Error(parsed.error || parsed.display);
+            const result = this.buildMeasurementResult(step, parsed.value, 'AUTOMATICA', automaticLabel);
+            return { ...result, performance: { prepare_ms: prepareMs, read_ms: readMs, read_count: readCount, cached_config: false, execute_ms: Date.now() - startedAt, total_ms: Date.now() - startedAt } };
+          } catch {}
+        }
+      }
+      const manualVal = await this.acquireManualFallbackMeasurement(step, firstError);
+      const result = this.buildMeasurementResult(step, manualVal, 'MANUALE', `${manualLabel} fallback manuale`);
+      return { ...result, performance: { prepare_ms: prepareMs, read_ms: readMs, read_count: readCount, cached_config: !!prepared.cached, execute_ms: Date.now() - startedAt, total_ms: Date.now() - startedAt } };
+    }
   }
 
   private async executeStep(step: TestStep): Promise<StepResult> {
@@ -1059,85 +1276,20 @@ export class RecipeEngine {
           return { success: actual === Boolean(step.value), measured: actual, details: `DI${step.channel ?? 0}: atteso ${Boolean(step.value) ? 'HIGH' : 'LOW'}, letto ${actual ? 'HIGH' : 'LOW'}` };
         }
 
-        case 'VoltageMeasurement': {
-          const cmd = step.command || 'MEAS:VOLT:DC?';
-          if (step.measurement_mode === 'manual') {
-            const manualVal = await this.requestManualMeasurementValue(step, 'Misura configurata come solo manuale');
-            return this.buildMeasurementResult(step, manualVal, 'MANUALE', 'Tensione manuale');
-          }
-          try {
-            const raw = await this.withTimeout(this.hal.querySCPI(step.device_mapping || 'Keysight_34461A', cmd), step.timeout || 2000, 'SCPI voltage');
-            const val = parseFloat(raw);
-            return this.buildMeasurementResult(step, Number.isNaN(val) ? raw : val, 'AUTOMATICA', 'Tensione automatica');
-          } catch (err) {
-            const manualVal = await this.acquireManualFallbackMeasurement(step, err);
-            return this.buildMeasurementResult(step, manualVal, 'MANUALE', 'Tensione fallback manuale');
-          }
-        }
+        case 'VoltageMeasurement':
+          return this.executeFastDmmMeasurement(step, 'MEAS:VOLT:DC?', 'Tensione automatica', 'Tensione manuale');
 
-        case 'CurrentMeasurement': {
-          const cmd = step.command || 'MEAS:CURR:DC?';
-          if (step.measurement_mode === 'manual') {
-            const manualVal = await this.requestManualMeasurementValue(step, 'Misura configurata come solo manuale');
-            return this.buildMeasurementResult(step, manualVal, 'MANUALE', 'Corrente manuale');
-          }
-          try {
-            const raw = await this.withTimeout(this.hal.querySCPI(step.device_mapping || 'Keysight_34461A', cmd), step.timeout || 2000, 'SCPI current');
-            const val = parseFloat(raw);
-            return this.buildMeasurementResult(step, Number.isNaN(val) ? raw : val, 'AUTOMATICA', 'Corrente automatica');
-          } catch (err) {
-            const manualVal = await this.acquireManualFallbackMeasurement(step, err);
-            return this.buildMeasurementResult(step, manualVal, 'MANUALE', 'Corrente fallback manuale');
-          }
-        }
+        case 'CurrentMeasurement':
+          return this.executeFastDmmMeasurement(step, 'MEAS:CURR:DC?', 'Corrente automatica', 'Corrente manuale');
 
-        case 'AnalogInputMeasurement': {
-          const cmd = step.command || 'MEAS:VOLT:DC?';
-          if (step.measurement_mode === 'manual') {
-            const manualVal = await this.requestManualMeasurementValue(step, 'Misura configurata come solo manuale');
-            return this.buildMeasurementResult(step, manualVal, 'MANUALE', 'DMM manuale');
-          }
-          try {
-            const raw = await this.withTimeout(this.hal.querySCPI(step.device_mapping || 'Keysight_34461A', cmd), step.timeout || 2500, 'DMM analog measurement');
-            const val = parseFloat(raw);
-            return this.buildMeasurementResult(step, Number.isNaN(val) ? raw : val, 'AUTOMATICA', 'DMM automatica');
-          } catch (err) {
-            const manualVal = await this.acquireManualFallbackMeasurement(step, err);
-            return this.buildMeasurementResult(step, manualVal, 'MANUALE', 'DMM fallback manuale');
-          }
-        }
+        case 'AnalogInputMeasurement':
+          return this.executeFastDmmMeasurement(step, 'MEAS:VOLT:DC?', 'DMM automatica', 'DMM manuale');
 
-        case 'ResistanceTest': {
-          const cmd = step.command || 'MEAS:RES?';
-          if (step.measurement_mode === 'manual') {
-            const manualVal = await this.requestManualMeasurementValue(step, 'Misura configurata come solo manuale');
-            return this.buildMeasurementResult(step, manualVal, 'MANUALE', 'Resistenza manuale');
-          }
-          try {
-            const raw = await this.withTimeout(this.hal.querySCPI(step.device_mapping || 'Keysight_34461A', cmd), step.timeout || 2000, 'SCPI resistance');
-            const val = parseFloat(raw);
-            return this.buildMeasurementResult(step, Number.isNaN(val) ? raw : val, 'AUTOMATICA', 'Resistenza automatica');
-          } catch (err) {
-            const manualVal = await this.acquireManualFallbackMeasurement(step, err);
-            return this.buildMeasurementResult(step, manualVal, 'MANUALE', 'Resistenza fallback manuale');
-          }
-        }
+        case 'ResistanceTest':
+          return this.executeFastDmmMeasurement(step, 'MEAS:RES?', 'Resistenza automatica', 'Resistenza manuale');
 
-        case 'FrequencyTest': {
-          const cmd = step.command || 'MEAS:FREQ?';
-          if (step.measurement_mode === 'manual') {
-            const manualVal = await this.requestManualMeasurementValue(step, 'Misura configurata come solo manuale');
-            return this.buildMeasurementResult(step, manualVal, 'MANUALE', 'Frequenza manuale');
-          }
-          try {
-            const raw = await this.withTimeout(this.hal.querySCPI(step.device_mapping || 'Keysight_34461A', cmd), step.timeout || 2000, 'SCPI frequency');
-            const val = parseFloat(raw);
-            return this.buildMeasurementResult(step, Number.isNaN(val) ? raw : val, 'AUTOMATICA', 'Frequenza automatica');
-          } catch (err) {
-            const manualVal = await this.acquireManualFallbackMeasurement(step, err);
-            return this.buildMeasurementResult(step, manualVal, 'MANUALE', 'Frequenza fallback manuale');
-          }
-        }
+        case 'FrequencyTest':
+          return this.executeFastDmmMeasurement(step, 'MEAS:FREQ?', 'Frequenza automatica', 'Frequenza manuale');
 
         case 'SCPICommand':
           await this.withTimeout(this.hal.writeSCPI(step.device_mapping, String(step.command || step.value)), step.timeout || 1000, 'SCPI command');
@@ -1184,8 +1336,8 @@ export class RecipeEngine {
     if (step.type === 'PowerSupplySet') return `${name}Alimentatore PL303QMD-P CH${step.ps_channel || step.channel || 1}: imposta ${step.ps_voltage ?? step.value?.voltage ?? 0} V / ${step.ps_current ?? step.value?.current ?? 0} A e output ${(step.ps_output_on ?? step.value?.outputOn ?? true) ? 'ON' : 'OFF'}.`;
     if (step.type === 'PowerSupplyMeasureCurrent') return `${name}Misura consumo alimentatore PL303QMD-P CH${step.ps_channel || step.channel || 1}: limite ${step.min ?? '-∞'} ÷ ${step.max ?? '+∞'} ${step.unit || 'A'}.`;
     if (step.type === 'AnalogInputMeasurement') return `${name}Multimetro digitale: acquisisci misura analogica (${step.command || 'MEAS:VOLT:DC?'}) e verifica ${step.min ?? '-∞'} ÷ ${step.max ?? '+∞'} ${step.unit || 'V'}.`;
-    if (step.type === 'StableMeasurement') return `${name}Misura stabilizzata su ${this.measurementDeviceDisplayName(step.device_mapping || step.device)}: target ${step.target ?? 'N/D'}, limiti ${step.min ?? '-∞'} ÷ ${step.max ?? '+∞'} ${step.unit || ''}, stabile per ${step.stable_time_ms ?? 1000} ms, timeout ${step.timeout ?? 10000} ms, su FAIL ${step.stop_on_fail === false ? 'continua' : 'ferma'}.`;
-    if (['VoltageMeasurement','CurrentMeasurement','ResistanceTest','FrequencyTest'].includes(step.type)) return `${name}${step.type} su ${step.device_mapping}: origine ${step.measurement_mode || 'auto_with_fallback'}, comando ${step.command || 'default'}, target ${step.target ?? 'N/D'}, tolleranza ±${step.tolerance ?? 'N/D'}, limiti ${step.min ?? '-∞'} ÷ ${step.max ?? '+∞'} ${step.unit || ''}.`;
+    if (step.type === 'StableMeasurement') return `${name}Misura stabilizzata su ${this.measurementDeviceDisplayName(step.device_mapping || step.device)}: target ${step.target ?? 'N/D'}, limiti ${step.min ?? '-∞'} ÷ ${step.max ?? '+∞'} ${step.unit || ''}, stabile per ${step.stable_time_ms ?? 1000} ms, timeout ${step.timeout ?? 10000} ms${step.measurement_gpio_enabled ? `, GPIO${step.measurement_gpio_channel} ${this.parseGpioState(step.measurement_gpio_state,true) ? 'HIGH' : 'LOW'} mantenuto fino a fine step e poi ${String(step.measurement_gpio_final_mode||'set')==='keep' ? 'mantenuto' : (this.parseGpioState(step.measurement_gpio_final_state,false) ? 'HIGH' : 'LOW')}` : ''}, su FAIL ${step.stop_on_fail === false ? 'continua' : 'ferma'}.`;
+    if (['VoltageMeasurement','CurrentMeasurement','ResistanceTest','FrequencyTest'].includes(step.type)) return `${name}${step.type} su ${step.device_mapping}: origine ${step.measurement_mode || 'auto_with_fallback'}, comando ${step.command || 'default'}, target ${step.target ?? 'N/D'}, tolleranza ±${step.tolerance ?? 'N/D'}, limiti ${step.min ?? '-∞'} ÷ ${step.max ?? '+∞'} ${step.unit || ''}${step.measurement_gpio_enabled ? `, GPIO${step.measurement_gpio_channel} ${this.parseGpioState(step.measurement_gpio_state,true) ? 'HIGH' : 'LOW'} durante misura` : ''}.`;
     if (step.type === 'Delay') return `${name}Attesa ${step.timeout || 500} ms.`;
     if (step.type === 'ManualMeasurement') return `${name}Step manuale: mostra istruzioni, attende conferma operatore, stabilizza ${step.stable_time_ms ?? step.timeout ?? 1000} ms e ${step.manual_input_enabled ? 'usa misura manuale inserita dall\'operatore' : 'acquisisce ' + (step.manual_measure_type || step.io_type || 'CONFIRM')}.`;
     return `${name}${step.type} su ${step.device_mapping}.`;

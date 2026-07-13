@@ -1,4 +1,4 @@
-/* VEXON 10.1.12 - Stable Action Unique Panel + Fast Start Fix.
+/* VEXON 10.1.13 - Stable Action Unique + Recipe GPIO Hold Measure Fix.
    Base: VEXON 10.1.9 Stable Measurement Operator Speed + AutoStart Fix.
    Scopo: misura stabilizzata automatica, popup Action pulito e passaggio veloce.
    - Nome step/misura attesa in evidenza.
@@ -9,7 +9,7 @@
    - Aggiornamento DOM a campi, senza ridisegno completo. */
 (function(){
   'use strict';
-  var VERSION='10.1.12_STABLE_ACTION_UNIQUE_FAST_START_FIX';
+  var VERSION='10.1.13_RECIPE_GPIO_HOLD_MEASURE_LIVE_FIX';
   var active=null;
   var lastStableStepId=null;
   var hideTimer=null;

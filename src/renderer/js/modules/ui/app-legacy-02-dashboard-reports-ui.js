@@ -133,7 +133,9 @@ async function loadSavedRecipe() {
     if (raw) loaded = JSON.parse(raw);
   }
   if (loaded) {
+    const previousRecipe10114 = recipe;
     recipe = loaded;
+    if (typeof window.vexon10114PrepareLoadedRecipe === 'function') await window.vexon10114PrepareLoadedRecipe(recipe, 'CARICAMENTO RICETTA EDITOR', previousRecipe10114);
     stepIdCounter = Math.max(...recipe.steps.map(s => s.step_id), 0) + 1;
     document.getElementById('recipe-name-inp').value = recipe.recipe_name;
     setPowerSourceValue(recipe.power_metadata || 'MANUAL_POWER');
@@ -336,6 +338,13 @@ async function startTest() {
   if (btnPause) btnPause.disabled = true;
   if (btnStop) btnStop.disabled = false;
   try {
+    let recipePreparedFast10114 = (typeof window.vexon10114IsRecipePrepared === 'function' && window.vexon10114IsRecipePrepared(recipe) === true);
+    const needsRecipePreparation10114 = ['gpio_initial_profile','gpio_inter_test_profile','gpio_safe_profile'].some(k => Array.isArray(recipe?.[k]) && recipe[k].some(r => r && r.enabled !== false && String(r.channel ?? '').trim() !== '' && Number.isFinite(Number(r.channel)))) || recipe?.automatic_cycle?.enabled === true;
+    if (!recipePreparedFast10114 && needsRecipePreparation10114 && typeof window.vexon10114PrepareLoadedRecipe === 'function') {
+      const prep10114 = await window.vexon10114PrepareLoadedRecipe(recipe, 'PREPARAZIONE PRIMA START', null);
+      if (!prep10114 || prep10114.ok === false) { alert('Preparazione GPIO ricetta non completata. Controlla ESP32 e profilo iniziale.'); forceRunIdleUi(); return; }
+      recipePreparedFast10114 = true;
+    }
     recipe.enabled = document.getElementById('recipe-enabled-page') ? document.getElementById('recipe-enabled-page').checked : (recipe.enabled !== false);
     if (recipe.enabled === false) { alert('Ricetta disabilitata: attiva il flag per eseguire.'); return; }
     if (recipe.steps.filter(s => s.enabled !== false).length === 0) { alert('Aggiungi o abilita almeno uno step alla ricetta prima di avviare!'); return; }
@@ -347,8 +356,12 @@ async function startTest() {
       // 10.1.12: non bloccare ogni START con recover completo quando il runtime è già pronto.
       try { api.recoverFault && api.recoverFault(); } catch(e) {}
     }
-    await guardedUi('Auto collegamento strumenti necessari', () => autoConnectProductionInstruments(false), { timeoutMs: 4500, logTo: document.getElementById('run-log'), fallback: null });
-    if (typeof window.dm413rjPreStartGateSafe === 'function') {
+    if (!recipePreparedFast10114) {
+      await guardedUi('Auto collegamento strumenti necessari', () => autoConnectProductionInstruments(false), { timeoutMs: 4500, logTo: document.getElementById('run-log'), fallback: null });
+    } else {
+      addLog(document.getElementById('run-log'), '⚡ Ricetta e GPIO già preparati: scansione strumenti completa saltata.', 'info');
+    }
+    if (!recipePreparedFast10114 && typeof window.dm413rjPreStartGateSafe === 'function') {
       const dmGate = await window.dm413rjPreStartGateSafe();
       if (!dmGate || dmGate.ok === false) { forceRunIdleUi(); return; }
     }
@@ -405,7 +418,7 @@ async function startTest() {
     if (btnStop) btnStop.disabled = false;
   } finally {
     startInProgress = false;
-    setTimeout(() => { try { window.__atmec10112StartBusy = false; } catch(e) {} }, 250);
+    setTimeout(() => { try { window.__atmec10112StartBusy = false; window.__vexon10114AutoCycleFastStart = false; } catch(e) {} }, 250);
     // Se il main ha accettato la ricetta, RUNNING arriverà via evento. Se non è partita, riabilita start.
     const stateText = document.getElementById('state-pill')?.textContent || '';
     if (btnStart && stateText !== 'RUNNING' && stateText !== 'PAUSED') btnStart.disabled = false;
@@ -432,6 +445,7 @@ async function stopTestAndReset() {
       return { ok:true };
     }, { timeoutMs: 3500, logTo: document.getElementById('run-log'), fallback:{ok:false} });
   }
+  try { if (typeof window.vexon10114ApplySafeProfile === 'function') await window.vexon10114ApplySafeProfile(recipe, 'STOP OPERATORE'); } catch(e) { console.warn('[10.1.14] safe profile stop', e); }
   currentRunState = 'STOP_OPERATORE';
   setProductionTimingState('STOP_OPERATORE');
   setStatePill('READY');
@@ -512,10 +526,13 @@ function getRequiredInstrumentsForRecipe() {
     return t === 'PowerSupplySet' || t === 'PowerSupplyMeasureCurrent' || dev === 'AimTTi_PL303';
   });
   if (power === 'ESP32_RELAY_POWER') required.add('modbus_serial');
+  const recipeGpioProfiles10114 = ['gpio_initial_profile','gpio_inter_test_profile','gpio_safe_profile'].some(k => Array.isArray(recipe?.[k]) && recipe[k].some(r => r && r.enabled !== false && String(r.channel ?? '').trim() !== '' && Number.isFinite(Number(r.channel))));
+  if (recipeGpioProfiles10114) required.add('modbus_serial');
+  if (recipe?.automatic_cycle?.enabled === true) required.add(recipe.automatic_cycle.trigger_device || 'Keysight_34461A');
   // 10.1.4: non mostrare/validare PL303 solo perché arriva power_metadata vecchio da WO/commessa.
   if (power === 'PL303_PROGRAMMABLE' && hasRealPl303Step) required.add('AimTTi_PL303');
   for (const step of activeSteps) {
-    if (['DI','DO'].includes(step.io_type) || step.type === 'DigitalInputCheck' || step.type === 'DigitalOutputSet') required.add('modbus_serial');
+    if (['DI','DO'].includes(step.io_type) || step.type === 'DigitalInputCheck' || step.type === 'DigitalOutputSet' || (step.measurement_gpio_enabled === true && Number.isFinite(Number(step.measurement_gpio_channel)))) required.add('modbus_serial');
     if (['VoltageMeasurement','CurrentMeasurement','ResistanceTest','FrequencyTest','AnalogInputMeasurement','StableMeasurement'].includes(step.type)) required.add(step.device_mapping || 'Keysight_34461A');
     if (step.type === 'PowerSupplySet' || step.type === 'PowerSupplyMeasureCurrent') required.add('AimTTi_PL303');
     if (step.type === 'SCPICommand' && step.device_mapping && step.device_mapping !== 'system') required.add(step.device_mapping);

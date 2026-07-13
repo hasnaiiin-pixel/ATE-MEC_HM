@@ -1,0 +1,87 @@
+{
+  "version": "AT-MEC_HM_10.1.13_RECIPE_GPIO_HOLD_MEASURE_LIVE_FIX",
+  "createdAt": "2026-07-10T15:08:59.190Z",
+  "score": 100,
+  "checks": [
+    {
+      "label": "package VEXON 10.1.13",
+      "ok": true,
+      "detail": "vexon-industrial-test-platform-10-1-13 10.1.13"
+    },
+    {
+      "label": "package-lock 10.1.13",
+      "ok": true,
+      "detail": "package-lock root"
+    },
+    {
+      "label": "runtime script 10.1.13",
+      "ok": true,
+      "detail": "package script"
+    },
+    {
+      "label": "startup doctor 10.1.13",
+      "ok": true,
+      "detail": "package script"
+    },
+    {
+      "label": "Version renderer 10.1.13",
+      "ok": true,
+      "detail": "version.js"
+    },
+    {
+      "label": "Settings 10.1.13",
+      "ok": true,
+      "detail": "app_settings"
+    },
+    {
+      "label": "RecipeEngine GPIO before/after TS",
+      "ok": true,
+      "detail": "runtime TS helpers"
+    },
+    {
+      "label": "RecipeEngine GPIO before/after dist",
+      "ok": true,
+      "detail": "runtime dist helpers"
+    },
+    {
+      "label": "GPIO held through step wrapper",
+      "ok": true,
+      "detail": "run loop wrapper"
+    },
+    {
+      "label": "Recipe editor GPIO hold UI",
+      "ok": true,
+      "detail": "recipe UI fields"
+    },
+    {
+      "label": "Required ESP32 when GPIO hold enabled",
+      "ok": true,
+      "detail": "hardware requirements"
+    },
+    {
+      "label": "CSS GPIO hold block",
+      "ok": true,
+      "detail": "recipe UI style"
+    },
+    {
+      "label": "Root cleaned current README only",
+      "ok": true,
+      "detail": "root readme cleanup"
+    },
+    {
+      "label": "BAT VEXON 10.1.13 presenti",
+      "ok": true,
+      "detail": "bat current"
+    },
+    {
+      "label": "Excel project history integrated",
+      "ok": true,
+      "detail": "project_history xlsx"
+    },
+    {
+      "label": "Release notes 10.1.13",
+      "ok": true,
+      "detail": "release notes"
+    }
+  ]
+}

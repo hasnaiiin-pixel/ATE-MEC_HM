@@ -28,7 +28,7 @@
   "builderLogoPath": "assets/default_logos/MIRZA.png",
   "excludedInstruments": [],
   "keysightMode": "USB_VISA",
-  "keysightIp": "USB0::0x2A8D::0x1301::MY57216945::0::INSTR",
+  "keysightIp": "USB0::0x2A8D::0x1301::MY59012548::0::INSTR",
   "keysightPort": 9600,
   "appName": "VEXON",
   "appSubtitle": "Industrial Test Platform",
@@ -36,7 +36,7 @@
   "appIconBrand": "MIRZA",
   "softwareLogoMode": "mini-vexon-near-name-only",
   "appDisplayName": "VEXON Industrial Test Platform",
-  "version": "10.1.12",
+  "version": "10.1.15",
   "branding": {
     "programName": "VEXON",
     "subtitle": "Industrial Test Platform",
@@ -46,5 +46,5 @@
   },
   "stableMeasurementDeviceBinding": "Keysight_34461A",
   "instrumentGateMode": "recipe_required_only",
-  "lastRelease": "AT-MEC_HM_10.1.12_STABLE_ACTION_UNIQUE_FAST_START_FIX"
+  "lastRelease": "AT-MEC_HM_10.1.15_DMM_PERSISTENT_SESSION_MEASUREMENT_SPEED_FIX"
 }

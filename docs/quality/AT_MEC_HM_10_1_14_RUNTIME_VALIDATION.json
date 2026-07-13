@@ -1,0 +1,102 @@
+{
+  "version": "AT-MEC_HM_10.1.14_RECIPE_GPIO_PRESET_AUTO_CYCLE_FAST_FIX",
+  "createdAt": "2026-07-13T07:58:52.147Z",
+  "score": 100,
+  "checks": [
+    {
+      "label": "package VEXON 10.1.14",
+      "ok": true,
+      "detail": "vexon-industrial-test-platform-10-1-14 10.1.14"
+    },
+    {
+      "label": "package-lock 10.1.14",
+      "ok": true,
+      "detail": "package-lock root"
+    },
+    {
+      "label": "version renderer 10.1.14",
+      "ok": true,
+      "detail": "version.js"
+    },
+    {
+      "label": "settings 10.1.14",
+      "ok": true,
+      "detail": "app_settings"
+    },
+    {
+      "label": "profili GPIO runtime UI",
+      "ok": true,
+      "detail": "3 profiles"
+    },
+    {
+      "label": "inizializzazione una volta",
+      "ok": true,
+      "detail": "recipe cache"
+    },
+    {
+      "label": "auto ciclo rimozione + presenza",
+      "ok": true,
+      "detail": "state machine"
+    },
+    {
+      "label": "poll multimetro solo idle",
+      "ok": true,
+      "detail": "idle poll"
+    },
+    {
+      "label": "editor profili e auto ciclo",
+      "ok": true,
+      "detail": "recipe editor"
+    },
+    {
+      "label": "fast start ricetta preparata",
+      "ok": true,
+      "detail": "start fast path"
+    },
+    {
+      "label": "safe profile su stop",
+      "ok": true,
+      "detail": "stop safe"
+    },
+    {
+      "label": "preparazione su load test mode",
+      "ok": true,
+      "detail": "production load"
+    },
+    {
+      "label": "hardware requirements TS",
+      "ok": true,
+      "detail": "DeviceManager TS"
+    },
+    {
+      "label": "hardware requirements dist",
+      "ok": true,
+      "detail": "DeviceManager JS"
+    },
+    {
+      "label": "asset JS/CSS caricati",
+      "ok": true,
+      "detail": "renderer index"
+    },
+    {
+      "label": "README root pulita",
+      "ok": true,
+      "detail": "current only"
+    },
+    {
+      "label": "BAT correnti 10.1.14",
+      "ok": true,
+      "detail": "current bat"
+    },
+    {
+      "label": "Excel storico integrato",
+      "ok": true,
+      "detail": "project history"
+    },
+    {
+      "label": "Release notes",
+      "ok": true,
+      "detail": "release notes"
+    }
+  ]
+}

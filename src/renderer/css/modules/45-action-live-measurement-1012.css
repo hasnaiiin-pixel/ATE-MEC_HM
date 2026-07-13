@@ -66,3 +66,30 @@ body.vexon-stable-live-active #fault-panel.show,
 body.vexon-stable-live-active #fail-decision-modal.show{display:none!important;visibility:hidden!important;pointer-events:none!important;}
 body.vexon-stable-live-active #manual-step-modal.show,
 body.vexon-stable-live-active #manual-step-modal.atmec66e-modern-modal.show{display:none!important;visibility:hidden!important;pointer-events:none!important;}
+
+/* 10.1.13 - Recipe GPIO hold durante misura tester */
+.recipe-gpio-hold-10113{
+  grid-column:1 / -1;
+  display:grid;
+  grid-template-columns:repeat(5,minmax(120px,1fr));
+  gap:8px;
+  padding:10px;
+  border:1px solid rgba(59,130,246,.35);
+  border-radius:12px;
+  background:linear-gradient(135deg,rgba(15,23,42,.84),rgba(30,41,59,.72));
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.04);
+}
+.recipe-gpio-hold-10113 .recipe-gpio-hold-title{
+  grid-column:1 / -1;
+  font-weight:800;
+  letter-spacing:.02em;
+  color:#bfdbfe;
+}
+.recipe-gpio-hold-10113 .recipe-gpio-hold-hint{
+  grid-column:1 / -1;
+  color:#cbd5e1;
+  font-size:12px;
+}
+.recipe-gpio-hold-10113 input,
+.recipe-gpio-hold-10113 select{min-height:34px;}
+@media(max-width:900px){.recipe-gpio-hold-10113{grid-template-columns:repeat(2,minmax(120px,1fr));}}

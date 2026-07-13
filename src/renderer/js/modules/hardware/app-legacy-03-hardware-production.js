@@ -601,10 +601,12 @@ async function loadProductionRecipeRevisionSelection() {
   try {
     const res = api?.loadRecipeVersion ? await api.loadRecipeVersion(name, version) : null;
     if (!res?.ok) throw new Error(res?.error || 'Versione non trovata');
+    const previousRecipe10114 = recipe;
     recipe = res.recipe;
     recipe.steps = Array.isArray(recipe.steps) ? recipe.steps : [];
     renumberRecipeSteps();
     syncLoadedRecipeToUi(name);
+    if (typeof window.vexon10114PrepareLoadedRecipe === 'function') await window.vexon10114PrepareLoadedRecipe(recipe, 'CAMBIO REVISIONE RICETTA', previousRecipe10114);
     addLog(document.getElementById('run-log'), `🕘 Ricetta caricata: <b>${escapeHtml(name)}</b> v${version}`, 'info');
   } catch(e) { addLog(document.getElementById('run-log'), `❌ Versione ricetta: ${escapeHtml(normalizeError(e))}`, 'fail'); }
 }
@@ -632,12 +634,14 @@ async function loadProductionRecipeSelection() {
   try { if (api?.loadRecipe) { const res = await api.loadRecipe(name); if (res?.ok) loaded = res.recipe; } } catch {}
   if (!loaded) { try { const raw = localStorage.getItem('recipe_' + name); if (raw) loaded = JSON.parse(raw); } catch {} }
   if (!loaded) { addLog(document.getElementById('run-log'), `❌ Ricetta non caricata: ${escapeHtml(name)}`, 'fail'); return; }
+  const previousRecipe10114 = recipe;
   recipe = loaded;
   recipe.steps = Array.isArray(recipe.steps) ? recipe.steps : [];
   renumberRecipeSteps();
   await refreshProductionRecipeVersions();
   syncLoadedRecipeToUi(name);
-  setTimeout(() => autoConnectProductionInstruments(false), 150);
+  if (typeof window.vexon10114PrepareLoadedRecipe === 'function') await window.vexon10114PrepareLoadedRecipe(recipe, 'CARICAMENTO RICETTA TEST MODE', previousRecipe10114);
+  else setTimeout(() => autoConnectProductionInstruments(false), 150);
   // AT-MEC_HM_2.29: apri il wizard solo se non e gia aperto; non deve resettare lo step corrente.
   if (productionTestMode) setTimeout(() => {
     const m = document.getElementById('startup-wizard-modal');

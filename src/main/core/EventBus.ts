@@ -7,7 +7,7 @@
  */
 export type SystemEvent =
   | 'system_started' | 'system_fault' | 'system_recovered' | 'recipe_loaded'
-  | 'step_started' | 'step_detail' | 'step_passed' | 'step_failed' | 'manual_step_request' | 'failure_decision_required' | 'run_completed'
+  | 'step_started' | 'step_detail' | 'step_performance' | 'step_passed' | 'step_failed' | 'manual_step_request' | 'failure_decision_required' | 'run_completed'
   | 'keysight-live-update' | 'cli-log-received' | 'state_changed' | 'kpi_updated';
 
 export class EventBus {
